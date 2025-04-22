@@ -2,14 +2,16 @@
 import './App.css';
 
 // export function App() {
-export const App = () => {
+// export const App = () => {
+export const App = () => (
 	// const hell = 'hello';
 
 	// return (
 	<div className='flex h-screen items-center justify-center bg-gray-100'>
 		<h1 className='text-4xl font-bold text-blue-600'>Hello Tailwind</h1>
-	</div>;
+	</div>
 	// );
-};
+	// );
+);
 
 export default App;
