@@ -25,6 +25,7 @@ module.exports = {
 		'tailwindcss',
 		'react-refresh',
 		'no-relative-import-paths',
+		'check-file',
 	],
 	// 자기자신을 검증하지 않도록
 	ignorePatterns: ['.eslintrc.cjs', 'vite.config.ts'],
@@ -68,6 +69,38 @@ module.exports = {
 				selector: 'function',
 				format: ['camelCase'],
 				filter: { regex: '^handle[A-Z].*[A-Z]', match: true },
+			},
+		],
+		// 파일명/폴더명 규칙
+		'check-file/filename-naming-convention': [
+			'error',
+			{
+				'src/components/**/*UI.tsx': 'PASCAL_CASE',
+				'src/features/**/*Feat.tsx': 'PASCAL_CASE',
+				'src/api/**/*Api.ts': 'CAMEL_CASE',
+				'src/api/**/*Api.type.ts': 'PASCAL_CASE',
+				'src/hooks/**/use*Api.ts': 'CAMEL_CASE',
+				'src/services/**/*ApiService.ts': 'CAMEL_CASE',
+				'src/utils/**/*Util.ts': 'CAMEL_CASE',
+				'src/constants/**/*Const.ts': 'SCREAMING_SNAKE_CASE',
+				'src/__tests__/**/*.test.{tsx,ts}': 'CAMEL_CASE',
+				'src/pages/**/*Page.tsx': 'PASCAL_CASE',
+				'src/layouts/**/*Layout.tsx': 'PASCAL_CASE',
+				'src/styles/**/*Styles.ts': 'CAMEL_CASE',
+				'src/**/*.stories.tsx': 'CAMEL_CASE',
+			},
+		],
+		'check-file/folder-naming-convention': [
+			'error',
+			{
+				'src/components/**/': 'KEBAB_CASE',
+				'src/features/**/': 'CAMEL_CASE',
+				'src/api/**/': 'KEBAB_CASE',
+				'src/services/**/': 'KEBAB_CASE',
+				'src/hooks/**/': 'KEBAB_CASE',
+				'src/constants/**/': 'KEBAB_CASE',
+				'src/pages/**/': 'KEBAB_CASE',
+				'src/layouts/**/': 'KEBAB_CASE',
 			},
 		],
 
