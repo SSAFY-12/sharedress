@@ -44,6 +44,14 @@ module.exports = {
 	rules: {
 		// 공통 규칙
 		'react/react-in-jsx-scope': 'off',
+		'@typescript-eslint/no-unused-vars': 'warn', // TypeScript용 미사용 변수 검사
+		'no-unused-vars': 'off', // 기본 규칙 비활성화 (TypeScript 규칙과 충돌 방지)
+
+		'react-hooks/exhaustive-deps': 'error', // useEffect 등 훅 의존성 검사
+
+		'no-undef': 'error', // 정의되지 않은 변수 사용 금지
+		'react/jsx-no-target-blank': 'error', // target="_blank" 보안 이슈 방지
+		'react/no-array-index-key': 'warn', // 배열 인덱스를 key로 사용 경고
 
 		// 네이밍 컨벤션
 		'@typescript-eslint/naming-convention': [
