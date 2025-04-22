@@ -28,7 +28,12 @@ module.exports = {
 		'check-file',
 	],
 	// 자기자신을 검증하지 않도록
-	ignorePatterns: ['.eslintrc.cjs', 'vite.config.ts'],
+	ignorePatterns: [
+		'.eslintrc.cjs',
+		'vite.config.ts',
+		'tailwind.config.js',
+		'postcss.config.js',
+	],
 	settings: {
 		react: { version: 'detect' },
 		tailwindcss: {
