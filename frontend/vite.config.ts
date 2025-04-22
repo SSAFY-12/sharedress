@@ -4,14 +4,16 @@ import checker from 'vite-plugin-checker';
 import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import path from 'path';
+import mkcert from 'vite-plugin-mkcert';
+import fs from 'fs';
 import { VitePWA } from 'vite-plugin-pwa';
 
 // Vite 설정 파일
 export default defineConfig({
 	plugins: [
 		react(), // React HMR 및 JSX 변환 지원
-
 		// PWA(Progressive Web App) 플러그인 설정
+		mkcert(), // https 환경을 위한 setting
 		VitePWA({
 			registerType: 'autoUpdate', // 서비스워커가 항상 최신 상태로 자동 업데이트
 			injectRegister: 'auto', // 서비스워커 등록 스크립트 자동 삽입
@@ -77,6 +79,11 @@ export default defineConfig({
 	},
 
 	server: {
+		// https: {
+		// 	key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
+		// 	cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
+		// },
+		https: true,
 		proxy: {
 			'/api': {
 				// 프론트에서 /api로 시작하는 요청을 아래 설정대로 프록시
