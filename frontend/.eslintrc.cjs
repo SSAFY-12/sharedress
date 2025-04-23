@@ -78,7 +78,7 @@ module.exports = {
 			// const/전역 변수: UPPER_CASE
 			{
 				selector: 'variable',
-				format: ['UPPER_CASE'],
+				format: ['UPPER_CASE', 'PascalCase'],
 				modifiers: ['const', 'global'],
 			},
 			// useXxx, withXxx, handleXxx 함수: camelCase 강제
@@ -164,4 +164,13 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: ['src/main.tsx'],
+			rules: {
+				'@typescript-eslint/no-non-null-assertion': 'off',
+			},
+		},
+		// 필요하다면 다른 파일도 추가 가능
+	],
 };
