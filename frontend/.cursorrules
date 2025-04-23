@@ -1,0 +1,32 @@
+# 프로젝트 기술 스택
+- 이 프로젝트는 React, TypeScript, Tailwind CSS, TanStack Query, Zustand, PWA, Vite을 사용한다.
+
+## 1. 파일/폴더 네이밍 규칙
+- 컴포넌트 파일: PascalCase (예: MyComponent.tsx)
+- API 관련 파일: camelCase (예: fetchUserApi.ts)
+- 상수 파일: SCREAMING_SNAKE_CASE (예: USER_ROLE_CONST.ts)
+- 폴더명: kebab-case (예: user-profile/)
+
+## 2. 변수/함수 네이밍
+- 변수: camelCase
+- 함수: camelCase, 단 React Hook은 use로 시작
+- 타입/인터페이스/클래스/Enum: PascalCase
+- 상수: UPPER_CASE
+
+## 3. 코드 스타일
+- 화살표 함수 사용 권장
+- 객체 구조분해 할당 권장
+- 상대경로 import 대신 @ 별칭 사용
+
+## 4. 금지 패턴
+- inline style 사용 금지
+- 직접적인 SQL 쿼리 사용 금지 (ORM만 사용)
+- React 17+에서는 import React from 'react' 생략
+
+## 5. 트러블슈팅/시행착오
+- Tailwind purge 설정 누락 주의
+
+---
+
+이 규칙을 반드시 지키며, 코드 리뷰 시 위반 사항은 지적한다.
+팀 상황에 따라 주기적으로 업데이트를 실시한다.
