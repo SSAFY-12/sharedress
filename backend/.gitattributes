@@ -1,15 +1,6 @@
 # 모든 텍스트 파일은 LF로 저장 (줄 끝 통일)
 * text eol=lf
 
-# 자바 관련 코드 파일들
-*.java text eol=lf
-*.gradle text eol=lf
-*.md text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
-*.properties text eol=lf
-*.sh text eol=lf
-
 # 윈도우 실행용 배치 파일은 CRLF 유지
 *.bat text eol=crlf
 
