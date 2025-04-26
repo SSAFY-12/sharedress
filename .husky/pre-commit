@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# 변경된 파일 목록 가져오기
+changed_files=$(git diff --cached --name-only)
+
+# 프로젝트 경로 설정
+frontend_project_path="frontend/"
+backend_project_path="backend/"
+
+# 프론트엔드 파일 변경 확인
+frontend_changes=$(echo "$changed_files" | grep "$frontend_project_path" || true)
+
+# 백엔드 파일 변경 확인
+backend_changes=$(echo "$changed_files" | grep "$backend_project_path" || true)
+
+# 프론트엔드 변경사항이 있을 때만 TypeScript, ESLint와 Prettier 검사 실행
+if [ ! -z "$frontend_changes" ]; then
+  echo "🧼 프론트엔드 변경 감지: TypeScript, ESLint, Prettier 검사 실행 중..."
+  cd $frontend_project_path
+
+  # TypeScript 검사 (컴파일만, 출력 없음)
+  npx tsc --project tsconfig.app.json --noEmit --skipLibCheck --pretty
+  if [ $? -ne 0 ]; then
+    echo "❌ TypeScript 타입 오류"
+    exit 1
+  fi
+
+  # ESLint 검사
+  npx eslint --fix "src/**/*.{ts,tsx}"
+  if [ $? -ne 0 ]; then
+    echo "❌ ESLint 검사 실패"
+    exit 1
+  fi
+
+  # Prettier 검사
+  npx prettier --check --write "src/**/*.{ts,tsx,css,scss,md,html,json}"
+  if [ $? -ne 0 ]; then
+    echo "❌ Prettier 포맷 오류. 'npm run format'을 실행해주세요."
+    exit 1
+  fi
+
+  cd ..
+else
+  echo "✅ 프론트엔드 변경 없음: 검사 건너뜀"
+fi
+
+# 백엔드 검사
+if [ ! -z "$backend_changes" ]; then
+  echo "🧪 백엔드 변경 감지: Checkstyle 검사 시작..."
+  cd $backend_project_path
+  ./gradlew check
+  if [ $? -ne 0 ]; then
+    echo "❌ Checkstyle 검사 실패"
+    exit 1
+  fi
+  cd ..
+else
+  echo "✅ 백엔드 변경 없음: 검사 건너뜀"
+fi
