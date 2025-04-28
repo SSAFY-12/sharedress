@@ -13,6 +13,7 @@
 		"tree": "find . -type d -not -path './node_modules/*' -not -path './dist/*' -not -path './.next/*' > notes/directory_structure.md"
 	},
 	"dependencies": {
+		"lucide-react": "^0.503.0",
 		"react": "^19.1.0",
 		"react-dom": "^19.1.0"
 	},
