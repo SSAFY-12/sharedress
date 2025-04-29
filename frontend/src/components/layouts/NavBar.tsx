@@ -1,6 +1,6 @@
 const NavBar = () => (
 	<div
-		className='flex items-center justify-center h-20
+		className='flex items-center justify-center h-16
      px-8 bg-white border-t border-gray-200 gap-x-16'
 	>
 		<button className='w-16 h-16 flex items-center justify-center bg-white'>

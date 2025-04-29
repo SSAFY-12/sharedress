@@ -1,5 +1,5 @@
 import { ChevronLeft } from 'lucide-react';
-import { Badge } from '@/components/etc/Badge/Badge';
+import { Badge } from '@/components/etc/badge/Badge';
 
 interface HeaderProps {
 	showBack?: boolean;
