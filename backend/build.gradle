@@ -24,7 +24,10 @@ checkstyle {
 	maxWarnings = 0
 }
 
-checkstyleMain.source = fileTree('src/main/java')
+tasks.named('checkstyleMain') {
+	dependsOn tasks.named('compileTestJava')
+	mustRunAfter tasks.named('compileTestJava')
+}
 
 configurations {
 	compileOnly {
