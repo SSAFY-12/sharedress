@@ -51,6 +51,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	//Actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	
 	// DB
 	runtimeOnly 'com.mysql:mysql-connector-j'
 

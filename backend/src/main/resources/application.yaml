@@ -1,4 +1,7 @@
 spring:
+    application:
+        name: backend                 # ← 앱 이름
+
     config:
         import: optional:file:.env[.properties]
 
@@ -20,6 +23,14 @@ spring:
     datasource.hikari:
         connection-init-sql: SET NAMES utf8mb4
 
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health,info
+
+    
 logging.level:
     show_sql: debug
     org.hibernate.type: trace
