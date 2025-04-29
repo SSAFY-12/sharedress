@@ -39,6 +39,8 @@ public class Coordination {
 
 	private Boolean isPublic;
 
+	private Boolean isTemplate;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "creator_guest_id")
 	private Guest creatorGuest;
