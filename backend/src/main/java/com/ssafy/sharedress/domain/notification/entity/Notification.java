@@ -39,6 +39,4 @@ public class Notification extends BaseTimeEntity {
 	private String body;
 
 	private Boolean isRead;
-
-	// private Long requestId;
 }

@@ -40,7 +40,7 @@ public class ClosetClothes extends BaseTimeEntity {
 	// 사용자 커스터마이징 정보 (nullable)
 	private String customName;
 
-	private String customColor;
+	private String customColorId;
 
 	private Long customBrandId;
 

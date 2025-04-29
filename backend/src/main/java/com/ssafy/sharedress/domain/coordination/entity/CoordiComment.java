@@ -38,7 +38,7 @@ public class CoordiComment extends BaseTimeEntity {
 	private CoordiComment parent;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "coordi_id")
+	@JoinColumn(name = "coordination_id")
 	private Coordination coordi;
 
 	@ManyToOne(fetch = FetchType.LAZY)
