@@ -1,15 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE suppressions PUBLIC
-"-//Puppy Crawl//DTD Suppressions 1.1//EN"
-"http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+	"-//Puppy Crawl//DTD Suppressions 1.1//EN"
+	"http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-    <!-- Spring에서 자동으로 생성하는 파일은 제외 -->
-    <suppress files="[\\/]src[\\/](main|test)[\\/]java[\\/]com[\\/]dawn[\\/]backend[\\/][^\\/]*\.java$" checks="."/>
+	<!-- Spring에서 자동으로 생성하는 파일은 제외 -->
+	<suppress files="[\\/]src[\\/](main|test)[\\/]java[\\/]com[\\/]ssafy[\\/]sharedress[\\/][^\\/]*\.java$" checks="."/>
 
-    <!-- Lombok을 통해 생성되는 메서드를 제외 -->
-    <suppress files=".*\.java" checks="HideUtilityClassConstructorCheck" />
-    <suppress files=".*\.java" checks="VisibilityModifierCheck" />
-    <suppress files=".*\.java" checks="MagicNumberCheck" />
-    <suppress files=".*\.java" checks="ParameterNumberCheck" />
+	<!-- generated 폴더 안 파일 모두 제외 -->
+	<suppress files="[\\/]src[\\/]main[\\/]generated[\\/].*" checks="."/>
+
+	<!-- Lombok을 통해 생성되는 메서드를 제외 -->
+	<suppress files=".*\.java" checks="HideUtilityClassConstructorCheck"/>
+	<suppress files=".*\.java" checks="VisibilityModifierCheck"/>
+	<suppress files=".*\.java" checks="MagicNumberCheck"/>
+	<suppress files=".*\.java" checks="ParameterNumberCheck"/>
 </suppressions>
