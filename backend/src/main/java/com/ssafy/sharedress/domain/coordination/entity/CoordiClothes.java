@@ -2,6 +2,7 @@ package com.ssafy.sharedress.domain.coordination.entity;
 
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -24,11 +25,8 @@ public class CoordiClothes {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Float posX;
-	private Float posY;
-	private Float rotation;
-	private Float scale;
-	private Integer zIndex;
+	@Embedded
+	private Position position;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "coordination_id", nullable = false)
