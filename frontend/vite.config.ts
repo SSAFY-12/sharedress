@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import checker from 'vite-plugin-checker';
@@ -11,9 +12,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 // Vite 설정 파일
 export default defineConfig({
 	plugins: [
-		react(), // React HMR 및 JSX 변환 지원
+		// React HMR 및 JSX 변환 지원
 		// PWA(Progressive Web App) 플러그인 설정
-		mkcert(), // https 환경을 위한 setting
+		react(), // https 환경을 위한 setting
+		mkcert(), // 타입스크립트/ESLint 실시간 체크 플러그인
 		VitePWA({
 			registerType: 'autoUpdate', // 서비스워커가 항상 최신 상태로 자동 업데이트
 			injectRegister: 'auto', // 서비스워커 등록 스크립트 자동 삽입
@@ -58,8 +60,6 @@ export default defineConfig({
 				// 필요하다면 runtimeCaching 등 추가 가능 => API 생성 후 추가 권장
 			},
 		}),
-
-		// 타입스크립트/ESLint 실시간 체크 플러그인
 		checker({
 			typescript: true, // 타입스크립트 타입 체크
 			eslint: {
@@ -67,7 +67,16 @@ export default defineConfig({
 				dev: { logLevel: ['error', 'warning'] }, // 에러/경고만 표시
 			},
 		}),
+		sentryVitePlugin({
+			org: 'ssafy-d6',
+			project: 'javascript-react',
+		}),
+		sentryVitePlugin({
+			org: 'ssafy-d6',
+			project: 'javascript-react',
+		}),
 	],
+
 	css: {
 		postcss: {
 			plugins: [tailwindcss, autoprefixer], // TailwindCSS와 브라우저 접두사 자동 추가
@@ -99,5 +108,9 @@ export default defineConfig({
 				// },
 			},
 		},
+	},
+
+	build: {
+		sourcemap: true,
 	},
 });
