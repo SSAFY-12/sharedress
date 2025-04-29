@@ -13,6 +13,7 @@ export const router = createBrowserRouter([
 			{
 				index: true,
 				element: <Navigate to='/wardrobe' replace />,
+				// 초기 세팅값 wardrobe
 			},
 			{
 				path: 'auth',
