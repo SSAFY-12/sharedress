@@ -1,4 +1,3 @@
-import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import TestMobileLayout from './components/TestMobileLayout';
 

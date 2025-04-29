@@ -16,7 +16,8 @@ module.exports = {
 		ecmaFeatures: { jsx: true }, // JSX 문법 지원
 		ecmaVersion: 'latest', // 최신 ECMAScript 문법 지원
 		sourceType: 'module', // ES 모듈(import/export) 사용
-		project: './tsconfig.app.json', // 타입 정보 기반 규칙 활성화 (strict type lint)
+		tsconfigRootDir: __dirname, // 이 줄 추가
+		project: ['./tsconfig.app.json', './tsconfig.node.json'],
 	},
 	plugins: [
 		'react', // React 관련 규칙
