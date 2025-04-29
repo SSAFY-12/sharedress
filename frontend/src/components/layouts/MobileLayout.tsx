@@ -1,12 +1,12 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
 import { headerConfig } from '@/constants/headerConfig';
 
 export const MobileLayout = () => {
-	const location = useLocation(); // 현재 경로 가져오기
-	const headerProps = headerConfig[ // 현재 경로에 따른 헤더 설정
-		location.pathname as keyof typeof headerConfig // 현재 경로를 헤더 설정에 매핑
+	const location = useLocation();
+	const headerProps = headerConfig[
+		location.pathname as keyof typeof headerConfig
 	] || {
 		showBack: false,
 		subtitle: '',
@@ -15,12 +15,16 @@ export const MobileLayout = () => {
 	};
 
 	return (
-		<div className='fixed inset-0 w-full h-screen bg-white'>
-			<Header {...headerProps} />
-			<main className='flex-1 overflow-y-auto'>
+		<div className='min-h-screen flex flex-col'>
+			<header className='fixed top-0 left-0 right-0 bg-white z-10'>
+				<Header {...headerProps} />
+			</header>
+			<main className='flex-1 mt-16 mb-16 overflow-y-auto'>
 				<Outlet />
 			</main>
-			<NavBar />
+			<footer className='fixed bottom-0 left-0 right-0 bg-white z-10'>
+				<NavBar />
+			</footer>
 		</div>
 	);
 };

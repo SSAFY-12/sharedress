@@ -1,5 +1,5 @@
-import { createBrowserRouter } from 'react-router-dom';
-import App from '@/App';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { App } from '@/App';
 import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import FriendPage from '@/pages/FriendPage';
@@ -10,6 +10,10 @@ export const router = createBrowserRouter([
 		path: '/',
 		element: <App />,
 		children: [
+			{
+				index: true,
+				element: <Navigate to='/wardrobe' replace />,
+			},
 			{
 				path: 'auth',
 				element: <AuthPage />,
@@ -25,6 +29,10 @@ export const router = createBrowserRouter([
 			{
 				path: 'friend',
 				element: <FriendPage />,
+			},
+			{
+				path: '*',
+				element: <Navigate to='/wardrobe' replace />,
 			},
 		],
 	},
