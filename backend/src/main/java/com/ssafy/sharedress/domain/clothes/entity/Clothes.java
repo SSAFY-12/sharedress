@@ -6,9 +6,8 @@ import com.ssafy.sharedress.domain.color.entity.Color;
 import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 import com.ssafy.sharedress.domain.shoppingmall.entity.ShoppingMall;
 
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,8 +33,8 @@ public class Clothes extends BaseTimeEntity {
 
 	private String imageUrl;
 
-	@Enumerated(EnumType.STRING)
-	private ClothesSourceType type; // SHOPPING_MALL or PHOTO
+	@Convert(converter = ClothesSourceTypeConverter.class)
+	private ClothesSourceType type;
 
 	private String goodsLinkUrl;
 
