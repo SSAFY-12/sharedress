@@ -1,14 +1,14 @@
-package com.ssafy.sharedress.api.color.dto;
+package com.ssafy.sharedress.application.color.dto;
 
 import com.ssafy.sharedress.domain.color.entity.Color;
 
-public record ColorDto(
+public record ColorResponse(
 	Long id,
 	String name,
 	String hexCode
 ) {
-	public static ColorDto from(Color color) {
-		return new ColorDto(
+	public static ColorResponse from(Color color) {
+		return new ColorResponse(
 			color.getId(),
 			color.getColorName(),
 			color.getColorHex()
