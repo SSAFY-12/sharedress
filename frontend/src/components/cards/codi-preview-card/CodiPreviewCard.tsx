@@ -1,4 +1,4 @@
-import { UserMiniAvatar } from '../user-mini-avatar/UserMiniAvatar';
+import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
 import { CodiPreviewCardProps } from './CodiPreviewCard.types';
 
 // 여러 옷 아이템을 작은 카드로 보여줌

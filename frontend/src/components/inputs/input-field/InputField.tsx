@@ -1,28 +1,42 @@
-interface InputFieldProps {
-	value: string;
-	onChange: (value: string) => void;
-	placeholder?: string;
-	type?: 'text' | 'password' | 'email';
-	error?: string;
-}
+import { InputFieldProps } from './InputField.types';
+import React from 'react';
 
 export const InputField = ({
+	type,
+	placeholder,
 	value,
 	onChange,
-	placeholder,
-	type = 'text',
-	error,
-}: InputFieldProps) => (
-	<div className='w-full'>
+	disabled = false,
+	name,
+	optionList = [],
+	className = '',
+}: InputFieldProps) => {
+	const baseClass =
+		'border rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-gray-100';
+
+	return type === 'text' ? (
 		<input
-			type={type}
-			value={value}
-			onChange={(e) => onChange(e.target.value)}
+			type='text'
 			placeholder={placeholder}
-			className={`w-full px-4 py-2 rounded-lg border ${
-				error ? 'border-red-500' : 'border-gray-300'
-			} focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+			value={value}
+			onChange={onChange as React.ChangeEventHandler<HTMLInputElement>}
+			disabled={disabled}
+			name={name}
+			className={`${baseClass} ${className}`}
 		/>
-		{error && <p className='mt-1 text-sm text-red-500'>{error}</p>}
-	</div>
-);
+	) : (
+		<select
+			value={value}
+			onChange={onChange as React.ChangeEventHandler<HTMLSelectElement>}
+			disabled={disabled}
+			name={name}
+			className={`${baseClass} ${className}`}
+		>
+			{optionList.map((option) => (
+				<option key={option} value={option}>
+					{option}
+				</option>
+			))}
+		</select>
+	);
+};
