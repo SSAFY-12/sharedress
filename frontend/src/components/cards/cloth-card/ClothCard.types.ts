@@ -5,8 +5,9 @@ export interface ClothItem {
 }
 
 export interface ClothCardProps {
-	item: ClothItem;
-	size: 'sm' | 'md' | 'lg';
-	selected?: boolean;
-	onClick?: () => void;
+	item: ClothItem; // 옷 아이템 정보
+	size: 'sm' | 'md' | 'lg'; // 카드 크기
+	selected?: boolean; // 선택 상태
+	onClick?: () => void; // 클릭 이벤트
+	className?: string; // 추가 스타일링
 }
