@@ -68,10 +68,17 @@ module.exports = {
 			// 변수: camelCase, PascalCase, UPPER_CASE 허용
 			{
 				selector: 'variable',
-				format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+				format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+				leadingUnderscore: 'allow',
+				trailingUnderscore: 'allow',
 			},
 			// 함수: camelCase, PascalCase 허용
-			{ selector: 'function', format: ['camelCase', 'PascalCase'] },
+			{
+				selector: 'function',
+				format: ['camelCase', 'PascalCase'],
+				leadingUnderscore: 'allow',
+				trailingUnderscore: 'allow',
+			},
 			// 타입/인터페이스/enum: PascalCase
 			{ selector: 'typeLike', format: ['PascalCase'] },
 			// 클래스: PascalCase
@@ -98,7 +105,50 @@ module.exports = {
 				format: ['camelCase'],
 				filter: { regex: '^handle[A-Z].*[A-Z]', match: true },
 			},
+			// API 관련 변수/함수 예외
+			{
+				selector: 'variable',
+				format: ['camelCase'],
+				filter: { regex: '^(client|headerConfig|router)$', match: true },
+			},
+			{
+				selector: 'function',
+				format: ['camelCase'],
+				filter: { regex: '^(getErrorMessage|handleGlobalError)$', match: true },
+			},
+			// const/전역 변수: UPPER_CASE
+			{
+				selector: 'variable',
+				format: ['UPPER_CASE', 'PascalCase'],
+				modifiers: ['const', 'global'],
+			},
+			// use로 시작하는 훅: camelCase 강제
+			{
+				selector: 'variable',
+				format: ['camelCase'],
+				filter: { regex: '^use[A-Z]', match: true },
+			},
+			// handle로 시작하는 함수: camelCase 강제
+			{
+				selector: 'function',
+				format: ['camelCase'],
+				filter: { regex: '^handle[A-Z]', match: true },
+			},
+			// get로 시작하는 함수: camelCase 강제
+			{
+				selector: 'function',
+				format: ['camelCase'],
+				filter: { regex: '^get[A-Z]', match: true },
+			},
+			// const로 선언된 함수: camelCase 강제
+			{
+				selector: 'variable',
+				format: ['camelCase'],
+				modifiers: ['const'],
+				filter: { regex: '^(handle|get)[A-Z]', match: true },
+			},
 		],
+		'@typescript-eslint/no-explicit-any': 'off', // any 타입 허용
 
 		// --- 파일/폴더명 규칙 (check-file 플러그인) ---
 		'check-file/filename-naming-convention': [

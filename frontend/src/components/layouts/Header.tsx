@@ -6,11 +6,29 @@ interface HeaderProps {
 	subtitle?: string;
 	logo?: string;
 	badge?: {
-		type: 'success' | 'error' | 'warning' | 'info';
+		iconType:
+			| 'bell'
+			| 'setting'
+			| 'back'
+			| 'next'
+			| 'done'
+			| 'info'
+			| 'success'
+			| 'warning'
+			| 'error';
 		text: string;
 	};
 	// 이전 방식과의 호환성을 위한 props
-	badgeType?: 'success' | 'error' | 'warning' | 'info';
+	badgeType?:
+		| 'bell'
+		| 'setting'
+		| 'back'
+		| 'next'
+		| 'done'
+		| 'info'
+		| 'success'
+		| 'warning'
+		| 'error';
 	badgeText?: string;
 	onBackClick?: () => void;
 }
@@ -32,7 +50,7 @@ const Header = ({
 		if (badgeType && badgeText) {
 			//뱃지 타입과 텍스트가 모두 제공되는 경우
 			return {
-				type: badgeType,
+				iconType: badgeType,
 				text: badgeText,
 			};
 		}
@@ -67,7 +85,9 @@ const Header = ({
 					<h1 className='font-bold text-lg text-gray-800'>{logo}</h1>
 				)}
 			</div>
-			{badgeProps && <Badge type={badgeProps.type} text={badgeProps.text} />}
+			{badgeProps && (
+				<Badge iconType={badgeProps.iconType} text={badgeProps.text} />
+			)}
 		</header>
 	);
 };

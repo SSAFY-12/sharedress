@@ -20,13 +20,18 @@ src/
 - API 관련 파일: camelCase (예: fetchUserApi.ts)
 - 상수 파일: SCREAMING_SNAKE_CASE (예: USER_ROLE_CONST.ts)
 - 폴더명: kebab-case (예: user-profile/)
-
+- 변수/함수/타입 네이밍은 ESLint 규칙을 따름
 
 ## 2. 변수/함수 네이밍
-- 변수: camelCase
-- 함수: camelCase, 단 React Hook은 use로 시작
+- 변수: camelCase, UPPER_CASE, PascalCase 허용
+- 함수: camelCase, PascalCase 허용, 단 React Hook은 use로 시작
 - 타입/인터페이스/클래스/Enum: PascalCase
 - 상수: UPPER_CASE
+
+### 2. 변수/함수 네이밍 (예외 사항)
+- 라우터 관련 변수는 소문자 허용 (예: router)
+- 설정 관련 변수는 camelCase 허용 (예: headerConfig)
+- API 클라이언트는 camelCase 허용 (예: client)
 
 
 ## 3. 코드 스타일
