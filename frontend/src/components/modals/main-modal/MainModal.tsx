@@ -8,11 +8,8 @@ import {
 	ModalBodyProps,
 	ModalFooterProps,
 } from './MainModal.types';
+import { CN } from '@/lib/utils';
 
-// Tailwind CSS에서 여러 클래스를 조건부로 결합할 때 사용하는 유틸리티 함수
-// 여러 인자를 배열로 받음
-const CN = (...classes: (string | undefined)[]) =>
-	classes.filter(Boolean).join(' '); // 빈 문자열은 제외
 // 이 Context는 모달의 상태(isOpen)와 닫기 함수(onClose)를 자식 컴포넌트들에게 전달
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 // context를 사용할 때 실수로 Provider밖에서 사용하는 것 방지
@@ -102,8 +99,6 @@ const Close = ({ className }: ModalCloseProps) => {
 		</button>
 	);
 };
-Close.displayName = 'MainModal.Close'; //컴포넌트 정의후 속성 설정 -> 타입추론과 디버깅을 위함
-MainModal.Close = Close;
 
 // 헤더 컴포넌트
 const Header = ({
@@ -116,19 +111,25 @@ const Header = ({
 		{children}
 	</div>
 );
-Header.displayName = 'MainModal.Header';
-MainModal.Header = Header;
 
 // 본문 컴포넌트
 const Body = ({ children, className }: ModalBodyProps) => (
 	<div className={CN('px-6 py-4', className)}>{children}</div>
 );
-Body.displayName = 'MainModal.Body';
-MainModal.Body = Body;
 
 // 푸터 컴포넌트
 const Footer = ({ children, className }: ModalFooterProps) => (
 	<div className={CN('border-t px-6 py-4', className)}>{children}</div>
 );
+
+// 컴포넌트 할당
 Footer.displayName = 'MainModal.Footer';
+Body.displayName = 'MainModal.Body';
+Header.displayName = 'MainModal.Header';
+Close.displayName = 'MainModal.Close'; //컴포넌트 정의후 속성 설정 -> 타입추론과 디버깅을 위함
+
+// 서브컴포넌트 연결
 MainModal.Footer = Footer;
+MainModal.Body = Body;
+MainModal.Header = Header;
+MainModal.Close = Close;
