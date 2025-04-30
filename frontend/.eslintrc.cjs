@@ -106,6 +106,7 @@ module.exports = {
 				filter: { regex: '^handle[A-Z].*[A-Z]', match: true },
 			},
 		],
+		'@typescript-eslint/no-explicit-any': 'off', // any 타입 허용
 
 		// --- 파일/폴더명 규칙 (check-file 플러그인) ---
 		'check-file/filename-naming-convention': [
