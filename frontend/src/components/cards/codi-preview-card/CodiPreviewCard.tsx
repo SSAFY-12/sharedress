@@ -30,7 +30,7 @@ export const CodiPreviewCard = ({
 
 		{(userName || userAvatar) && (
 			<div className='flex items-center mt-2'>
-				{userAvatar && <UserMiniAvatar src={userAvatar} size='small' />}
+				{userAvatar && <UserMiniAvatar src={userAvatar} size='sm' />}
 				{userName && <span className='text-sm font-medium'>{userName}</span>}
 			</div>
 		)}

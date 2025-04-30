@@ -1,32 +1,34 @@
-interface UserMiniAvatarProps {
-	src: string;
-	size?: 'small' | 'medium' | 'large';
-	name?: string;
-}
+import { UserMiniAvatarProps } from './UserMiniAvatar.types';
 
 export const UserMiniAvatar = ({
 	src,
-	size = 'medium',
-	name,
+	size,
+	withBadge = false,
+	editable = false,
+	onClick,
+	className = '',
 }: UserMiniAvatarProps) => {
-	const sizeClasses = {
-		small: 'w-8 h-8',
-		medium: 'w-12 h-12',
-		large: 'w-16 h-16',
-	};
+	const sizeClass = {
+		sm: 'w-8 h-8',
+		md: 'w-12 h-12',
+		lg: 'w-16 h-16',
+	}[size];
 
 	return (
-		<div className='flex flex-col items-center'>
-			<div
-				className={`${sizeClasses[size]} relative overflow-hidden rounded-full`}
-			>
-				<img
-					src={src}
-					alt={name || 'User avatar'}
-					className='w-full h-full object-cover'
-				/>
-			</div>
-			{name && <p className='mt-1 text-sm font-medium'>{name}</p>}
+		<div className={`relative ${className}`} onClick={onClick}>
+			<img
+				src={src || '/placeholder.svg?height=100&width=100'}
+				alt='User Avatar'
+				className={`${sizeClass} rounded-full object-cover border border-gray-200`}
+			/>
+			{withBadge && (
+				<span className='absolute bottom-0 right-0 bg-green-400 rounded-full w-3 h-3 border border-white' />
+			)}
+			{editable && (
+				<span className='absolute bottom-0 right-0 bg-rose-500 rounded-full w-5 h-5 text-white text-xs flex items-center justify-center border border-white'>
+					✏️
+				</span>
+			)}
 		</div>
 	);
 };
