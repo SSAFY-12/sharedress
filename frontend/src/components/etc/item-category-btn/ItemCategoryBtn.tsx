@@ -1,22 +1,24 @@
-interface ItemCategoryBtnProps {
-	category: string;
-	isActive: boolean;
-	onClick: () => void;
-}
+import { ItemCategoryBtnProps } from './ItemCategoryBtn.types';
 
 export const ItemCategoryBtn = ({
-	category,
+	text,
 	isActive,
 	onClick,
-}: ItemCategoryBtnProps) => (
-	<button
-		onClick={onClick}
-		className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-			isActive
-				? 'bg-indigo-600 text-white'
-				: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-		}`}
-	>
-		{category}
-	</button>
-);
+	color = 'primary',
+	className = '',
+}: ItemCategoryBtnProps) => {
+	const activeClass = isActive
+		? color === 'primary'
+			? 'bg-rose-500 text-white'
+			: 'bg-gray-600 text-white'
+		: 'bg-gray-100 text-gray-700 hover:bg-gray-200';
+
+	return (
+		<button
+			onClick={onClick}
+			className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeClass} ${className}`}
+		>
+			{text}
+		</button>
+	);
+};
