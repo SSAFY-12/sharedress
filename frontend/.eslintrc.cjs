@@ -68,10 +68,17 @@ module.exports = {
 			// 변수: camelCase, PascalCase, UPPER_CASE 허용
 			{
 				selector: 'variable',
-				format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+				format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+				leadingUnderscore: 'allow',
+				trailingUnderscore: 'allow',
 			},
 			// 함수: camelCase, PascalCase 허용
-			{ selector: 'function', format: ['camelCase', 'PascalCase'] },
+			{
+				selector: 'function',
+				format: ['camelCase', 'PascalCase'],
+				leadingUnderscore: 'allow',
+				trailingUnderscore: 'allow',
+			},
 			// 타입/인터페이스/enum: PascalCase
 			{ selector: 'typeLike', format: ['PascalCase'] },
 			// 클래스: PascalCase
