@@ -52,8 +52,8 @@ pipeline {
     }
 
     stage('Build & Push Image') {
-    dir('backend') {
       steps {
+      dir('backend') {
         // AWS 자격증명(Binding) → aws cli 가 non-TTY 환경에서도 동작
         withCredentials([[
           $class: 'AmazonWebServicesCredentialsBinding',
