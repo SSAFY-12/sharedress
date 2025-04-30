@@ -40,34 +40,35 @@ pipeline {
       }
     }
 
+    stage('Setup Buildx') {
+      steps {
+        sh '''
+          # multi-builder가 없다면 생성 후 사용 설정
+          docker buildx create --name multi-builder --driver docker-container --use || true
+          # QEMU 백엔드까지 부트스트랩
+          docker buildx inspect multi-builder --bootstrap
+        '''
+      }
+    }
+
     stage('Build & Push Image') {
       steps {
-        sh """
-          aws ecr get-login-password --region $AWS_REGION | \
-            docker login --username AWS --password-stdin $ECR_URI
+        // AWS 자격증명(Binding) → aws cli 가 non-TTY 환경에서도 동작
+        withCredentials([[
+          $class: 'AmazonWebServicesCredentialsBinding',
+          credentialsId: 'aws key'
+        ]]) {
+          sh """
+            aws ecr get-login-password --region $AWS_REGION | \
+              docker login --username AWS --password-stdin $ECR_URI
 
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            --provenance=false \
-            -t $ECR_URI/$APP_NAME:\$TAG \
-            --push .
-        """
-         // AWS 자격증명 바인딩 → aws cli 가 non-TTY 환경에서도 로그인 가능
-         withCredentials([[
-            $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: 'aws key'
-         ]]) {
-            sh """
-                aws ecr get-login-password --region $AWS_REGION | \
-                    docker login --username AWS --password-stdin $ECR_URI
-
-                docker buildx build \
-                     --platform linux/amd64,linux/arm64 \
-                     --provenance=false \
-                     -t $ECR_URI/$APP_NAME:\$TAG \
-                     --push .
-            """
-         }
+            docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              --provenance=false \
+              -t $ECR_URI/$APP_NAME:\$TAG \
+              --push .
+          """
+        }
       }
     }
 
