@@ -116,6 +116,12 @@ module.exports = {
 				format: ['camelCase'],
 				filter: { regex: '^(getErrorMessage|handleGlobalError)$', match: true },
 			},
+			// const/전역 변수: UPPER_CASE
+			{
+				selector: 'variable',
+				format: ['UPPER_CASE', 'PascalCase'],
+				modifiers: ['const', 'global'],
+			},
 			// use로 시작하는 훅: camelCase 강제
 			{
 				selector: 'variable',
