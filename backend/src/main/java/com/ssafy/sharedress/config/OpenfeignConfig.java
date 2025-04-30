@@ -1,10 +1,10 @@
-package com.ssafy.sharedress.infra.config;
+package com.ssafy.sharedress.config;
 
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients(basePackages = "com.ssafy.sharedress.api.auth.controller")
+@EnableFeignClients(basePackages = "com.ssafy.sharedress.adapter.auth.out")
 public class OpenfeignConfig {
 
 }

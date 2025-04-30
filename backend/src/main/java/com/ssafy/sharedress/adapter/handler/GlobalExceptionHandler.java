@@ -1,4 +1,4 @@
-package com.ssafy.sharedress.api.handler;
+package com.ssafy.sharedress.adapter.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.ssafy.sharedress.api.auth.dto;
+package com.ssafy.sharedress.application.auth.dto;
 
 public record GoogleUserInfoResponse(
 	String id,
