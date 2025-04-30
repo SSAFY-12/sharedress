@@ -1,5 +1,5 @@
 pipeline {
-  agent any
+  agent { label 'Jenkins ec2' }
 
   environment {
     AWS_REGION  = 'ap-northeast-2'
