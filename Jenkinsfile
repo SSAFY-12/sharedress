@@ -52,6 +52,22 @@ pipeline {
             -t $ECR_URI/$APP_NAME:\$TAG \
             --push .
         """
+         // AWS 자격증명 바인딩 → aws cli 가 non-TTY 환경에서도 로그인 가능
+         withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws key'
+         ]]) {
+            sh """
+                aws ecr get-login-password --region $AWS_REGION | \
+                    docker login --username AWS --password-stdin $ECR_URI
+
+                docker buildx build \
+                     --platform linux/amd64,linux/arm64 \
+                     --provenance=false \
+                     -t $ECR_URI/$APP_NAME:\$TAG \
+                     --push .
+            """
+         }
       }
     }
 
