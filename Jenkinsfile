@@ -31,15 +31,12 @@ pipeline {
 
     stage('Build JAR') {
       steps {
-          dir('backend') {
-            sh './gradlew clean bootJar'
-      }
-
-            sh '''
-                cd backend
-                chmod +x gradlew
-                ./gradlew clean bootJar
-              '''
+        dir('backend') {
+          sh '''
+            chmod +x gradlew
+            ./gradlew clean bootJar
+          '''
+        }
       }
     }
 
