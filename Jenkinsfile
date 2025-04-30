@@ -53,22 +53,21 @@ pipeline {
 
     stage('Build & Push Image') {
       steps {
-      dir('backend') {
-        // AWS 자격증명(Binding) → aws cli 가 non-TTY 환경에서도 동작
-        withCredentials([[
-          $class: 'AmazonWebServicesCredentialsBinding',
-          credentialsId: 'aws key'
-        ]]) {
-          sh """
-            aws ecr get-login-password --region $AWS_REGION | \
-              docker login --username AWS --password-stdin $ECR_URI
+        dir('backend') {
+          withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws key'
+          ]]) {
+            sh """
+              aws ecr get-login-password --region $AWS_REGION | \
+                docker login --username AWS --password-stdin $ECR_URI
 
-            docker buildx build \
-              --platform linux/amd64,linux/arm64 \
-              --provenance=false \
-              -t $ECR_URI/$APP_NAME:\$TAG \
-              --push .
-          """
+              docker buildx build \
+                --platform linux/amd64,linux/arm64 \
+                --provenance=false \
+                -t $ECR_URI/$APP_NAME:\$TAG \
+                --push .
+            """
           }
         }
       }
@@ -81,22 +80,21 @@ pipeline {
           def targetIP    = isGreen ? env.GREEN_IP : env.BLUE_IP
           def sshCred     = isGreen ? 'green-ssh'  : 'blue-ec2-ssh'
           def sshUser     = isGreen ? 'ubuntu'     : 'ec2-user'
-          def composeFile = isGreen 
+          def composeFile = isGreen
             ? '/opt/green/docker-compose.green.yml'
             : '/opt/blue/docker-compose.blue.yml'
 
           sshagent([sshCred]) {
             sh """
-              ssh -o StrictHostKeyChecking=no ${sshUser}@${targetIP} << 'EOS'
-                export AWS_REGION=${AWS_REGION}
-                export ECR_URI=${ECR_URI}
-                aws ecr get-login-password --region \$AWS_REGION | \
-                  docker login --username AWS --password-stdin \$ECR_URI
+ssh -o StrictHostKeyChecking=no ${sshUser}@${targetIP} << 'EOF'
+export AWS_REGION=${AWS_REGION}
+export ECR_URI=${ECR_URI}
+aws ecr get-login-password --region \$AWS_REGION | docker login --username AWS --password-stdin \$ECR_URI
 
-                sed -i "s@image:.*@image: \$ECR_URI/${APP_NAME}:\${TAG}@" ${composeFile}
-                docker pull \$ECR_URI/${APP_NAME}:\${TAG}
-                docker compose -f ${composeFile} up -d
-              EOS
+sed -i "s@image:.*@image: ${ECR_URI}/${APP_NAME}:${TAG}@" ${composeFile}
+docker pull ${ECR_URI}/${APP_NAME}:${TAG}
+docker compose -f ${composeFile} up -d
+EOF
             """
           }
         }
@@ -118,10 +116,10 @@ pipeline {
 
           sshagent(['lb-ssh']) {
             sh """
-              ssh -o StrictHostKeyChecking=no ec2-user@${LB_IP} << 'EOS'
-                sudo sed -i 's/${fromIP}/${toIP}/' /etc/nginx/conf.d/loadbalancer.conf
-                sudo nginx -s reload
-              EOS
+ssh -o StrictHostKeyChecking=no ec2-user@${LB_IP} << 'EOF'
+sudo sed -i 's/${fromIP}/${toIP}/' /etc/nginx/conf.d/loadbalancer.conf
+sudo nginx -s reload
+EOF
             """
           }
         }
