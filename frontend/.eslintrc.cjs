@@ -105,6 +105,17 @@ module.exports = {
 				format: ['camelCase'],
 				filter: { regex: '^handle[A-Z].*[A-Z]', match: true },
 			},
+			// API 관련 변수/함수 예외
+			{
+				selector: 'variable',
+				format: ['camelCase'],
+				filter: { regex: '^(client|headerConfig|router)$', match: true },
+			},
+			{
+				selector: 'function',
+				format: ['camelCase'],
+				filter: { regex: '^(getErrorMessage|handleGlobalError)$', match: true },
+			},
 		],
 		'@typescript-eslint/no-explicit-any': 'off', // any 타입 허용
 
