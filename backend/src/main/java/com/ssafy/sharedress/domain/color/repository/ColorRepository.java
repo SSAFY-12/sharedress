@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.ssafy.sharedress.domain.color.entity.Color;
 
 public interface ColorRepository extends JpaRepository<Color, Long> {
-	List<Color> findAll();
+	List<Color> findAllByOrderByIdAsc();
 }

@@ -20,6 +20,6 @@ public class ColorDomainService {
 	private final ColorRepository colorRepository;
 
 	public List<Color> getAllColors() {
-		return colorRepository.findAll();
+		return colorRepository.findAllByOrderByIdAsc();
 	}
 }
