@@ -1,4 +1,4 @@
-package com.ssafy.sharedress.api.category.controller;
+package com.ssafy.sharedress.adapter.category.in;
 
 import java.util.List;
 
@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.sharedress.api.category.dto.CategoryDto;
-import com.ssafy.sharedress.domain.category.service.CategoryDomainService;
+import com.ssafy.sharedress.application.category.dto.CategoryResponse;
+import com.ssafy.sharedress.application.category.usecase.CategoryUseCase;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
@@ -18,14 +18,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CategoryController {
 
-	private final CategoryDomainService categoryDomainService;
+	private final CategoryUseCase categoryUseCase;
 
 	@GetMapping("/clothes/categories")
-	public ResponseEntity<ResponseWrapper<List<CategoryDto>>> getAllCategories() {
-		List<CategoryDto> categories = categoryDomainService.findAll()
-			.stream()
-			.map(CategoryDto::from)
-			.toList();
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, categories);
+	public ResponseEntity<ResponseWrapper<List<CategoryResponse>>> getAllCategories() {
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, categoryUseCase.getAllCategories());
 	}
 }
