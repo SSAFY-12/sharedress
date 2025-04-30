@@ -1,8 +1,8 @@
 // import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { router } from '@/routes';
-import * as Sentry from '@sentry/react';
-import { useEffect } from 'react';
+// import * as Sentry from '@sentry/react';
+// import { useEffect } from 'react';
 import './index.css';
 import {
 	RouterProvider,
