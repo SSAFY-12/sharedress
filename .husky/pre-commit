@@ -19,7 +19,7 @@ if [ ! -z "$frontend_changes" ]; then
   cd $frontend_project_path
 
   # TypeScript 검사 (컴파일만, 출력 없음)
-  npx tsc --project tsconfig.app.json --noEmit --skipLibCheck --pretty
+  npx tsc --noEmit --skipLibCheck --pretty
   if [ $? -ne 0 ]; then
     echo "❌ TypeScript 타입 오류"
     exit 1
