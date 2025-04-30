@@ -140,6 +140,13 @@ module.exports = {
 				format: ['camelCase'],
 				filter: { regex: '^get[A-Z]', match: true },
 			},
+			// const로 선언된 함수: camelCase 강제
+			{
+				selector: 'variable',
+				format: ['camelCase'],
+				modifiers: ['const'],
+				filter: { regex: '^(handle|get)[A-Z]', match: true },
+			},
 		],
 		'@typescript-eslint/no-explicit-any': 'off', // any 타입 허용
 
