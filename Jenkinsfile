@@ -31,9 +31,15 @@ pipeline {
 
     stage('Build JAR') {
       steps {
-        dir('backend') {
-          sh './gradlew clean bootJar'
-        }
+    -   dir('backend') {
+    -     sh './gradlew clean bootJar'
+    -   }
+
+       sh '''
+         cd backend
+         chmod +x gradlew
+         ./gradlew clean bootJar
+       '''
       }
     }
 
@@ -47,7 +53,7 @@ pipeline {
             --platform linux/amd64,linux/arm64 \
             --provenance=false \
             -t $ECR_URI/$APP_NAME:\$TAG \
-            --push backend/.
+            --push .
         """
       }
     }
