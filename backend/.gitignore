@@ -75,6 +75,8 @@ cmake-build-*/
 # IntelliJ
 out/
 
+!src/main/java/com/ssafy/sharedress/adapter/**/out/
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 
