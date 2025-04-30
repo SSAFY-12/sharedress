@@ -116,6 +116,24 @@ module.exports = {
 				format: ['camelCase'],
 				filter: { regex: '^(getErrorMessage|handleGlobalError)$', match: true },
 			},
+			// use로 시작하는 훅: camelCase 강제
+			{
+				selector: 'variable',
+				format: ['camelCase'],
+				filter: { regex: '^use[A-Z]', match: true },
+			},
+			// handle로 시작하는 함수: camelCase 강제
+			{
+				selector: 'function',
+				format: ['camelCase'],
+				filter: { regex: '^handle[A-Z]', match: true },
+			},
+			// get로 시작하는 함수: camelCase 강제
+			{
+				selector: 'function',
+				format: ['camelCase'],
+				filter: { regex: '^get[A-Z]', match: true },
+			},
 		],
 		'@typescript-eslint/no-explicit-any': 'off', // any 타입 허용
 
