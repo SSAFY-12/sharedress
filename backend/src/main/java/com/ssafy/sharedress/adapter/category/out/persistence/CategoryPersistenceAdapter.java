@@ -15,6 +15,7 @@ public class CategoryPersistenceAdapter implements CategoryRepository {
 
 	private final CategoryJpaRepository categoryJpaRepository;
 
+	@Override
 	public List<Category> findAllByOrderByIdAsc() {
 		return categoryJpaRepository.findAllByOrderByIdAsc();
 	}
