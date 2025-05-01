@@ -15,10 +15,10 @@ export const router = createBrowserRouter([
 				element: <Navigate to='/wardrobe' replace />,
 				// 초기 세팅값 wardrobe
 			},
-			{
-				path: 'auth',
-				element: <AuthPage />,
-			},
+			// {
+			// 	path: 'auth',
+			// 	element: <AuthPage />,
+			// },
 			{
 				path: 'wardrobe',
 				element: <WardrobePage />,
@@ -36,5 +36,9 @@ export const router = createBrowserRouter([
 				element: <Navigate to='/wardrobe' replace />,
 			},
 		],
+	},
+	{
+		path: '/auth',
+		element: <AuthPage />,
 	},
 ]);
