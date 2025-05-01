@@ -31,13 +31,13 @@ export const BottomSheet = ({
 
 	// 드래그가 끝났을 때의 처리
 	const handleDragEnd = (_: any, info: PanInfo) => {
+		//실제 사용X -> _, 드래그 관련 정보
 		// 이벤트 객체, 드래그 정보(Framer Motion에서 제공하는 타입)
 
 		const threshold = 0.5; // 스와이프 동작을 결정하는 기준값 (현재 높이의 50%)
 		const velocity = info.velocity.y; // 드래그 종료 시점의 Y축 속도 (픽셀/초)
 		const direction = velocity > 0 ? 1 : -1; // 양수: 아래로, 음수: 위로
-		// 실제로 얼마나 드래그했는지 측정
-		const offset = info.offset.y;
+		const offset = info.offset.y; // 드래그한 총 거리 (픽셀)
 
 		// 6. 빠른 스와이프 처리 -> velocity 기반
 		if (Math.abs(velocity) > 500) {
@@ -96,9 +96,9 @@ export const BottomSheet = ({
 							'fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-md overflow-hidden rounded-t-2xl bg-white shadow-lg',
 							className,
 						)}
-						initial={{ y: '100%' }} // 처음에는 화면 밖에
+						initial={{ y: '100%' }} // 처음에는 화면 아래에
 						animate={{
-							// 현재 스냅 포인트 위치로 이동
+							// 현재 스냅 포인트 위치로 이동 -> 현재 스냅 포인트 위치(index)에 따라 애니메이션 처리
 							y: snapPoints[currentSnap]
 								? `calc(${(1 - snapPoints[currentSnap]) * 100}%)`
 								: 0,

@@ -1,4 +1,4 @@
-import { PrimaryButton } from '@/components/buttons/primary-button/PrimaryButton';
+import { PrimaryBtn } from '@/components/buttons/primary-button/PrimaryBtn';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
 
 interface UserRowItemProps {
@@ -27,7 +27,7 @@ export const UserRowItem = ({
 		<UserMiniAvatar src={userAvatar} size='sm' />
 		<span className='ml-3 flex-1 font-medium text-sm'>{userName}</span>
 		{actionButtonText && (
-			<PrimaryButton
+			<PrimaryBtn
 				size='compact'
 				name={actionButtonText}
 				onClick={(e) => {

@@ -1,4 +1,4 @@
-import { PrimaryButton } from '@/components/buttons/primary-button/PrimaryButton';
+import { PrimaryBtn } from '@/components/buttons/primary-button/PrimaryBtn';
 
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
 
@@ -28,7 +28,7 @@ export const ProfileHeaderCard = ({
 			)}
 		</div>
 		{actionButtonText && (
-			<PrimaryButton
+			<PrimaryBtn
 				size='compact'
 				name={actionButtonText}
 				onClick={() => onActionClick?.()}
