@@ -7,7 +7,35 @@ import autoprefixer from 'autoprefixer';
 import path from 'path';
 import mkcert from 'vite-plugin-mkcert';
 import { VitePWA } from 'vite-plugin-pwa';
-import { GoogleLogin } from '@react-oauth/google';
+
+const cspHeader = [
+	// 기본 설정
+	"default-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data:",
+
+	// 스크립트 설정
+	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:",
+
+	// 스타일 설정
+	"style-src 'self' 'unsafe-inline' https: http:",
+
+	// 이미지 설정
+	"img-src 'self' data: https: http:",
+
+	// 폰트 설정
+	"font-src 'self' data: https: http:",
+
+	// 프레임 설정
+	"frame-src 'self' https: http:",
+
+	// 웹소켓 등 연결 설정 (Vite HMR을 위해 필요)
+	"connect-src 'self' ws: wss: https: http:",
+
+	// 워커 설정 (PWA를 위해 필요)
+	"worker-src 'self' blob:",
+
+	// 매니페스트 설정
+	"manifest-src 'self'",
+].join('; ');
 
 // Vite 설정 파일
 export default defineConfig({
@@ -94,11 +122,16 @@ export default defineConfig({
 		// },
 		https: true,
 		headers: {
+			// COOP 설정 변경
 			'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+			// COEP 설정 변경
 			'Cross-Origin-Embedder-Policy': 'credentialless',
 			'Referrer-Policy': 'strict-origin-when-cross-origin',
+			// CORS 설정 변경
 			'Access-Control-Allow-Origin': '*',
+			// CORP 설정 변경
 			'Cross-Origin-Resource-Policy': 'cross-origin',
+			'Content-Security-Policy': cspHeader,
 		},
 		proxy: {
 			'/api': {

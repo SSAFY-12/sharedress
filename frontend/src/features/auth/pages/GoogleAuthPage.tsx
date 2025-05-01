@@ -1,18 +1,36 @@
 import { useGoogleLogin } from '@react-oauth/google';
+// import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const GoogleAuthPage = () => {
+	const location = useLocation();
+	// const navigate = useNavigate();
+
+	// 리다이렉트 후 코드 처리
+	useEffect(() => {
+		// URL에서 인증 코드 가져오기
+		const urlParams = new URLSearchParams(location.search);
+		const code = urlParams.get('code');
+
+		if (code) {
+			console.log('Authorization Code:', code);
+			// TODO: 백엔드로 코드 전송
+			// URL에서 코드 제거
+			// navigate(location.pathname);
+		}
+	}, [location]);
+
 	const login = useGoogleLogin({
-		onSuccess: (response) => {
-			// 승인 코드 플로우
-			if ('code' in response) {
-				console.log('Authorization Code:', response.code);
-				// TODO: 이 코드를 백엔드로 전송하여 액세스 토큰으로 교환
-			}
-		},
+		flow: 'auth-code',
+		// onSuccess: (response) => {
+		// 모바일에서 redirect 더 많이 사용 -> 그리고 대부분 여기서 처리 하지 않음
+		// },
 		onError: () => {
 			console.log('Login Failed');
 		},
-		flow: 'auth-code',
+		ux_mode: 'redirect', // 추가: 팝업 대신 리다이렉트 사용
+		redirect_uri: `https://localhost:5173/auth/google/callback`, // 콜백 URL 지정
 	});
 
 	return (
