@@ -6,8 +6,8 @@ import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import path from 'path';
 import mkcert from 'vite-plugin-mkcert';
-import fs from 'fs';
 import { VitePWA } from 'vite-plugin-pwa';
+import { GoogleLogin } from '@react-oauth/google';
 
 // Vite 설정 파일
 export default defineConfig({
@@ -93,6 +93,13 @@ export default defineConfig({
 		// 	cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
 		// },
 		https: true,
+		headers: {
+			'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+			'Cross-Origin-Embedder-Policy': 'credentialless',
+			'Referrer-Policy': 'strict-origin-when-cross-origin',
+			'Access-Control-Allow-Origin': '*',
+			'Cross-Origin-Resource-Policy': 'cross-origin',
+		},
 		proxy: {
 			'/api': {
 				// 프론트에서 /api로 시작하는 요청을 아래 설정대로 프록시
