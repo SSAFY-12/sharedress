@@ -6,14 +6,24 @@ const AuthPage = () => (
 	// TODO: Add route handling logic here
 	<div>
 		{/* 모바일 레이아웃 */}
-		<div className='block sm:hidden min-h-screen bg-auth-bg'>
-			<LoginPage />
+		<div className='block sm:hidden min-h-screen bg-auth-bg relative'>
+			{/* 어두운 오버레이 */}
+			<div className='absolute inset-0 bg-black/30'></div>
+			{/* 컨텐츠 */}
+			<div className='relative z-10'>
+				<LoginPage />
+			</div>
 		</div>
 
 		{/* 웹 레이아웃 - 모바일 에뮬레이션 */}
 		<div className='hidden sm:flex min-h-screen items-center justify-center bg-neutral-900'>
-			<div className='w-[390px] h-[844px] rounded-xl overflow-hidden shadow-xl bg-auth-bg'>
-				<LoginPage />
+			<div className='w-[390px] h-[844px] rounded-xl overflow-hidden shadow-xl bg-auth-bg relative'>
+				{/* 어두운 오버레이 */}
+				<div className='absolute inset-0 bg-black/30'></div>
+				{/* 컨텐츠 */}
+				<div className='relative z-10'>
+					<LoginPage />
+				</div>
 			</div>
 		</div>
 	</div>
