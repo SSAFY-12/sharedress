@@ -1,4 +1,4 @@
-import { PrimaryButton } from '@/components/buttons/primary-button/PrimaryButton';
+import { PrimaryButton } from '@/components/buttons/primary-button';
 
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
 

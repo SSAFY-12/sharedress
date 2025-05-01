@@ -2,8 +2,8 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { App } from '@/App';
 import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
-import FriendPage from '@/pages/FriendPage';
 import AuthPage from '@/pages/AuthPage';
+import SocialPage from '@/pages/SocialPage';
 
 export const router = createBrowserRouter([
 	{
@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
 			},
 			{
 				path: 'friend',
-				element: <FriendPage />,
+				element: <SocialPage />,
 			},
 			{
 				path: '*',

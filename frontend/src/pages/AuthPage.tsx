@@ -1,4 +1,4 @@
-import { LoginPage } from '../features/auth/pages/LoginPage';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
 
 // Auth 관련 데이터 여기 넣으면 될 것 같음
 
