@@ -82,6 +82,7 @@ export default defineConfig({
 				],
 			},
 			workbox: {
+				disableDevLogs: true,
 				clientsClaim: true, // 새 서비스워커가 즉시 모든 탭을 제어
 				skipWaiting: true, // 새 서비스워커가 대기 없이 즉시 활성화
 				globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'], // precache할 파일 확장자
@@ -122,14 +123,10 @@ export default defineConfig({
 		// },
 		https: true,
 		headers: {
-			// COOP 설정 변경
 			'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-			// COEP 설정 변경
 			'Cross-Origin-Embedder-Policy': 'credentialless',
 			'Referrer-Policy': 'strict-origin-when-cross-origin',
-			// CORS 설정 변경
 			'Access-Control-Allow-Origin': '*',
-			// CORP 설정 변경
 			'Cross-Origin-Resource-Policy': 'cross-origin',
 			'Content-Security-Policy': cspHeader,
 		},
