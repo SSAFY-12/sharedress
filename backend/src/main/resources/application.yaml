@@ -39,6 +39,10 @@ google:
     resource-uri: https://www.googleapis.com/oauth2/v2/userinfo
 
 ---
+jwt:
+    secret: ${JWT_SECRET}
+
+---
 logging.level:
     show_sql: debug
     org.hibernate.type: trace
