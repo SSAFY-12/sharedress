@@ -4,7 +4,7 @@ pipeline {
   environment {
     // Git 브랜치에 따라 태그만 구분 (예: 12‑fe)
     BUILD_TAG = "${BUILD_NUMBER}-fe"
-    BLUE_IP   = '172.31.55.206'          // 배포 대상 EC2 (Nginx)
+    BLUE_IP = '172.31.35.103'   // LB EC2 프라이빗(또는 퍼블릭) IP
     DIST_DIR  = 'frontend/dist'          // 빌드 산출물 위치
   }
 
