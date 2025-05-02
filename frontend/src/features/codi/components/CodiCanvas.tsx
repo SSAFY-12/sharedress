@@ -18,6 +18,7 @@ interface CanvasItem {
 	aspectRatio?: number;
 	initialWidth?: number;
 	initialHeight?: number;
+	isLoaded?: boolean; // 이미지 로드 상태 추적 변수
 }
 
 interface CodiCanvasProps {
@@ -73,6 +74,7 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 			aspectRatio,
 			initialWidth,
 			initialHeight,
+			isLoaded: true,
 		});
 	};
 
@@ -291,6 +293,8 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 						transform: `rotate(${item.rotation}deg) scale(${item.scale})`,
 						transformOrigin: 'center',
 						zIndex: item.zIndex,
+						opacity: item.isLoaded ? 1 : 0,
+						transition: 'opaticy 0.2s ease-in-out',
 					}}
 					onClick={(e) => handleItemSelect(e, item.canvasId)}
 					onTouchStart={(e) => handleItemSelect(e, item.canvasId)}
@@ -308,6 +312,8 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 							style={{
 								width: item.initialWidth ? `${item.initialWidth}px` : 'auto',
 								height: item.initialHeight ? `${item.initialHeight}px` : 'auto',
+								minWidth: '40px',
+								minHeight: '40px',
 							}}
 							draggable={false}
 							onLoad={(e) => handleImageLoad(e, item)}
