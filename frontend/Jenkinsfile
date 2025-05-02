@@ -1,0 +1,49 @@
+pipeline {
+  agent any
+
+  environment {
+    // Git 브랜치에 따라 태그만 구분 (예: 12-blue)
+    BUILD_TAG = "${BUILD_NUMBER}-fe"
+    BLUE_IP   = '172.31.55.206'
+  }
+
+  tools {                                           // Jenkins → Global Tool Config
+    nodejs 'node20'                                 // Node 20.x LTS 이름
+  }
+
+  stages {
+
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
+    stage('Install & Build') {
+      steps {
+        sh '''
+          echo "🔧  Installing deps…"
+          npm ci --legacy-peer-deps        # yarn 이나 pnpm 쓰면 교체
+          npm run build                    # 결과물: dist/  or build/
+        '''
+      }
+    }
+
+    stage('Deploy to Blue') {
+      steps {
+        sshagent(credentials: ['blue-ec2-ssh']) {   // 이미 등록한 EC2 SSH 키
+          sh """
+            echo '🚀  Rsync to Blue…'
+            rsync -avz --delete dist/ ec2-user@${BLUE_IP}:/var/www/blue/
+
+            echo '🔄  Point current → blue'
+            ssh ec2-user@${BLUE_IP} 'ln -sfn /var/www/blue /var/www/current && sudo nginx -s reload'
+          """
+        }
+      }
+    }
+  }
+
+  post {
+    success { echo "✅  FE build ${BUILD_TAG} 배포 완료 (→ Blue)" }
+    failure { echo "❌  FE build 실패 – 콘솔 로그 확인" }
+  }
+}
