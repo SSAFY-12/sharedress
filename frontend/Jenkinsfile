@@ -6,6 +6,7 @@ pipeline {
     BUILD_TAG = "${BUILD_NUMBER}-fe"
     BLUE_IP   = '172.31.35.103'      // LB EC2 프라이빗(또는 퍼블릭) IP
     DIST_DIR  = 'frontend/dev-dist'  // 🔄 dev‑dist 로 변경
+    SSH_USER  = 'ec2-user' 
   }
 
   tools {                            // Jenkins → Global Tool Configuration
@@ -34,15 +35,17 @@ pipeline {
 
     stage('Deploy to Blue') {
       steps {
-        sshagent(credentials: ['blue-ec2-ssh']) {   // 등록해둔 Blue EC2 SSH 키
+        sshagent(credentials: ['lb-ssh']) {   // 등록해둔 Blue EC2 SSH 키
           sh """
             echo '🚀  Rsync to Blue…'
             rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
                   ${DIST_DIR}/ ec2-user@${BLUE_IP}:/var/www/blue/
 
             echo '🔄  Switch current → blue'
-            ssh -o StrictHostKeyChecking=no ec2-user@${BLUE_IP} '
-              ln -sfn /var/www/blue /var/www/current &&
+            ssh -o StrictHostKeyChecking=no ${SSH_USER}@${BLUE_IP} '
+              sudo mkdir -p /var/www/current &&
+              sudo ln -sfn /var/www/blue /var/www/current &&
+              sudo chown -R ${SSH_USER}:${SSH_USER} /var/www &&
               sudo nginx -s reload
             '
           """
