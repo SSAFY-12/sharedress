@@ -35,7 +35,9 @@ export const ClothListContainer = ({
 			</div>
 		)}
 
-		<div className={`grid grid-cols-${columns} gap-4`}>
+		<div
+			className={`grid gap-4 ${columns === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}
+		>
 			{items.map((item) => (
 				<ClothCard
 					key={item.id}
