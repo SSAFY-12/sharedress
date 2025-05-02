@@ -33,7 +33,8 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 		QClothes cl = QClothes.clothes;
 
 		BooleanBuilder condition = new BooleanBuilder()
-			.and(cc.closet.member.id.eq(memberId));
+			.and(cc.closet.member.id.eq(memberId))
+			.and(cc.imageUrl.isNotNull());
 
 		if (categoryId != null) {
 			condition.and(
