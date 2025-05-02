@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.adapter.auth.out.GoogleUserInfoClient;
 import com.ssafy.sharedress.application.auth.dto.GoogleUserInfoResponse;
@@ -23,6 +24,7 @@ public class GoogleLoginService implements GoogleLoginUseCase {
 	private final MemberRepository memberRepository;
 	private final TokenUseCase tokenUseCase;
 
+	@Transactional
 	@Override
 	public TokenWithRefresh login(String googleAccessToken) {
 		// 1. user info 얻기
