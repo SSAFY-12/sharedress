@@ -22,7 +22,10 @@ public class ClothesController {
 	@PostMapping("/clothes/purchase-history")
 	public ResponseEntity<ResponseWrapper<Void>> registerClothesFromPurchase(
 		@RequestBody PurchaseHistoryRequest request) {
-		clothesUseCase.registerClothesFromPurchase(request);
+
+		// TODO[지윤]: security context에서 memberId를 가져오는 로직 추가
+		Long myId = 1L;
+		clothesUseCase.registerClothesFromPurchase(request, myId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
 	}
 }
