@@ -4,7 +4,9 @@ import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
 import SocialPage from '@/pages/SocialPage';
-
+// import { FriendSearchResultPage } from '@/features/social/pages/FriendSearchResultPage';
+// import { FriendsListPage } from '@/features/social/pages/FriendListPage';
+// import { FriendRequestsPage } from '@/features/social/pages/FriendRequestPage';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -28,8 +30,23 @@ export const router = createBrowserRouter([
 				element: <CodiPage />,
 			},
 			{
-				path: 'friend',
+				path: 'social',
+				// element: <FriendsListPage />,
 				element: <SocialPage />,
+				// children: [
+				// 	{
+				// 		path: 'search',
+				// 		element: <FriendSearchResultPage />,
+				// 	},
+				// 	// {
+				// 	// 	path: 'list',
+				// 	// 	element: <FriendsListPage />,
+				// 	// },
+				// 	{
+				// 		path: 'request',
+				// 		element: <FriendRequestsPage />,
+				// 	},
+				// ],
 			},
 			{
 				path: '*',
