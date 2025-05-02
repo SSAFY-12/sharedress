@@ -3,6 +3,7 @@ package com.ssafy.sharedress.application.clothes.service;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
@@ -23,9 +24,10 @@ import com.ssafy.sharedress.global.exception.ExceptionUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
+@Transactional(readOnly = true)
 public class ClothesService implements ClothesUseCase {
 
 	private final ClothesRepository clothesRepository;
@@ -35,6 +37,7 @@ public class ClothesService implements ClothesUseCase {
 	private final ClosetClothesRepository closetClothesRepository;
 
 	@Override
+	@Transactional
 	public void registerClothesFromPurchase(PurchaseHistoryRequest request, Long memberId) {
 		Long shopId = request.shopId();
 
