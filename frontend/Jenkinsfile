@@ -37,7 +37,8 @@ pipeline {
         sshagent(credentials: ['blue-ec2-ssh']) {   // 등록해둔 Blue EC2 SSH 키
           sh """
             echo '🚀  Rsync to Blue…'
-            rsync -avz --delete ${DIST_DIR}/  ec2-user@${BLUE_IP}:/var/www/blue/
+            rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
+                  ${DIST_DIR}/ ec2-user@${BLUE_IP}:/var/www/blue/
 
             echo '🔄  Switch current → blue'
             ssh -o StrictHostKeyChecking=no ec2-user@${BLUE_IP} '
