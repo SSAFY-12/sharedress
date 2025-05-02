@@ -36,4 +36,11 @@ public class Member extends BaseTimeEntity {
 	private String fcmToken;
 
 	private Boolean notificationStatus;
+
+	public Member(String email, String profileUrl, String nickname, String code) {
+		this.email = email;
+		this.profileUrl = profileUrl;
+		this.nickname = nickname;
+		this.code = code;
+	}
 }
