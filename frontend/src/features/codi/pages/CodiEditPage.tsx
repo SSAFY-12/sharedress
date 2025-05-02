@@ -78,6 +78,13 @@ const CodiEditPage = () => {
 			brand: '브랜드',
 			category: 'outer',
 		},
+		{
+			id: '10',
+			imageUrl: 'https://picsum.photos/200',
+			name: '옷',
+			brand: '브랜드',
+			category: 'etc',
+		},
 	];
 
 	// 상태 관리
@@ -156,11 +163,11 @@ const CodiEditPage = () => {
 	});
 
 	return (
-		<div className='max-w-md mx-auto min-h-screen flex flex-col bg-white'>
-			<Header showBack={true} badge={{ iconType: 'next', text: '다음' }} />
-			<div className='flex-1 flex flex-col'>
+		<div className='max-w-md mx-auto h-screen flex flex-col bg-white overflow-hidden'>
+			<Header showBack={true} badgeText='다음' />
+			<div className='flex-1 flex flex-col overflow-hidden'>
 				{/* 코디 캔버스 부분 */}
-				<div className='flex-1'>
+				<div className='flex-shrink-0'>
 					<CodiCanvas
 						items={canvasItems}
 						updateItem={updateCanvasItem}
@@ -171,20 +178,24 @@ const CodiEditPage = () => {
 				</div>
 
 				{/* 아이템 선택 영역 */}
-				<div className='bg-white border-t border-gray-100'>
+				<div className='flex-1 flex flex-col min-h-0 bg-white border-t border-gray-100'>
 					{/* 카테고리 탭 */}
-					<CodiCategoryTabs
-						categories={categories}
-						activeCategory={activeCategory}
-						onCategoryChange={setActiveCategory}
-					/>
+					<div className='flex-shrink-0'>
+						<CodiCategoryTabs
+							categories={categories}
+							activeCategory={activeCategory}
+							onCategoryChange={setActiveCategory}
+						/>
+					</div>
 
 					{/* 옷 나열되는 부분 */}
-					<div className='p-4'>
-						<ClothListContainer
-							items={filteredProducts}
-							onItemClick={addItemToCanvas}
-						/>
+					<div className='flex-1 overflow-y-auto'>
+						<div className='p-4'>
+							<ClothListContainer
+								items={filteredProducts}
+								onItemClick={addItemToCanvas}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
