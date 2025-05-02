@@ -2,8 +2,13 @@ package com.ssafy.sharedress.application.jwt;
 
 import java.io.IOException;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.ssafy.sharedress.application.auth.service.CustomMemberDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,8 +20,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	// private final JwtTokenProvider jwtTokenProvider;
-	// private final CustomUserDetailsService userDetailsService;
+	private final JwtTokenProvider tokenProvider;
+	private final JwtTokenResolver tokenResolver;
+	private final CustomMemberDetailsService memberDetailsService;
 
 	@Override
 	protected void doFilterInternal(
@@ -24,18 +30,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		HttpServletResponse response,
 		FilterChain filterChain
 	) throws ServletException, IOException {
+		String accessToken = tokenResolver.resolveAccessToken(request);
 
-		// String token = jwtTokenProvider.resolveToken(request);
-		//
-		// if (token != null && jwtTokenProvider.validateToken(token)) {
-		// 	String username = jwtTokenProvider.getUsernameFromToken(token);
-		// 	UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-		// 	UsernamePasswordAuthenticationToken authentication =
-		// 		new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-		//
-		// 	SecurityContextHolder.getContext().setAuthentication(authentication);
-		// }
+		if (accessToken != null && tokenProvider.validateToken(accessToken)) {
+			String memberId = tokenProvider.getMemberId(accessToken);
 
-		filterChain.doFilter(request, response);
+			// DB에서 사용자 정보 로드
+			UserDetails userDetails = memberDetailsService.loadUserByUsername(memberId);
+
+			// 인증 정보 생성 및 SecurityContext 설정
+			UsernamePasswordAuthenticationToken authentication =
+				new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		}
+
+		filterChain.doFilter(request, response); // 다음 필터로 넘김
 	}
 }
