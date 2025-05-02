@@ -10,10 +10,10 @@ import com.ssafy.sharedress.domain.brand.entity.Brand;
 
 public interface BrandJpaRepository extends JpaRepository<Brand, Long> {
 	@Query("""
-			SELECT b
-			FROM Brand b
-			WHERE LOWER(b.nameKr) LIKE LOWER(CONCAT('%', :keyword, '%'))
-			OR LOWER(b.nameEn) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		SELECT b
+		FROM Brand b
+		WHERE b.nameKr LIKE CONCAT('%', :keyword, '%')
+		   OR LOWER(b.nameEn) LIKE LOWER(CONCAT('%', :keyword, '%'))
 		""")
 	List<Brand> searchByKeyword(@Param("keyword") String keyword);
 }
