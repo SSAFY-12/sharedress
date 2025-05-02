@@ -12,7 +12,8 @@ interface AuthResState {
 }
 
 const useAuth = () => {
-	const { setAccessToken, isAuthenticated, accessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
+	const { setAccessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
+	// const { setAccessToken, isAuthenticated, accessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
 
 	const mutation = useMutation({
 		mutationFn: (token: string) => authApi.login(token),
@@ -28,8 +29,6 @@ const useAuth = () => {
 	});
 
 	return {
-		isAuthenticated, // store에서 관리되는 값
-		accessToken, // store에서 관리되는 값
 		mutation,
 	};
 };
