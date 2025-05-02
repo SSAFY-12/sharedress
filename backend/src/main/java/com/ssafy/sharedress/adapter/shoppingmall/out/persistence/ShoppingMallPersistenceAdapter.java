@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.adapter.shoppingmall.out.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +19,10 @@ public class ShoppingMallPersistenceAdapter implements ShoppingMallRepository {
 	@Override
 	public List<ShoppingMall> findAllByOrderByIdAsc() {
 		return shoppingMallJpaRepository.findAllByOrderByIdAsc();
+	}
+
+	@Override
+	public Optional<ShoppingMall> findById(Long id) {
+		return shoppingMallJpaRepository.findById(id);
 	}
 }
