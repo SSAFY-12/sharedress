@@ -14,7 +14,7 @@ public interface BrandJpaRepository extends JpaRepository<Brand, Long> {
 		SELECT b
 		FROM Brand b
 		WHERE b.nameKr LIKE CONCAT('%', :keyword, '%')
-		OR LOWER(b.nameEn) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		OR LOWER(b.nameEn) LIKE CONCAT('%', LOWER(:keyword), '%')
 		""")
 	List<Brand> searchByKeyword(@Param("keyword") String keyword);
 
