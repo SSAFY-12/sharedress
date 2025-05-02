@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiCategoryTabs from '@/features/codi/components/CodiCategoryTabs';
 import Header from '@/components/layouts/Header';
 
 const CodiEditPage = () => {
+	const navigate = useNavigate();
 	const categories = [
 		{ id: 'all', label: '전체' },
 		{ id: 'top', label: '상의' },
@@ -162,9 +164,15 @@ const CodiEditPage = () => {
 		};
 	});
 
+	const handleNextClick = () => {
+		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
+
+		navigate('/codi/save');
+	};
+
 	return (
 		<div className='max-w-md mx-auto h-screen flex flex-col bg-white overflow-hidden'>
-			<Header showBack={true} badgeText='다음' />
+			<Header showBack={true} badgeText='다음' onBadgeClick={handleNextClick} />
 			<div className='flex-1 flex flex-col overflow-hidden'>
 				{/* 코디 캔버스 부분 */}
 				<div className='flex-shrink-0'>

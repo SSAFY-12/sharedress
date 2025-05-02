@@ -18,6 +18,7 @@ interface HeaderProps {
 		| 'error';
 	badgeText?: string;
 	onBackClick?: () => void;
+	onBadgeClick?: () => void;
 }
 
 const Header = ({
@@ -27,6 +28,7 @@ const Header = ({
 	badgeIcon,
 	badgeText,
 	onBackClick,
+	onBadgeClick,
 }: HeaderProps) => (
 	<header className='flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200'>
 		<div className='flex items-center min-w-0'>
@@ -52,7 +54,9 @@ const Header = ({
 		</div>
 		{/* badgeIcon이 있으면 Badge 컴포넌트 렌더링 */}
 		{/* badgIcon은 없을 수 있음 : ? 로표현 */}
-		{(badgeIcon || badgeText) && <Badge icon={badgeIcon} text={badgeText} />}
+		{(badgeIcon || badgeText) && (
+			<Badge icon={badgeIcon} text={badgeText} onClick={onBadgeClick} />
+		)}
 	</header>
 );
 
