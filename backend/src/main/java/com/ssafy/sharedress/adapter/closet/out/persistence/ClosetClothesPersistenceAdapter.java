@@ -20,6 +20,8 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 
 	private final JPAQueryFactory queryFactory;
 
+	private final ClosetClothesJpaRepository closetClothesJpaRepository;
+
 	@Override
 	public CursorPageResult<ClosetClothes> findByMemberAndCategoryWithCursor(
 		Long memberId,
@@ -63,5 +65,10 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 		Long nextCursor = hasNext ? results.get(results.size() - 1).getId() : null;
 
 		return new CursorPageResult<>(results, hasNext, nextCursor);
+	}
+
+	@Override
+	public ClosetClothes save(ClosetClothes closetClothes) {
+		return closetClothesJpaRepository.save(closetClothes);
 	}
 }

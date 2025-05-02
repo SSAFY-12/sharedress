@@ -54,5 +54,18 @@ public class ClosetClothes extends BaseTimeEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "custom_category_id")
 	private Category customCategory;
+
+	public ClosetClothes(Closet closet, Clothes clothes) {
+		this.closet = closet;
+		this.clothes = clothes;
+	}
+
+	public void updateIsPublic(Boolean isPublic) {
+		this.isPublic = isPublic;
+	}
+
+	public void updateImgUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 }
 
