@@ -1,13 +1,13 @@
-import { PrimaryButtonProps } from './PrimaryButton.types';
+import { PrimaryBtnProps } from './PrimaryBtn.types';
 
-export const PrimaryButton = ({
+export const PrimaryBtn = ({
 	size,
 	name,
 	color = 'primary',
 	activate = true,
 	onClick,
 	className = '',
-}: PrimaryButtonProps) => {
+}: PrimaryBtnProps) => {
 	const sizeClass = {
 		full: 'w-full',
 		medium: 'w-2/3',

@@ -24,7 +24,6 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		// "noUncheckedSideEffectImports": true,
 
 		/*url 경로*/
 		"baseUrl": "src",

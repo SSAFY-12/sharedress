@@ -1,6 +1,6 @@
 import React from 'react';
 
-export interface PrimaryButtonProps {
+export interface PrimaryBtnProps {
 	size: 'full' | 'medium' | 'compact'; // 버튼 크기
 	name: string; // 버튼에 표시될 텍스트
 	color?: 'primary' | 'black' | 'gray'; // 버튼 색상

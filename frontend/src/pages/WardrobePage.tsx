@@ -1,7 +1,3 @@
-const WardrobePage = () => (
-	<div>
-		<h1>WardrobePage</h1>
-	</div>
-);
+const WardrobePage = () => <h1>WardrobePage</h1>;
 
 export default WardrobePage;

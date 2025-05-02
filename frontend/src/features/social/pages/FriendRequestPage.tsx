@@ -1,4 +1,4 @@
-import { PrimaryButton } from '@/components/buttons/primary-button';
+import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 
 // 메인 컴포넌트
@@ -33,7 +33,7 @@ export const FriendRequestsPage = () => {
 							<h3 className='font-medium'>{request.name}</h3>
 							<p className='text-sm text-gray-500'>{request.message}</p>
 						</div>
-						<PrimaryButton
+						<PrimaryBtn
 							size='compact'
 							name='친구 수락'
 							color='black'

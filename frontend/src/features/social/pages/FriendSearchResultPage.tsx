@@ -1,4 +1,4 @@
-import { PrimaryButton } from '@/components/buttons/primary-button';
+import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { useState } from 'react';
@@ -34,7 +34,7 @@ export const FriendSearchResultPage = () => {
 						className='mb-3'
 					/>
 					<h2 className='font-bold mb-1'>돈까스현래</h2>
-					<PrimaryButton
+					<PrimaryBtn
 						size='compact'
 						name='친구 신청'
 						color='black'
