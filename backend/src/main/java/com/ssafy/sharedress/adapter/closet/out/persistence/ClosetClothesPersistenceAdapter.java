@@ -1,0 +1,67 @@
+package com.ssafy.sharedress.adapter.closet.out.persistence;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
+import com.ssafy.sharedress.domain.closet.entity.QClosetClothes;
+import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
+import com.ssafy.sharedress.domain.clothes.entity.QClothes;
+import com.ssafy.sharedress.global.dto.CursorPageResult;
+
+import lombok.RequiredArgsConstructor;
+
+@Repository
+@RequiredArgsConstructor
+public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository {
+
+	private final JPAQueryFactory queryFactory;
+
+	@Override
+	public CursorPageResult<ClosetClothes> findByMemberAndCategoryWithCursor(
+		Long memberId,
+		Long categoryId,
+		Long cursorId,
+		int size
+	) {
+		QClosetClothes cc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		BooleanBuilder condition = new BooleanBuilder()
+			.and(cc.closet.member.id.eq(memberId));
+
+		if (categoryId != null) {
+			condition.and(
+				cc.customCategory.id.eq(categoryId)
+					.or(cc.customCategory.isNull().and(cl.category.id.eq(categoryId)))
+			);
+		}
+
+		if (cursorId != null) {
+			condition.and(cc.id.lt(cursorId));
+		}
+
+		List<ClosetClothes> results = queryFactory.selectFrom(cc)
+			.leftJoin(cc.clothes, cl).fetchJoin()
+			.leftJoin(cc.customBrand).fetchJoin()
+			.leftJoin(cl.color).fetchJoin()
+			.leftJoin(cl.brand).fetchJoin()
+			.leftJoin(cl.category).fetchJoin()
+			.where(condition)
+			.orderBy(cc.id.desc())
+			.limit(size + 1)
+			.fetch();
+
+		boolean hasNext = results.size() > size;
+		if (hasNext) {
+			results.remove(size);
+		}
+
+		Long nextCursor = hasNext ? results.get(results.size() - 1).getId() : null;
+
+		return new CursorPageResult<>(results, hasNext, nextCursor);
+	}
+}

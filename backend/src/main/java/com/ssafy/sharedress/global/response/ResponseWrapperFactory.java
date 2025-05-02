@@ -2,12 +2,14 @@ package com.ssafy.sharedress.global.response;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.sharedress.global.dto.CursorPageResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -106,6 +108,29 @@ public class ResponseWrapperFactory<T> {
 			null,
 			content
 		).createResponseEntity();
+	}
+
+	public static <E> ResponseEntity<ResponseWrapper<List<E>>> toPageResponseEntity(
+		ResponseCode responseCode,
+		CursorPageResult<E> pageResult
+	) {
+		return new ResponseEntity<>(
+			ResponseWrapper.from(responseCode, pageResult),
+			new HttpHeaders(),
+			responseCode.getHttpStatus()
+		);
+	}
+
+	public static <E> ResponseEntity<ResponseWrapper<List<E>>> toPageResponseEntity(
+		HttpStatus httpStatus,
+		CursorPageResult<E> pageResult
+	) {
+		ResponseCode responseCode = DefaultResponseCode.of(httpStatus);
+		return new ResponseEntity<>(
+			ResponseWrapper.from(responseCode, pageResult),
+			new HttpHeaders(),
+			httpStatus
+		);
 	}
 
 	// 2. HttpServletResponse에 직접 세팅 (void)

@@ -1,6 +1,9 @@
 package com.ssafy.sharedress.domain.closet.entity;
 
+import com.ssafy.sharedress.domain.brand.entity.Brand;
+import com.ssafy.sharedress.domain.category.entity.Category;
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
+import com.ssafy.sharedress.domain.color.entity.Color;
 import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 
 import jakarta.persistence.Entity;
@@ -40,10 +43,16 @@ public class ClosetClothes extends BaseTimeEntity {
 	// 사용자 커스터마이징 정보 (nullable)
 	private String customName;
 
-	private String customColorId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "custom_color_id")
+	private Color customColor;
 
-	private Long customBrandId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "custom_brand_id")
+	private Brand customBrand;
 
-	private Long customCategoryId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "custom_category_id")
+	private Category customCategory;
 }
 
