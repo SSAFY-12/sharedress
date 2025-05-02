@@ -4,7 +4,7 @@ import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
 import SocialPage from '@/pages/SocialPage';
-
+import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -40,5 +40,9 @@ export const router = createBrowserRouter([
 	{
 		path: '/auth',
 		element: <AuthPage />,
+	},
+	{
+		path: '/oauth/google/callback',
+		element: <GoogleCallbackHandler />,
 	},
 ]);

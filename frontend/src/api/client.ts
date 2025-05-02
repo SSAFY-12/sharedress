@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { APIError, getErrorMessage } from './errorHandler';
-import { useAuthStore } from '@/store/useAuthStore';
 
 export const client = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
@@ -31,10 +30,10 @@ const handleGlobalError = (status: number, serverMessage?: string) => {
 
 client.interceptors.request.use(
 	async (config) => {
-		const token = useAuthStore.getState().accessToken;
-		if (token) {
-			config.headers['Authorization'] = `Bearer ${token}`;
-		}
+		// const token = useAuthStore.getState().accessToken;
+		// if (token) {
+		// 	config.headers['Authorization'] = `Bearer ${token}`;
+		// }
 		try {
 			// FormData인 경우 multipart/form-data로 설정
 			if (config.data instanceof FormData) {

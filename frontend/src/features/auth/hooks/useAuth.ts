@@ -15,12 +15,15 @@ const useAuth = () => {
 	const { setAccessToken, isAuthenticated, accessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
 
 	const mutation = useMutation({
-		mutationFn: (code: string) => authApi.login(code),
+		mutationFn: (token: string) => authApi.login(token),
 		onSuccess: (data: AuthResState) => {
 			console.log('BE 데이터 값 확인 : ', data);
 			// accessToken만 Zustand store에 저장
 			setAccessToken(data.content.accessToken);
 			// refreshToken은 서버에서 HttpOnly Cookie로 설정되어야 합니다
+		},
+		onError: (error) => {
+			console.error('로그인 실패:', error);
 		},
 	});
 

@@ -5,16 +5,19 @@ import axios from 'axios';
 // zustand에 저장하고, localstorage는 취약점이니,, indexDb에 넣어도 취약한거 아닌지? 이거 보안적으로 어떻게 해야할까?
 
 // axios의 기본 구조 -> data, status : 상태코드, statusText : 상태정보, headers, config, request
-
 export const authApi = {
 	//login
-	login: async (code: string) => {
+
+	login: async (accessToken: string) => {
 		//url코드
 		//OAuth 인증 토큰
-		const response = await axios.post('/api/auth/google', {
-			//axios자체를 활용했으니까
-			code,
-		});
+		const response = await axios.post(
+			`${import.meta.env.VITE_API_URL}/api/auth/google`,
+			{
+				//axios자체를 활용했으니까
+				accessToken: accessToken,
+			},
+		);
 		return response.data;
 	},
 };
