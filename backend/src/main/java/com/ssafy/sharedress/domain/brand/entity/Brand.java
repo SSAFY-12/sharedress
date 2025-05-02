@@ -21,4 +21,9 @@ public class Brand {
 
 	private String nameEn;
 	private String nameKr;
+
+	public Brand(String nameEn, String nameKr) {
+		this.nameEn = nameEn;
+		this.nameKr = nameKr;
+	}
 }

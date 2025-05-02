@@ -10,4 +10,6 @@ public interface ClosetClothesRepository {
 		Long cursorId,
 		int size
 	);
+
+	ClosetClothes save(ClosetClothes closetClothes);
 }

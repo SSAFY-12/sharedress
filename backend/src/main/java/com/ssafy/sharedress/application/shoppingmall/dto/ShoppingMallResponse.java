@@ -6,7 +6,7 @@ public record ShoppingMallResponse(
 	Long id,
 	String name,
 	String homepageLink,
-	String paymentHistoryLink
+	String purchaseHistoryLink
 ) {
 	public static ShoppingMallResponse from(ShoppingMall shoppingMall) {
 		return new ShoppingMallResponse(
@@ -16,5 +16,4 @@ public record ShoppingMallResponse(
 			shoppingMall.getHistoryUrlLink()
 		);
 	}
-
 }

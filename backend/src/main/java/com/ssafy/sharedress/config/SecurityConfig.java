@@ -38,8 +38,9 @@ public class SecurityConfig {
 				.accessDeniedHandler(accessDeniedHandler)
 			)
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/api/auth/**").permitAll()
-				.anyRequest().authenticated()
+				// .requestMatchers("/api/auth/**").permitAll()
+				// .anyRequest().authenticated()
+				.anyRequest().permitAll() // 개발 테스트 위해 모든 요청 허용
 			)
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
