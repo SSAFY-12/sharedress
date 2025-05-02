@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.adapter.clothes.out.persistence;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
@@ -16,5 +18,10 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 	@Override
 	public Clothes save(Clothes clothes) {
 		return clothesJpaRepository.save(clothes);
+	}
+
+	@Override
+	public Optional<Clothes> findByNameAndBrandId(String name, Long brandId) {
+		return clothesJpaRepository.findByNameAndBrandId(name, brandId);
 	}
 }

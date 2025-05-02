@@ -54,10 +54,11 @@ public class Clothes extends BaseTimeEntity {
 	@JoinColumn(name = "shopping_mall_id")
 	private ShoppingMall shoppingMall;
 
-	public Clothes(String name, Brand brand, ShoppingMall shoppingMall) {
+	public Clothes(String name, Brand brand, ShoppingMall shoppingMall, String goodsLinkUrl) {
 		this.name = name;
 		this.brand = brand;
 		this.shoppingMall = shoppingMall;
+		this.goodsLinkUrl = goodsLinkUrl;
 		this.type = ClothesSourceType.SHOPPING_MALL;
 	}
 }
