@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.application.auth.usecase;
 
+import com.ssafy.sharedress.application.auth.dto.TokenWithRefresh;
+
 public interface GoogleLoginUseCase {
-	String login(String accessToken);
+	TokenWithRefresh login(String accessToken);
 }
