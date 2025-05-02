@@ -10,10 +10,10 @@ import com.ssafy.sharedress.domain.clothes.entity.Clothes;
 
 public interface ClothesJpaRepository extends JpaRepository<Clothes, Long> {
 	@Query("""
-		    SELECT c
-		    FROM Clothes c
-		    WHERE c.name = :name
-		      AND c.brand.id = :brandId
+			SELECT c
+			FROM Clothes c
+			WHERE c.name = :name
+			AND c.brand.id = :brandId
 		""")
 	Optional<Clothes> findByNameAndBrandId(@Param("name") String name, @Param("brandId") Long brandId);
 }
