@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.adapter.closet.out.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -71,5 +72,27 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	@Override
 	public ClosetClothes save(ClosetClothes closetClothes) {
 		return closetClothesJpaRepository.save(closetClothes);
+	}
+
+	@Override
+	public Optional<ClosetClothes> findById(Long id) {
+		QClosetClothes cc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		BooleanBuilder condition = new BooleanBuilder()
+			.and(cc.id.eq(id))
+			.and(cc.imageUrl.isNotNull());
+
+		return Optional.ofNullable(
+			queryFactory.selectFrom(cc)
+				.leftJoin(cc.clothes, cl).fetchJoin()
+				.leftJoin(cc.customBrand).fetchJoin()
+				.leftJoin(cl.color).fetchJoin()
+				.leftJoin(cl.brand).fetchJoin()
+				.leftJoin(cl.category).fetchJoin()
+				.leftJoin(cl.shoppingMall).fetchJoin()
+				.where(condition)
+				.fetchOne()
+		);
 	}
 }

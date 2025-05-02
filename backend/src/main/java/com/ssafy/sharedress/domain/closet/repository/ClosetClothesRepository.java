@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.domain.closet.repository;
 
+import java.util.Optional;
+
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 
@@ -12,4 +14,6 @@ public interface ClosetClothesRepository {
 	);
 
 	ClosetClothes save(ClosetClothes closetClothes);
+
+	Optional<ClosetClothes> findById(Long id);
 }
