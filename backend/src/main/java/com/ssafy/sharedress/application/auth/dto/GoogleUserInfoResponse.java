@@ -6,4 +6,11 @@ public record GoogleUserInfoResponse(
 	String name,
 	String picture
 ) {
+	// public Member toEntity() {
+	// 	return new Member(
+	// 		email,
+	// 		name,
+	// 		picture
+	// 	);
+	// }
 }
