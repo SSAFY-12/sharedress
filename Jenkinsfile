@@ -2,33 +2,41 @@ pipeline {
   agent any
 
   environment {
-    AWS_REGION  = 'ap-northeast-2'
-    ACCOUNT_ID  = '273354621375'
-    ECR_URI     = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-    APP_NAME    = 'spring-app'
-    BLUE_IP     = '172.31.55.206'    // Blue EC2 프라이빗 IP
-    GREEN_IP    = '172.26.11.74'     // Green EC2 프라이빗 IP
-    LB_IP       = '172.31.35.103'    // Nginx 로드밸런서 EC2 프라이빗 IP
+    AWS_REGION      = 'ap-northeast-2'
+    ACCOUNT_ID      = '273354621375'
+    ECR_URI         = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    APP_NAME        = 'spring-app'
+
+    BLUE_IP         = '172.31.55.206'   // Blue EC2 (Amazon Linux)
+    GREEN_IP        = '172.26.11.74'    // Green EC2 (Ubuntu)
+    LB_IP           = '172.31.35.103'   // Nginx LB EC2
+
+    /* ─────────────── 임시로 Green 비활성화 ───────────────
+       ► 피어링 완료되면 false 로만 바꾸면 됩니다          */
+    GREEN_DISABLED  = 'true'
   }
 
   stages {
+
+    /* ─────────────── 소스 체크아웃 ─────────────── */
     stage('Checkout') {
-      steps {
-        checkout scm
-      }
+      steps { checkout scm }
     }
 
+    /* ─────────────── 변수 계산 ─────────────── */
     stage('Prepare Variables') {
       steps {
         script {
-          def isGreen = (env.BRANCH_NAME == 'develop-be')
-          def color   = isGreen ? 'green' : 'blue'
-          env.TAG     = "${env.BUILD_NUMBER}-${color}"
-          echo "📦 Branch=${env.BRANCH_NAME}, Deploy Color=${color}, TAG=${env.TAG}"
+          def isGreenBranch = (env.BRANCH_NAME == 'develop-be')
+          def color         = isGreenBranch ? 'green' : 'blue'
+          env.TAG           = "${env.BUILD_NUMBER}-${color}"
+
+          echo "📦  Branch=${env.BRANCH_NAME}, DeployColor=${color}, TAG=${env.TAG}"
         }
       }
     }
 
+    /* ─────────────── JAR 빌드 ─────────────── */
     stage('Build JAR') {
       steps {
         dir('backend') {
@@ -40,17 +48,17 @@ pipeline {
       }
     }
 
+    /* ─────────────── Buildx 준비 ─────────────── */
     stage('Setup Buildx') {
       steps {
         sh '''
-          # multi-builder가 없다면 생성 후 사용 설정
           docker buildx create --name multi-builder --driver docker-container --use || true
-          # QEMU 백엔드까지 부트스트랩
           docker buildx inspect multi-builder --bootstrap
         '''
       }
     }
 
+    /* ─────────────── 이미지 빌드 & 푸시 ─────────────── */
     stage('Build & Push Image') {
       steps {
         dir('backend') {
@@ -73,27 +81,29 @@ pipeline {
       }
     }
 
+    /* ─────────────── 대상 서버 배포 ─────────────── */
     stage('Deploy to Target') {
       steps {
         script {
-          def isGreen     = (env.BRANCH_NAME == 'develop-be')
-          def targetIP    = isGreen ? env.GREEN_IP : env.BLUE_IP
-          def sshCred     = isGreen ? 'green-ssh'  : 'blue-ec2-ssh'
-          def sshUser     = isGreen ? 'ubuntu'     : 'ec2-user'
-          def composeFile = isGreen
-            ? '/opt/green/docker-compose.green.yml'
-            : '/opt/blue/docker-compose.blue.yml'
+          boolean greenOff      = (env.GREEN_DISABLED == 'true')
+          boolean isGreenBranch = (env.BRANCH_NAME == 'develop-be')
+
+          // ▸ Green 이 꺼져있으면 develop‑be 도 Blue 로 보냄
+          def targetIP    = (!greenOff && isGreenBranch) ? env.GREEN_IP : env.BLUE_IP
+          def sshCred     = (!greenOff && isGreenBranch) ? 'green-ssh'  : 'blue-ec2-ssh'
+          def sshUser     = (!greenOff && isGreenBranch) ? 'ubuntu'     : 'ec2-user'
+          def composeFile = (!greenOff && isGreenBranch)
+                            ? '/opt/green/docker-compose.green.yml'
+                            : '/opt/blue/docker-compose.blue.yml'
 
           sshagent([sshCred]) {
             sh """
-ssh -o StrictHostKeyChecking=no ${sshUser}@${targetIP} << 'EOF'
-export AWS_REGION=${AWS_REGION}
-export ECR_URI=${ECR_URI}
-aws ecr get-login-password --region \$AWS_REGION | docker login --username AWS --password-stdin \$ECR_URI
+ssh -o StrictHostKeyChecking=no ${sshUser}@${targetIP} <<'EOF'
+  aws ecr get-login-password --region ${AWS_REGION} | \
+      docker login --username AWS --password-stdin ${ECR_URI}
 
-sed -i "s@image:.*@image: ${ECR_URI}/${APP_NAME}:${TAG}@" ${composeFile}
-docker pull ${ECR_URI}/${APP_NAME}:${TAG}
-docker compose -f ${composeFile} up -d
+  docker pull ${ECR_URI}/${APP_NAME}:${TAG}
+  docker compose -f ${composeFile} up -d
 EOF
             """
           }
@@ -101,24 +111,25 @@ EOF
       }
     }
 
+    /* ─────────────── LB 트래픽 스위치 ─────────────── */
     stage('Switch Traffic') {
       when {
-        anyOf {
-          branch 'develop-be'
-          branch 'main'
+        allOf {
+          not { environment name: 'GREEN_DISABLED', value: 'true' }   // Green 살아있을 때만
+          anyOf { branch 'develop-be'; branch 'main' }
         }
       }
       steps {
         script {
-          def isGreen = (env.BRANCH_NAME == 'develop-be')
-          def fromIP  = isGreen ? env.BLUE_IP  : env.GREEN_IP
-          def toIP    = isGreen ? env.GREEN_IP : env.BLUE_IP
+          def isGreenBranch = (env.BRANCH_NAME == 'develop-be')
+          def fromIP  = isGreenBranch ? env.BLUE_IP  : env.GREEN_IP
+          def toIP    = isGreenBranch ? env.GREEN_IP : env.BLUE_IP
 
           sshagent(['lb-ssh']) {
             sh """
-ssh -o StrictHostKeyChecking=no ec2-user@${LB_IP} << 'EOF'
-sudo sed -i 's/${fromIP}/${toIP}/' /etc/nginx/conf.d/loadbalancer.conf
-sudo nginx -s reload
+ssh -o StrictHostKeyChecking=no ec2-user@${LB_IP} <<'EOF'
+  sudo sed -i 's/${fromIP}/${toIP}/' /etc/nginx/conf.d/loadbalancer.conf
+  sudo nginx -s reload
 EOF
             """
           }
@@ -127,12 +138,9 @@ EOF
     }
   }
 
+  /* ─────────────── 결과 알림 ─────────────── */
   post {
-    success {
-      echo "✅ ${env.BRANCH_NAME} 배포 완료 (TAG=${env.TAG})"
-    }
-    failure {
-      echo "❌ ${env.BRANCH_NAME} 배포 실패 – 콘솔 로그 확인"
-    }
+    success { echo "✅  ${env.BRANCH_NAME} 배포 완료 (TAG=${env.TAG})" }
+    failure { echo "❌  ${env.BRANCH_NAME} 배포 실패 – 콘솔 로그 확인" }
   }
 }
