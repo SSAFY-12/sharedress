@@ -4,6 +4,7 @@ import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import FriendPage from '@/pages/FriendPage';
 import AuthPage from '@/pages/AuthPage';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 
 export const router = createBrowserRouter([
 	{
@@ -36,5 +37,9 @@ export const router = createBrowserRouter([
 				element: <Navigate to='/wardrobe' replace />,
 			},
 		],
+	},
+	{
+		path: 'codi/edit',
+		element: <CodiEditPage />,
 	},
 ]);
