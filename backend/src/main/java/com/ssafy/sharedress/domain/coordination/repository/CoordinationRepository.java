@@ -10,4 +10,8 @@ public interface CoordinationRepository {
 	List<Coordination> findMyCoordinations(Long myId);
 
 	List<Coordination> findMyRecommendedCoordinations(Long myId);
+
+	List<Coordination> findFriendCoordinations(Long friendId);
+
+	List<Coordination> findMyRecommendToFriend(Long myId, Long friendId);
 }

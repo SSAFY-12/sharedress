@@ -68,4 +68,46 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 			.fetch();
 	}
 
+	@Override
+	public List<Coordination> findFriendCoordinations(Long friendId) {
+		QCoordination cd = QCoordination.coordination;
+		QCoordinationClothes cc = QCoordinationClothes.coordinationClothes;
+		QClosetClothes clc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		return queryFactory
+			.selectFrom(cd)
+			.leftJoin(cd.coordinationClothes, cc).fetchJoin()
+			.leftJoin(cc.closetClothes, clc).fetchJoin()
+			.leftJoin(clc.clothes, cl).fetchJoin()
+			.where(
+				cd.creator.id.eq(friendId)
+					.and(cd.owner.id.eq(friendId))
+			)
+			.orderBy(cd.id.desc())
+			.distinct()
+			.fetch();
+	}
+
+	@Override
+	public List<Coordination> findMyRecommendToFriend(Long myId, Long friendId) {
+		QCoordination cd = QCoordination.coordination;
+		QCoordinationClothes cc = QCoordinationClothes.coordinationClothes;
+		QClosetClothes clc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		return queryFactory
+			.selectFrom(cd)
+			.leftJoin(cd.coordinationClothes, cc).fetchJoin()
+			.leftJoin(cc.closetClothes, clc).fetchJoin()
+			.leftJoin(clc.clothes, cl).fetchJoin()
+			.where(
+				cd.originCreator.id.eq(myId)
+					.and(cd.owner.id.eq(friendId))
+			)
+			.orderBy(cd.id.desc())
+			.distinct()
+			.fetch();
+	}
+
 }

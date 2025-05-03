@@ -33,6 +33,17 @@ public class CoordinationQueryService implements CoordinationQueryUseCase {
 			return myRecommendedCoordinations.stream()
 				.map(CoordinationWithItemResponse::fromEntity)
 				.toList();
+		} else if (scope == Scope.CREATED) {
+			List<Coordination> friendCoordinations = coordinationRepository.findFriendCoordinations(targetMemberId);
+			return friendCoordinations.stream()
+				.map(CoordinationWithItemResponse::fromEntity)
+				.toList();
+		} else if (scope == Scope.RECOMMENDED) {
+			List<Coordination> myRecommendToFriend = coordinationRepository.findMyRecommendToFriend(myId,
+				targetMemberId);
+			return myRecommendToFriend.stream()
+				.map(CoordinationWithItemResponse::fromEntity)
+				.toList();
 		}
 		throw new IllegalArgumentException("Invalid scope: " + scope);
 	}
