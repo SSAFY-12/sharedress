@@ -17,7 +17,12 @@ const CLOTHING_ITEMS: ClothItem[] = [
 		imageUrl: 'https://picsum.photos/200',
 		name: '비바스튜디오',
 	},
-	{ id: '3', category: 'outer', imageUrl: '/black-jacket.png', name: '세터' },
+	{
+		id: '3',
+		category: 'outer',
+		imageUrl: 'https://picsum.photos/200',
+		name: '세터',
+	},
 	{
 		id: '4',
 		category: '아우터',

@@ -28,7 +28,7 @@ const Header = ({
 	badgeText,
 	onBackClick,
 }: HeaderProps) => (
-	<header className='flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200'>
+	<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
 		<div className='flex items-center min-w-0'>
 			{showBack && (
 				<div className='flex items-center gap-1 min-w-0'>

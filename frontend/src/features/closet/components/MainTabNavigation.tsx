@@ -9,9 +9,9 @@ const MainTabNavigation = ({
 }: MainTabNavigationProps) => (
 	<div className='flex border-b border-[#e6e5e5]'>
 		<button
-			className={`flex-1 py-4 text-center font-medium ${
+			className={`flex-1 py-4 text-center font-medium rounded-none ${
 				activeTab === 'closet'
-					? 'border-b-2 border-[#3a3636]'
+					? 'border-b-2 border-b-[#3a3636]'
 					: 'text-[#a7a5a4]'
 			}`}
 			onClick={() => onTabChange('closet')}
@@ -20,7 +20,9 @@ const MainTabNavigation = ({
 		</button>
 		<button
 			className={`flex-1 py-4 text-center font-medium ${
-				activeTab === 'codi' ? 'border-b-2 border-[#3a3636]' : 'text-[#a7a5a4]'
+				activeTab === 'codi'
+					? 'border-b-2 border-b-[#3a3636]'
+					: 'text-[#a7a5a4]'
 			}`}
 			onClick={() => onTabChange('codi')}
 		>

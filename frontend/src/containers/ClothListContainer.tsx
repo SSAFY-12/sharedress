@@ -23,13 +23,14 @@ export const ClothListContainer = ({
 }: ClothListContainerProps) => (
 	<div className={className}>
 		{categories.length > 0 && (
-			<div className='flex flex-wrap gap-2 mb-4'>
+			<div className='flex overflow-x-auto pb-2 mb-4 -mx-1 px-1'>
 				{categories.map((category) => (
 					<ItemCategoryBtn
 						key={category}
 						text={category}
 						isActive={selectedCategory === category}
 						onClick={() => onCategoryChange?.(category)}
+						className='mr-1 whitespace-nowrap'
 					/>
 				))}
 			</div>
