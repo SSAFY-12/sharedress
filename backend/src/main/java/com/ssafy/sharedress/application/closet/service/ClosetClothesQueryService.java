@@ -5,11 +5,14 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
+import com.ssafy.sharedress.domain.closet.error.ClosetClothesErrorCode;
 import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
+import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,5 +42,12 @@ public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 			.toList();
 
 		return new CursorPageResult<>(contents, result.hasNext(), result.nextCursor());
+	}
+
+	@Override
+	public ClosetClothesDetailResponse getClosetClothesDetail(Long memberId, Long closetClothesId) {
+		return closetClothesRepository.findById(closetClothesId)
+			.map(ClosetClothesDetailResponse::from)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
 	}
 }

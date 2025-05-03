@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
@@ -41,5 +42,16 @@ public class ClosetClothesController {
 		);
 
 		return ResponseWrapperFactory.toPageResponseEntity(HttpStatus.OK, result);
+	}
+
+	@GetMapping("/closet/clothes/{closetClothesId}")
+	public ResponseEntity<ResponseWrapper<ClosetClothesDetailResponse>> getClosetClothesDetail(
+		@PathVariable("closetClothesId") Long closetClothesId
+	) {
+		// TODO[준]: security context 에서 myId 가져오기
+		Long myId = 1L;
+		ClosetClothesDetailResponse result = closetClothesQueryUseCase.getClosetClothesDetail(myId, closetClothesId);
+
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 }
