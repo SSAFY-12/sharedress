@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
-import { getTokenExpiration } from '../utils/tokenUtils';
+import { getTokenExpiration } from '@/features/auth/utils/tokenUtils';
 import useRefresh from './useRefresh';
 
 const TOKEN_EXPIRATION_BUFFER = 5 * 60 * 1000; // 5분

@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/useAuthStore';
 import { TokenResponse } from '@/features/auth/types/auth';
-import { isTokenValid } from '../utils/tokenUtils';
+import { isTokenValid } from '@/features/auth/utils/tokenUtils';
 const useRefresh = () => {
 	const { setAccessToken } = useAuthStore();
 

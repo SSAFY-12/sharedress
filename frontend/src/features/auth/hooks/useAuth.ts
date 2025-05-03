@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/useAuthStore';
 import { TokenResponse } from '@/features/auth/types/auth';
-import { isTokenValid } from '../utils/tokenUtils';
+import { isTokenValid } from '@/features/auth/utils/tokenUtils';
 // content 내부에서 refreshToken, accessToken 저장
 // 구글 자체의 토큰이 아닌, 백엔드에서 제공하는 Token 사용
 
