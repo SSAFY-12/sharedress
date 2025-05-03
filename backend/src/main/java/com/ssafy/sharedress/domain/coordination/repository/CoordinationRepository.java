@@ -8,4 +8,6 @@ public interface CoordinationRepository {
 	Coordination save(Coordination coordination);
 
 	List<Coordination> findMyCoordinations(Long myId);
+
+	List<Coordination> findMyRecommendedCoordinations(Long myId);
 }

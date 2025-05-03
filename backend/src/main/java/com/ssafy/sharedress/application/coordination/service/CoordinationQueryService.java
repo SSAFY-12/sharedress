@@ -28,8 +28,11 @@ public class CoordinationQueryService implements CoordinationQueryUseCase {
 			return myCoordinations.stream()
 				.map(CoordinationWithItemResponse::fromEntity)
 				.toList();
-		} else if (scope == Scope.RECOMMENDED) {
-			return null;
+		} else if (Objects.equals(myId, targetMemberId) && scope == Scope.RECOMMENDED) {
+			List<Coordination> myRecommendedCoordinations = coordinationRepository.findMyRecommendedCoordinations(myId);
+			return myRecommendedCoordinations.stream()
+				.map(CoordinationWithItemResponse::fromEntity)
+				.toList();
 		}
 		throw new IllegalArgumentException("Invalid scope: " + scope);
 	}

@@ -47,4 +47,25 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 			.fetch();
 	}
 
+	@Override
+	public List<Coordination> findMyRecommendedCoordinations(Long myId) {
+		QCoordination cd = QCoordination.coordination;
+		QCoordinationClothes cc = QCoordinationClothes.coordinationClothes;
+		QClosetClothes clc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		return queryFactory
+			.selectFrom(cd)
+			.leftJoin(cd.coordinationClothes, cc).fetchJoin()
+			.leftJoin(cc.closetClothes, clc).fetchJoin()
+			.leftJoin(clc.clothes, cl).fetchJoin()
+			.where(
+				cd.owner.id.eq(myId)
+					.and(cd.originCreator.id.ne(myId))
+			)
+			.orderBy(cd.id.desc())
+			.distinct()
+			.fetch();
+	}
+
 }
