@@ -14,4 +14,9 @@ export const headerConfig = {
 		subtitle: '알림',
 		badgeIcon: 'bell', // 아이콘만
 	},
+	'/social': {
+		showBack: false,
+		subtitle: '쉐어드레스',
+		badgeIcon: 'bell', // 아이콘만
+	},
 } as const;
