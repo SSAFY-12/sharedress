@@ -71,4 +71,9 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	public ClosetClothes save(ClosetClothes closetClothes) {
 		return closetClothesJpaRepository.save(closetClothes);
 	}
+
+	@Override
+	public ClosetClothes getReferenceById(Long id) {
+		return closetClothesJpaRepository.getReferenceById(id);
+	}
 }
