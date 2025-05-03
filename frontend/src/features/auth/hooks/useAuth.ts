@@ -13,15 +13,13 @@ interface AuthResState {
 
 const useAuth = () => {
 	const { setAccessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
-	// const { setAccessToken, isAuthenticated, accessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
 
 	const mutation = useMutation({
-		mutationFn: (token: string) => authApi.login(token),
+		mutationFn: (token: string) => authApi.login(token), // 구글 자체의 토큰이 아닌, 백엔드에서 제공하는 Token 사용
 		onSuccess: (data: AuthResState) => {
 			console.log('BE 데이터 값 확인 : ', data);
-			// accessToken만 Zustand store에 저장
+			// accessToken만 Zustand store에 저장 : 서버에서 응답한 토큰
 			setAccessToken(data.content.accessToken);
-			// refreshToken은 서버에서 HttpOnly Cookie로 설정되어야 합니다
 		},
 		onError: (error) => {
 			console.error('로그인 실패:', error);

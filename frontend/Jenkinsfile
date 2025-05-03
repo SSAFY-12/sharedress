@@ -1,0 +1,61 @@
+pipeline {
+  agent any
+
+  environment {
+    // Git 브랜치에 따라 태그만 구분 (예: 12‑fe)
+    BUILD_TAG = "${BUILD_NUMBER}-fe"
+    BLUE_IP   = '172.31.35.103'      // LB EC2 프라이빗(또는 퍼블릭) IP
+    DIST_DIR  = 'frontend/dist'  // 🔄 dev‑dist 로 변경
+    SSH_USER  = 'ec2-user'
+  }
+
+  tools {                            // Jenkins → Global Tool Configuration
+    nodejs 'node20'                  // Node 20.x LTS (이미 등록한 이름)
+  }
+
+  stages {
+
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
+    stage('Install & Build') {       // **frontend 폴더로 들어가서 빌드**
+      steps {
+        dir('frontend') {
+          sh '''
+            echo "🔧  Installing deps…"
+            npm ci --legacy-peer-deps
+
+            echo "📦  Building…"
+            npm run build
+          '''
+        }
+      }
+    }
+
+    stage('Deploy to Blue') {
+      steps {
+        sshagent(credentials: ['lb-ssh']) {   // 등록해둔 Blue EC2 SSH 키
+          sh """
+            echo '🚀  Rsync to Blue…'
+            rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" \
+                  ${DIST_DIR}/ ec2-user@${BLUE_IP}:/var/www/blue/
+
+            echo '🔄  Switch current → blue'
+            ssh -o StrictHostKeyChecking=no ${SSH_USER}@${BLUE_IP} '
+              sudo mkdir -p /var/www/current &&
+              sudo ln -sfn /var/www/blue /var/www/current &&
+              sudo chown -R ${SSH_USER}:${SSH_USER} /var/www &&
+              sudo nginx -s reload
+            '
+          """
+        }
+      }
+    }
+  }
+
+  post {
+    success { echo "✅  FE build ${BUILD_TAG} 배포 완료 (→ Blue)" }
+    failure { echo "❌  FE build 실패 – 콘솔 로그 확인" }
+  }
+}

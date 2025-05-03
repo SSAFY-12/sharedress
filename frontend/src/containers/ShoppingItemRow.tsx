@@ -1,4 +1,4 @@
-import { PrimaryButton } from '@/components/buttons/primary-button/PrimaryButton';
+import { PrimaryBtn } from '@/components/buttons/primary-button/PrimaryBtn';
 import { ClothCard } from '@/components/cards/cloth-card/ClothCard';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ExternalLink } from 'lucide-react';
@@ -36,7 +36,7 @@ export const ShoppingItemRow = ({
 			rel='noopener noreferrer'
 			className='ml-2'
 		>
-			<PrimaryButton
+			<PrimaryBtn
 				size='compact'
 				name='링크'
 				color='primary'
@@ -46,7 +46,7 @@ export const ShoppingItemRow = ({
 				className='flex items-center justify-center'
 			>
 				<ExternalLink className='h-4 w-4 mr-1' />
-			</PrimaryButton>
+			</PrimaryBtn>
 		</a>
 	</div>
 );

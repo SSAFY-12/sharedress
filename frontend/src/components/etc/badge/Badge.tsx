@@ -1,3 +1,4 @@
+import { BadgeProps } from './Badge.types';
 import {
 	Bell,
 	Settings,
@@ -8,7 +9,6 @@ import {
 	AlertTriangle,
 	XCircle,
 } from 'lucide-react';
-import { BadgeProps } from './Badge.types';
 
 export const Badge = ({ icon, text, onClick, className = '' }: BadgeProps) => {
 	const getIcon = () => {
