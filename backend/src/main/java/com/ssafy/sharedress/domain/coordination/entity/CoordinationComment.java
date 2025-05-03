@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.domain.coordination.entity;
 
+import java.time.LocalDateTime;
+
 import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 import com.ssafy.sharedress.domain.member.entity.Member;
 
@@ -16,22 +18,30 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "coordi_request")
+@Table(name = "coordination_comment")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CoordiRequest extends BaseTimeEntity {
+public class CoordinationComment extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "requester_id")
-	private Member requester;
+	private String content;
+
+	private LocalDateTime deletedAt;
+
+	private Integer depth;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "receiver_id")
-	private Member receiver;
+	@JoinColumn(name = "parent_id")
+	private CoordinationComment parent;
 
-	private String message;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "coordination_id")
+	private Coordination coordination;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
+	private Member member;
 }

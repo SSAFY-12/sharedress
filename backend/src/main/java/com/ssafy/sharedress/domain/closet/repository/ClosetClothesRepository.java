@@ -15,5 +15,7 @@ public interface ClosetClothesRepository {
 
 	ClosetClothes save(ClosetClothes closetClothes);
 
+	ClosetClothes getReferenceById(Long id);
+
 	Optional<ClosetClothes> findById(Long id);
 }

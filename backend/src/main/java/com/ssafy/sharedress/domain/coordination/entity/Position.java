@@ -13,17 +13,11 @@ public class Position {
 
 	private Float posY;
 
-	private Float rotation;
-
-	private Float scale;
-
 	private Integer zIndex;
 
-	public Position(Float posX, Float posY, Float rotation, Float scale, Integer zIndex) {
+	public Position(Float posX, Float posY, Integer zIndex) {
 		this.posX = posX;
 		this.posY = posY;
-		this.rotation = rotation;
-		this.scale = scale;
 		this.zIndex = zIndex;
 	}
 }

@@ -16,10 +16,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "coordi_clothes")
+@Table(name = "coordination_clothes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CoordiClothes {
+public class CoordinationClothes {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +28,10 @@ public class CoordiClothes {
 	@Embedded
 	private Position position;
 
+	private Float scale;
+
+	private Float rotation;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "coordination_id", nullable = false)
 	private Coordination coordination;
@@ -35,4 +39,24 @@ public class CoordiClothes {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "closet_clothes_id", nullable = false)
 	private ClosetClothes closetClothes;
+
+	// -- 생성자 -- //
+	public CoordinationClothes(Position position, Float scale, Float rotation, Coordination coordination,
+		ClosetClothes closetClothes) {
+		this.position = position;
+		this.scale = scale;
+		this.rotation = rotation;
+		this.coordination = coordination;
+		this.closetClothes = closetClothes;
+	}
+
+	public void setCoordination(Coordination coordination) {
+		if (this.coordination != null) {
+			this.coordination.getCoordinationClothes().remove(this);
+		}
+		this.coordination = coordination;
+		if (coordination != null) {
+			coordination.getCoordinationClothes().add(this);
+		}
+	}
 }

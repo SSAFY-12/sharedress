@@ -75,6 +75,10 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	}
 
 	@Override
+	public ClosetClothes getReferenceById(Long id) {
+		return closetClothesJpaRepository.getReferenceById(id);
+	}
+
 	public Optional<ClosetClothes> findById(Long id) {
 		QClosetClothes cc = QClosetClothes.closetClothes;
 		QClothes cl = QClothes.clothes;

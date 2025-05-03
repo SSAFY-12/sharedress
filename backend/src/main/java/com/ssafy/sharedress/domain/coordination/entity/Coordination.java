@@ -1,8 +1,13 @@
 package com.ssafy.sharedress.domain.coordination.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 import com.ssafy.sharedress.domain.guest.entity.Guest;
 import com.ssafy.sharedress.domain.member.entity.Member;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,19 +25,11 @@ import lombok.NoArgsConstructor;
 @Table(name = "coordination")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Coordination {
+public class Coordination extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "creator_id")
-	private Member creator;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "owner_id")
-	private Member owner;
 
 	private String title;
 
@@ -42,6 +40,53 @@ public class Coordination {
 	private Boolean isTemplate;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "creator_id")
+	private Member creator;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "origin_creator_id")
+	private Member originCreator;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner_id")
+	private Member owner;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "creator_guest_id")
 	private Guest creatorGuest;
+
+	@OneToMany(mappedBy = "coordination", cascade = CascadeType.ALL)
+	private List<CoordinationClothes> coordinationClothes = new ArrayList<>();
+
+	// -- 생성자 -- //
+	public Coordination(String title, String content, Boolean isPublic, Boolean isTemplate, Member creator,
+		Member owner,
+		Member originCreator) {
+		this.title = title;
+		this.content = content;
+		this.isPublic = isPublic;
+		this.isTemplate = isTemplate;
+		this.creator = creator;
+		this.owner = owner;
+		this.originCreator = originCreator;
+	}
+
+	// -- 생성자 팩토리 메서드 -- //
+	public static Coordination createByMember(
+		String title,
+		String content,
+		Boolean isPublic,
+		Boolean isTemplate,
+		Member creator,
+		Member owner,
+		Member originCreator
+	) {
+		return new Coordination(title, content, isPublic, isTemplate, creator, owner, originCreator);
+	}
+
+	// -- 연관관계 편의 메서드 -- //
+	public void addCoordinationClothes(CoordinationClothes coordinationClothes) {
+		this.coordinationClothes.add(coordinationClothes);
+		coordinationClothes.setCoordination(this);
+	}
 }
