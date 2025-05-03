@@ -35,7 +35,7 @@ public class CoordinationController {
 	) {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		CoordinationResponse response = coordinationUseCase.saveMyCoordination(myId, coordinationRequest);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, response);
 	}
 
 	@PostMapping("/coordinations/friends/{memberId}")
@@ -45,7 +45,7 @@ public class CoordinationController {
 	) {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		CoordinationResponse response = coordinationUseCase.recommendCoordination(myId, memberId, coordinationRequest);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, response);
 	}
 
 	@GetMapping("/coordinations")

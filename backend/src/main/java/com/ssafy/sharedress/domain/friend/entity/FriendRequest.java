@@ -34,4 +34,10 @@ public class FriendRequest extends BaseTimeEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "receiver_id", nullable = false)
 	private Member receiver;
+
+	public FriendRequest(String message, Member requester, Member receiver) {
+		this.message = message;
+		this.requester = requester;
+		this.receiver = receiver;
+	}
 }
