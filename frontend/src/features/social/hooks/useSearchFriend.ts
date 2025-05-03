@@ -1,6 +1,6 @@
-import { socialApi } from '../api/socialApi';
+import { socialApi } from '@/features/social/api/socialApi';
 import { useQuery } from '@tanstack/react-query';
-import { SearchFriend } from '../types/social';
+import { SearchFriend } from '@/features/social/types/social';
 
 interface SearchFriendResponse {
 	//실제 데이터 응답구조

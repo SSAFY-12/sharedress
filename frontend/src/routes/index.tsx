@@ -7,6 +7,8 @@ import SocialPage from '@/pages/SocialPage';
 // import { FriendSearchResultPage } from '@/features/social/pages/FriendSearchResultPage';
 // import { FriendsListPage } from '@/features/social/pages/FriendListPage';
 // import { FriendRequestsPage } from '@/features/social/pages/FriendRequestPage';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -53,5 +55,9 @@ export const router = createBrowserRouter([
 				element: <Navigate to='/wardrobe' replace />,
 			},
 		],
+	},
+	{
+		path: 'codi/edit',
+		element: <CodiEditPage />,
 	},
 ]);

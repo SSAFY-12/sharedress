@@ -4,7 +4,7 @@ import NavBar from './layouts/NavBar';
 const TestMobileLayout = () => (
 	<div className='flex flex-col w-full h-full'>
 		{/* Top Bar */}
-		<Header showBack subtitle='쉐어드레스' badgeType='info' badgeText='알림' />
+		<Header showBack subtitle='쉐어드레스' badgeIcon='info' badgeText='알림' />
 		{/* Inner Content */}
 		<div className='flex-1 overflow-y-auto px-2 py-4 space-y-4 bg-gray-50'>
 			<div className='bg-white rounded-lg shadow p-4 text-center w-full'>

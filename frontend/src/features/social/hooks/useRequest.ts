@@ -1,10 +1,10 @@
-import { socialApi } from '../api/socialApi';
+import { socialApi } from '@/features/social/api/socialApi';
 import { useMutation } from '@tanstack/react-query';
 import {
 	FriendRequest,
 	AcceptFriendRequest,
 	RejectFriendRequest,
-} from '../types/social';
+} from '@/features/social/types/social';
 
 const useRequest = () => {
 	// 친구 요청 보내기 -> 데이터가 필요할시 voidX / api 호출 실패시 발생하는 에러 / mutation 함수에 전달되는 파라미터
