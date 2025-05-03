@@ -5,6 +5,7 @@ import CodiPage from '@/pages/CodiPage';
 import FriendPage from '@/pages/FriendPage';
 import AuthPage from '@/pages/AuthPage';
 import MyClosetPage from '@/features/closet/pages/MyClosetPage';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 
 export const router = createBrowserRouter([
 	{
@@ -41,5 +42,9 @@ export const router = createBrowserRouter([
 	{
 		path: 'mypage',
 		element: <MyClosetPage />,
+	},
+	{
+		path: 'codi/edit',
+		element: <CodiEditPage />,
 	},
 ]);

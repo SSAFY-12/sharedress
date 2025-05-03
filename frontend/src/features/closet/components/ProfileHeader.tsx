@@ -28,7 +28,7 @@ const ProfileHeader = ({
 
 		{/* 헤더 */}
 		<div className='relative z-10'>
-			<Header logo='쉐어드레스' badgeType='bell' badgeText='알림' />
+			<Header logo='쉐어드레스' badgeIcon='bell' />
 		</div>
 
 		{/* 프로필 카드 컨테이너 */}
