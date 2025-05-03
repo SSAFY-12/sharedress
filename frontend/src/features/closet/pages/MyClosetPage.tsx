@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import ProfileHeader from '../components/ProfileHeader';
-import MainTabNavigation from '../components/MainTabNavigation';
-import ClosetTab from '../components/ClosetTab';
-import CodiTab from '../components/CodiTab';
+import ProfileHeader from '@/features/closet/components/ProfileHeader';
+import MainTabNavigation from '@/features/closet/components/MainTabNavigation';
+import ClosetTab from '@/features/closet/components/ClosetTab';
+import CodiTab from '@/features/closet/components/CodiTab';
 import NavBar from '@/components/layouts/NavBar';
 
 const MyClosetPage = () => {
