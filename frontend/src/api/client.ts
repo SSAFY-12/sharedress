@@ -66,11 +66,11 @@ client.interceptors.response.use(
 		// 401 에러 (인증 실패) 처리
 		if (status === 401) {
 			// 토큰 만료 시 401 에러 발생 * 인증 실패
+			// 우선순위 2
 			try {
 				const { mutateAsync: refreshAsync } = useRefresh(); // 인터셉터 자체에서 단순 훅 사용
 
 				await refreshAsync(); // 토큰 갱신 -> 명시적 비동기 처리(토큰 갱신 완료까지 기다림)
-				//Q
 				return axios(error.config); // 토큰 갱신 후 원래 요청 재시도
 			} catch (refreshError) {
 				// 갱신 실패시 로그인 페이지로 리다이렉트
