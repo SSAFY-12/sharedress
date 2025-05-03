@@ -1,5 +1,6 @@
 package com.ssafy.sharedress.adapter.handler;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -10,6 +11,8 @@ import com.ssafy.sharedress.global.exception.BaseException;
 import com.ssafy.sharedress.global.response.ResponseCode;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,6 +37,27 @@ public class GlobalExceptionHandler {
 			@Override
 			public String getMessage() {
 				return message;
+			}
+
+			@Override
+			public HttpStatus getHttpStatus() {
+				return HttpStatus.BAD_REQUEST;
+			}
+		}, null);
+	}
+
+	// EntityNotFoundException 에서 발생하는 예외를 처리하는 핸들러
+	@ExceptionHandler({EntityNotFoundException.class, DataAccessException.class})
+	public ResponseEntity<ResponseWrapper<Void>> handleEntityNotFoundException(Exception ex) {
+		return ResponseWrapperFactory.toResponseEntity(new ResponseCode() {
+			@Override
+			public String getCode() {
+				return "400";
+			}
+
+			@Override
+			public String getMessage() {
+				return "DB에 존재하지 않는 데이터를 요청했습니다.";
 			}
 
 			@Override
