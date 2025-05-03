@@ -14,7 +14,7 @@ export const socialApi = {
 		return response.data;
 	},
 	// 친구 요청
-	requestFriend: async (receiverId: string, message: string) => {
+	requestFriend: async (receiverId: number, message: string) => {
 		const response = await client.post(`/api/friends/request`, {
 			receiverId,
 			message,
@@ -22,14 +22,14 @@ export const socialApi = {
 		return response.data;
 	},
 	// 친구 요청 수락
-	acceptFriendRequest: async (requestId: string) => {
+	acceptFriendRequest: async (requestId: number) => {
 		const response = await client.post(
 			`/api/friends/request/${requestId}/accept`,
 		);
 		return response.data;
 	},
 	// 친구 요청 거절
-	rejectFriendRequest: async (requestId: string) => {
+	rejectFriendRequest: async (requestId: number) => {
 		const response = await client.post(
 			`/api/friends/request/${requestId}/reject`,
 		);
