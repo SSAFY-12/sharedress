@@ -4,6 +4,7 @@ import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import FriendPage from '@/pages/FriendPage';
 import AuthPage from '@/pages/AuthPage';
+import MyClosetPage from '@/features/closet/pages/MyClosetPage';
 
 export const router = createBrowserRouter([
 	{
@@ -36,5 +37,9 @@ export const router = createBrowserRouter([
 				element: <Navigate to='/wardrobe' replace />,
 			},
 		],
+	},
+	{
+		path: 'mypage',
+		element: <MyClosetPage />,
 	},
 ]);
