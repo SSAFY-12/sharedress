@@ -38,3 +38,13 @@ jwt:
 logging.level:
     show_sql: debug
     org.hibernate.type: trace
+
+---
+cloud:
+    aws:
+        region: ap-southeast-2
+        credentials:
+            accessKey: ${AWS_ACCESS_KEY}
+            secretKey: ${AWS_SECRET_KEY}
+        sqs:
+            queue-name: MyQueue
