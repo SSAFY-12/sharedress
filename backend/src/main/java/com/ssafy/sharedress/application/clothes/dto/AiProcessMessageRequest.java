@@ -1,9 +1,15 @@
 package com.ssafy.sharedress.application.clothes.dto;
 
+import java.util.List;
+
 public record AiProcessMessageRequest(
-	Long clothesId,
 	Long memberId,
-	String linkUrl,
-	String fcmToken
+	String fcmToken,
+	List<ItemInfo> items
 ) {
+	public record ItemInfo(
+		Long clothesId,
+		String linkUrl
+	) {
+	}
 }

@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.application.clothes.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -57,6 +59,8 @@ public class ClothesService implements ClothesUseCase {
 		Closet closet = closetRepository.findByMemberId(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
+		List<AiProcessMessageRequest.ItemInfo> itemsToProcess = new ArrayList<>();
+
 		request.items().forEach(item -> {
 
 			// 브랜드 조회 또는 저장
@@ -81,10 +85,7 @@ public class ClothesService implements ClothesUseCase {
 
 			// 전처리 대상이면 AI 메시지큐 발행
 			if (existing.isEmpty()) {
-				AiProcessMessageRequest message = new AiProcessMessageRequest(
-					clothes.getId(), memberId, item.linkUrl(), member.getFcmToken()
-				);
-				sqsMessageSender.send(message);
+				itemsToProcess.add(new AiProcessMessageRequest.ItemInfo(clothes.getId(), item.linkUrl()));
 				log.info("AI 처리 요청 발행됨: clothesId={}, memberId={}", clothes.getId(), memberId);
 			}
 
@@ -97,6 +98,12 @@ public class ClothesService implements ClothesUseCase {
 			closetClothesRepository.save(closetClothes);
 			log.info("내 옷장 등록 완료: clothesId={}, closetId={}", clothes.getId(), closet.getId());
 		});
+		// 한번에 SQS로 전송
+		if (!itemsToProcess.isEmpty()) {
+			AiProcessMessageRequest message = new AiProcessMessageRequest(memberId, member.getFcmToken(),
+				itemsToProcess);
+			sqsMessageSender.send(message);
+		}
 	}
 
 }
