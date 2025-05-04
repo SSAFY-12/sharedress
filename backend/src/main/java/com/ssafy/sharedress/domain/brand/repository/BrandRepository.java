@@ -13,4 +13,8 @@ public interface BrandRepository {
 	Optional<Brand> findByExactNameEnOrKr(String nameEn, String nameKr);
 
 	Brand save(Brand brand);
+
+	Optional<Brand> findById(Long id);
+
+	Brand getReferenceById(Long id);
 }

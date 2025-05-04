@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.adapter.category.out.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +19,15 @@ public class CategoryPersistenceAdapter implements CategoryRepository {
 	@Override
 	public List<Category> findAllByOrderByIdAsc() {
 		return categoryJpaRepository.findAllByOrderByIdAsc();
+	}
+
+	@Override
+	public Optional<Category> findById(Long id) {
+		return categoryJpaRepository.findById(id);
+	}
+
+	@Override
+	public Category getReferenceById(Long id) {
+		return categoryJpaRepository.getReferenceById(id);
 	}
 }

@@ -104,4 +104,9 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	public boolean existsByClosetIdAndClothesId(Long closetId, Long clothesId) {
 		return closetClothesJpaRepository.existsByClosetIdAndClothesId(closetId, clothesId);
 	}
+
+	@Override
+	public void deleteById(Long closetClothesId) {
+		closetClothesJpaRepository.deleteById(closetClothesId);
+	}
 }

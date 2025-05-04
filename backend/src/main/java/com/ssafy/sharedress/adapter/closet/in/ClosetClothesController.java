@@ -4,14 +4,19 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
+import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
+import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
@@ -23,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class ClosetClothesController {
 
 	private final ClosetClothesQueryUseCase closetClothesQueryUseCase;
+	private final ClosetClothesUseCase closetClothesUseCase;
 
 	@GetMapping("/closet/{memberId}")
 	public ResponseEntity<ResponseWrapper<List<ClosetClothesResponse>>> getMemberClosetClothes(
@@ -53,5 +59,28 @@ public class ClosetClothesController {
 		ClosetClothesDetailResponse result = closetClothesQueryUseCase.getClosetClothesDetail(myId, closetClothesId);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+	}
+
+	@PutMapping("/closet/clothes/{closetClothesId}")
+	public ResponseEntity<ResponseWrapper<ClosetClothesDetailResponse>> updateClosetClothes(
+		@PathVariable("closetClothesId") Long closetClothesId,
+		@RequestBody ClosetClothesUpdateRequest request
+	) {
+		// TODO[준]: security context 에서 myId 가져오기
+		Long myId = 1L;
+		ClosetClothesDetailResponse result = closetClothesUseCase.updateClosetClothes(myId, closetClothesId, request);
+
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+	}
+
+	@DeleteMapping("/closet/clothes/{closetClothesId}")
+	public ResponseEntity<ResponseWrapper<Void>> removeClosetClothes(
+		@PathVariable("closetClothesId") Long closetClothesId
+	) {
+		// TODO[준]: security context 에서 myId 가져오기
+		Long myId = 1L;
+		closetClothesUseCase.removeClosetClothes(myId, closetClothesId);
+
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 }
