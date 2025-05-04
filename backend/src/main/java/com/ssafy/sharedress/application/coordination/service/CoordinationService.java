@@ -113,7 +113,7 @@ public class CoordinationService implements CoordinationUseCase {
 
 		Member member = memberRepository.getReferenceById(myId);
 
-		Coordination copyCoordination = new Coordination(
+		Coordination copyCoordination = Coordination.createByMember(
 			coordination.getTitle(),
 			coordination.getContent(),
 			coordination.getIsPublic(),
