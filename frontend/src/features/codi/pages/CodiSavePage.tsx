@@ -22,6 +22,14 @@ const CodiSavePage = () => {
 		setIsLoading(false);
 	}, []);
 
+	const handleBackClick = () => {
+		if (window.history.length > 1) {
+			navigate(-1);
+		} else {
+			navigate('/');
+		}
+	};
+
 	// 여기서부터는 코디 저장 로직인데 여기는 추후 api와 연결해야 한다.
 	const handleComplete = () => {
 		const codiData = {
@@ -41,7 +49,12 @@ const CodiSavePage = () => {
 
 	return (
 		<div className='max-w-md mx-auto h-screen flex flex-col bg-white'>
-			<Header showBack={true} badgeText='완료' onBadgeClick={handleComplete} />
+			<Header
+				showBack={true}
+				badgeText='완료'
+				onBackClick={handleBackClick}
+				onBadgeClick={handleComplete}
+			/>
 
 			<div className='flex-1 flex flex-col overflow-auto'>
 				{isLoading ? (

@@ -325,7 +325,7 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 						<>
 							{/* 회전 및 확대축소 핸들 */}
 							<div
-								className='absolute -bottom-4 -right-4 w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center cursor-move border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+								className='absolute -bottom-2 -right-2 w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center cursor-move border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 								onMouseDown={(e) => handleTransformStart(e, item)}
 								onTouchStart={(e) => handleTransformStart(e, item)}
 							>
