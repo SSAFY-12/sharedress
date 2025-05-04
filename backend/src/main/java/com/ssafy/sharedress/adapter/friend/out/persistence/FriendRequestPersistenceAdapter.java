@@ -1,5 +1,6 @@
 package com.ssafy.sharedress.adapter.friend.out.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -37,5 +38,10 @@ public class FriendRequestPersistenceAdapter implements FriendRequestRepository 
 	@Override
 	public Optional<FriendRequest> findByIdAndRequesterId(Long id, Long requesterId) {
 		return friendRequestJpaRepository.findByIdAndRequesterId(id, requesterId);
+	}
+
+	@Override
+	public List<FriendRequest> findAllByReceiverId(Long receiverId) {
+		return friendRequestJpaRepository.findAllByReceiverId(receiverId);
 	}
 }

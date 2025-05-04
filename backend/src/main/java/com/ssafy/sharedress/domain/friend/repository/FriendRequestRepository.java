@@ -1,5 +1,6 @@
 package com.ssafy.sharedress.domain.friend.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.ssafy.sharedress.domain.friend.entity.FriendRequest;
@@ -14,4 +15,6 @@ public interface FriendRequestRepository {
 	Optional<FriendRequest> findByIdAndReceiverId(Long id, Long receiverId);
 
 	Optional<FriendRequest> findByIdAndRequesterId(Long id, Long requesterId);
+
+	List<FriendRequest> findAllByReceiverId(Long receiverId);
 }

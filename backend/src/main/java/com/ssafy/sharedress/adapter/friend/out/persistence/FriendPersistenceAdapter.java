@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.adapter.friend.out.persistence;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.sharedress.domain.friend.entity.Friend;
@@ -20,5 +22,15 @@ public class FriendPersistenceAdapter implements FriendRepository {
 	@Override
 	public Boolean existsByMemberId(Long memberAId, Long memberBId) {
 		return friendJpaRepository.existsByMemberA_IdAndMemberB_Id(memberAId, memberBId);
+	}
+
+	@Override
+	public List<Friend> findAllByMemberId(Long memberId) {
+		return friendJpaRepository.findAllByMemberId(memberId);
+	}
+
+	@Override
+	public List<Friend> findByKeyword(Long memberId, String keyword) {
+		return friendJpaRepository.findByKeyword(memberId, keyword);
 	}
 }
