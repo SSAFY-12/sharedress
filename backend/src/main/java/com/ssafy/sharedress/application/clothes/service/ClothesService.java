@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.adapter.clothes.out.messaging.SqsMessageSender;
+import com.ssafy.sharedress.application.clothes.dto.AiProcessMessageRequest;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
 import com.ssafy.sharedress.domain.brand.entity.Brand;
@@ -16,6 +18,9 @@ import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
 import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
 import com.ssafy.sharedress.domain.clothes.repository.ClothesRepository;
+import com.ssafy.sharedress.domain.member.entity.Member;
+import com.ssafy.sharedress.domain.member.error.MemberErrorCode;
+import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 import com.ssafy.sharedress.domain.shoppingmall.entity.ShoppingMall;
 import com.ssafy.sharedress.domain.shoppingmall.error.ShoppingMallErrorCode;
 import com.ssafy.sharedress.domain.shoppingmall.repository.ShoppingMallRepository;
@@ -30,51 +35,67 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class ClothesService implements ClothesUseCase {
 
+	private final MemberRepository memberRepository;
 	private final ClothesRepository clothesRepository;
 	private final ShoppingMallRepository shoppingMallRepository;
 	private final BrandRepository brandRepository;
 	private final ClosetRepository closetRepository;
 	private final ClosetClothesRepository closetClothesRepository;
+	private final SqsMessageSender sqsMessageSender;
 
 	@Override
 	@Transactional
 	public void registerClothesFromPurchase(PurchaseHistoryRequest request, Long memberId) {
-		Long shopId = request.shopId();
 
-		ShoppingMall shoppingMall = shoppingMallRepository.findById(shopId)
+		Member member = memberRepository
+			.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		ShoppingMall shoppingMall = shoppingMallRepository.findById(request.shopId())
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ShoppingMallErrorCode.SHOPPING_MALL_NOT_FOUND));
 
 		Closet closet = closetRepository.findByMemberId(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
 		request.items().forEach(item -> {
-			// 브랜드 처리
+
+			// 브랜드 조회 또는 저장
 			Brand brand = brandRepository.findByExactNameEnOrKr(item.brandNameEng(), item.brandNameKor())
 				.orElseGet(() -> brandRepository.save(new Brand(item.brandNameEng(), item.brandNameKor())));
 
-			// 라이브러리에 해당 브랜드-상품명 존재하는지 확인
+			// 라이브러리 조회 (상품명 + 브랜드 ID 기준)
 			Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(item.name(), brand.getId());
 
-			// 있으면 재사용, 없으면 새로 등록 + 메시지큐 발행
-			Clothes clothes = existing.orElseGet(() -> {
-				Clothes newClothes = new Clothes(item.name(), brand, shoppingMall, item.linkUrl());
+			// Clothes 객체 (있으면 재사용, 없으면 생성 및 저장)
+			Clothes clothes = existing.orElseGet(() ->
+				clothesRepository.save(new Clothes(item.name(), brand, shoppingMall, item.linkUrl()))
+			);
 
-				// TODO[지윤] : AI 서버로 전처리 메시지 발행
+			// 내 옷장에 이미 있는 옷인지 확인
+			boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
+				clothes.getId());
+			if (alreadyExists) {
+				log.info("중복된 옷: clothesId={}, closetId={}", clothes.getId(), closet.getId());
+				return; // 중복된 옷이면 해당 옷은 skip
+			}
 
-				return clothesRepository.save(newClothes);
-			});
+			// 전처리 대상이면 AI 메시지큐 발행
+			if (existing.isEmpty()) {
+				AiProcessMessageRequest message = new AiProcessMessageRequest(
+					clothes.getId(), memberId, item.linkUrl(), member.getFcmToken()
+				);
+				sqsMessageSender.send(message);
+				log.info("AI 처리 요청 발행됨: clothesId={}, memberId={}", clothes.getId(), memberId);
+			}
 
 			// 내 옷장에 등록
 			ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
-
-			// 라이브러리에 존재하는 경우 ai 서버 거치지 않고 imageUrl 복사
 			if (existing.isPresent()) {
 				closetClothes.updateImgUrl(clothes.getImageUrl());
 			}
 			closetClothes.updateIsPublic(true); // 기본 공개
 			closetClothesRepository.save(closetClothes);
-
-			log.info("내옷장옷 등록 완료 clothesId={}, closetId={}", clothes.getId(), closet.getId());
+			log.info("내 옷장 등록 완료: clothesId={}, closetId={}", clothes.getId(), closet.getId());
 		});
 	}
 
