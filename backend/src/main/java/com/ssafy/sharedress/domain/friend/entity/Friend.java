@@ -36,4 +36,9 @@ public class Friend extends BaseTimeEntity {
 	private Member memberB;
 
 	private LocalDateTime deletedAt;
+
+	public Friend(Member memberA, Member memberB) {
+		this.memberA = memberA;
+		this.memberB = memberB;
+	}
 }
