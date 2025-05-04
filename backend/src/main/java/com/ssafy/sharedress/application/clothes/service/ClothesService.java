@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.adapter.clothes.out.messaging.SqsMessageSender;
 import com.ssafy.sharedress.application.clothes.dto.AiProcessMessageRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
 import com.ssafy.sharedress.domain.brand.entity.Brand;
@@ -26,6 +27,7 @@ import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 import com.ssafy.sharedress.domain.shoppingmall.entity.ShoppingMall;
 import com.ssafy.sharedress.domain.shoppingmall.error.ShoppingMallErrorCode;
 import com.ssafy.sharedress.domain.shoppingmall.repository.ShoppingMallRepository;
+import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -104,6 +106,17 @@ public class ClothesService implements ClothesUseCase {
 				itemsToProcess);
 			sqsMessageSender.send(message);
 		}
+	}
+
+	@Override
+	public CursorPageResult<ClothesSearchResponse> getLibraryClothes(
+		String keyword,
+		List<Long> categoryIds,
+		Long shopId,
+		Long cursorId,
+		int size
+	) {
+		return clothesRepository.searchClothesWithCursor(keyword, categoryIds, shopId, cursorId, size);
 	}
 
 }
