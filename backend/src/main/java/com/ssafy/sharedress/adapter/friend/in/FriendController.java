@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.friend.dto.FriendRequestDto;
 import com.ssafy.sharedress.application.friend.dto.FriendRequestResponse;
+import com.ssafy.sharedress.application.friend.dto.FriendResponse;
+import com.ssafy.sharedress.application.friend.usecase.FriendQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestUseCase;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
@@ -25,6 +27,7 @@ public class FriendController {
 
 	private final FriendRequestUseCase friendRequestUseCase;
 	private final FriendRequestQueryUseCase friendRequestQueryUseCase;
+	private final FriendQueryUseCase friendQueryUseCase;
 
 	@PostMapping("/friends/request")
 	public ResponseEntity<ResponseWrapper<Void>> sendFriendRequest(
@@ -72,5 +75,13 @@ public class FriendController {
 		Long myId = 1L;
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
 			friendRequestQueryUseCase.getFriendRequestList(myId));
+	}
+
+	@GetMapping("/friends")
+	public ResponseEntity<ResponseWrapper<List<FriendResponse>>> getFriendList() {
+		// TODO[준]: SecurityContextHolder에서 memberId 가져오기
+		Long myId = 1L;
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
+			friendQueryUseCase.getFriendList(myId));
 	}
 }
