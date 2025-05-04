@@ -1,5 +1,6 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button/PrimaryBtn';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
+import { ChevronRight } from 'lucide-react';
 
 interface UserRowItemProps {
 	userName: string;
@@ -9,6 +10,7 @@ interface UserRowItemProps {
 	onActionClick?: () => void;
 	onClick?: () => void;
 	className?: string;
+	actionType?: 'arrow' | 'button';
 }
 
 // rowItem 컴포넌트 -> 상태메세지 데이터가 없음
@@ -21,9 +23,10 @@ export const UserRowItem = ({
 	onActionClick,
 	onClick,
 	className = '',
+	actionType = 'arrow',
 }: UserRowItemProps) => (
 	<div
-		className={`flex items-center justify-between py-3 last:border-b-0 ${
+		className={`flex items-center justify-between px-3 py-3 last:border-b-0 ${
 			onClick ? 'cursor-pointer' : ''
 		} ${className}`}
 		onClick={onClick}
@@ -41,7 +44,7 @@ export const UserRowItem = ({
 				)}
 			</div>
 		</div>
-		{actionButtonText && (
+		{actionType === 'button' && actionButtonText && (
 			<PrimaryBtn
 				size='compact'
 				name={actionButtonText}
@@ -50,6 +53,18 @@ export const UserRowItem = ({
 					if (onActionClick) onActionClick();
 				}}
 			/>
+		)}
+		{actionType === 'arrow' && (
+			<button
+				type='button'
+				className='ml-2 p-2 rounded-full hover:bg-gray-100 transition'
+				onClick={(e) => {
+					e.stopPropagation();
+					if (onClick) onClick();
+				}}
+			>
+				<ChevronRight size={24} />
+			</button>
 		)}
 	</div>
 );

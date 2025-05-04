@@ -56,7 +56,7 @@ export const FriendsListPage = () => {
 	return (
 		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
 			{/* 검색 영역 */}
-			<div className='py-3'>
+			<div className='py-3 px-3'>
 				<SearchBar
 					placeholder='친구 검색'
 					value={searchValue}
@@ -75,8 +75,7 @@ export const FriendsListPage = () => {
 						userName={friend.nickname}
 						userAvatar={friend.profileImage}
 						userStatus={friend.oneLiner}
-						actionButtonText='채팅'
-						onActionClick={() => console.log('Navigate to user profile')}
+						actionType='arrow'
 						onClick={() => console.log('Navigate to user profile')}
 					/>
 				))}
