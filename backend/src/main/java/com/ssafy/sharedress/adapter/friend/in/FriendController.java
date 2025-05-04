@@ -35,10 +35,10 @@ public class FriendController {
 	@PostMapping("/friends/request")
 	public ResponseEntity<ResponseWrapper<Void>> sendFriendRequest(
 		@AuthenticationPrincipal CustomMemberDetails memberDetails,
-		@RequestBody FriendRequestDto friendRequestDto
+		@RequestBody FriendRequestDto request
 	) {
 		Long myId = memberDetails.member().getId();
-		friendRequestUseCase.sendFriendRequest(myId, friendRequestDto);
+		friendRequestUseCase.sendFriendRequest(myId, request);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
 	}
 

@@ -34,4 +34,10 @@ public class CoordinationRequest extends BaseTimeEntity {
 	private Member receiver;
 
 	private String message;
+
+	public CoordinationRequest(Member requester, Member receiver, String message) {
+		this.requester = requester;
+		this.receiver = receiver;
+		this.message = message;
+	}
 }

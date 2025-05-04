@@ -3,7 +3,7 @@ package com.ssafy.sharedress.application.coordination.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.sharedress.application.coordination.dto.CoordinationRequest;
+import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationUseCase;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
@@ -28,22 +28,22 @@ public class CoordinationService implements CoordinationUseCase {
 
 	@Transactional
 	@Override
-	public CoordinationResponse saveMyCoordination(Long myId, CoordinationRequest coordinationRequest) {
+	public CoordinationResponse saveMyCoordination(Long myId, CoordinationRequestDto coordinationRequestDto) {
 		Member member = memberRepository
 			.findById(myId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		Coordination coordination = Coordination.createByMember(
-			coordinationRequest.title(),
-			coordinationRequest.description(),
-			coordinationRequest.isPublic(),
-			coordinationRequest.isTemplate(),
+			coordinationRequestDto.title(),
+			coordinationRequestDto.description(),
+			coordinationRequestDto.isPublic(),
+			coordinationRequestDto.isTemplate(),
 			member,
 			member,
 			member
 		);
 
-		coordinationRequest.items().forEach(item -> {
+		coordinationRequestDto.items().forEach(item -> {
 			// TODO[준]: 상대방의 옷장에 있는 옷인지 확인하는 로직 추가
 			ClosetClothes closetClothes = closetClothesRepository.getReferenceById(item.id());
 			CoordinationClothes coordinationClothes = item.toEntity(coordination, closetClothes);
@@ -58,7 +58,7 @@ public class CoordinationService implements CoordinationUseCase {
 	@Transactional
 	@Override
 	public CoordinationResponse recommendCoordination(Long myId, Long targetMemberId,
-		CoordinationRequest coordinationRequest) {
+		CoordinationRequestDto coordinationRequestDto) {
 		// TODO[준]: 나와 상대방이 친구 관계인지 확인하는 로직 추가
 
 		Member creator = memberRepository
@@ -70,10 +70,10 @@ public class CoordinationService implements CoordinationUseCase {
 			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		Coordination coordination = Coordination.createByMember(
-			coordinationRequest.title(),
-			coordinationRequest.description(),
+			coordinationRequestDto.title(),
+			coordinationRequestDto.description(),
 			true,
-			coordinationRequest.isTemplate(),
+			coordinationRequestDto.isTemplate(),
 			creator,
 			owner,
 			creator
@@ -81,7 +81,7 @@ public class CoordinationService implements CoordinationUseCase {
 
 		// TODO[준]: 코디를 추천했다는 알림 전송 로직 추가
 
-		coordinationRequest.items().forEach(item -> {
+		coordinationRequestDto.items().forEach(item -> {
 			// TODO[준]: 상대방의 옷장에 있는 옷인지 확인하는 로직 추가
 			ClosetClothes closetClothes = closetClothesRepository.getReferenceById(item.id());
 			CoordinationClothes coordinationClothes = item.toEntity(coordination, closetClothes);

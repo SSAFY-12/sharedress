@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.sharedress.application.coordination.dto.CoordinationRequest;
+import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
+import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestRequest;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationWithItemResponse;
 import com.ssafy.sharedress.application.coordination.dto.Scope;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationQueryUseCase;
+import com.ssafy.sharedress.application.coordination.usecase.CoordinationRequestUseCase;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationUseCase;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
@@ -28,23 +30,28 @@ public class CoordinationController {
 
 	private final CoordinationUseCase coordinationUseCase;
 	private final CoordinationQueryUseCase coordinationQueryUseCase;
+	private final CoordinationRequestUseCase coordinationRequestUseCase;
 
 	@PostMapping("/coordinations/my")
 	public ResponseEntity<ResponseWrapper<CoordinationResponse>> saveMyCoordination(
-		@RequestBody CoordinationRequest coordinationRequest
+		@RequestBody CoordinationRequestDto request
 	) {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
-		CoordinationResponse response = coordinationUseCase.saveMyCoordination(myId, coordinationRequest);
+		CoordinationResponse response = coordinationUseCase.saveMyCoordination(myId, request);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, response);
 	}
 
 	@PostMapping("/coordinations/friends/{memberId}")
 	public ResponseEntity<ResponseWrapper<CoordinationResponse>> recommendCoordination(
 		@PathVariable("memberId") Long memberId,
-		@RequestBody CoordinationRequest coordinationRequest
+		@RequestBody CoordinationRequestDto request
 	) {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
-		CoordinationResponse response = coordinationUseCase.recommendCoordination(myId, memberId, coordinationRequest);
+		CoordinationResponse response = coordinationUseCase.recommendCoordination(
+			myId,
+			memberId,
+			request
+		);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, response);
 	}
 
@@ -56,5 +63,14 @@ public class CoordinationController {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		List<CoordinationWithItemResponse> response = coordinationQueryUseCase.getCoordinations(myId, memberId, scope);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
+	}
+
+	@PostMapping("/coordinations/request")
+	public ResponseEntity<ResponseWrapper<Void>> sendCoordinationRequest(
+		@RequestBody CoordinationRequestRequest request
+	) {
+		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
+		coordinationRequestUseCase.sendCoordinationRequest(myId, request);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
 	}
 }
