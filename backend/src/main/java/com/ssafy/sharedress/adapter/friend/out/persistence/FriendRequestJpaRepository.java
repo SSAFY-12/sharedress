@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.adapter.friend.out.persistence;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,4 +15,16 @@ public interface FriendRequestJpaRepository extends JpaRepository<FriendRequest,
 		@Param("requesterId") Long requesterId,
 		@Param("receiverId") Long receiverId
 	);
+
+	@Query("SELECT fr FROM FriendRequest fr "
+		+ "JOIN FETCH fr.requester r "
+		+ "JOIN FETCH fr.receiver v "
+		+ "WHERE fr.receiver.id = :receiverId")
+	Optional<FriendRequest> findByIdAndReceiverId(Long id, Long receiverId);
+
+	@Query("SELECT fr FROM FriendRequest fr "
+		+ "JOIN FETCH fr.requester r "
+		+ "JOIN FETCH fr.receiver v "
+		+ "WHERE fr.requester.id = :requesterId")
+	Optional<FriendRequest> findByIdAndRequesterId(Long id, Long requesterId);
 }
