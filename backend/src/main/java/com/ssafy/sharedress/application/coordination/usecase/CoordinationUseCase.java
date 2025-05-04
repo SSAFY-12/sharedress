@@ -8,4 +8,6 @@ public interface CoordinationUseCase {
 
 	CoordinationResponse recommendCoordination(Long myId, Long targetMemberId,
 		CoordinationRequestDto coordinationRequestDto);
+
+	CoordinationResponse copyCoordination(Long myId, Long targetCoordinationId);
 }

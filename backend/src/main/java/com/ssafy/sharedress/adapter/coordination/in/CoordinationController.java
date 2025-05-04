@@ -46,7 +46,7 @@ public class CoordinationController {
 		@PathVariable("memberId") Long memberId,
 		@RequestBody CoordinationRequestDto request
 	) {
-		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
+		Long myId = 2L; // TODO[준]: security context 에서 myId 가져오기
 		CoordinationResponse response = coordinationUseCase.recommendCoordination(
 			myId,
 			memberId,
@@ -72,5 +72,14 @@ public class CoordinationController {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		coordinationRequestUseCase.sendCoordinationRequest(myId, request);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
+	}
+
+	@PostMapping("/coordinations/{coordinationId}/copy")
+	public ResponseEntity<ResponseWrapper<CoordinationResponse>> copyCoordination(
+		@PathVariable("coordinationId") Long coordinationId
+	) {
+		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
+		CoordinationResponse response = coordinationUseCase.copyCoordination(myId, coordinationId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, response);
 	}
 }

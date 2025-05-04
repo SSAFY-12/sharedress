@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.application.coordination.service;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +12,7 @@ import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
 import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
 import com.ssafy.sharedress.domain.coordination.entity.Coordination;
 import com.ssafy.sharedress.domain.coordination.entity.CoordinationClothes;
+import com.ssafy.sharedress.domain.coordination.error.CoordinationErrorCode;
 import com.ssafy.sharedress.domain.coordination.repository.CoordinationRepository;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.error.MemberErrorCode;
@@ -90,6 +93,52 @@ public class CoordinationService implements CoordinationUseCase {
 
 		return CoordinationResponse.fromEntity(
 			coordinationRepository.save(coordination)
+		);
+	}
+
+	@Transactional
+	@Override
+	public CoordinationResponse copyCoordination(Long myId, Long targetCoordinationId) {
+		Coordination coordination = coordinationRepository.findByIdWithOwnerAndOriginCreator(targetCoordinationId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
+
+		// 검증 로직
+		if (!Objects.equals(coordination.getOwner().getId(), myId)) {
+			ExceptionUtil.throwException(CoordinationErrorCode.COORDINATION_IS_NOT_MINE);
+		}
+
+		if (Objects.equals(coordination.getOriginCreator().getId(), myId)) {
+			ExceptionUtil.throwException(CoordinationErrorCode.COORDINATION_ALREADY_MINE);
+		}
+
+		Member member = memberRepository.getReferenceById(myId);
+
+		Coordination copyCoordination = Coordination.createByMember(
+			coordination.getTitle(),
+			coordination.getContent(),
+			coordination.getIsPublic(),
+			coordination.getIsTemplate(),
+			member,
+			coordination.getOwner(),
+			coordination.getOriginCreator()
+		);
+
+		// deep copy 필요
+		for (CoordinationClothes clothes : coordination.getCoordinationClothes()) {
+			CoordinationClothes copied = new CoordinationClothes(
+				clothes.getPosition(),
+				clothes.getScale(),
+				clothes.getRotation(),
+				copyCoordination,
+				clothes.getClosetClothes()
+			);
+			copyCoordination.addCoordinationClothes(copied);
+		}
+
+		// TODO[준]: 코디를 복사했다는 알림 전송 로직 추가
+
+		return CoordinationResponse.fromEntity(
+			coordinationRepository.save(copyCoordination)
 		);
 	}
 }
