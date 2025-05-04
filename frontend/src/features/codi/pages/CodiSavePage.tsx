@@ -1,7 +1,7 @@
 import Header from '@/components/layouts/Header';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ResultCodiCanvas from '../components/ResultCodiCanvas';
+import ResultCodiCanvas from '@/features/codi/components/ResultCodiCanvas';
 import { InputField } from '@/components/inputs/input-field';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
 
