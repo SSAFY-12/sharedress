@@ -74,16 +74,28 @@ pipeline {
     stage('Deploy to Blue') {
       steps {
         sshagent(['blue-ec2-ssh']) {
+          // 동적으로 docker-compose 파일을 생성
           sh """
-            # ECR 로그인 + 이미지 Pull
-            aws ecr get-login-password --region ${AWS_REGION} | \
-              docker login --username AWS --password-stdin ${ECR_URI}
-            docker pull ${ECR_URI}/${APP_NAME}:${TAG}
+            # 새 이미지 태그로 docker-compose 파일 생성
+            ssh -o StrictHostKeyChecking=no ec2-user@${BLUE_IP} "cat > /opt/blue/docker-compose.blue.yml << 'EOL'
+services:
+  spring-app:
+    image: ${ECR_URI}/${APP_NAME}:${TAG}
+    container_name: spring_blue
+    env_file:
+      - /opt/blue/blue.env
+    restart: always
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+EOL"
 
-            # Blue EC2 에서 재기동
-            ssh -o StrictHostKeyChecking=no ec2-user@${BLUE_IP} << 'EOF'
-              docker compose -f /opt/blue/docker-compose.blue.yml up -d
-            EOF
+            # Blue EC2에서 컨테이너 재시작
+            ssh -o StrictHostKeyChecking=no ec2-user@${BLUE_IP} "cd /opt/blue && docker compose -f docker-compose.blue.yml down && docker compose -f docker-compose.blue.yml up -d"
           """
         }
       }
