@@ -99,4 +99,9 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 				.fetchOne()
 		);
 	}
+
+	@Override
+	public boolean existsByClosetIdAndClothesId(Long closetId, Long clothesId) {
+		return closetClothesJpaRepository.existsByClosetIdAndClothesId(closetId, clothesId);
+	}
 }

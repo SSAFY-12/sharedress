@@ -18,4 +18,7 @@ public interface ClosetClothesRepository {
 	ClosetClothes getReferenceById(Long id);
 
 	Optional<ClosetClothes> findById(Long id);
+
+	boolean existsByClosetIdAndClothesId(Long closetId, Long clothesId);
+
 }
