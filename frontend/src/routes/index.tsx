@@ -3,11 +3,12 @@ import { App } from '@/App';
 import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
-import SocialPage from '@/pages/SocialPage';
+import FriendPage from '@/pages/social/FriendPage';
 // import { FriendSearchResultPage } from '@/features/social/pages/FriendSearchResultPage';
 // import { FriendsListPage } from '@/features/social/pages/FriendListPage';
 // import { FriendRequestsPage } from '@/features/social/pages/FriendRequestPage';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+import FriendAddPage from '@/pages/social/FriendAddPage';
 
 export const router = createBrowserRouter([
 	{
@@ -34,21 +35,11 @@ export const router = createBrowserRouter([
 			{
 				path: 'social',
 				// element: <FriendsListPage />,
-				element: <SocialPage />,
-				// children: [
-				// 	{
-				// 		path: 'search',
-				// 		element: <FriendSearchResultPage />,
-				// 	},
-				// 	// {
-				// 	// 	path: 'list',
-				// 	// 	element: <FriendsListPage />,
-				// 	// },
-				// 	{
-				// 		path: 'request',
-				// 		element: <FriendRequestsPage />,
-				// 	},
-				// ],
+				element: <FriendPage />,
+			},
+			{
+				path: 'social/add',
+				element: <FriendAddPage />,
 			},
 			{
 				path: '*',

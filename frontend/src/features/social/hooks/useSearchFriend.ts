@@ -8,15 +8,41 @@ interface SearchFriendResponse {
 		code: string;
 		message: string;
 	};
-	content: SearchFriend['comments']; //실제 데이터 응답구조 -> 키 값
+	content: SearchFriend['content']; //실제 데이터 응답구조 -> 키 값
 }
 
+// 두 가지 케이스가 필요한데
+// 1. 내가 가지고 있는 친구 목록에서 검색
+// 2. 뭐 전체 검색 & ID 찾기에서 친구 목록 검색 후 친구 추가
+
 const useSearchFriend = (nickname: string) => {
-	const { data, isLoading, error } = useQuery<SearchFriendResponse>({
+	const {
+		data: searchMyFriend,
+		isLoading: isLoadingMyFriend,
+		error: errorMyFriend,
+	} = useQuery<SearchFriendResponse>({
 		queryKey: ['searchFriend'], // 친구 검색
 		queryFn: () => socialApi.searchFriend(nickname),
 	});
-	return { data: data?.content, isLoading, error }; //data에 원하는 값 반환
+
+	//searchAllFriend
+	const {
+		data: searchAllFriend,
+		isLoading: isLoadingAllFriend,
+		error: errorAllFriend,
+	} = useQuery<SearchFriendResponse>({
+		queryKey: ['searchFriend'], // 친구 검색
+		queryFn: () => socialApi.searchFriend(nickname),
+	});
+
+	return {
+		searchMyFriend,
+		searchAllFriend,
+		isLoadingMyFriend,
+		isLoadingAllFriend,
+		errorMyFriend,
+		errorAllFriend,
+	}; //data에 원하는 값 반환
 };
 
 export default useSearchFriend;
