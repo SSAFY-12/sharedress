@@ -13,18 +13,20 @@ const ProfileHeader = ({
 	statusMessage,
 }: ProfileHeaderProps) => (
 	<div className='relative'>
-		<div
-			className='absolute inset-0'
-			style={{
-				backgroundImage: "url('https://picsum.photos/200/300')",
-				backgroundSize: 'cover',
-				backgroundPosition: 'center',
-				filter: 'blur(2px)',
-			}}
-		></div>
-
-		{/* 배경 오버레이 */}
-		<div className='absolute inset-0'></div>
+		<div className='absolute inset-0 overflow-hidden'>
+			<div
+				className='absolute inset-0'
+				style={{
+					backgroundImage: "url('https://picsum.photos/200/300')",
+					backgroundSize: 'cover',
+					backgroundPosition: 'center',
+					filter: 'blur(8px)',
+					transform: 'scale(1.1)',
+				}}
+			></div>
+			{/* 배경 오버레이 */}
+			<div className='absolute inset-0'></div>
+		</div>
 
 		{/* 헤더 */}
 		<div className='relative z-10'>

@@ -19,7 +19,7 @@ const MainTabNavigation = ({
 			옷장
 		</button>
 		<button
-			className={`flex-1 py-4 text-center font-medium ${
+			className={`flex-1 py-4 text-center font-medium rounded-none ${
 				activeTab === 'codi'
 					? 'border-b-2 border-b-[#3a3636]'
 					: 'text-[#a7a5a4]'

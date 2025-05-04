@@ -1,6 +1,7 @@
 import { ClothItem } from '@/components/cards/cloth-card';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CATEGORIES = ['전체', '아우터', '상의', '하의', '신발', '기타'];
 
@@ -44,6 +45,7 @@ const CLOTHING_ITEMS: ClothItem[] = [
 ];
 
 const ClosetTab = () => {
+	const navigate = useNavigate();
 	// 상태 관리
 	const [selectedCategory, setSelectedCategory] = useState('전체');
 
@@ -53,7 +55,7 @@ const ClosetTab = () => {
 			: CLOTHING_ITEMS.filter((item) => item.category === selectedCategory);
 
 	const handleItemClick = (item: ClothItem) => {
-		console.log('Item clicked:', item);
+		navigate(`/cloth/${item.id}`);
 	};
 
 	return (

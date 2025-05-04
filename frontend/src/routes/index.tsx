@@ -6,6 +6,7 @@ import FriendPage from '@/pages/FriendPage';
 import AuthPage from '@/pages/AuthPage';
 import MyClosetPage from '@/features/closet/pages/MyClosetPage';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 
 export const router = createBrowserRouter([
 	{
@@ -46,5 +47,9 @@ export const router = createBrowserRouter([
 	{
 		path: 'codi/edit',
 		element: <CodiEditPage />,
+	},
+	{
+		path: 'cloth/:id',
+		element: <ClothDetailPage />,
 	},
 ]);
