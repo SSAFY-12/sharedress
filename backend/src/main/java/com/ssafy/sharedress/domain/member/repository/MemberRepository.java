@@ -12,4 +12,6 @@ public interface MemberRepository {
 	Boolean existsByNicknameAndCode(String nickname, String code);
 
 	Member save(Member member);
+
+	Member getReferenceById(Long id);
 }

@@ -41,12 +41,12 @@ public class AuthController {
 		cookie.setMaxAge(7 * 24 * 60 * 60); // 7일
 
 		response.addCookie(cookie);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, new TokenResponse(token.accessToken()));
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, new TokenResponse(token.accessToken()));
 	}
 
 	@PostMapping("/auth/refresh")
 	public ResponseEntity<ResponseWrapper<TokenResponse>> refresh(HttpServletRequest request) {
 		TokenResponse result = tokenUseCase.refreshToken(request);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, result);
 	}
 }

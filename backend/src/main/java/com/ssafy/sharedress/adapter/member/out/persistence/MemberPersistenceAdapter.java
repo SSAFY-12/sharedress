@@ -34,4 +34,9 @@ public class MemberPersistenceAdapter implements MemberRepository {
 	public Member save(Member member) {
 		return memberJpaRepository.save(member);
 	}
+
+	@Override
+	public Member getReferenceById(Long id) {
+		return memberJpaRepository.getReferenceById(id);
+	}
 }
