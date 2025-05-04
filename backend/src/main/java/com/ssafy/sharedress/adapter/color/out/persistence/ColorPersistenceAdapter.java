@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.adapter.color.out.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +19,15 @@ public class ColorPersistenceAdapter implements ColorRepository {
 	@Override
 	public List<Color> findAllByOrderByIdAsc() {
 		return colorJpaRepository.findAllByOrderByIdAsc();
+	}
+
+	@Override
+	public Optional<Color> findById(Long id) {
+		return colorJpaRepository.findById(id);
+	}
+
+	@Override
+	public Color getReferenceById(Long id) {
+		return colorJpaRepository.getReferenceById(id);
 	}
 }

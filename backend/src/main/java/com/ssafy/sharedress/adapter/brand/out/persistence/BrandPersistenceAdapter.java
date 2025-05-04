@@ -35,4 +35,14 @@ public class BrandPersistenceAdapter implements BrandRepository {
 	public Brand save(Brand brand) {
 		return brandJpaRepository.save(brand);
 	}
+
+	@Override
+	public Optional<Brand> findById(Long id) {
+		return brandJpaRepository.findById(id);
+	}
+
+	@Override
+	public Brand getReferenceById(Long id) {
+		return brandJpaRepository.getReferenceById(id);
+	}
 }
