@@ -10,4 +10,6 @@ public interface FriendRepository {
 	Boolean existsByMemberId(Long memberAId, Long memberBId);
 
 	List<Friend> findAllByMemberId(Long memberId);
+
+	List<Friend> findByKeyword(Long memberId, String keyword);
 }

@@ -19,4 +19,12 @@ public interface FriendJpaRepository extends JpaRepository<Friend, Long> {
 		+ "WHERE (f.memberA.id = :memberId OR f.memberB.id = :memberId) "
 		+ "ORDER BY f.id DESC")
 	List<Friend> findAllByMemberId(Long memberId);
+
+	@Query("SELECT f FROM Friend f "
+		+ "JOIN FETCH f.memberA a "
+		+ "JOIN FETCH f.memberB b "
+		+ "WHERE (f.memberA.id = :memberId AND b.nickname LIKE %:keyword%) "
+		+ "OR (f.memberB.id = :memberId AND a.nickname LIKE %:keyword%) "
+		+ "ORDER BY f.id DESC")
+	List<Friend> findByKeyword(Long memberId, String keyword);
 }

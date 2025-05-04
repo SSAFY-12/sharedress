@@ -28,4 +28,9 @@ public class FriendPersistenceAdapter implements FriendRepository {
 	public List<Friend> findAllByMemberId(Long memberId) {
 		return friendJpaRepository.findAllByMemberId(memberId);
 	}
+
+	@Override
+	public List<Friend> findByKeyword(Long memberId, String keyword) {
+		return friendJpaRepository.findByKeyword(memberId, keyword);
+	}
 }

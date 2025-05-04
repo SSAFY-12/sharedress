@@ -14,7 +14,8 @@ public record FriendRequestResponse(
 			new RequestMember(
 				friendRequest.getRequester().getId(),
 				friendRequest.getRequester().getProfileUrl(),
-				friendRequest.getRequester().getNickname()
+				friendRequest.getRequester().getNickname(),
+				friendRequest.getRequester().getCode()
 			)
 		);
 	}
@@ -22,7 +23,8 @@ public record FriendRequestResponse(
 	public record RequestMember(
 		Long id,
 		String profileImage,
-		String nickname
+		String nickname,
+		String code
 	) {
 	}
 }

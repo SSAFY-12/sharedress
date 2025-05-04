@@ -8,6 +8,7 @@ import com.ssafy.sharedress.domain.member.entity.Member;
 public record FriendResponse(
 	Long id,
 	String nickname,
+	String code,
 	String profileImage,
 	String oneLiner
 ) {
@@ -19,6 +20,7 @@ public record FriendResponse(
 		return new FriendResponse(
 			friendMember.getId(),
 			friendMember.getNickname(),
+			friendMember.getCode(),
 			friendMember.getProfileUrl(),
 			friendMember.getStatusMessage()
 		);

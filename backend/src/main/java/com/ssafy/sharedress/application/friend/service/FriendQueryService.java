@@ -25,4 +25,12 @@ public class FriendQueryService implements FriendQueryUseCase {
 			.map(friend -> FriendResponse.fromEntity(friend, memberId))
 			.toList();
 	}
+
+	@Override
+	public List<FriendResponse> getFriendListByKeyword(Long memberId, String keyword) {
+		return friendRepository.findByKeyword(memberId, keyword)
+			.stream()
+			.map(friend -> FriendResponse.fromEntity(friend, memberId))
+			.toList();
+	}
 }

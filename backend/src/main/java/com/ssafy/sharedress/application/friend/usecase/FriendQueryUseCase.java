@@ -6,4 +6,6 @@ import com.ssafy.sharedress.application.friend.dto.FriendResponse;
 
 public interface FriendQueryUseCase {
 	List<FriendResponse> getFriendList(Long memberId);
+
+	List<FriendResponse> getFriendListByKeyword(Long memberId, String keyword);
 }
