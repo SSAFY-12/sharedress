@@ -11,6 +11,13 @@ export const socialApi = {
 		const response = await client.get('/api/friends/request');
 		return response.data;
 	},
+	// 전체 사용자 검색
+	searchAllUser: async (keyword: string, cursor: number, size: number) => {
+		const response = await client.get(
+			`/api/members/search?keyword=${keyword}&cursor=${cursor}&size=${size}`,
+		);
+		return response.data;
+	},
 
 	// 친구 검색
 	searchFriend: async (nickname: string) => {

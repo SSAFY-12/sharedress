@@ -26,23 +26,10 @@ const useSearchFriend = (nickname: string) => {
 		enabled: !!nickname, // nickname이 있을 때만 쿼리 실행(빈 문자열이 아닐 때) + 변경될때마다 자동으로 쿼리가 재실행
 	});
 
-	//searchAllFriend
-	const {
-		data: searchAllFriend,
-		isLoading: isLoadingAllFriend,
-		error: errorAllFriend,
-	} = useQuery<SearchFriendResponse>({
-		queryKey: ['searchFriend'], // 친구 검색
-		queryFn: () => socialApi.searchFriend(nickname),
-	});
-
 	return {
 		searchMyFriend: searchMyFriend?.content,
-		searchAllFriend: searchAllFriend?.content,
 		isLoadingMyFriend,
-		isLoadingAllFriend,
 		errorMyFriend,
-		errorAllFriend,
 	}; //data에 원하는 값 반환
 };
 

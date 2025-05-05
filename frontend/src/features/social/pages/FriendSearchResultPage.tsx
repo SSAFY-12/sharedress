@@ -3,9 +3,9 @@ import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { FriendRequestMsgModal } from '@/features/social/components/FriendRequestMsgModal';
 import React, { useState } from 'react';
-import useSearchFriend from '@/features/social/hooks/useSearchFriend';
 import useRequest from '@/features/social/hooks/useRequest';
-
+import useSearchUser from '@/features/social/hooks/useSearchUser';
+import { RelationStatus } from '@/features/social/types/social';
 export const FriendSearchResultPage = () => {
 	const [searchValue, setSearchValue] = useState(''); // 실시간으로 바뀌는 내용
 	// enter 이벤트를 걸었을때 담길 resultValue
@@ -17,15 +17,16 @@ export const FriendSearchResultPage = () => {
 		profileImage: string;
 		nickname: string;
 		id: number; //친구 고유 아이디
+		relationStatus: RelationStatus; //친구 관계
 		// code: string; // 닉네임 중복방지
 		// oneLiner: string; //한줄 소개
 	} | null>(null); // 선택된 친구가 있거나 없거나
 
-	// const { searchAllFriend, isLoadingAllFriend, errorAllFriend } =
-	const { searchAllFriend } = useSearchFriend(resultValue); // 검색 결과 목록 영역에 데이터 반환 -> 그럼 이게 resultValue가 변경될때마다 반영이 되는 것인지?
+	const { searchUser } = useSearchUser(resultValue);
+	// const { searchUser, pagination } = useSearchUser(resultValue);
+	const { requestFriend, cancelRequest, acceptRequest } = useRequest(); // 친구 요청 전송/취소 버튼 로직
 	// const { requestFriend, isRequesting, requestError, isRequestSuccess } =
-	// const { requestFriend, cancelRequest } = useRequest(); // 친구 요청 전송/취소 버튼 로직
-	const { requestFriend } = useRequest(); // 친구 요청 전송/취소 버튼 로직
+	// const { requestFriend } = useRequest(); // 친구 요청 전송/취소 버튼 로직
 
 	// useEffect(() => {
 	// 	if(resultValue) {
@@ -56,12 +57,23 @@ export const FriendSearchResultPage = () => {
 		setModalOpen(false); // 모달 닫기
 	};
 
-	// 친구 요청 취소 => 이게 보냈는지 어떻게 알지? 단순 id값으로 요청 여부를 판단할 수는 없을 것 같은데 : 서버에서 받아와야 하는 것 아닌지?
-	// const handleCancel = () => {
-	// 	if (selectedFriend) {
-	// 		cancelRequest(selectedFriend.id);
-	// 	}
-	// };
+	// 친구 요청 취소
+	const handleCancel = () => {
+		if (selectedFriend) {
+			cancelRequest({
+				requestId: selectedFriend.id,
+			});
+		}
+	};
+
+	// 친구 요청 수락
+	const handleAccept = () => {
+		if (selectedFriend) {
+			acceptRequest({
+				requestId: selectedFriend.id,
+			});
+		}
+	};
 
 	return (
 		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
@@ -79,44 +91,65 @@ export const FriendSearchResultPage = () => {
 				<div className='flex-1 p-4 flex items-center justify-center'>
 					<span className='text-gray-500'>친구 ID를 검색해주세요.</span>
 				</div>
-			) : searchAllFriend?.length === 0 ? (
+			) : searchUser?.length === 0 ? (
 				<div className='flex-1 p-4 flex items-center justify-center'>
 					<span className='text-gray-500'>검색 결과가 없습니다.</span>
 				</div>
 			) : (
 				<div className='flex-1 p-4'>
 					{/* 검색 결과 목록 영역 === 제출한 값이 있다면 */}
-					{searchAllFriend &&
-						searchAllFriend.length > 0 &&
-						searchAllFriend.map((friend) => (
+					{searchUser &&
+						searchUser.length > 0 &&
+						// 페이지네이션으로 리스트화 해서 내리기..?
+						searchUser.map((user) => (
 							<div
 								className='border rounded-lg p-6 flex flex-col items-center'
-								key={friend.id}
+								key={user.id}
 							>
 								<UserMiniAvatar
 									// src='https://picsum.photos/200/300?random=1'
-									src={friend.profileImage}
+									src={user.profileImage}
 									size='lg'
 									className='mb-3'
 								/>
 								{/* <h2 className='font-bold mb-1'>돈까스현래</h2> */}
-								<h2 className='font-bold mb-1'>{friend.nickname}</h2>
+								<h2 className='font-bold mb-1'>{user.nickname}</h2>
 								{/* 서버에서 받아온 data */}
 
 								{/* 친구 유무에 따른 name 변경 => 친구 신청 / 친구 요청 취소 */}
-								<PrimaryBtn
-									size='compact'
-									name='친구 신청'
-									color='black'
-									// 신청을 보내지 않았으면 -> 친구 신청 modal을 제공하되, 이미 완료된 상태면 취소
-									// 즉 onClick Event에 따라 친구 신청 모달 열기 / 취소 모달 열기
-									// 친구 신청 요청 모달 열기
-									onClick={() => {
-										setModalOpen(true); // 모달 열기
-										setSelectedFriend(friend); // 선택된 친구 데이터 저장
-									}} //친구 신청 요청 -> api 연동
-									className='mt-3'
-								/>
+								{user.relationStatus === 0 || user.relationStatus === 3 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구 요청'
+										color='black'
+										onClick={() => {
+											setModalOpen(true); // 모달 열기
+											setSelectedFriend(user); // 선택된 친구 데이터 저장
+										}}
+										className='mt-3'
+									/>
+								) : user.relationStatus === 1 ? (
+									<PrimaryBtn
+										size='compact'
+										name='요청 취소'
+										color='gray'
+										onClick={() => {
+											setSelectedFriend(user); // 취소할 친구 선택
+											handleCancel(); // 친구 요청 취소
+										}}
+										className='mt-3'
+									/>
+								) : user.relationStatus === 2 ? (
+									<PrimaryBtn
+										size='compact'
+										name='요청 수락'
+										color='primary'
+										onClick={() => {
+											handleAccept();
+										}}
+										className='mt-3'
+									/>
+								) : null}
 							</div>
 						))}
 				</div>

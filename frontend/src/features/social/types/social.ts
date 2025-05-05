@@ -23,6 +23,19 @@ export interface FriendRequestList {
 	}[]; //배열 리스트 === 친구 요청 목록
 }
 
+export interface SearchUser {
+	// 유저 검색 -> 전체 유저 검색
+	content: {
+		id: number; //유저 고유 아이디
+		profileImage: string; //프로필 이미지
+		nickname: string; //유저 닉네임
+		code: string; // 중복 방지 코드
+		relationStatus: RelationStatus; //친구 관계
+	}[]; //배열 리스트 === 유저 검색 결과
+}
+
+export type RelationStatus = 0 | 1 | 2 | 3; //친구 관계 (0-친구, 1-친구 요청 보냄, 2- 친구 요청 받음, 3-아무 사이 아님)
+
 export interface SearchFriend {
 	// 친구 검색
 	content: {
