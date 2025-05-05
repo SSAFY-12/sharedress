@@ -1,6 +1,6 @@
 export interface BadgeProps {
-	icon?: //icon 타입
-	| 'bell'
+	icon?:
+		| 'bell'
 		| 'setting'
 		| 'back'
 		| 'next'
@@ -8,8 +8,8 @@ export interface BadgeProps {
 		| 'info'
 		| 'success'
 		| 'warning'
-		| 'error';
-	text?: string; //text 타입
-	onClick?: () => void; //onClick 타입
-	className?: string; //className 타입
+		| 'error'; // 아이콘 종류
+	onClick?: () => void; // 클릭 핸들러
+	text?: string; // 텍스트 표시 (아이콘 대신)
+	className?: string; // 추가 스타일링
 }

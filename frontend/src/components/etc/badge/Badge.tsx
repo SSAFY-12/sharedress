@@ -10,7 +10,7 @@ import {
 	XCircle,
 } from 'lucide-react';
 
-export const Badge = ({ icon, text, onClick, className = '' }: BadgeProps) => {
+export const Badge = ({ icon, onClick, text, className = '' }: BadgeProps) => {
 	const getIcon = () => {
 		switch (icon) {
 			case 'bell':

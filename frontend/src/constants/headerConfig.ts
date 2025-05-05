@@ -2,13 +2,13 @@ export const headerConfig = {
 	'/auth': {
 		showBack: false,
 		subtitle: '로그인',
-		badgeText: '로그인 필요', // 텍스트만
+		badgeText: '로그인 필요',
 	},
 	'/wardrobe': {
 		showBack: true,
 		subtitle: '내 옷장',
 		// badgeIcon: 'success', // 아이콘만
-		badgeText: '전체', // 텍스트도 함께
+		badgeText: '전체',
 	},
 	'/notifications': {
 		showBack: true,

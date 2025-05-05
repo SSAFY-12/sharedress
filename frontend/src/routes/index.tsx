@@ -5,6 +5,9 @@ import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
 import SocialPage from '@/pages/SocialPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+import CodiSavePage from '@/features/codi/pages/CodiSavePage';
+
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -44,5 +47,13 @@ export const router = createBrowserRouter([
 	{
 		path: '/oauth/google/callback',
 		element: <GoogleCallbackHandler />,
+	},
+	{
+		path: 'codi/edit',
+		element: <CodiEditPage />,
+	},
+	{
+		path: 'codi/save',
+		element: <CodiSavePage />,
 	},
 ]);
