@@ -6,7 +6,8 @@ import com.ssafy.sharedress.global.response.ResponseCode;
 
 public enum GuestErrorCode implements ResponseCode {
 
-	GUEST_NOT_FOUND("404", "존재하지 않는 게스트입니다.", HttpStatus.NOT_FOUND);
+	GUEST_NOT_FOUND("404", "존재하지 않는 게스트입니다.", HttpStatus.NOT_FOUND),
+	GUEST_UNAUTHORIZED("401", "인증되지 않은 게스트입니다.", HttpStatus.UNAUTHORIZED);
 
 	private final String code;
 	private final String message;
