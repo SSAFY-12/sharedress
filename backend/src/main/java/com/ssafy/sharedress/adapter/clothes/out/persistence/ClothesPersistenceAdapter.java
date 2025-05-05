@@ -99,4 +99,8 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 		return new CursorPageResult<>(content, hasNext, nextCursor);
 	}
 
+	@Override
+	public List<Clothes> findAllByIds(List<Long> ids) {
+		return clothesJpaRepository.findAllById(ids);
+	}
 }
