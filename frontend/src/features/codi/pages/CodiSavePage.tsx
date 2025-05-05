@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ResultCodiCanvas from '@/features/codi/components/ResultCodiCanvas';
 import { InputField } from '@/components/inputs/input-field';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
-import { myCodiSaveApi } from '../api/codiApi';
+import { myCodiSaveApi } from '@/features/codi/api/codiApi';
 
 const CodiSavePage = () => {
 	const navigate = useNavigate();
