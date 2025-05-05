@@ -119,4 +119,13 @@ public class ClothesService implements ClothesUseCase {
 		return clothesRepository.searchClothesWithCursor(keyword, categoryIds, shopId, cursorId, size);
 	}
 
+	@Transactional
+	@Override
+	public void markClothesAsAiCompleted(Long memberId, String fcmToken) {
+		log.info("AI 전처리 완료 알림 수신: memberId={}, fcmToken={}", memberId, fcmToken);
+
+		// TODO[지윤]: FCM 전송 로직 구현 필요
+		// fcmService.sendNotification(fcmToken, "AI 전처리 완료", "옷 등록이 완료되었습니다!");
+		//log.info("FCM 전송 완료: memberId={}", memberId);
+	}
 }
