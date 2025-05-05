@@ -8,6 +8,8 @@ interface CodiEditorProps {
 	onImageClick?: () => void;
 	children: React.ReactNode;
 	className?: string;
+	showMoreButton?: boolean;
+	onMoreButtonClick?: () => void;
 }
 
 export const CodiEditor = ({
@@ -16,6 +18,8 @@ export const CodiEditor = ({
 	onImageClick,
 	children,
 	className = '',
+	showMoreButton = false,
+	onMoreButtonClick,
 }: CodiEditorProps) => (
 	<div className={`w-full max-w-3xl mx-auto ${className}`}>
 		<div className='mb-6'>
@@ -23,6 +27,8 @@ export const CodiEditor = ({
 				item={item}
 				editable={editable}
 				onClick={onImageClick}
+				showMoreButton={showMoreButton}
+				onMoreButtonClick={onMoreButtonClick}
 			/>
 		</div>
 		<div className='space-y-4'>{children}</div>

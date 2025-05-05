@@ -2,7 +2,7 @@ import { ClothItem } from '@/components/cards/cloth-card';
 import { useState } from 'react';
 import SubTabNavigation from './SubTabNavigation';
 import { ClothListContainer } from '@/containers/ClothListContainer';
-
+import { useNavigate } from 'react-router-dom';
 const CodiTabs = [
 	{
 		id: 'my' as const,
@@ -47,9 +47,10 @@ const friendsOutfits: ClothItem[] = [
 
 const CodiTab = () => {
 	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friends'>('my');
+	const navigate = useNavigate();
 
 	const handleItemClick = (item: ClothItem) => {
-		console.log('Outfit clicked:', item);
+		navigate(`/codi/${item.id}`);
 	};
 
 	const displayItems = activeSubTab === 'my' ? myOutfits : friendsOutfits;

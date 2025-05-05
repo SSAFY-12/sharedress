@@ -7,6 +7,7 @@ export interface InputFieldProps {
 	onChange: (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => void; // 값 변경 핸들러
+	onFocus?: () => void; // 포커스 핸들러
 	disabled?: boolean; // 비활성화 여부
 	name?: string; // input/select의 name 속성
 	optionList?: string[]; // select 옵션 리스트

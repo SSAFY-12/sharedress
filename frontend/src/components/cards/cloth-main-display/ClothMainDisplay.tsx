@@ -1,4 +1,4 @@
-import { Camera } from 'lucide-react';
+import { Camera, MoreVertical } from 'lucide-react';
 import { ClothMainDisplayProps } from './ClothMainDisplay.types';
 
 // 메인 옷 이미지, 수정 모드 시 오버레이 표시
@@ -7,6 +7,8 @@ export const ClothMainDisplay = ({
 	editable = false,
 	onClick,
 	className = '',
+	showMoreButton = false,
+	onMoreButtonClick,
 }: ClothMainDisplayProps) => (
 	<div
 		className={`relative w-full aspect-[10/11] border rounded-md overflow-hidden ${className}`}
@@ -16,6 +18,17 @@ export const ClothMainDisplay = ({
 			alt={item.name}
 			className='object-cover w-full h-full'
 		/>
+
+		{/* 더보기 버튼 */}
+		{showMoreButton && (
+			<button
+				onClick={onMoreButtonClick}
+				className='absolute top-2 right-2 p-2 bg-black/20 hover:bg-black/30 rounded-full transition-colors z-10'
+				aria-label='더보기'
+			>
+				<MoreVertical size={20} className='text-gray-400' />
+			</button>
+		)}
 		{editable && (
 			<div
 				onClick={onClick}

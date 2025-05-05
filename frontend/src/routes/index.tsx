@@ -9,6 +9,7 @@ import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 import SocialPage from '@/pages/SocialPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
+import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
 
 export const router = createBrowserRouter([
 	{
@@ -65,5 +66,9 @@ export const router = createBrowserRouter([
 	{
 		path: 'cloth/:id',
 		element: <ClothDetailPage />,
+	},
+	{
+		path: 'codi/:id',
+		element: <CodiDetailPage />,
 	},
 ]);
