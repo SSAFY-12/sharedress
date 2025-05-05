@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.clothes.dto.AiCompleteRequest;
 import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
-import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
@@ -25,16 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class ClothesController {
 
 	private final ClothesUseCase clothesUseCase;
-
-	@PostMapping("/clothes/purchase-history")
-	public ResponseEntity<ResponseWrapper<Void>> registerClothesFromPurchase(
-		@RequestBody PurchaseHistoryRequest request) {
-
-		// TODO[지윤]: security context에서 memberId를 가져오는 로직 추가
-		Long myId = 1L;
-		clothesUseCase.registerClothesFromPurchase(request, myId);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
-	}
 
 	@GetMapping("/clothes")
 	public ResponseEntity<ResponseWrapper<List<ClothesSearchResponse>>> getClothes(
@@ -55,5 +44,4 @@ public class ClothesController {
 		clothesUseCase.markClothesAsAiCompleted(request.memberId(), request.fcmToken());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
-
 }
