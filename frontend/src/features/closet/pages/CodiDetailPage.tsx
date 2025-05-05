@@ -3,8 +3,8 @@ import { ClothItem } from '@/components/cards/cloth-card';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/layouts/Header';
 import { CodiEditor } from '@/containers/CodiEditor';
-import CommentList from '../components/CommentList';
-import { Comment } from '../components/CommentItem.types';
+import CommentList from '@/features/closet/components/CommentList';
+import { Comment } from '@/features/closet/components/CommentItem.types';
 import { InputField } from '@/components/inputs/input-field';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
 
