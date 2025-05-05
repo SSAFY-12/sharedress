@@ -19,4 +19,6 @@ public interface ClothesRepository {
 		Long cursorId,
 		int size
 	);
+
+	List<Clothes> findAllByIds(List<Long> ids);
 }
