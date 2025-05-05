@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MemberSearchResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
 import com.ssafy.sharedress.application.member.usecase.MemberQueryUseCase;
@@ -57,4 +59,11 @@ public class MemberController {
 		MyProfileResponse result = memberUseCase.getMyProfile(myId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
+
+	@GetMapping("/members/{memberId}/profile")
+	public ResponseEntity<ResponseWrapper<MemberProfileResponse>> getProfile(@PathVariable Long memberId) {
+		MemberProfileResponse result = memberUseCase.getMemberProfile(memberId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+	}
+
 }
