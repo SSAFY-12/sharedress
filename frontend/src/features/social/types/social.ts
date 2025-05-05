@@ -14,7 +14,12 @@ export interface FriendRequestList {
 	content: {
 		id: number; //친구 요청 고유 아이디
 		message: string; //메시지
-		requester: object; //요청자 정보(사람)
+		requester: {
+			id: number; //요청자 고유 아이디
+			nickname: string; //요청자 닉네임
+			profileImage: string; //요청자 프로필 이미지
+			code: string; // 중복 방지 코드
+		}; //요청자 정보(사람)
 	}[]; //배열 리스트 === 친구 요청 목록
 }
 

@@ -24,7 +24,8 @@ export const FriendSearchResultPage = () => {
 	// const { searchAllFriend, isLoadingAllFriend, errorAllFriend } =
 	const { searchAllFriend } = useSearchFriend(resultValue); // 검색 결과 목록 영역에 데이터 반환 -> 그럼 이게 resultValue가 변경될때마다 반영이 되는 것인지?
 	// const { requestFriend, isRequesting, requestError, isRequestSuccess } =
-	const { requestFriend } = useRequest(); // 친구 요청 버튼 로직
+	// const { requestFriend, cancelRequest } = useRequest(); // 친구 요청 전송/취소 버튼 로직
+	const { requestFriend } = useRequest(); // 친구 요청 전송/취소 버튼 로직
 
 	// Enter이벤트 발생시 -> searchAllFriend에 친구리스트 목록이 나올 것
 	const handleSearch = (e: any) => {
@@ -47,6 +48,13 @@ export const FriendSearchResultPage = () => {
 		}
 		setModalOpen(false); // 모달 닫기
 	};
+
+	// 친구 요청 취소 => 이게 보냈는지 어떻게 알지? 단순 id값으로 요청 여부를 판단할 수는 없을 것 같은데 : 서버에서 받아와야 하는 것 아닌지?
+	// const handleCancel = () => {
+	// 	if (selectedFriend) {
+	// 		cancelRequest(selectedFriend.id);
+	// 	}
+	// };
 
 	return (
 		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
@@ -90,6 +98,8 @@ export const FriendSearchResultPage = () => {
 									size='compact'
 									name='친구 신청'
 									color='black'
+									// 신청을 보내지 않았으면 -> 친구 신청 modal을 제공하되, 이미 완료된 상태면 취소
+									// 즉 onClick Event에 따라 친구 신청 모달 열기 / 취소 모달 열기
 									// 친구 신청 요청 모달 열기
 									onClick={() => {
 										setModalOpen(true); // 모달 열기
