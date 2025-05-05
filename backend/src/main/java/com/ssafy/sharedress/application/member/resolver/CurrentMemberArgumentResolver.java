@@ -37,6 +37,11 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
 			return details.member();
 		}
 
+		CurrentMember annotation = parameter.getParameterAnnotation(CurrentMember.class);
+		if (annotation != null && !annotation.required()) {
+			return null;
+		}
+
 		ExceptionUtil.throwException(MemberErrorCode.MEMBER_UNAUTHORIZED);
 		return null;
 	}
