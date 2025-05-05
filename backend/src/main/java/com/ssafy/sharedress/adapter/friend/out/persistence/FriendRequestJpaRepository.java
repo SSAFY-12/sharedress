@@ -20,13 +20,13 @@ public interface FriendRequestJpaRepository extends JpaRepository<FriendRequest,
 	@Query("SELECT fr FROM FriendRequest fr "
 		+ "JOIN FETCH fr.requester r "
 		+ "JOIN FETCH fr.receiver v "
-		+ "WHERE fr.receiver.id = :receiverId")
+		+ "WHERE fr.id = :id AND fr.receiver.id = :receiverId")
 	Optional<FriendRequest> findByIdAndReceiverId(Long id, Long receiverId);
 
 	@Query("SELECT fr FROM FriendRequest fr "
 		+ "JOIN FETCH fr.requester r "
 		+ "JOIN FETCH fr.receiver v "
-		+ "WHERE fr.requester.id = :requesterId")
+		+ "WHERE fr.id = :id AND fr.requester.id = :requesterId")
 	Optional<FriendRequest> findByIdAndRequesterId(Long id, Long requesterId);
 
 	@Query("SELECT fr FROM FriendRequest fr "
