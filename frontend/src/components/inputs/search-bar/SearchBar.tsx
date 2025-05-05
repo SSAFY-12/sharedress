@@ -5,6 +5,7 @@ export const SearchBar = ({
 	placeholder,
 	value,
 	onChange,
+	onKeyDown,
 	onSubmit,
 	className = '',
 }: SearchBarProps) => (
@@ -18,6 +19,7 @@ export const SearchBar = ({
 				placeholder={placeholder}
 				value={value}
 				onChange={onChange}
+				onKeyDown={onKeyDown}
 				className='border rounded-xl pl-10 pr-4 py-3 w-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 bg-gray-100'
 			/>
 		</div>

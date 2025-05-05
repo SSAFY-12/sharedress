@@ -1,8 +1,8 @@
-import { FriendRequestsPage } from '@/features/social/pages/FriendRequestPage';
+import { FriendSearchResultPage } from '@/features/social/pages/FriendSearchResultPage';
 
 const FriendAddPage = () => (
 	<div>
-		<FriendRequestsPage />
+		<FriendSearchResultPage />
 	</div>
 );
 

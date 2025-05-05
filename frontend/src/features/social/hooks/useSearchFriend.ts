@@ -36,8 +36,8 @@ const useSearchFriend = (nickname: string) => {
 	});
 
 	return {
-		searchMyFriend,
-		searchAllFriend,
+		searchMyFriend: searchMyFriend?.content,
+		searchAllFriend: searchAllFriend?.content,
 		isLoadingMyFriend,
 		isLoadingAllFriend,
 		errorMyFriend,

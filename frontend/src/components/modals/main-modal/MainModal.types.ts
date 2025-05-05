@@ -16,6 +16,7 @@ export interface ModalProps {
 	onClose: () => void; // 모달을 닫는 함수
 	children: React.ReactNode; // 하위 컴포넌트들 (Header, Body, Footer)
 	className?: string; // 추가 스타일 클래스 (예: "w-96" - 모달 너비 조정)
+	overlayClassName?: string; // 오버레이(배경) 추가 스타일
 }
 
 // 3. 닫기 버튼 Props 타입 === Modal.Close
