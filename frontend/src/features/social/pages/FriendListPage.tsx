@@ -2,7 +2,7 @@ import { SearchBar } from '@/components/inputs/search-bar';
 import { UserRowItem } from '@/containers/UserRowItem';
 import { useState } from 'react';
 import useFriendList from '@/features/social/hooks/useFriendList';
-import useSearchFriend from '../hooks/useSearchFriend';
+import useSearchFriend from '@/features/social/hooks/useSearchFriend';
 
 // 더미 데이터
 // const friends = [

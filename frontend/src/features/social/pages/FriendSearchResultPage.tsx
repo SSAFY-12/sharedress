@@ -2,51 +2,66 @@ import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { FriendRequestMsgModal } from '@/features/social/components/FriendRequestMsgModal';
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 import useSearchUser from '@/features/social/hooks/useSearchUser';
 import { RelationStatus } from '@/features/social/types/social';
+
 export const FriendSearchResultPage = () => {
-	const [searchValue, setSearchValue] = useState(''); // 실시간으로 바뀌는 내용
-	// enter 이벤트를 걸었을때 담길 resultValue
-	const [resultValue, setResultValue] = useState(''); // useEffect로 거는게 아니라 enter 이벤트에 따라 발생하도록
-	// useEffectHook이 resultValue가 바뀔떄마다 실행되어야 함!!!
-	const [modalOpen, setModalOpen] = useState(false); // 모달 열기
+	const [searchValue, setSearchValue] = useState('');
+	const [resultValue, setResultValue] = useState('');
+	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedFriend, setSelectedFriend] = useState<{
-		// 선택된 친구 => 해당 친구를 기준으로 모달 열어줌
 		profileImage: string;
 		nickname: string;
-		id: number; //친구 고유 아이디
-		relationStatus: RelationStatus; //친구 관계
-		// code: string; // 닉네임 중복방지
-		// oneLiner: string; //한줄 소개
-	} | null>(null); // 선택된 친구가 있거나 없거나
+		id: number;
+		relationStatus: RelationStatus;
+	} | null>(null);
 
-	const { searchUser } = useSearchUser(resultValue);
-	// const { searchUser, pagination } = useSearchUser(resultValue);
+	const { searchUsers, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useSearchUser(resultValue); // 검색 결과 목록 영역(무한 스크롤 구현)
 	const { requestFriend, cancelRequest, acceptRequest } = useRequest(); // 친구 요청 전송/취소 버튼 로직
-	// const { requestFriend, isRequesting, requestError, isRequestSuccess } =
-	// const { requestFriend } = useRequest(); // 친구 요청 전송/취소 버튼 로직
 
-	// useEffect(() => {
-	// 	if(resultValue) {
-	// 		//useSearchFriend 훅 자동 실행?
-	// 	}
-	// }, [resultValue])
-	// usehook자체의 enabled로 사용
+	// Intersection Observer를 위한 ref
+	const observerRef = useRef<IntersectionObserver | null>(null); // IntersectionObserver 객체 저장
+	// 웹 브라우저에서 제공하는 API, 특정 요소가 화면에 보이는지 감지할 수 있게 해주는 기능
 
-	// Enter이벤트 발생시 -> searchAllFriend에 친구리스트 목록이 나올 것
+	// 마지막 요소를 관찰
+	const lastElementRef = useCallback(
+		// 불필요한 재생성 방지를 위해 함수 메모이제이션
+		(node: HTMLDivElement | null) => {
+			// 마지막 요소를 관찰하는 ref, node === 관찰할 HTML
+			if (isFetchingNextPage) return; // 데이터 로딩 중이면 관찰 중단
+			// 다음 페이지를 불러오면 관찰 중단
+
+			// 이전 observer가 있다면 연결 해제
+			if (observerRef.current) {
+				observerRef.current.disconnect();
+			}
+
+			// 새로운 observer 생성
+			observerRef.current = new IntersectionObserver((entries) => {
+				// 첫 번째 요소가 화면에 보이고 있는지 확인 && 다음 페이지가 있는지 여부
+				if (entries[0].isIntersecting && hasNextPage) {
+					fetchNextPage(); // 다음 페이지 로드
+				}
+			});
+
+			// 마지막 요소를 관찰
+			if (node) {
+				observerRef.current.observe(node); // 마지막 요소를 관찰
+			}
+		},
+		[fetchNextPage, hasNextPage, isFetchingNextPage],
+	);
+
 	const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
-			// 엔터 이벤트 처리
-			e.preventDefault(); // html 폼 새로 고침 : 제출 방지
-			// 근데 그렇다면 searchBar의 진정한 역할은 무엇일까? 그냥 data를 담아주는 용도? inputTag를 깔끔하게 보여주는 공통 컴포넌트의 그 역할에 그친것?
-			setResultValue(searchValue); // 검색 결과 목록 영역에 데이터 반환 => 이것을 get으로 전달해서 get으로 데이터 받아옴
-			// 검색 로직 구현
+			e.preventDefault();
+			setResultValue(searchValue);
 		}
 	};
 
-	// 친구 신청 메세지 제출
 	const handleSubmit = (msg: string) => {
 		if (selectedFriend) {
 			requestFriend({
@@ -54,10 +69,9 @@ export const FriendSearchResultPage = () => {
 				message: msg,
 			});
 		}
-		setModalOpen(false); // 모달 닫기
+		setModalOpen(false);
 	};
 
-	// 친구 요청 취소
 	const handleCancel = () => {
 		if (selectedFriend) {
 			cancelRequest({
@@ -66,7 +80,6 @@ export const FriendSearchResultPage = () => {
 		}
 	};
 
-	// 친구 요청 수락
 	const handleAccept = () => {
 		if (selectedFriend) {
 			acceptRequest({
@@ -77,13 +90,12 @@ export const FriendSearchResultPage = () => {
 
 	return (
 		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
-			{/* 검색 영역 */}
 			<div className='px-4 py-3'>
 				<SearchBar
 					placeholder='친구 ID'
 					value={searchValue}
 					onChange={(e) => setSearchValue(e.target.value)}
-					onKeyDown={handleSearch} // 엔터 이벤트 처리
+					onKeyDown={handleSearch}
 				/>
 			</div>
 
@@ -91,40 +103,36 @@ export const FriendSearchResultPage = () => {
 				<div className='flex-1 p-4 flex items-center justify-center'>
 					<span className='text-gray-500'>친구 ID를 검색해주세요.</span>
 				</div>
-			) : searchUser?.length === 0 ? (
+			) : searchUsers?.length === 0 ? (
 				<div className='flex-1 p-4 flex items-center justify-center'>
 					<span className='text-gray-500'>검색 결과가 없습니다.</span>
 				</div>
 			) : (
 				<div className='flex-1 p-4'>
-					{/* 검색 결과 목록 영역 === 제출한 값이 있다면 */}
-					{searchUser &&
-						searchUser.length > 0 &&
-						// 페이지네이션으로 리스트화 해서 내리기..?
-						searchUser.map((user) => (
+					{searchUsers &&
+						searchUsers.length > 0 &&
+						searchUsers.map((user, index) => (
 							<div
-								className='border rounded-lg p-6 flex flex-col items-center'
+								ref={index === searchUsers.length - 1 ? lastElementRef : null}
+								// 배열의 마지막 인덱스, 현재 요소가 마지막 요소인지 확인 -> 마지막일경우 lastElementRef 참조
+								className='border rounded-lg p-6 flex flex-col items-center mb-4'
 								key={user.id}
 							>
 								<UserMiniAvatar
-									// src='https://picsum.photos/200/300?random=1'
 									src={user.profileImage}
 									size='lg'
 									className='mb-3'
 								/>
-								{/* <h2 className='font-bold mb-1'>돈까스현래</h2> */}
 								<h2 className='font-bold mb-1'>{user.nickname}</h2>
-								{/* 서버에서 받아온 data */}
 
-								{/* 친구 유무에 따른 name 변경 => 친구 신청 / 친구 요청 취소 */}
 								{user.relationStatus === 0 || user.relationStatus === 3 ? (
 									<PrimaryBtn
 										size='compact'
 										name='친구 요청'
 										color='black'
 										onClick={() => {
-											setModalOpen(true); // 모달 열기
-											setSelectedFriend(user); // 선택된 친구 데이터 저장
+											setModalOpen(true);
+											setSelectedFriend(user);
 										}}
 										className='mt-3'
 									/>
@@ -134,8 +142,8 @@ export const FriendSearchResultPage = () => {
 										name='요청 취소'
 										color='gray'
 										onClick={() => {
-											setSelectedFriend(user); // 취소할 친구 선택
-											handleCancel(); // 친구 요청 취소
+											setSelectedFriend(user);
+											handleCancel();
 										}}
 										className='mt-3'
 									/>
@@ -152,15 +160,19 @@ export const FriendSearchResultPage = () => {
 								) : null}
 							</div>
 						))}
+					{/* 다음 상태 불러오는지 체크 */}
+					{isFetchingNextPage && (
+						<div className='text-center py-4'>
+							<span className='text-gray-500'>로딩 중...</span>
+						</div>
+					)}
 				</div>
 			)}
-			{/* 친구 정보가 담기게 된다면? -> 모달 열기 */}
 			{selectedFriend && (
 				<FriendRequestMsgModal
 					isOpen={modalOpen}
-					onClose={() => setModalOpen(false)} // 모달 닫기
-					friend={selectedFriend} // 선택된 친구 데이터 전달
-					// 제출시 mutation 요청 : 친구 아이디와 메시지 전달
+					onClose={() => setModalOpen(false)}
+					friend={selectedFriend}
 					onSubmit={handleSubmit}
 				/>
 			)}
