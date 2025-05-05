@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +17,8 @@ import com.ssafy.sharedress.application.friend.dto.FriendResponse;
 import com.ssafy.sharedress.application.friend.usecase.FriendQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestUseCase;
-import com.ssafy.sharedress.application.member.dto.CustomMemberDetails;
+import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
@@ -34,68 +34,68 @@ public class FriendController {
 
 	@PostMapping("/friends/request")
 	public ResponseEntity<ResponseWrapper<Void>> sendFriendRequest(
-		@AuthenticationPrincipal CustomMemberDetails memberDetails,
+		@CurrentMember Member member,
 		@RequestBody FriendRequestDto request
 	) {
-		Long myId = memberDetails.member().getId();
+		Long myId = member.getId();
 		friendRequestUseCase.sendFriendRequest(myId, request);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
 	}
 
 	@PostMapping("/friends/request/{requestId}/accept")
 	public ResponseEntity<ResponseWrapper<Void>> acceptFriendRequest(
-		@AuthenticationPrincipal CustomMemberDetails memberDetails,
+		@CurrentMember Member member,
 		@PathVariable("requestId") Long requestId
 	) {
-		Long myId = memberDetails.member().getId();
+		Long myId = member.getId();
 		friendRequestUseCase.acceptFriendRequest(myId, requestId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
 	}
 
 	@PostMapping("/friends/request/{requestId}/reject")
 	public ResponseEntity<ResponseWrapper<Void>> rejectFriendRequest(
-		@AuthenticationPrincipal CustomMemberDetails memberDetails,
+		@CurrentMember Member member,
 		@PathVariable("requestId") Long requestId
 	) {
-		Long myId = memberDetails.member().getId();
+		Long myId = member.getId();
 		friendRequestUseCase.rejectFriendRequest(myId, requestId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
 	}
 
 	@PostMapping("/friends/request/{requestId}/cancel")
 	public ResponseEntity<ResponseWrapper<Void>> cancelFriendRequest(
-		@AuthenticationPrincipal CustomMemberDetails memberDetails,
+		@CurrentMember Member member,
 		@PathVariable("requestId") Long requestId
 	) {
-		Long myId = memberDetails.member().getId();
+		Long myId = member.getId();
 		friendRequestUseCase.cancelFriendRequest(myId, requestId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
 	}
 
 	@GetMapping("/friends/request")
 	public ResponseEntity<ResponseWrapper<List<FriendRequestResponse>>> getFriendRequestList(
-		@AuthenticationPrincipal CustomMemberDetails memberDetails
+		@CurrentMember Member member
 	) {
-		Long myId = memberDetails.member().getId();
+		Long myId = member.getId();
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
 			friendRequestQueryUseCase.getFriendRequestList(myId));
 	}
 
 	@GetMapping("/friends")
 	public ResponseEntity<ResponseWrapper<List<FriendResponse>>> getFriendList(
-		@AuthenticationPrincipal CustomMemberDetails memberDetails
+		@CurrentMember Member member
 	) {
-		Long myId = memberDetails.member().getId();
+		Long myId = member.getId();
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
 			friendQueryUseCase.getFriendList(myId));
 	}
 
 	@GetMapping("/friends/search")
 	public ResponseEntity<ResponseWrapper<List<FriendResponse>>> getFriendListByKeyword(
-		@AuthenticationPrincipal CustomMemberDetails memberDetails,
+		@CurrentMember Member member,
 		@RequestParam(required = false, defaultValue = "") String keyword
 	) {
-		Long myId = memberDetails.member().getId();
+		Long myId = member.getId();
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
 			friendQueryUseCase.getFriendListByKeyword(myId, keyword));
 	}
