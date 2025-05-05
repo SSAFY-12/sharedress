@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
+import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
 import com.ssafy.sharedress.application.member.usecase.MemberUseCase;
 import com.ssafy.sharedress.domain.member.entity.Member;
@@ -53,5 +54,16 @@ public class MemberService implements MemberUseCase {
 		}
 
 		return MyProfileResponse.from(member);
+	}
+
+	@Override
+	@Transactional
+	public void updateNotificationStatus(UpdateNotificationStatusRequest request, Long myId) {
+		Member member = memberRepository.findById(myId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		if (request.notificationStatus() != null) {
+			member.updateNotificationStatus(request.notificationStatus());
+		}
 	}
 }
