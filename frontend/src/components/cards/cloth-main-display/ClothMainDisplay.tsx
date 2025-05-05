@@ -9,7 +9,7 @@ export const ClothMainDisplay = ({
 	className = '',
 }: ClothMainDisplayProps) => (
 	<div
-		className={`relative w-full h-96 border rounded-md overflow-hidden ${className}`}
+		className={`relative w-full aspect-[10/11] border rounded-md overflow-hidden ${className}`}
 	>
 		<img
 			src={item.imageUrl || '/placeholder.svg?height=400&width=400'}

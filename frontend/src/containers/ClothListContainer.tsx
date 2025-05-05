@@ -37,13 +37,15 @@ export const ClothListContainer = ({
 		)}
 
 		<div
-			className={`grid gap-4 ${columns === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}
+			className={`grid gap-2.5 justify-items-center ${
+				columns === 2 ? 'grid-cols-2' : 'grid-cols-3'
+			}`}
 		>
 			{items.map((item) => (
 				<ClothCard
 					key={item.id}
 					item={item}
-					size='md'
+					size={columns === 2 ? 'lg' : 'md'}
 					onClick={() => onItemClick?.(item)}
 				/>
 			))}
