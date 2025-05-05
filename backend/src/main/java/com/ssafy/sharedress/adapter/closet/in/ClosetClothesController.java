@@ -19,6 +19,7 @@ import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AddLibraryClothesToClosetRequest;
+import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
@@ -93,5 +94,15 @@ public class ClosetClothesController {
 		Long myId = 1L; // TODO: 시큐리티 컨텍스트에서 추출 예정
 		closetClothesUseCase.addLibraryClothesToCloset(request.itemsId(), myId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
+	}
+
+	@PostMapping("/closet/clothes/purchase-history")
+	public ResponseEntity<ResponseWrapper<Void>> registerClothesFromPurchase(
+		@RequestBody PurchaseHistoryRequest request) {
+
+		// TODO[지윤]: security context에서 memberId를 가져오는 로직 추가
+		Long myId = 1L;
+		closetClothesUseCase.registerClothesFromPurchase(request, myId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
 	}
 }
