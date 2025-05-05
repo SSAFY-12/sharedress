@@ -29,7 +29,15 @@ public class Guest extends BaseTimeEntity {
 
 	private String nickname;
 
+	private String code;
+
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "linked_member_id")
 	private Member member;
+
+	public Guest(String uuid, String nickname, String code) {
+		this.uuid = uuid;
+		this.nickname = nickname;
+		this.code = code;
+	}
 }

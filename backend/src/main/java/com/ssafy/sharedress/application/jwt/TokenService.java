@@ -1,15 +1,8 @@
-package com.ssafy.sharedress.application.auth.service;
+package com.ssafy.sharedress.application.jwt;
 
 import org.springframework.stereotype.Service;
 
 import com.ssafy.sharedress.application.auth.dto.TokenWithRefresh;
-import com.ssafy.sharedress.application.auth.usecase.TokenUseCase;
-import com.ssafy.sharedress.application.jwt.JwtTokenProvider;
-import com.ssafy.sharedress.application.jwt.JwtTokenResolver;
-import com.ssafy.sharedress.application.jwt.RefreshToken;
-import com.ssafy.sharedress.application.jwt.RefreshTokenRepository;
-import com.ssafy.sharedress.application.jwt.TokenErrorCode;
-import com.ssafy.sharedress.application.jwt.TokenResponse;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
