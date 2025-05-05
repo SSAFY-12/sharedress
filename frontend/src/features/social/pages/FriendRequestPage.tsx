@@ -116,6 +116,7 @@ export const FriendRequestsPage = () => {
 								<PrimaryBtn
 									size='compact'
 									name='친구 수락'
+									// 친구 거절
 									color='black'
 									onClick={() => handleAccept(request.id)} // 친구 요청 수락
 								/>

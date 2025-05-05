@@ -2,14 +2,14 @@ import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { FriendRequestMsgModal } from '@/features/social/components/FriendRequestMsgModal';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import useSearchFriend from '@/features/social/hooks/useSearchFriend';
 import useRequest from '@/features/social/hooks/useRequest';
 
 export const FriendSearchResultPage = () => {
 	const [searchValue, setSearchValue] = useState(''); // 실시간으로 바뀌는 내용
 	// enter 이벤트를 걸었을때 담길 resultValue
-	const [resultValue, setResultValue] = useState('돈까스 현래'); // useEffect로 거는게 아니라 enter 이벤트에 따라 발생하도록
+	const [resultValue, setResultValue] = useState(''); // useEffect로 거는게 아니라 enter 이벤트에 따라 발생하도록
 	// useEffectHook이 resultValue가 바뀔떄마다 실행되어야 함!!!
 	const [modalOpen, setModalOpen] = useState(false); // 모달 열기
 	const [selectedFriend, setSelectedFriend] = useState<{
@@ -27,13 +27,20 @@ export const FriendSearchResultPage = () => {
 	// const { requestFriend, cancelRequest } = useRequest(); // 친구 요청 전송/취소 버튼 로직
 	const { requestFriend } = useRequest(); // 친구 요청 전송/취소 버튼 로직
 
+	// useEffect(() => {
+	// 	if(resultValue) {
+	// 		//useSearchFriend 훅 자동 실행?
+	// 	}
+	// }, [resultValue])
+	// usehook자체의 enabled로 사용
+
 	// Enter이벤트 발생시 -> searchAllFriend에 친구리스트 목록이 나올 것
-	const handleSearch = (e: any) => {
+	const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			// 엔터 이벤트 처리
-			e.preventDefault(); // 이것 why?
+			e.preventDefault(); // html 폼 새로 고침 : 제출 방지
 			// 근데 그렇다면 searchBar의 진정한 역할은 무엇일까? 그냥 data를 담아주는 용도? inputTag를 깔끔하게 보여주는 공통 컴포넌트의 그 역할에 그친것?
-			setResultValue(resultValue); // 검색 결과 목록 영역에 데이터 반환 => 이것을 get으로 전달해서 get으로 데이터 받아옴
+			setResultValue(searchValue); // 검색 결과 목록 영역에 데이터 반환 => 이것을 get으로 전달해서 get으로 데이터 받아옴
 			// 검색 로직 구현
 		}
 	};
@@ -65,13 +72,16 @@ export const FriendSearchResultPage = () => {
 					value={searchValue}
 					onChange={(e) => setSearchValue(e.target.value)}
 					onKeyDown={handleSearch} // 엔터 이벤트 처리
-					onSubmit={handleSearch} // 검색 이벤트 처리
 				/>
 			</div>
 
-			{resultValue === '' ? (
-				<div>
-					<span>검색 결과가 없습니다.</span>
+			{!resultValue ? (
+				<div className='flex-1 p-4 flex items-center justify-center'>
+					<span className='text-gray-500'>친구 ID를 검색해주세요.</span>
+				</div>
+			) : searchAllFriend?.length === 0 ? (
+				<div className='flex-1 p-4 flex items-center justify-center'>
+					<span className='text-gray-500'>검색 결과가 없습니다.</span>
 				</div>
 			) : (
 				<div className='flex-1 p-4'>

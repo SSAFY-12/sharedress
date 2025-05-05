@@ -95,6 +95,7 @@ export const FriendsListPage = () => {
 							userStatus={friend.oneLiner}
 							actionType='arrow'
 							onClick={() => console.log('Navigate to user profile')}
+							// user 클릭시 프로필 이동
 						/>
 					))}
 				</div>
