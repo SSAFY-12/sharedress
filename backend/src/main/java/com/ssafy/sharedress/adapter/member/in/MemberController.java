@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +15,7 @@ import com.ssafy.sharedress.application.member.annotation.CurrentMember;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MemberSearchResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
+import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
 import com.ssafy.sharedress.application.member.usecase.MemberQueryUseCase;
 import com.ssafy.sharedress.application.member.usecase.MemberUseCase;
 import com.ssafy.sharedress.domain.member.entity.Member;
@@ -63,6 +66,16 @@ public class MemberController {
 	@GetMapping("/members/{memberId}/profile")
 	public ResponseEntity<ResponseWrapper<MemberProfileResponse>> getProfile(@PathVariable Long memberId) {
 		MemberProfileResponse result = memberUseCase.getMemberProfile(memberId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+	}
+
+	@PatchMapping("/members/profile")
+	public ResponseEntity<ResponseWrapper<MyProfileResponse>> updateMyProfile(
+		@RequestBody UpdateProfileRequest request
+	) {
+		// TODO[지윤] : @CurrentMember 어노테이션을 사용하여 로그인한 사용자의 정보를 가져오는 방법으로 변경
+		Long myId = 1L;
+		MyProfileResponse result = memberUseCase.updateProfile(request, myId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 
