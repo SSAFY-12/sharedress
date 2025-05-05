@@ -3,7 +3,6 @@ package com.ssafy.sharedress.application.guest.service;
 import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +14,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CustomGuestDetailsService implements UserDetailsService {
+public class CustomGuestDetailsService {
 
 	private final GuestRepository guestRepository;
 
-	@Override
-	public UserDetails loadUserByUsername(String guestId) throws UsernameNotFoundException {
-		Optional<Guest> guest = guestRepository.findById(Long.valueOf(guestId));
+	public UserDetails loadUserByUsername(String uuid) throws UsernameNotFoundException {
+		Optional<Guest> guest = guestRepository.findByUuid(uuid);
 		return guest.map(CustomGuestDetails::new).orElse(null);
 	}
 }

@@ -37,6 +37,11 @@ public class CurrentGuestArgumentResolver implements HandlerMethodArgumentResolv
 			return details.guest();
 		}
 
+		CurrentGuest annotation = parameter.getParameterAnnotation(CurrentGuest.class);
+		if (annotation != null && !annotation.required()) {
+			return null; // 인증이 없어도 null로 허용
+		}
+
 		ExceptionUtil.throwException(GuestErrorCode.GUEST_UNAUTHORIZED);
 		return null;
 	}
