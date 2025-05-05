@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.sharedress.application.auth.dto.GoogleLoginRequest;
 import com.ssafy.sharedress.application.auth.dto.TokenWithRefresh;
 import com.ssafy.sharedress.application.auth.usecase.GoogleLoginUseCase;
-import com.ssafy.sharedress.application.auth.usecase.TokenUseCase;
 import com.ssafy.sharedress.application.jwt.TokenResponse;
+import com.ssafy.sharedress.application.jwt.TokenUseCase;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 

@@ -1,19 +1,19 @@
-package com.ssafy.sharedress.domain.member.error;
+package com.ssafy.sharedress.domain.guest.error;
 
 import org.springframework.http.HttpStatus;
 
 import com.ssafy.sharedress.global.response.ResponseCode;
 
-public enum MemberErrorCode implements ResponseCode {
+public enum GuestErrorCode implements ResponseCode {
 
-	MEMBER_NOT_FOUND("404", "존재하지 않는 사용자입니다.", HttpStatus.NOT_FOUND),
-	MEMBER_UNAUTHORIZED("401", "인증되지 않은 사용자입니다.", HttpStatus.UNAUTHORIZED);
+	GUEST_NOT_FOUND("404", "존재하지 않는 게스트입니다.", HttpStatus.NOT_FOUND),
+	GUEST_UNAUTHORIZED("401", "인증되지 않은 게스트입니다.", HttpStatus.UNAUTHORIZED);
 
 	private final String code;
 	private final String message;
 	private final HttpStatus httpStatus;
 
-	MemberErrorCode(String code, String message, HttpStatus httpStatus) {
+	GuestErrorCode(String code, String message, HttpStatus httpStatus) {
 		this.code = code;
 		this.message = message;
 		this.httpStatus = httpStatus;

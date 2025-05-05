@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ssafy.sharedress.application.auth.service.CustomMemberDetailsService;
+import com.ssafy.sharedress.application.member.service.CustomMemberDetailsService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

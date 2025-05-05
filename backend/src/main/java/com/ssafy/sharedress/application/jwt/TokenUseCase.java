@@ -1,7 +1,6 @@
-package com.ssafy.sharedress.application.auth.usecase;
+package com.ssafy.sharedress.application.jwt;
 
 import com.ssafy.sharedress.application.auth.dto.TokenWithRefresh;
-import com.ssafy.sharedress.application.jwt.TokenResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 

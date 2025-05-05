@@ -10,7 +10,7 @@ import com.ssafy.sharedress.adapter.auth.out.GoogleUserInfoClient;
 import com.ssafy.sharedress.application.auth.dto.GoogleUserInfoResponse;
 import com.ssafy.sharedress.application.auth.dto.TokenWithRefresh;
 import com.ssafy.sharedress.application.auth.usecase.GoogleLoginUseCase;
-import com.ssafy.sharedress.application.auth.usecase.TokenUseCase;
+import com.ssafy.sharedress.application.jwt.TokenUseCase;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 
