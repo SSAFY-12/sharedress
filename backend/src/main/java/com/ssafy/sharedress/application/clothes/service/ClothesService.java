@@ -5,15 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ssafy.sharedress.adapter.clothes.out.messaging.SqsMessageSender;
 import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
-import com.ssafy.sharedress.domain.brand.repository.BrandRepository;
-import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
-import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
 import com.ssafy.sharedress.domain.clothes.repository.ClothesRepository;
-import com.ssafy.sharedress.domain.member.repository.MemberRepository;
-import com.ssafy.sharedress.domain.shoppingmall.repository.ShoppingMallRepository;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 
 import lombok.RequiredArgsConstructor;
@@ -25,13 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class ClothesService implements ClothesUseCase {
 
-	private final MemberRepository memberRepository;
 	private final ClothesRepository clothesRepository;
-	private final ShoppingMallRepository shoppingMallRepository;
-	private final BrandRepository brandRepository;
-	private final ClosetRepository closetRepository;
-	private final ClosetClothesRepository closetClothesRepository;
-	private final SqsMessageSender sqsMessageSender;
 
 	@Override
 	public CursorPageResult<ClothesSearchResponse> getLibraryClothes(
