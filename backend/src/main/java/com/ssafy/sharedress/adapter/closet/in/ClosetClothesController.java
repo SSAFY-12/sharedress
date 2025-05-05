@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
+import com.ssafy.sharedress.application.clothes.dto.AddLibraryClothesToClosetRequest;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
@@ -82,5 +84,14 @@ public class ClosetClothesController {
 		closetClothesUseCase.removeClosetClothes(myId, closetClothesId);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
+	}
+
+	@PostMapping("/closet/clothes/library")
+	public ResponseEntity<ResponseWrapper<Void>> addClothesToCloset(
+		@RequestBody AddLibraryClothesToClosetRequest request
+	) {
+		Long myId = 1L; // TODO: 시큐리티 컨텍스트에서 추출 예정
+		closetClothesUseCase.addLibraryClothesToCloset(request.itemsId(), myId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
 	}
 }
