@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { socialApi } from '../api/socialApi';
-import { SearchUser } from '../types/social';
+import { socialApi } from '@/features/social/api/socialApi';
+import { SearchUser } from '@/features/social/types/social';
 
 interface SearchUserResponse {
 	status: {
