@@ -102,6 +102,9 @@ dependencies {
 	// AWS SQS
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+
+	// HashIds
+	implementation 'org.hashids:hashids:1.0.3'
 }
 
 tasks.named('test') {
