@@ -21,10 +21,8 @@ const FriendSearchPage = () => {
 					onSubmit={handleSearch}
 				/>
 			</div>
-
 			{/* 빈 영역 */}
 			<div className='flex-1'></div>
-
 			{/* 키보드 (실제로는 시스템 키보드가 표시됨) */}
 		</div>
 	);

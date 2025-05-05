@@ -1,12 +1,13 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { App } from '@/App';
 import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
-import SocialPage from '@/pages/SocialPage';
-// import { FriendSearchResultPage } from '@/features/social/pages/FriendSearchResultPage';
-// import { FriendsListPage } from '@/features/social/pages/FriendListPage';
-// import { FriendRequestsPage } from '@/features/social/pages/FriendRequestPage';
+import FriendPage from '@/pages/social/FriendPage';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+import FriendAddPage from '@/pages/social/FriendAddPage';
+import FriendRequestListPage from '@/pages/social/FriendRequestListPage';
+import { App } from '@/App';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -32,26 +33,24 @@ export const router = createBrowserRouter([
 			{
 				path: 'social',
 				// element: <FriendsListPage />,
-				element: <SocialPage />,
-				// children: [
-				// 	{
-				// 		path: 'search',
-				// 		element: <FriendSearchResultPage />,
-				// 	},
-				// 	// {
-				// 	// 	path: 'list',
-				// 	// 	element: <FriendsListPage />,
-				// 	// },
-				// 	{
-				// 		path: 'request',
-				// 		element: <FriendRequestsPage />,
-				// 	},
-				// ],
+				element: <FriendPage />,
+			},
+			{
+				path: 'social/add',
+				element: <FriendAddPage />,
+			},
+			{
+				path: 'social/request',
+				element: <FriendRequestListPage />,
 			},
 			{
 				path: '*',
 				element: <Navigate to='/wardrobe' replace />,
 			},
 		],
+	},
+	{
+		path: 'codi/edit',
+		element: <CodiEditPage />,
 	},
 ]);
