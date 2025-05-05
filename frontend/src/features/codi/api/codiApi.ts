@@ -14,6 +14,7 @@ interface CodiItem {
 }
 
 interface SaveCodiRequest {
+	title: string;
 	description: string;
 	isPublic: boolean;
 	isTemplate: boolean;

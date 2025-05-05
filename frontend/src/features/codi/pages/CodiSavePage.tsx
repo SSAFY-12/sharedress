@@ -17,6 +17,7 @@ const CodiSavePage = () => {
 	useEffect(() => {
 		// 로컬 스토리지에서 코디 아이템 정보 가져오기
 		const savedItems = localStorage.getItem('codiItems');
+		console.log(savedItems);
 		if (savedItems) {
 			setCodiItems(JSON.parse(savedItems));
 		}
@@ -34,6 +35,7 @@ const CodiSavePage = () => {
 	// 여기서부터는 코디 저장 로직인데 여기는 추후 api와 연결해야 한다.
 	const handleComplete = async () => {
 		try {
+			console.log('코디 저장 로직 이전 확인:', codiItems);
 			const formattedItems = codiItems.map((item) => ({
 				id: Number(item.id),
 				position: {
@@ -46,11 +48,14 @@ const CodiSavePage = () => {
 			}));
 
 			const payload = {
+				title: '임시 제목',
 				description,
 				isPublic,
 				isTemplate: false,
 				items: formattedItems,
 			};
+
+			console.log('payload 확인:', payload);
 
 			const response = await myCodiSaveApi(payload);
 			console.log(response);
