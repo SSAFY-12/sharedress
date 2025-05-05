@@ -7,6 +7,7 @@ export const headerConfig = {
 	'/wardrobe': {
 		showBack: true,
 		subtitle: '내 옷장',
+		// badgeIcon: 'success', // 아이콘만
 		badgeText: '전체',
 	},
 	'/notifications': {

@@ -18,6 +18,7 @@ interface CanvasItem {
 	aspectRatio?: number;
 	initialWidth?: number;
 	initialHeight?: number;
+	isLoaded?: boolean; // 이미지 로드 상태 추적 변수
 }
 
 interface CodiCanvasProps {
@@ -73,6 +74,7 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 			aspectRatio,
 			initialWidth,
 			initialHeight,
+			isLoaded: true,
 		});
 	};
 
@@ -291,6 +293,8 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 						transform: `rotate(${item.rotation}deg) scale(${item.scale})`,
 						transformOrigin: 'center',
 						zIndex: item.zIndex,
+						opacity: item.isLoaded ? 1 : 0,
+						transition: 'opaticy 0.2s ease-in-out',
 					}}
 					onClick={(e) => handleItemSelect(e, item.canvasId)}
 					onTouchStart={(e) => handleItemSelect(e, item.canvasId)}
@@ -308,6 +312,8 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 							style={{
 								width: item.initialWidth ? `${item.initialWidth}px` : 'auto',
 								height: item.initialHeight ? `${item.initialHeight}px` : 'auto',
+								minWidth: '40px',
+								minHeight: '40px',
 							}}
 							draggable={false}
 							onLoad={(e) => handleImageLoad(e, item)}
@@ -319,7 +325,7 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 						<>
 							{/* 회전 및 확대축소 핸들 */}
 							<div
-								className='absolute -bottom-4 -right-4 w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center cursor-move border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+								className='absolute -bottom-2 -right-2 w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center cursor-move border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 								onMouseDown={(e) => handleTransformStart(e, item)}
 								onTouchStart={(e) => handleTransformStart(e, item)}
 							>

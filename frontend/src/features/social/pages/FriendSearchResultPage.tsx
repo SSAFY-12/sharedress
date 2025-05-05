@@ -32,14 +32,15 @@ export const FriendSearchResultPage = () => {
 		(node: HTMLDivElement | null) => {
 			// 마지막 요소를 관찰하는 ref, node === 관찰할 HTML
 			if (isFetchingNextPage) return; // 데이터 로딩 중이면 관찰 중단
-			// 다음 페이지를 불러오면 관찰 중단
+			// 다음 페이지를 불러오면 관찰 중단 => 그니까 다음을 다 불러오기 전까지는 재요청을 하지 않도록 하기 위함
+			// 중복 요청을 방지하기 위한 안전 장치
 
 			// 이전 observer가 있다면 연결 해제
 			if (observerRef.current) {
 				observerRef.current.disconnect();
 			}
 
-			// 새로운 observer 생성
+			// 새로운 observer 생성(요소에 다음 페이지 로드 )
 			observerRef.current = new IntersectionObserver((entries) => {
 				// 첫 번째 요소가 화면에 보이고 있는지 확인 && 다음 페이지가 있는지 여부
 				if (entries[0].isIntersecting && hasNextPage) {
@@ -47,12 +48,14 @@ export const FriendSearchResultPage = () => {
 				}
 			});
 
-			// 마지막 요소를 관찰
+			// 마지막 요소를 관찰(요소에 감시자 붙이기)
 			if (node) {
+				// 감시를 시작 하기 위한 요소가 있는지 확인
+				//node === 감시 대상, observe는 감시 시작 -> 즉 감시할 대상이 실제로 있는지 확인
 				observerRef.current.observe(node); // 마지막 요소를 관찰
 			}
 		},
-		[fetchNextPage, hasNextPage, isFetchingNextPage],
+		[hasNextPage, isFetchingNextPage, fetchNextPage],
 	);
 
 	const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -115,6 +118,7 @@ export const FriendSearchResultPage = () => {
 							<div
 								ref={index === searchUsers.length - 1 ? lastElementRef : null}
 								// 배열의 마지막 인덱스, 현재 요소가 마지막 요소인지 확인 -> 마지막일경우 lastElementRef 참조
+								// 마지막일 때 observe 연결(감시자가 붙게 되면 다음 요소를 호출하게 되는 것)
 								className='border rounded-lg p-6 flex flex-col items-center mb-4'
 								key={user.id}
 							>
