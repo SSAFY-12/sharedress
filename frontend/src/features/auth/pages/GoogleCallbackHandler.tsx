@@ -3,10 +3,12 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '@/features/auth/hooks/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const GoogleCallbackHandler = () => {
 	const { mutation } = useAuth();
 	const navigate = useNavigate();
+	const accessToken = useAuthStore((state) => state.accessToken);
 
 	useEffect(() => {
 		const handleToken = () => {
@@ -16,9 +18,6 @@ const GoogleCallbackHandler = () => {
 			if (accessToken) {
 				console.log(accessToken, 'test!!!!!!!!');
 				mutation.mutate(accessToken, {
-					onSuccess: () => {
-						navigate('/wardrobe');
-					},
 					onError: (error) => {
 						console.error('토큰 검증 실패:', error);
 						navigate('/login');
@@ -33,6 +32,13 @@ const GoogleCallbackHandler = () => {
 		handleToken();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [navigate]);
+
+	// accessToken이 store에 저장된 후에만 wardrobe로 이동
+	useEffect(() => {
+		if (accessToken) {
+			navigate('/wardrobe');
+		}
+	}, [accessToken, navigate]);
 
 	return <div>구글 로그인 중입니다...</div>;
 };
