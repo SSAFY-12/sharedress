@@ -1,4 +1,4 @@
-package com.ssafy.sharedress.application.auth.dto;
+package com.ssafy.sharedress.application.member.dto;
 
 import java.util.Collection;
 import java.util.List;

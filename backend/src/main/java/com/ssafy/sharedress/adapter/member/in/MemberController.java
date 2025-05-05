@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.sharedress.application.auth.dto.CustomMemberDetails;
+import com.ssafy.sharedress.application.member.dto.CustomMemberDetails;
 import com.ssafy.sharedress.application.member.dto.MemberSearchResponse;
 import com.ssafy.sharedress.application.member.usecase.MemberQueryUseCase;
 import com.ssafy.sharedress.domain.member.entity.Member;

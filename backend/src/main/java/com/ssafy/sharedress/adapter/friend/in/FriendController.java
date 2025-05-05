@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.sharedress.application.auth.dto.CustomMemberDetails;
 import com.ssafy.sharedress.application.friend.dto.FriendRequestDto;
 import com.ssafy.sharedress.application.friend.dto.FriendRequestResponse;
 import com.ssafy.sharedress.application.friend.dto.FriendResponse;
 import com.ssafy.sharedress.application.friend.usecase.FriendQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestUseCase;
+import com.ssafy.sharedress.application.member.dto.CustomMemberDetails;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 

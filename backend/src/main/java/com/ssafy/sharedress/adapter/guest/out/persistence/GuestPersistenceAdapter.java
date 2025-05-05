@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.adapter.guest.out.persistence;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.ssafy.sharedress.domain.guest.entity.Guest;
@@ -21,5 +23,10 @@ public class GuestPersistenceAdapter implements GuestRepository {
 	@Override
 	public boolean existsByNicknameAndCode(String nickname, String code) {
 		return guestJpaRepository.existsByNicknameAndCode(nickname, code);
+	}
+
+	@Override
+	public Optional<Guest> findById(Long id) {
+		return guestJpaRepository.findById(id);
 	}
 }
