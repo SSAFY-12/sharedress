@@ -14,6 +14,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.ssafy.sharedress.application.auth.handler.CustomAccessDeniedHandler;
 import com.ssafy.sharedress.application.auth.handler.CustomAuthenticationEntryPoint;
+import com.ssafy.sharedress.application.guest.filter.GuestAuthenticationFilter;
 import com.ssafy.sharedress.application.jwt.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class SecurityConfig {
 	private final CustomAuthenticationEntryPoint customEntryPoint;
 	private final CustomAccessDeniedHandler accessDeniedHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final GuestAuthenticationFilter guestAuthenticationFilter;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,7 +44,8 @@ public class SecurityConfig {
 				// .anyRequest().authenticated()
 				.anyRequest().permitAll() // 개발 테스트 위해 모든 요청 허용
 			)
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+			.addFilterAfter(guestAuthenticationFilter, JwtAuthenticationFilter.class);
 		return http.build();
 	}
 

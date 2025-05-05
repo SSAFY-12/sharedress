@@ -29,4 +29,9 @@ public class GuestPersistenceAdapter implements GuestRepository {
 	public Optional<Guest> findById(Long id) {
 		return guestJpaRepository.findById(id);
 	}
+
+	@Override
+	public Optional<Guest> findByUuid(String token) {
+		return guestJpaRepository.findByUuid(token);
+	}
 }

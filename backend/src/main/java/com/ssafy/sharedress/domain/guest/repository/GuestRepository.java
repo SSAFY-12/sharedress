@@ -10,4 +10,6 @@ public interface GuestRepository {
 	boolean existsByNicknameAndCode(String nickname, String code);
 
 	Optional<Guest> findById(Long id);
+
+	Optional<Guest> findByUuid(String uuid);
 }
