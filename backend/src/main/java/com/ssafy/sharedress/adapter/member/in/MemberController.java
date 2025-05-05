@@ -18,6 +18,7 @@ import com.ssafy.sharedress.application.member.annotation.CurrentMember;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MemberSearchResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
+import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
 import com.ssafy.sharedress.application.member.usecase.MemberQueryUseCase;
 import com.ssafy.sharedress.application.member.usecase.MemberUseCase;
@@ -111,4 +112,14 @@ public class MemberController {
 		Long memberId = new Hashids("sharedress", 10).decode(hash)[0];
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, memberId);
 	}
+
+	@PatchMapping("/members/profile/notification")
+	public ResponseEntity<ResponseWrapper<Void>> updateNotificationStatus(
+		@RequestBody UpdateNotificationStatusRequest request
+	) {
+		Long myId = 1L;
+		memberUseCase.updateNotificationStatus(request, myId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
+	}
+
 }
