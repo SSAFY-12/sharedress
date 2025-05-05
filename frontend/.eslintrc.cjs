@@ -71,6 +71,10 @@ module.exports = {
 				format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
 				leadingUnderscore: 'allow',
 				trailingUnderscore: 'allow',
+				filter: {
+					regex: '(Api|Client)$',
+					match: true,
+				},
 			},
 			// 함수: camelCase, PascalCase 허용
 			{

@@ -5,6 +5,7 @@ interface HeaderProps {
 	showBack?: boolean;
 	subtitle?: string;
 	logo?: string;
+	//Badge 아이콘 타입 / 텍스트 타입 직접 전달 => Badge로 묶던 기존 방식과 다름
 	// 이전 방식과의 호환성을 위한 props
 	badgeIcon?:
 		| 'bell'
