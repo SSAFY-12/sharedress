@@ -22,11 +22,10 @@ export const Badge = ({ icon, onClick, text, className = '' }: BadgeProps) => {
 			case 'next':
 				return <ArrowRight className='h-4 w-4' />;
 			case 'done':
+			case 'success':
 				return <Check className='h-4 w-4' />;
 			case 'info':
 				return <Info className='h-4 w-4' />;
-			case 'success':
-				return <Check className='h-4 w-4' />;
 			case 'warning':
 				return <AlertTriangle className='h-4 w-4' />;
 			case 'error':
