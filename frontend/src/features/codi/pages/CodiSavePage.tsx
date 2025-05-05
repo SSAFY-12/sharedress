@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import ResultCodiCanvas from '@/features/codi/components/ResultCodiCanvas';
 import { InputField } from '@/components/inputs/input-field';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
+import { myCodiSaveApi } from '../api/codiApi';
 
 const CodiSavePage = () => {
 	const navigate = useNavigate();
@@ -31,20 +32,34 @@ const CodiSavePage = () => {
 	};
 
 	// 여기서부터는 코디 저장 로직인데 여기는 추후 api와 연결해야 한다.
-	const handleComplete = () => {
-		const codiData = {
-			items: codiItems,
-			description,
-			isPublic,
-			createdAt: new Date().toISOString(),
-		};
+	const handleComplete = async () => {
+		try {
+			const formattedItems = codiItems.map((item) => ({
+				id: Number(item.id),
+				position: {
+					x: item.position.x,
+					y: item.position.y,
+					z: item.zIndex,
+				},
+				scale: item.scale,
+				rotation: item.rotation,
+			}));
 
-		// 서버에 저장해야하지만 우선은 로컬 스토리지에 저장
-		localStorage.setItem('savedCodi', JSON.stringify(codiData));
+			const payload = {
+				description,
+				isPublic,
+				isTemplate: false,
+				items: formattedItems,
+			};
 
-		// 완료 후 홈으로 이동
-		alert('코디가 저장되었습니다!');
-		navigate('/');
+			const response = await myCodiSaveApi(payload);
+			console.log(response);
+			alert('코디가 저장되었습니다!');
+			navigate('/');
+		} catch (error) {
+			console.error('코디 저장 실패:', error);
+			alert('코디 저장 실패');
+		}
 	};
 
 	return (
