@@ -5,11 +5,10 @@ import FriendAddPage from '@/pages/social/FriendAddPage';
 import FriendRequestListPage from '@/pages/social/FriendRequestListPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import SocialPage from '@/pages/SocialPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
-
+import FriendPage from '@/pages/social/FriendPage';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -34,7 +33,8 @@ export const router = createBrowserRouter([
 			},
 			{
 				path: 'social',
-				element: <SocialPage />,
+				// element: <SocialPage />,
+				element: <FriendPage />,
 			},
 			{
 				path: 'social/add',

@@ -39,7 +39,8 @@ const useSearchUser = (nickname: string) => {
 	});
 
 	const searchUsers = data?.pages.flatMap((page) => page.content) ?? [];
-	//모든 페이지의 content를 하나의 배열로 합침
+	// 모든 페이지의 content를 하나의 배열로 합침
+	// 배열의 각 페이지에서 content 배열만 추출하여 하나의 큰 배열로 합치는 역할을 함
 
 	return {
 		searchUsers, //검색 결과

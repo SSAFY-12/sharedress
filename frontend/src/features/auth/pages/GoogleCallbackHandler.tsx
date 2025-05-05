@@ -31,7 +31,8 @@ const GoogleCallbackHandler = () => {
 		};
 
 		handleToken();
-	}, [mutation, navigate]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [navigate]);
 
 	return <div>구글 로그인 중입니다...</div>;
 };
