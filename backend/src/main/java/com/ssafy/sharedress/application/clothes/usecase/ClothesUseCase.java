@@ -18,4 +18,7 @@ public interface ClothesUseCase {
 		Long cursor,
 		int size
 	);
+
+	void markClothesAsAiCompleted(Long memberId, String fcmToken);
+
 }

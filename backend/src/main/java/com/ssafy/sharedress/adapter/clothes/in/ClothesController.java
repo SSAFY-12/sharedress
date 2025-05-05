@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.sharedress.application.clothes.dto.AiCompleteRequest;
 import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
@@ -47,6 +48,12 @@ public class ClothesController {
 			clothesUseCase.getLibraryClothes(keyword, categoryIds, shopId, cursor, size);
 
 		return ResponseWrapperFactory.toPageResponseEntity(HttpStatus.OK, result);
+	}
+
+	@PostMapping("/clothes/ai-complete")
+	public ResponseEntity<ResponseWrapper<Void>> completeClothesPreprocessing(@RequestBody AiCompleteRequest request) {
+		clothesUseCase.markClothesAsAiCompleted(request.memberId(), request.fcmToken());
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
 }
