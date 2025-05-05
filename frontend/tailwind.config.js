@@ -3,6 +3,12 @@ export default {
 	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
 	theme: {
 		extend: {
+			backgroundImage: {
+				'auth-bg': "url('@/assets/login/clothImg.png')",
+			},
+			fontFamily: {
+				logo: ['WatermelonSalad', 'sans-serif'],
+			},
 			fontSize: {
 				categoryButton: '14px',
 				topHeader: '18px',

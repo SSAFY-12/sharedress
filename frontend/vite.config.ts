@@ -6,8 +6,36 @@ import tailwindcss from 'tailwindcss';
 import autoprefixer from 'autoprefixer';
 import path from 'path';
 import mkcert from 'vite-plugin-mkcert';
-import fs from 'fs';
 import { VitePWA } from 'vite-plugin-pwa';
+
+const cspHeader = [
+	// 기본 설정
+	"default-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data:",
+
+	// 스크립트 설정
+	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:",
+
+	// 스타일 설정
+	"style-src 'self' 'unsafe-inline' https: http:",
+
+	// 이미지 설정
+	"img-src 'self' data: https: http:",
+
+	// 폰트 설정
+	"font-src 'self' data: https: http:",
+
+	// 프레임 설정
+	"frame-src 'self' https: http:",
+
+	// 웹소켓 등 연결 설정 (Vite HMR을 위해 필요)
+	"connect-src 'self' ws: wss: https: http:",
+
+	// 워커 설정 (PWA를 위해 필요)
+	"worker-src 'self' blob:",
+
+	// 매니페스트 설정
+	"manifest-src 'self'",
+].join('; ');
 
 // Vite 설정 파일
 export default defineConfig({
@@ -54,6 +82,7 @@ export default defineConfig({
 				],
 			},
 			workbox: {
+				disableDevLogs: true,
 				clientsClaim: true, // 새 서비스워커가 즉시 모든 탭을 제어
 				skipWaiting: true, // 새 서비스워커가 대기 없이 즉시 활성화
 				globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'], // precache할 파일 확장자
@@ -88,15 +117,20 @@ export default defineConfig({
 	},
 
 	server: {
-		// https: {
-		// 	key: fs.readFileSync(path.resolve(__dirname, 'localhost-key.pem')),
-		// 	cert: fs.readFileSync(path.resolve(__dirname, 'localhost.pem')),
-		// },
 		https: true,
+		port: 5173,
+		headers: {
+			'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+			'Cross-Origin-Embedder-Policy': 'credentialless',
+			'Referrer-Policy': 'strict-origin-when-cross-origin',
+			'Access-Control-Allow-Origin': '*',
+			'Cross-Origin-Resource-Policy': 'cross-origin',
+			'Content-Security-Policy': cspHeader,
+		},
 		proxy: {
 			'/api': {
 				// 프론트에서 /api로 시작하는 요청을 아래 설정대로 프록시
-				target: 'http://localhost:8080', // 실제 백엔드 서버 주소
+				target: 'http://70.12.246.84:8080', // 실제 백엔드 서버 주소
 				changeOrigin: true, // CORS 우회(Origin 헤더 변경)
 				secure: false, // HTTPS 인증서 검증 생략(개발용)
 				// rewrite: (path) => path.replace(/^\/api/, ''), // 백엔드가 /api 필요 없으면 주석 해제

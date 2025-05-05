@@ -5,6 +5,7 @@ interface HeaderProps {
 	showBack?: boolean;
 	subtitle?: string;
 	logo?: string;
+	//Badge 아이콘 타입 / 텍스트 타입 직접 전달 => Badge로 묶던 기존 방식과 다름
 	// 이전 방식과의 호환성을 위한 props
 	badgeIcon?:
 		| 'bell'
@@ -18,6 +19,7 @@ interface HeaderProps {
 		| 'error';
 	badgeText?: string;
 	onBackClick?: () => void;
+	onBadgeClick?: () => void;
 }
 
 const Header = ({
@@ -27,6 +29,7 @@ const Header = ({
 	badgeIcon,
 	badgeText,
 	onBackClick,
+	onBadgeClick,
 }: HeaderProps) => (
 	<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
 		<div className='flex items-center min-w-0'>
@@ -52,7 +55,9 @@ const Header = ({
 		</div>
 		{/* badgeIcon이 있으면 Badge 컴포넌트 렌더링 */}
 		{/* badgIcon은 없을 수 있음 : ? 로표현 */}
-		{(badgeIcon || badgeText) && <Badge icon={badgeIcon} text={badgeText} />}
+		{(badgeIcon || badgeText) && (
+			<Badge icon={badgeIcon} text={badgeText} onClick={onBadgeClick} />
+		)}
 	</header>
 );
 

@@ -15,7 +15,7 @@ export const WebLayout = () => {
 	};
 
 	return (
-		<div className='h-full flex flex-col'>
+		<div className='h-full flexW flex-col'>
 			<header className='sticky top-0 bg-white z-10'>
 				<Header {...headerProps} />
 			</header>

@@ -1,6 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@font-face {
+	font-family: 'WatermelonSalad';
+	src: url('@/assets/fonts/EF_watermelonSalad(ttf).ttf') format('truetype');
+}
 
 :root {
 	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
