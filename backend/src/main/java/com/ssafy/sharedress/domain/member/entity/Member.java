@@ -43,4 +43,17 @@ public class Member extends BaseTimeEntity {
 		this.nickname = nickname;
 		this.code = code;
 	}
+
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public void updateStatusMessage(String oneLiner) {
+		this.statusMessage = oneLiner;
+	}
+
+	public void updateIsPublic(boolean isPublic) {
+		this.isPublic = isPublic;
+	}
+
 }
