@@ -89,7 +89,18 @@ export const FriendSearchResultPage = () => {
 
 	const handleCancel = () => {
 		if (selectedFriend?.memberId) {
-			console.log('Cancelling request with ID:', selectedFriend.memberId);
+			if (selectedFriend.relationStatus !== 1) {
+				console.error(
+					'Cannot cancel request: Invalid relation status',
+					selectedFriend.relationStatus,
+				);
+				return;
+			}
+			console.log('Cancelling request for user:', {
+				memberId: selectedFriend.memberId,
+				nickname: selectedFriend.nickname,
+				relationStatus: selectedFriend.relationStatus,
+			});
 			cancelRequest(selectedFriend.memberId);
 		} else {
 			console.error('No request found for user:', selectedFriend);
@@ -155,6 +166,12 @@ export const FriendSearchResultPage = () => {
 									color='gray'
 									onClick={() => {
 										console.log('Setting selectedFriend for cancel:', user);
+										setSelectedFriend({
+											profileImage: user.profileImage,
+											nickname: user.nickname,
+											relationStatus: user.relationStatus,
+											memberId: user.memberId,
+										});
 										handleCancel();
 									}}
 									className='mt-3'
