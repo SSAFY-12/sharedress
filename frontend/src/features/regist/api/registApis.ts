@@ -29,8 +29,8 @@ export interface ClothesResponse {
 // API 요청 파라미터 타입 정의
 export interface ClothesRequestParams {
 	keyword?: string;
-	categoryIds?: number[];
-	shopId?: number;
+	categoryIds?: string;
+	shopId?: string;
 	cursor?: number;
 	size?: number;
 }
@@ -52,13 +52,5 @@ export const RegistApis = {
 		return response.data;
 	},
 
-	// --------------------옷 등록------------------------
-	registCloth: async (accessToken: string) => {
-		const response = await client.post(`/api/clothes`, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-		return response.data;
-	},
+
 };

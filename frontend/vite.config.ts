@@ -130,7 +130,7 @@ export default defineConfig({
 		proxy: {
 			'/api': {
 				// 프론트에서 /api로 시작하는 요청을 아래 설정대로 프록시
-				target: 'http://70.12.246.84:8080', // 실제 백엔드 서버 주소
+				target: 'http://www.sharedress.co.kr', // 실제 백엔드 서버 주소
 				changeOrigin: true, // CORS 우회(Origin 헤더 변경)
 				secure: false, // HTTPS 인증서 검증 생략(개발용)
 				// rewrite: (path) => path.replace(/^\/api/, ''), // 백엔드가 /api 필요 없으면 주석 해제
