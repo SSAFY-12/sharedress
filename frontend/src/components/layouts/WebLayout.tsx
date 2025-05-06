@@ -15,14 +15,14 @@ export const WebLayout = () => {
 	};
 
 	return (
-		<div className='h-full flexW flex-col'>
-			<header className='sticky top-0 bg-white z-10'>
+		<div className='relative h-full flex flex-col'>
+			<header className='absolute top-0 left-0 right-0 bg-white z-10'>
 				<Header {...headerProps} />
 			</header>
-			<main className='flex-1 overflow-y-auto'>
+			<main className='flex-1 mt-16 mb-16 overflow-y-auto'>
 				<Outlet />
 			</main>
-			<footer className='sticky bottom-0 bg-white z-10'>
+			<footer className='absolute bottom-0 left-0 right-0 bg-white z-10'>
 				<NavBar />
 			</footer>
 		</div>
