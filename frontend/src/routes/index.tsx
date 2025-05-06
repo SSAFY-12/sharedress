@@ -9,6 +9,7 @@ import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import FriendPage from '@/pages/social/FriendPage';
+import NotificationPage from '@/pages/NotificationPage';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -65,5 +66,9 @@ export const router = createBrowserRouter([
 	{
 		path: 'codi/save',
 		element: <CodiSavePage />,
+	},
+	{
+		path: 'notification',
+		element: <NotificationPage />,
 	},
 ]);
