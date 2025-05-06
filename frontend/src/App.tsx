@@ -4,6 +4,7 @@ import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
 import { ToastContainer } from 'react-toastify';
 import { useTokenValidation } from './features/auth/hooks/useTokenValidation';
+import { GoogleAnalytics } from './components/GoogleAnalytics';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
@@ -22,6 +23,7 @@ export const App = () => {
 
 	return (
 		<>
+			<GoogleAnalytics />
 			{/* Sentry 테스트 버튼 */}
 			{/* <div className='fixed top-4 right-4 flex flex-col gap-2'> */}
 			{/* 자동 에러 테스트 */}
