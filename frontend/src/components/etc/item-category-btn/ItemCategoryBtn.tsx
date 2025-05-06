@@ -7,16 +7,19 @@ export const ItemCategoryBtn = ({
 	color = 'primary',
 	className = '',
 }: ItemCategoryBtnProps) => {
-	const activeClass = isActive
-		? color === 'primary'
-			? 'bg-rose-500 text-white'
-			: 'bg-gray-600 text-white'
-		: 'bg-gray-100 text-gray-700 hover:bg-gray-200';
+	const activeClass =
+		color === 'primary'
+			? isActive
+				? 'border border-regular text-regular'
+				: 'border border-light text-low'
+			: isActive
+			? 'bg-regular text-white'
+			: 'bg-background text-regular';
 
 	return (
 		<button
 			onClick={onClick}
-			className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeClass} ${className}`}
+			className={`px-3 py-1.5 rounded-full text-categoryButton transition-colors ${activeClass} ${className}`}
 		>
 			{text}
 		</button>
