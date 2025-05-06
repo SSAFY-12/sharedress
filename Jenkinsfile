@@ -94,8 +94,8 @@ services:
       retries: 3
 EOL"
 
-            # Blue EC2에서 컨테이너 재시작
-            ssh -o StrictHostKeyChecking=no ec2-user@${BLUE_IP} "cd /opt/blue && docker compose -f docker-compose.blue.yml down && docker compose -f docker-compose.blue.yml up -d"
+            # ECR 로그인 추가 및 Blue EC2에서 컨테이너 재시작
+            ssh -o StrictHostKeyChecking=no ec2-user@${BLUE_IP} "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URI} && cd /opt/blue && docker compose -f docker-compose.blue.yml down && docker compose -f docker-compose.blue.yml up -d"
           """
         }
       }
