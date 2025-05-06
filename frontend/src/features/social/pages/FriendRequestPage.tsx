@@ -4,32 +4,11 @@ import { useSwipeable } from 'react-swipeable'; // 밀어서 거절 기능
 import { useState } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 
-// const [friendRequests, setFriendRequests] = useState([
-// 	{
-// 		id: 1,
-// 		name: '예승아기',
-// 		avatar: 'https://picsum.photos/200/300?random=1',
-// 		message: '나 갓긴데 안받아줄거야?',
-// 	},
-// 	{
-// 		id: 2,
-// 		name: '예승아기',
-// 		avatar: 'https://picsum.photos/200/300?random=2',
-// 		message: '나 갓긴데 안받아줄거야?',
-// 	},
-// ]);
-
 // 메인 컴포넌트
 export const FriendRequestsPage = () => {
 	// 친구 요청 목록 조회 -> 요청 수락 / 거절 : 밀어서 거절
-	// const { friendRequests, isFriendRequestsLoading, friendRequestsError } =
 	const { friendRequests, acceptRequest, rejectRequest } = useRequest(); // 친구 요청 전체 목록 조회
-	//		id: number; //친구 요청 고유 아이디
-	//		message: string; //메시지
-	//		requester: object; //요청자 정보(사람)
 	const [swipedId, setSwipedId] = useState<number | null>(null); // 밀어서 거절 기능 === 거절할 친구 id
-
-	//id, message, requester
 
 	// 매개변수에는 friendRequest 를 전달하게 되어있었음
 	const handleAccept = (id: number) => {

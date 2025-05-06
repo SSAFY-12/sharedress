@@ -26,12 +26,12 @@ export interface FriendRequestList {
 export interface SearchUser {
 	// 유저 검색 -> 전체 유저 검색
 	content: {
-		id: number; //유저 고유 아이디
+		// id: number; //유저 고유 아이디
 		profileImage: string; //프로필 이미지
 		nickname: string; //유저 닉네임
 		code: string; // 중복 방지 코드
 		relationStatus: RelationStatus; //친구 관계
-		requestId?: number; //친구 요청 ID (요청이 있는 경우에만)
+		memberId: number; // 유저 고유 아이디
 	}[]; //배열 리스트 === 유저 검색 결과
 }
 

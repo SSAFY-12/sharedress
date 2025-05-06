@@ -2,7 +2,7 @@ import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { FriendRequestMsgModal } from '@/features/social/components/FriendRequestMsgModal';
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 import useSearchUser from '@/features/social/hooks/useSearchUser';
 import { RelationStatus } from '@/features/social/types/social';
@@ -13,16 +13,21 @@ export const FriendSearchResultPage = () => {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [requestMessage, setRequestMessage] = useState(''); // 친구 요청 메시지
 	const [selectedFriend, setSelectedFriend] = useState<{
+		// 선택된 친구 정보
 		profileImage: string;
 		nickname: string;
-		id: number;
 		relationStatus: RelationStatus;
-		requestId?: number;
+		memberId: number; //서버에서 memberId로 받아오기 때문
 	} | null>(null);
 
 	const { searchUsers, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useSearchUser(resultValue); // 검색 결과 목록 영역(무한 스크롤 구현)
 	const { requestFriend, cancelRequest, acceptRequest } = useRequest(); // 친구 요청 전송/취소 버튼 로직
+
+	// selectedFriend 객체 로깅
+	useEffect(() => {
+		console.log('selectedFriend : ', selectedFriend);
+	}, [selectedFriend]);
 
 	// Intersection Observer를 위한 ref
 	const observerRef = useRef<IntersectionObserver | null>(null); // IntersectionObserver 객체 저장
@@ -70,11 +75,11 @@ export const FriendSearchResultPage = () => {
 	const handleSubmit = () => {
 		if (selectedFriend) {
 			console.log('Submitting friend request:', {
-				receiverId: selectedFriend.id,
+				receiverId: selectedFriend.memberId,
 				message: requestMessage,
 			});
 			requestFriend({
-				receiverId: selectedFriend.id,
+				receiverId: selectedFriend.memberId,
 				message: requestMessage,
 			});
 			setModalOpen(false);
@@ -83,18 +88,18 @@ export const FriendSearchResultPage = () => {
 	};
 
 	const handleCancel = () => {
-		if (selectedFriend?.requestId) {
-			console.log('Cancelling request with ID:', selectedFriend.requestId);
-			cancelRequest(selectedFriend.requestId);
+		if (selectedFriend?.memberId) {
+			console.log('Cancelling request with ID:', selectedFriend.memberId);
+			cancelRequest(selectedFriend.memberId);
 		} else {
 			console.error('No request found for user:', selectedFriend);
 		}
 	};
 
 	const handleAccept = () => {
-		if (selectedFriend?.requestId) {
-			console.log('Accepting request with ID:', selectedFriend.requestId);
-			acceptRequest(selectedFriend.requestId);
+		if (selectedFriend?.memberId) {
+			console.log('Accepting request with ID:', selectedFriend.memberId);
+			acceptRequest(selectedFriend.memberId);
 		} else {
 			console.error('No requestId found in selectedFriend:', selectedFriend);
 		}
@@ -117,7 +122,7 @@ export const FriendSearchResultPage = () => {
 						<div
 							ref={index === searchUsers.length - 1 ? lastElementRef : null}
 							className='border rounded-lg p-6 flex flex-col items-center mb-4'
-							key={user.id}
+							key={user.memberId}
 						>
 							<UserMiniAvatar
 								src={user.profileImage}
@@ -132,9 +137,14 @@ export const FriendSearchResultPage = () => {
 									name='친구 요청'
 									color='black'
 									onClick={() => {
-										console.log('Setting selectedFriend:', user);
+										console.log('Setting selectedFriend:', user); //정보가 맞게 출력되는 것을 볼 수 있음
 										setModalOpen(true);
-										setSelectedFriend(user);
+										setSelectedFriend({
+											profileImage: user.profileImage,
+											nickname: user.nickname,
+											relationStatus: user.relationStatus,
+											memberId: user.memberId,
+										});
 									}}
 									className='mt-3'
 								/>
@@ -187,7 +197,7 @@ export const FriendSearchResultPage = () => {
 					friend={{
 						profileImage: selectedFriend.profileImage,
 						nickname: selectedFriend.nickname,
-						receiverId: selectedFriend.id,
+						receiverId: selectedFriend.memberId,
 					}}
 					message={requestMessage}
 					onMessageChange={setRequestMessage}
