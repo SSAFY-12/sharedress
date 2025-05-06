@@ -44,4 +44,14 @@ public class CoordinationComment extends BaseTimeEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
+
+	public CoordinationComment(String content, int depth, CoordinationComment parent,
+		Coordination coordination, Member member) {
+		this.content = content;
+		this.depth = depth;
+		this.parent = parent;
+		this.coordination = coordination;
+		this.member = member;
+	}
+
 }
