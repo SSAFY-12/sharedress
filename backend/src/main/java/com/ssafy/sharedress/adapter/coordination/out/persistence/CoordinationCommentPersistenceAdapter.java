@@ -24,4 +24,9 @@ public class CoordinationCommentPersistenceAdapter implements CoordinationCommen
 	public Optional<CoordinationComment> findById(Long id) {
 		return coordinationCommentJpaRepository.findById(id);
 	}
+
+	@Override
+	public void delete(CoordinationComment comment) {
+		coordinationCommentJpaRepository.delete(comment);
+	}
 }

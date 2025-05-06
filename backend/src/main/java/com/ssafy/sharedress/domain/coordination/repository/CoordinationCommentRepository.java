@@ -8,4 +8,6 @@ public interface CoordinationCommentRepository {
 	CoordinationComment save(CoordinationComment comment);
 
 	Optional<CoordinationComment> findById(Long id);
+
+	void delete(CoordinationComment comment);
 }

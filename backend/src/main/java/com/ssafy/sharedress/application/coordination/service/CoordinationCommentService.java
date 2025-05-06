@@ -81,4 +81,20 @@ public class CoordinationCommentService implements CoordinationCommentUseCase {
 		comment.updateContent(request.content());
 		return CoordinationCommentResponse.from(comment);
 	}
+
+	@Override
+	@Transactional
+	public void removeComment(Long coordinationId, Long commentId, Long memberId) {
+		coordinationRepository.findById(coordinationId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
+
+		CoordinationComment comment = coordinationCommentRepository.findById(commentId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationCommentErrorCode.COMMENT_NOT_FOUND));
+
+		if (!comment.getMember().getId().equals(memberId)) {
+			ExceptionUtil.throwException(CoordinationCommentErrorCode.NOT_COMMENT_OWNER);
+		}
+
+		coordinationCommentRepository.delete(comment);
+	}
 }

@@ -10,4 +10,6 @@ public interface CoordinationCommentUseCase {
 
 	CoordinationCommentResponse update(Long coordinationId, Long commentId, UpdateCommentRequest request,
 		Long memberId);
+
+	void removeComment(Long coordinationId, Long commentId, Long memberId);
 }
