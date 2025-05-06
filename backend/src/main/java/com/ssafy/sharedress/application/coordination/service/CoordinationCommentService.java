@@ -43,7 +43,11 @@ public class CoordinationCommentService implements CoordinationCommentUseCase {
 		if (request.parentId() != null) {
 			parent = coordinationCommentRepository.findById(request.parentId())
 				.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationCommentErrorCode.PARENT_COMMENT_NOT_FOUND));
-			depth = 1;
+
+			if (parent.getDepth() >= 1) {
+				ExceptionUtil.throwException(CoordinationCommentErrorCode.CANNOT_REPLY_TO_CHILD_COMMENT);
+			}
+
 		}
 
 		CoordinationComment comment = new CoordinationComment(
