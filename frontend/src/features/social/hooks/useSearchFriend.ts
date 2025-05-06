@@ -12,16 +12,16 @@ interface SearchFriendResponse {
 }
 
 // 친구 검색
-const useSearchFriend = (nickname: string) => {
+const useSearchFriend = (keyword: string) => {
 	const {
 		data: searchMyFriend, // 내 친구리스트 검색
 		isLoading: isLoadingMyFriend, // 내 친구리스트 검색 로딩
 		error: errorMyFriend, // 내 친구리스트 검색 에러
 	} = useQuery<SearchFriendResponse>({
-		// 내 친구리스트 검색 => 따라서 쿼리키를 동일화?
-		queryKey: ['friendList', nickname], // 친구 검색 -> 쿼리키에 nickname 포함
-		queryFn: () => socialApi.searchFriend(nickname),
-		enabled: !!nickname, // nickname이 있을 때만 쿼리 실행(빈 문자열이 아닐 때) + 변경될때마다 자동으로 쿼리가 재실행
+		// 내 친구리스트 검색
+		queryKey: ['friendList', keyword], // 친구 검색 -> 쿼리키에 keyword 포함
+		queryFn: () => socialApi.searchFriend(keyword),
+		enabled: !!keyword, // keyword가 있을 때만 쿼리 실행(빈 문자열이 아닐 때) + 변경될때마다 자동으로 쿼리가 재실행
 	});
 
 	return {
