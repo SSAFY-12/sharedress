@@ -23,26 +23,29 @@ export const ClothListContainer = ({
 }: ClothListContainerProps) => (
 	<div className={className}>
 		{categories.length > 0 && (
-			<div className='flex flex-wrap gap-2 mb-4'>
+			<div className='flex overflow-x-auto pb-2 mb-4 -mx-1 px-1'>
 				{categories.map((category) => (
 					<ItemCategoryBtn
 						key={category}
 						text={category}
 						isActive={selectedCategory === category}
 						onClick={() => onCategoryChange?.(category)}
+						className='mr-1 whitespace-nowrap'
 					/>
 				))}
 			</div>
 		)}
 
 		<div
-			className={`grid gap-4 ${columns === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}
+			className={`grid gap-2.5 justify-items-center ${
+				columns === 2 ? 'grid-cols-2' : 'grid-cols-3'
+			}`}
 		>
 			{items.map((item) => (
 				<ClothCard
 					key={item.id}
 					item={item}
-					size='md'
+					size={columns === 2 ? 'lg' : 'md'}
 					onClick={() => onItemClick?.(item)}
 				/>
 			))}

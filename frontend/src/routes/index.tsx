@@ -3,10 +3,13 @@ import { App } from '@/App';
 import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
+import MyClosetPage from '@/features/closet/pages/MyClosetPage';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 import SocialPage from '@/pages/SocialPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
-import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
+import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
 
 export const router = createBrowserRouter([
 	{
@@ -41,6 +44,10 @@ export const router = createBrowserRouter([
 		],
 	},
 	{
+		path: 'mypage',
+		element: <MyClosetPage />,
+	},
+	{
 		path: '/auth',
 		element: <AuthPage />,
 	},
@@ -55,5 +62,13 @@ export const router = createBrowserRouter([
 	{
 		path: 'codi/save',
 		element: <CodiSavePage />,
+	},
+	{
+		path: 'cloth/:id',
+		element: <ClothDetailPage />,
+	},
+	{
+		path: 'codi/:id',
+		element: <CodiDetailPage />,
 	},
 ]);
