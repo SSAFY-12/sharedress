@@ -6,6 +6,7 @@ import { LucideIcon } from 'lucide-react';
  * - 알림 리스트에서 개별 알림(아이템)을 표현합니다.
  * - lucide-react 아이콘을 props로 받아 사용합니다.
  * - 클릭, 읽음/안읽음 등 확장성을 고려한 구조입니다.
+ * - 부모 컨테이너에 맞춰 100% width로 확장됩니다.
  */
 export interface NotificationItemProps {
 	icon: LucideIcon; // lucide-react 아이콘 타입
@@ -25,7 +26,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
 	onClick,
 }) => (
 	<div
-		className={`flex items-start gap-3 px-4 py-3 border-b last:border-b-0 transition-colors cursor-pointer relative ${
+		className={`w-full flex items-start gap-3 px-4 py-4 transition-colors cursor-pointer relative ${
 			read ? 'bg-white' : 'bg-gray-100'
 		}`}
 		onClick={onClick}
@@ -45,12 +46,12 @@ const NotificationItem: FC<NotificationItemProps> = ({
 			<IconComponent className='w-6 h-6 text-gray-600' />
 		</div>
 		{/* 알림 내용 */}
-		<div className='flex-1'>
-			<div className='flex justify-between items-center'>
-				<span className='font-semibold text-gray-800'>{title}</span>
-				<span className='text-xs text-gray-400'>{time}</span>
+		<div className='flex-1 min-w-0 flex flex-col items-start text-left'>
+			<div className='flex justify-between items-center w-full'>
+				<span className='font-semibold text-gray-800 truncate'>{title}</span>
+				<span className='text-xs text-gray-400 flex-shrink-0'>{time}</span>
 			</div>
-			<div className='text-sm text-gray-500'>{message}</div>
+			<div className='mt-1 text-sm text-gray-500 break-all'>{message}</div>
 		</div>
 	</div>
 );

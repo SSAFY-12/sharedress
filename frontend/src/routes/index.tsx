@@ -46,6 +46,11 @@ export const router = createBrowserRouter([
 				element: <FriendRequestListPage />,
 			},
 			{
+				path: 'notification',
+				element: <NotificationPage />,
+			},
+
+			{
 				path: '*',
 				element: <Navigate to='/wardrobe' replace />,
 			},
@@ -66,9 +71,5 @@ export const router = createBrowserRouter([
 	{
 		path: 'codi/save',
 		element: <CodiSavePage />,
-	},
-	{
-		path: 'notification',
-		element: <NotificationPage />,
 	},
 ]);
