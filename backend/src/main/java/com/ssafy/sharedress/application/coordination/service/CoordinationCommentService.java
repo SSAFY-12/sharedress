@@ -31,7 +31,7 @@ public class CoordinationCommentService implements CoordinationCommentUseCase {
 
 	@Override
 	@Transactional
-	public CoordinationCommentResponse create(Long coordinationId, CreateCommentRequest request, Long memberId) {
+	public CoordinationCommentResponse createComment(Long coordinationId, CreateCommentRequest request, Long memberId) {
 		Coordination coordination = coordinationRepository.findById(coordinationId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
 
@@ -65,7 +65,7 @@ public class CoordinationCommentService implements CoordinationCommentUseCase {
 
 	@Override
 	@Transactional
-	public CoordinationCommentResponse update(Long coordinationId, Long commentId, UpdateCommentRequest request,
+	public CoordinationCommentResponse updateComment(Long coordinationId, Long commentId, UpdateCommentRequest request,
 		Long memberId) {
 		coordinationRepository.findById(coordinationId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));

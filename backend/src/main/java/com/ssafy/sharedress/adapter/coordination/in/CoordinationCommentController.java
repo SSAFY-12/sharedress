@@ -30,7 +30,7 @@ public class CoordinationCommentController {
 		@RequestBody CreateCommentRequest request
 	) {
 		Long memberId = 1L; // TODO[지윤]: @CurrentMember로 변경하기
-		CoordinationCommentResponse result = commentUseCase.create(coordinationId, request, memberId);
+		CoordinationCommentResponse result = commentUseCase.createComment(coordinationId, request, memberId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, result);
 	}
 
@@ -41,7 +41,7 @@ public class CoordinationCommentController {
 		@RequestBody UpdateCommentRequest request
 	) {
 		Long memberId = 1L; // TODO[지윤]: @CurrentMember로 변경하기
-		CoordinationCommentResponse result = commentUseCase.update(coordinationId, commentId, request, memberId);
+		CoordinationCommentResponse result = commentUseCase.updateComment(coordinationId, commentId, request, memberId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 
