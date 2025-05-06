@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.application.coordination.dto.CoordinationCommentResponse;
 import com.ssafy.sharedress.application.coordination.dto.CreateCommentRequest;
+import com.ssafy.sharedress.application.coordination.dto.UpdateCommentRequest;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationCommentUseCase;
 import com.ssafy.sharedress.domain.coordination.entity.Coordination;
 import com.ssafy.sharedress.domain.coordination.entity.CoordinationComment;
@@ -59,6 +60,25 @@ public class CoordinationCommentService implements CoordinationCommentUseCase {
 		);
 
 		coordinationCommentRepository.save(comment);
+		return CoordinationCommentResponse.from(comment);
+	}
+
+	@Override
+	@Transactional
+	public CoordinationCommentResponse update(Long coordinationId, Long commentId, UpdateCommentRequest request,
+		Long memberId) {
+		coordinationRepository.findById(coordinationId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
+
+		CoordinationComment comment = coordinationCommentRepository.findById(commentId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationCommentErrorCode.COMMENT_NOT_FOUND));
+
+		// 작성자 본인 여부 확인
+		if (!comment.getMember().getId().equals(memberId)) {
+			ExceptionUtil.throwException(CoordinationCommentErrorCode.NOT_COMMENT_OWNER);
+		}
+
+		comment.updateContent(request.content());
 		return CoordinationCommentResponse.from(comment);
 	}
 }
