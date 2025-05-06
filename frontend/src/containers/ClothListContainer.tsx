@@ -64,7 +64,7 @@ export const ClothListContainer = ({
 						key={item.id}
 						item={item}
 						onClick={() => onItemClick?.(item)}
-						className='flex flex-col w-full gap-2.5'
+						className='flex flex-col w-full gap-2.5 items-center'
 					/>
 				),
 			)}

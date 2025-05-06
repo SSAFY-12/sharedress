@@ -1,4 +1,4 @@
-export const categoryConst = [
+export const categoryConfig = [
 	'전체',
 	'아우터',
 	'상의',
