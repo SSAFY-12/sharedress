@@ -1,4 +1,10 @@
-export const headerConfig = {
+import { HeaderProps } from '@/components/layouts/Header';
+
+type HeaderConfig = {
+	[key: string]: Partial<HeaderProps>;
+};
+
+export const headerConfig: HeaderConfig = {
 	'/auth': {
 		showBack: false,
 		subtitle: '로그인',
@@ -7,18 +13,25 @@ export const headerConfig = {
 	'/wardrobe': {
 		showBack: true,
 		subtitle: '내 옷장',
-		// badgeIcon: 'success', // 아이콘만
 		badgeText: '전체',
 	},
 	'/notifications': {
 		showBack: true,
 		subtitle: '알림',
-		badgeIcon: 'bell', // 아이콘만
+		badgeIcon: 'bell',
 	},
-	// 로고
 	'/social': {
 		showBack: false,
-		subtitle: '쉐어드레스',
-		badgeIcon: 'bell', // 아이콘만
+		logo: '쉐어드레스',
+		badgeIcon: 'profile',
 	},
-} as const;
+	'/social/add': {
+		showBack: true,
+		subtitle: '친구 ID로 추가',
+		badgeText: '확인',
+	},
+	'/social/request': {
+		showBack: true,
+		subtitle: '친구 요청 목록',
+	},
+};

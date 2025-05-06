@@ -11,11 +11,13 @@ export const FriendSearchResultPage = () => {
 	const [searchValue, setSearchValue] = useState('');
 	const [resultValue, setResultValue] = useState('');
 	const [modalOpen, setModalOpen] = useState(false);
+	const [requestMessage, setRequestMessage] = useState(''); // 친구 요청 메시지
 	const [selectedFriend, setSelectedFriend] = useState<{
 		profileImage: string;
 		nickname: string;
 		id: number;
 		relationStatus: RelationStatus;
+		requestId?: number;
 	} | null>(null);
 
 	const { searchUsers, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -65,29 +67,36 @@ export const FriendSearchResultPage = () => {
 		}
 	};
 
-	const handleSubmit = (msg: string) => {
+	const handleSubmit = () => {
 		if (selectedFriend) {
+			console.log('Submitting friend request:', {
+				receiverId: selectedFriend.id,
+				message: requestMessage,
+			});
 			requestFriend({
 				receiverId: selectedFriend.id,
-				message: msg,
+				message: requestMessage,
 			});
+			setModalOpen(false);
+			setRequestMessage('');
 		}
-		setModalOpen(false);
 	};
 
 	const handleCancel = () => {
-		if (selectedFriend) {
-			cancelRequest({
-				requestId: selectedFriend.id,
-			});
+		if (selectedFriend?.requestId) {
+			console.log('Cancelling request with ID:', selectedFriend.requestId);
+			cancelRequest(selectedFriend.requestId);
+		} else {
+			console.error('No request found for user:', selectedFriend);
 		}
 	};
 
 	const handleAccept = () => {
-		if (selectedFriend) {
-			acceptRequest({
-				requestId: selectedFriend.id,
-			});
+		if (selectedFriend?.requestId) {
+			console.log('Accepting request with ID:', selectedFriend.requestId);
+			acceptRequest(selectedFriend.requestId);
+		} else {
+			console.error('No requestId found in selectedFriend:', selectedFriend);
 		}
 	};
 
@@ -102,82 +111,87 @@ export const FriendSearchResultPage = () => {
 				/>
 			</div>
 
-			{!resultValue ? (
-				<div className='flex-1 p-4 flex items-center justify-center'>
-					<span className='text-gray-500'>친구 ID를 검색해주세요.</span>
-				</div>
-			) : searchUsers?.length === 0 ? (
-				<div className='flex-1 p-4 flex items-center justify-center'>
-					<span className='text-gray-500'>검색 결과가 없습니다.</span>
-				</div>
-			) : (
-				<div className='flex-1 p-4'>
-					{searchUsers &&
-						searchUsers.length > 0 &&
-						searchUsers.map((user, index) => (
-							<div
-								ref={index === searchUsers.length - 1 ? lastElementRef : null}
-								// 배열의 마지막 인덱스, 현재 요소가 마지막 요소인지 확인 -> 마지막일경우 lastElementRef 참조
-								// 마지막일 때 observe 연결(감시자가 붙게 되면 다음 요소를 호출하게 되는 것)
-								className='border rounded-lg p-6 flex flex-col items-center mb-4'
-								key={user.id}
-							>
-								<UserMiniAvatar
-									src={user.profileImage}
-									size='lg'
-									className='mb-3'
-								/>
-								<h2 className='font-bold mb-1'>{user.nickname}</h2>
+			<div className='flex-1 p-4'>
+				{searchUsers && searchUsers.length > 0 ? (
+					searchUsers.map((user, index) => (
+						<div
+							ref={index === searchUsers.length - 1 ? lastElementRef : null}
+							className='border rounded-lg p-6 flex flex-col items-center mb-4'
+							key={user.id}
+						>
+							<UserMiniAvatar
+								src={user.profileImage}
+								size='lg'
+								className='mb-3'
+							/>
+							<h2 className='font-bold mb-1'>{user.nickname}</h2>
 
-								{user.relationStatus === 0 || user.relationStatus === 3 ? (
-									<PrimaryBtn
-										size='compact'
-										name='친구 요청'
-										color='black'
-										onClick={() => {
-											setModalOpen(true);
-											setSelectedFriend(user);
-										}}
-										className='mt-3'
-									/>
-								) : user.relationStatus === 1 ? (
-									<PrimaryBtn
-										size='compact'
-										name='요청 취소'
-										color='gray'
-										onClick={() => {
-											setSelectedFriend(user);
-											handleCancel();
-										}}
-										className='mt-3'
-									/>
-								) : user.relationStatus === 2 ? (
-									<PrimaryBtn
-										size='compact'
-										name='요청 수락'
-										color='primary'
-										onClick={() => {
-											handleAccept();
-										}}
-										className='mt-3'
-									/>
-								) : null}
-							</div>
-						))}
-					{/* 다음 상태 불러오는지 체크 */}
-					{isFetchingNextPage && (
-						<div className='text-center py-4'>
-							<span className='text-gray-500'>로딩 중...</span>
+							{user.relationStatus === 0 || user.relationStatus === 3 ? (
+								<PrimaryBtn
+									size='compact'
+									name='친구 요청'
+									color='black'
+									onClick={() => {
+										console.log('Setting selectedFriend:', user);
+										setModalOpen(true);
+										setSelectedFriend(user);
+									}}
+									className='mt-3'
+								/>
+							) : user.relationStatus === 1 ? (
+								<PrimaryBtn
+									size='compact'
+									name='요청 취소'
+									color='gray'
+									onClick={() => {
+										console.log('Setting selectedFriend for cancel:', user);
+										handleCancel();
+									}}
+									className='mt-3'
+								/>
+							) : user.relationStatus === 2 ? (
+								<PrimaryBtn
+									size='compact'
+									name='요청 수락'
+									color='primary'
+									onClick={() => {
+										handleAccept();
+									}}
+									className='mt-3'
+								/>
+							) : null}
 						</div>
-					)}
-				</div>
-			)}
+					))
+				) : (
+					<div className='flex items-center justify-center h-full'>
+						<span className='text-gray-500'>
+							{resultValue
+								? '검색 결과가 없습니다.'
+								: '친구 ID를 검색해주세요.'}
+						</span>
+					</div>
+				)}
+				{isFetchingNextPage && (
+					<div className='text-center py-4'>
+						<span className='text-gray-500'>로딩 중...</span>
+					</div>
+				)}
+			</div>
 			{selectedFriend && (
 				<FriendRequestMsgModal
 					isOpen={modalOpen}
-					onClose={() => setModalOpen(false)}
-					friend={selectedFriend}
-					onSubmit={handleSubmit}
+					onClose={() => {
+						setModalOpen(false);
+						setRequestMessage('');
+					}}
+					friend={{
+						profileImage: selectedFriend.profileImage,
+						nickname: selectedFriend.nickname,
+						receiverId: selectedFriend.id,
+					}}
+					message={requestMessage}
+					onMessageChange={setRequestMessage}
+					onConfirm={handleSubmit}
 				/>
 			)}
 		</div>

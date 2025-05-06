@@ -11,13 +11,6 @@ export const socialApi = {
 		const response = await client.get('/api/friends/request');
 		return response.data;
 	},
-	// 전체 사용자 검색
-	searchAllUser: async (keyword: string, cursor: number, size: number) => {
-		const response = await client.get(
-			`/api/members/search?keyword=${keyword}&cursor=${cursor}&size=${size}`,
-		);
-		return response.data;
-	},
 
 	// 친구 검색
 	searchFriend: async (nickname: string) => {
@@ -26,7 +19,19 @@ export const socialApi = {
 		);
 		return response.data;
 	},
-	// 친구 요청
+	// 전체 사용자 검색
+	searchAllUser: async (keyword: string, cursor?: number, size?: number) => {
+		let url = `/api/members/search?keyword=${keyword}`;
+		if (cursor !== undefined && cursor !== null) {
+			url += `&cursor=${cursor}`;
+		}
+		if (size !== undefined) {
+			url += `&size=${size}`;
+		}
+		const response = await client.get(url);
+		return response.data;
+	},
+	// 전체 사용자 -> 친구 요청
 	requestFriend: async (receiverId: number, message: string) => {
 		const response = await client.post(`/api/friends/request`, {
 			receiverId,
@@ -34,21 +39,21 @@ export const socialApi = {
 		});
 		return response.data;
 	},
-	// 친구 요청 수락
+	//  전체 사용자 -> 친구 요청 수락
 	acceptFriendRequest: async (requestId: number) => {
 		const response = await client.post(
 			`/api/friends/request/${requestId}/accept`,
 		);
 		return response.data;
 	},
-	// 친구 요청 거절
+	//  전체 사용자 -> 친구 요청 거절
 	rejectFriendRequest: async (requestId: number) => {
 		const response = await client.post(
 			`/api/friends/request/${requestId}/reject`,
 		);
 		return response.data;
 	},
-	// 친구 요청 취소
+	// 전체 사용자 ->  친구 요청 취소
 	cancelFriendRequest: async (requestId: number) => {
 		const response = await client.post(
 			`/api/friends/request/${requestId}/cancel`,

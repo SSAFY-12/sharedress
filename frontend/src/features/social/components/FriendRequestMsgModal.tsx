@@ -1,22 +1,32 @@
-import { useState } from 'react';
 import { MainModal } from '@/components/modals/main-modal/MainModal';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 
 interface FriendRequestMsgModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-	onSubmit: (msg: string) => void; // 친구 요청 메시지 제출
-	friend: { profileImage: string; nickname: string }; // 친구정보
+	// 친구 요청 메시지 모달 컴포넌트의 타입 정의
+	isOpen: boolean; // 모달 열림 여부
+	onClose: () => void; // 모달 닫기 함수
+	friend: {
+		profileImage: string; // 친구 프로필 이미지
+		nickname: string; // 친구 닉네임
+		receiverId: number; // 친구 요청 받는 사람의 ID
+	};
+	message: string;
+	onMessageChange: (message: string) => void;
+	onConfirm: () => void;
 }
 
+// modal 내역 로그
 export const FriendRequestMsgModal = ({
 	isOpen,
 	onClose,
-	onSubmit,
-	friend, // 친구정보
+	friend,
+	message,
+	onMessageChange,
+	onConfirm,
 }: FriendRequestMsgModalProps) => {
-	const [msg, setMsg] = useState(''); // 친구 요청 메시지
+	console.log('friendRequestMsgModal 랜더링 : ', friend); // 전체 friend 객체 로깅
+	console.log('friendRequestMsgModal 랜더링 :', friend?.receiverId); // memberId 값만 로깅
 
 	return (
 		<MainModal
@@ -37,19 +47,15 @@ export const FriendRequestMsgModal = ({
 						<input
 							className='w-full border rounded px-3 py-2 mb-4'
 							placeholder='메시지 입력'
-							value={msg}
-							onChange={(e) => setMsg(e.target.value)}
+							value={message}
+							onChange={(e) => onMessageChange(e.target.value)}
 						/>
 						<PrimaryBtn
 							size='compact'
 							name='친구 요청'
 							color='black'
 							className='w-full'
-							onClick={() => {
-								// 제출 버튼 클릭 시 친구 요청 메시지 제출 => 서버 요청 로직
-								onSubmit(msg);
-								setMsg('');
-							}}
+							onClick={onConfirm}
 						/>
 					</div>
 				</MainModal.Body>

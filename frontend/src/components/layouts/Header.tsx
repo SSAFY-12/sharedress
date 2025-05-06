@@ -1,12 +1,10 @@
 import { ChevronLeft } from 'lucide-react';
 import { Badge } from '@/components/etc/badge/Badge';
 
-interface HeaderProps {
+export interface HeaderProps {
 	showBack?: boolean;
 	subtitle?: string;
 	logo?: string;
-	//Badge 아이콘 타입 / 텍스트 타입 직접 전달 => Badge로 묶던 기존 방식과 다름
-	// 이전 방식과의 호환성을 위한 props
 	badgeIcon?:
 		| 'bell'
 		| 'setting'
@@ -16,7 +14,9 @@ interface HeaderProps {
 		| 'info'
 		| 'success'
 		| 'warning'
-		| 'error';
+		| 'error'
+		| 'profile'
+		| 'add';
 	badgeText?: string;
 	onBackClick?: () => void;
 	onBadgeClick?: () => void;
@@ -53,8 +53,6 @@ const Header = ({
 				<h1 className='font-bold text-lg text-gray-800'>{logo}</h1>
 			)}
 		</div>
-		{/* badgeIcon이 있으면 Badge 컴포넌트 렌더링 */}
-		{/* badgIcon은 없을 수 있음 : ? 로표현 */}
 		{(badgeIcon || badgeText) && (
 			<Badge icon={badgeIcon} text={badgeText} onClick={onBadgeClick} />
 		)}

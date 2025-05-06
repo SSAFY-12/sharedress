@@ -10,7 +10,7 @@ export const MobileLayout = () => {
 	] || {
 		showBack: false,
 		subtitle: '',
-		badgeType: 'info' as const,
+		badgeIcon: 'info',
 		badgeText: '',
 	};
 

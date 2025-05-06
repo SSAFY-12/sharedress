@@ -33,14 +33,15 @@ export const FriendRequestsPage = () => {
 
 	// 매개변수에는 friendRequest 를 전달하게 되어있었음
 	const handleAccept = (id: number) => {
+		console.log(id, 'requestId');
 		// 친구 요청 수락
-		acceptRequest({ requestId: id });
+		acceptRequest(id);
 	};
 
 	const handleReject = (id: number) => {
 		// 친구 요청 거절
 		setSwipedId(null);
-		rejectRequest({ requestId: id });
+		rejectRequest(id);
 	};
 
 	// 밀어서 거절 기능
@@ -73,6 +74,7 @@ export const FriendRequestsPage = () => {
 									opacity: swipedId === request.id ? 1 : 0, // 투명도 조절
 									pointerEvents: swipedId === request.id ? 'auto' : 'none', // 포인터 이벤트 처리
 								}}
+								// onClick={() => handleReject(request.requester.id)} // 밀어서 거절 기능
 								onClick={() => handleReject(request.id)} // 밀어서 거절 기능
 							>
 								<svg
@@ -118,6 +120,7 @@ export const FriendRequestsPage = () => {
 									name='친구 수락'
 									// 친구 거절
 									color='black'
+									// onClick={() => handleAccept(request.requester.id)} // 친구 요청 수락
 									onClick={() => handleAccept(request.id)} // 친구 요청 수락
 								/>
 							</div>

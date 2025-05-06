@@ -226,6 +226,122 @@ return (
 
 **useInfiniteQuery**는 무한 스크롤, 더보기 등 점진적 데이터 로딩이 필요한 UI에
 서  
-복잡한 페이지네이션 로직을 간단하게 구현할 수 있게 해주는 React Query의 강력한
-도구입니다.  
+복잡한 페이지네이션 로직을 간단하게 구현할 수 있게 해주는 React Query의 강력한도
+구입니다.  
 적절히 활용하면 사용자 경험을 크게 향상시킬 수 있습니다!
+
+---
+
+# React Query의 mutate와 mutateAsync 사용 가이드 (2025/05/06-안주민)
+
+## 1. 개요
+
+React Query의 `useMutation` 훅은 데이터를 수정하는 작업을 처리할 때 사용되며,
+`mutate`와 `mutateAsync` 두 가지 메서드를 제공한다. 각각의 메서드는 서로 다른 사
+용 사례에 적합하며, 상황에 맞는 올바른 선택이 중요하다.
+
+## 2. 기본 사용법
+
+```typescript
+// mutate 사용
+const mutation = useMutation({
+	mutationFn: (data) => api.post(data),
+	onSuccess: () => console.log('성공'),
+	onError: (error) => console.error('에러:', error),
+});
+mutation.mutate(data);
+
+// mutateAsync 사용
+const mutation = useMutation({
+	mutationFn: (data) => api.post(data),
+});
+try {
+	await mutation.mutateAsync(data);
+	console.log('성공');
+} catch (error) {
+	console.error('에러:', error);
+}
+```
+
+## 3. 동작방식
+
+### mutate
+
+- Promise를 반환하지 않음
+- 비동기 작업 완료를 기다리지 않고 즉시 다음 코드 실행
+- 성공/실패는 `onSuccess`, `onError` 콜백으로 처리
+- `UI 이벤트 핸들러`에 최적화
+
+### mutateAsync
+
+- Promise를 반환
+- `await`를 사용하여 `비동기 작업 완료 대기 가능`
+- try/catch로 직접 에러 처리 가능
+- Promise 체인 구성 가능
+
+## 4. 일반적인 사용 사례
+
+### mutate 사용이 적합한 경우
+
+- `단순한 UI 이벤트 핸들러`
+- 성공/실패 처리가 콜백으로 충분한 경우
+- 비동기 작업의 완료를 기다릴 필요가 없는 경우
+- `즉각적인 UI 피드백`이 필요한 경우
+
+### mutateAsync 사용이 적합한 경우
+
+- 다른 비동기 작업과 연계해서 사용해야 할 때
+- Promise 체인이 필요한 경우
+- try/catch로 직접 에러 처리가 필요한 경우
+- `비동기 작업의 완료를 기다려야 하는 경우`
+
+## 5. 장점
+
+### mutate의 장점
+
+- UI 응답성이 뛰어남
+- 코드가 단순하고 직관적
+- 콜백 기반의 명확한 성공/실패 처리
+
+### mutateAsync의 장점
+
+- Promise 기반의 유연한 에러 처리
+- 다른 비동기 작업과의 쉬운 통합
+- 비동기 작업의 완료를 명확하게 제어 가능
+
+## 6. 주의 사항
+
+- `mutate` 사용 시 비동기 작업 완료를 기다리지 않으므로, 작업 완료 후 필요한 처
+  리는 반드시 `onSuccess` 콜백에서 수행
+- `mutateAsync` 사용 시 Promise 체인이 복잡해질 수 있으므로, 필요한 경우에만 사
+  용
+- 두 메서드 모두 로딩 상태(`isPending`)와 에러 상태(`error`)를 제공하므로, UI 피
+  드백에 활용 가능
+
+## 7. 실제 사용 예시
+
+```typescript
+// UI 이벤트에 적합한 mutate 사용
+const handleClick = () => {
+	mutation.mutate(data);
+};
+
+// 복잡한 비동기 로직에 적합한 mutateAsync 사용
+const handleComplexOperation = async () => {
+	try {
+		await mutation.mutateAsync(data);
+		await anotherAsyncOperation();
+		showSuccessMessage();
+	} catch (error) {
+		handleError(error);
+	}
+};
+```
+
+## 8. 결론
+
+`mutate`와 `mutateAsync`는 각각의 장단점이 있으며, 사용 사례에 따라 적절한 메서
+드를 선택해야 한다. 단순한 UI 이벤트나 즉각적인 피드백이 필요한 경우 `mutate`를,
+복잡한 비동기 로직이나 Promise 체인이 필요한 경우 `mutateAsync`를 사용하는 것이
+좋다. 두 메서드 모두 React Query의 강력한 기능을 활용할 수 있으며, 상황에 맞는
+올바른 선택이 중요하다.

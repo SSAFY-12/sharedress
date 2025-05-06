@@ -31,6 +31,7 @@ export interface SearchUser {
 		nickname: string; //유저 닉네임
 		code: string; // 중복 방지 코드
 		relationStatus: RelationStatus; //친구 관계
+		requestId?: number; //친구 요청 ID (요청이 있는 경우에만)
 	}[]; //배열 리스트 === 유저 검색 결과
 }
 

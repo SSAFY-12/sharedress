@@ -34,8 +34,8 @@ const useSearchUser = (nickname: string) => {
 			if (!lastPage.pagination.hasNext) return undefined; //hasNext가 false면 더 이상 조회할 페이지가 없음
 			return lastPage.pagination.cursor; //다음 페이지 조회
 		},
-		initialPageParam: 0, //초기 페이지 번호
-		enabled: !!nickname, //nickname이 있을 때만 조회
+		initialPageParam: undefined, //초기에는 cursor 파라미터 없이 요청
+		enabled: true, // 항상 쿼리 실행
 	});
 
 	const searchUsers = data?.pages.flatMap((page) => page.content) ?? [];

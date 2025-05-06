@@ -11,17 +11,15 @@ interface SearchFriendResponse {
 	content: SearchFriend['content']; //실제 데이터 응답구조 -> 키 값
 }
 
-// 두 가지 케이스가 필요한데
-// 1. 내가 가지고 있는 친구 목록에서 검색
-// 2. 뭐 전체 검색 & ID 찾기에서 친구 목록 검색 후 친구 추가
-
+// 친구 검색
 const useSearchFriend = (nickname: string) => {
 	const {
-		data: searchMyFriend,
-		isLoading: isLoadingMyFriend,
-		error: errorMyFriend,
+		data: searchMyFriend, // 내 친구리스트 검색
+		isLoading: isLoadingMyFriend, // 내 친구리스트 검색 로딩
+		error: errorMyFriend, // 내 친구리스트 검색 에러
 	} = useQuery<SearchFriendResponse>({
-		queryKey: ['searchFriend', nickname], // 친구 검색 -> 쿼리키에 nickname 포함
+		// 내 친구리스트 검색 => 따라서 쿼리키를 동일화?
+		queryKey: ['friendList', nickname], // 친구 검색 -> 쿼리키에 nickname 포함
 		queryFn: () => socialApi.searchFriend(nickname),
 		enabled: !!nickname, // nickname이 있을 때만 쿼리 실행(빈 문자열이 아닐 때) + 변경될때마다 자동으로 쿼리가 재실행
 	});
