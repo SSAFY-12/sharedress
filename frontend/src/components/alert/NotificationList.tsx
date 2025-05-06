@@ -20,6 +20,7 @@ import {
  * - 여러 개의 NotificationItem을 리스트 형태로 보여줍니다.
  * - 알림 센터, 알림 드로어, 모달 등에서 활용할 수 있습니다.
  * - 클릭 시 읽음 처리(파란 점 사라짐) 기능을 포함합니다.
+ * - 부모 컨테이너에 맞춰 100% width/height로 확장됩니다.
  */
 
 // 알림 타입별 아이콘 매핑
@@ -38,7 +39,7 @@ const sampleNotifications = [
 	{
 		type: 'friend_request',
 		title: '친구 추가 요청',
-		message: '홍길동님이 친구 요청을 보냈어요.',
+		message: '홍길동님이 친구 요청을 보냈습니다.',
 		time: '방금 전',
 		read: false,
 		link: '/friend-requests',
@@ -105,9 +106,9 @@ const NotificationList: FC = () => {
 	};
 
 	return (
-		<div className='w-[350px] bg-white rounded-lg shadow-lg overflow-hidden'>
-			{/* 알림 리스트만 표시 (카테고리/필터 바 제거) */}
-			<div>
+		<div className='w-full h-full flex flex-col bg-white overflow-hidden'>
+			{/* 알림 리스트 (스크롤 가능) */}
+			<div className='flex-1 overflow-y-auto flex flex-col divide-y divide-gray-100 p-0 sm:p-4'>
 				{notifications.map((n, i) => (
 					<NotificationItem
 						key={i}
