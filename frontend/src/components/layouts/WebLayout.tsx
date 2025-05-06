@@ -2,9 +2,11 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
 import { headerConfig } from '@/constants/headerConfig';
+import SocialHeader from './SocialHeader';
 
 export const WebLayout = () => {
 	const location = useLocation();
+	const isSocial = location.pathname.startsWith('/social');
 	const headerProps = headerConfig[
 		location.pathname as keyof typeof headerConfig
 	] || {
@@ -17,7 +19,7 @@ export const WebLayout = () => {
 	return (
 		<div className='relative h-full flex flex-col'>
 			<header className='absolute top-0 left-0 right-0 bg-white z-10'>
-				<Header {...headerProps} />
+				{isSocial ? <SocialHeader /> : <Header {...headerProps} />}
 			</header>
 			<main className='flex-1 mt-16 mb-16 overflow-y-auto'>
 				<Outlet />
