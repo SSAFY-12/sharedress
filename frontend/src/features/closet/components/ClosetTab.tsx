@@ -2,7 +2,7 @@ import { ClothItem } from '@/components/cards/cloth-card';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCloset } from '../hooks/useCloset';
+import { useCloset } from '@/features/closet/hooks/useCloset';
 
 interface ClosetTabProps {
 	memberId: number;

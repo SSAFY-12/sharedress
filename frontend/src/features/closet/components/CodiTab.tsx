@@ -3,7 +3,7 @@ import { useState } from 'react';
 import SubTabNavigation from './SubTabNavigation';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useNavigate } from 'react-router-dom';
-import { useCoordinationList } from '../hooks/useCoordinationList';
+import { useCoordinationList } from '@/features/closet/hooks/useCoordinationList';
 const CodiTabs = [
 	{
 		id: 'my' as const,

@@ -4,7 +4,7 @@ import MainTabNavigation from '@/features/closet/components/MainTabNavigation';
 import ClosetTab from '@/features/closet/components/ClosetTab';
 import CodiTab from '@/features/closet/components/CodiTab';
 import NavBar from '@/components/layouts/NavBar';
-import { useMyProfile } from '../hooks/useMyProfile';
+import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
 
 const MyClosetPage = () => {
 	// 상태 관리
