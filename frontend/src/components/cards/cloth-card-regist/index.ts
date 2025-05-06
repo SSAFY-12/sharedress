@@ -1,2 +1,2 @@
 export { ClothCardRegist } from './ClothCardRegist.tsx';
-export type { ClothCardProps, ClothItem } from './ClothCardRegist.types';
+export type { ClothCardRegistProps } from './ClothCardRegist.types';

@@ -1,4 +1,4 @@
-import { ClothCardProps } from './ClothCardRegist.types';
+import { ClothCardRegistProps } from './ClothCardRegist.types';
 
 // 선택 여부에 따라 테두리 색상 변경, 크기 동적 적용
 export const ClothCardRegist = ({
@@ -6,16 +6,7 @@ export const ClothCardRegist = ({
 	selected = false,
 	onClick,
 	className = '',
-}: ClothCardProps) => (
-	// 사이즈가 아니라 10:11 비율이 유지되면서 container를 꽉채우도록 해야함.
-	/*
-	const sizeClass = {
-		sm: 'w-20 h-20',
-		md: 'w-32 h-32',
-		lg: 'w-48 h-48',
-	}[size];
-*/
-
+}: ClothCardRegistProps) => (
 	<div onClick={onClick} className={className}>
 		<div
 			className={`w-full aspect-[10/11] border border-light overflow-hidden rounded-md relative`}
