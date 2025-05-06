@@ -6,8 +6,10 @@ import com.ssafy.sharedress.application.coordination.dto.UpdateCommentRequest;
 
 public interface CoordinationCommentUseCase {
 
-	CoordinationCommentResponse create(Long coordinationId, CreateCommentRequest request, Long memberId);
+	CoordinationCommentResponse createComment(Long coordinationId, CreateCommentRequest request, Long memberId);
 
-	CoordinationCommentResponse update(Long coordinationId, Long commentId, UpdateCommentRequest request,
+	CoordinationCommentResponse updateComment(Long coordinationId, Long commentId, UpdateCommentRequest request,
 		Long memberId);
+
+	void removeComment(Long coordinationId, Long commentId, Long memberId);
 }
