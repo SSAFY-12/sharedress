@@ -17,4 +17,6 @@ public interface CoordinationRepository {
 	List<Coordination> findMyRecommendToFriend(Long myId, Long friendId);
 
 	Optional<Coordination> findByIdWithOwnerAndOriginCreator(Long id);
+
+	Optional<Coordination> findById(Long id);
 }
