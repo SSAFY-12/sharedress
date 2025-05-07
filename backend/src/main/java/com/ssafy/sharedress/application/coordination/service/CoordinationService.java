@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
+import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationIsPublicRequest;
 import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationThumbnailResponse;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationUseCase;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
@@ -172,9 +173,23 @@ public class CoordinationService implements CoordinationUseCase {
 		return new UpdateCoordinationThumbnailResponse(thumbnailUrl);
 	}
 
+	@Transactional
 	@Override
 	public void removeCoordination(Long myId, Long coordinationId) {
 		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
 		coordinationRepository.deleteById(coordinationId);
+	}
+
+	@Transactional
+	@Override
+	public CoordinationResponse updateIsPublic(Long myId, Long coordinationId,
+		UpdateCoordinationIsPublicRequest request) {
+		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
+
+		Coordination coordination = coordinationRepository.findById(coordinationId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
+
+		coordination.updateIsPublic(request.isPublic());
+		return CoordinationResponse.fromEntity(coordination);
 	}
 }

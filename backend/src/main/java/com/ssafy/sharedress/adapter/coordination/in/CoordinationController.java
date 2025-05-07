@@ -21,6 +21,7 @@ import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestRequ
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationWithItemResponse;
 import com.ssafy.sharedress.application.coordination.dto.Scope;
+import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationIsPublicRequest;
 import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationThumbnailResponse;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationQueryUseCase;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationRequestUseCase;
@@ -106,6 +107,16 @@ public class CoordinationController {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
 			coordinationUseCase.updateThumbnail(thumbnail, coordinationId));
+	}
+
+	@PatchMapping("/coordinations/{coordinationId}")
+	public ResponseEntity<ResponseWrapper<CoordinationResponse>> updateCoordinationIsPublic(
+		@PathVariable("coordinationId") Long coordinationId,
+		@RequestBody UpdateCoordinationIsPublicRequest request
+	) {
+		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
+			coordinationUseCase.updateIsPublic(myId, coordinationId, request));
 	}
 
 	@DeleteMapping("/coordinations/{coordinationId}")

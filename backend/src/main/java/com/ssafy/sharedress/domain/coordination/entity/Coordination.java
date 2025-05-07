@@ -98,4 +98,8 @@ public class Coordination extends BaseTimeEntity {
 	public void updateThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
 	}
+
+	public void updateIsPublic(Boolean isPublic) {
+		this.isPublic = isPublic;
+	}
 }

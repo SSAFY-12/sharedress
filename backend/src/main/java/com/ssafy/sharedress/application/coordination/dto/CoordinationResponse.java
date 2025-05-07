@@ -10,6 +10,7 @@ public record CoordinationResponse(
 	String description,
 	Boolean isPublic,
 	Boolean isTemplate,
+	String thumbnail,
 	LocalDateTime createdAt
 ) {
 	public static CoordinationResponse fromEntity(Coordination coordination) {
@@ -19,6 +20,7 @@ public record CoordinationResponse(
 			coordination.getContent(),
 			coordination.getIsPublic(),
 			coordination.getIsTemplate(),
+			coordination.getThumbnail(),
 			coordination.getCreatedAt()
 		);
 	}
