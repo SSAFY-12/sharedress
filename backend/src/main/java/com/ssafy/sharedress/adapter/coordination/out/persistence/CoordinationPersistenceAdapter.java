@@ -138,4 +138,9 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 	public Optional<Coordination> findById(Long id) {
 		return coordinationJpaRepository.findById(id);
 	}
+
+	@Override
+	public void deleteById(Long id) {
+		coordinationJpaRepository.deleteById(id);
+	}
 }

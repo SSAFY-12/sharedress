@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
+import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationIsPublicRequest;
 import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationThumbnailResponse;
 
 public interface CoordinationUseCase {
@@ -15,4 +16,8 @@ public interface CoordinationUseCase {
 	CoordinationResponse copyCoordination(Long myId, Long targetCoordinationId);
 
 	UpdateCoordinationThumbnailResponse updateThumbnail(MultipartFile thumbnail, Long coordinationId);
+
+	void removeCoordination(Long myId, Long coordinationId);
+
+	CoordinationResponse updateIsPublic(Long myId, Long coordinationId, UpdateCoordinationIsPublicRequest request);
 }

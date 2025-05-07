@@ -60,6 +60,9 @@ public class Coordination extends BaseTimeEntity {
 	@OneToMany(mappedBy = "coordination", cascade = CascadeType.ALL)
 	private List<CoordinationClothes> coordinationClothes = new ArrayList<>();
 
+	@OneToMany(mappedBy = "coordination", cascade = CascadeType.ALL)
+	private List<CoordinationComment> coordinationComments = new ArrayList<>();
+
 	// -- 생성자 -- //
 	public Coordination(String title, String content, Boolean isPublic, Boolean isTemplate, Member creator,
 		Member owner,
@@ -94,5 +97,9 @@ public class Coordination extends BaseTimeEntity {
 
 	public void updateThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
+	}
+
+	public void updateIsPublic(Boolean isPublic) {
+		this.isPublic = isPublic;
 	}
 }
