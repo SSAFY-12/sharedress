@@ -32,7 +32,14 @@ public interface FriendRequestJpaRepository extends JpaRepository<FriendRequest,
 	@Query("SELECT fr FROM FriendRequest fr "
 		+ "JOIN FETCH fr.requester r "
 		+ "JOIN FETCH fr.receiver v "
-		+ "WHERE fr.receiver.id = :receiverId"
-		+ " ORDER BY fr.id DESC")
+		+ "WHERE fr.receiver.id = :receiverId "
+		+ "ORDER BY fr.id DESC")
 	List<FriendRequest> findAllByReceiverId(Long receiverId);
+
+	@Query("SELECT fr FROM FriendRequest fr "
+		+ "JOIN FETCH fr.requester r "
+		+ "JOIN FETCH fr.receiver v "
+		+ "WHERE (fr.requester.id = :myId AND fr.receiver.id = :friendId) "
+		+ "OR (fr.requester.id = :friendId AND fr.receiver.id = :myId)")
+	Optional<FriendRequest> findByMemberId(Long myId, Long friendId);
 }

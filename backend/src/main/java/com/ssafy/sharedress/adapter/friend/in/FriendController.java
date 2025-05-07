@@ -99,4 +99,16 @@ public class FriendController {
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
 			friendQueryUseCase.getFriendListByKeyword(myId, keyword));
 	}
+
+	@GetMapping("/friends/{friendId}/request")
+	public ResponseEntity<ResponseWrapper<FriendRequestResponse>> sendFriendRequestToFriend(
+		@CurrentMember Member member,
+		@PathVariable("friendId") Long friendId
+	) {
+		Long myId = member.getId();
+		return ResponseWrapperFactory.toResponseEntity(
+			HttpStatus.CREATED,
+			friendRequestQueryUseCase.getFriendRequest(myId, friendId)
+		);
+	}
 }

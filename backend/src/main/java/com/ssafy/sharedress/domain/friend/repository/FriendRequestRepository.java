@@ -17,4 +17,6 @@ public interface FriendRequestRepository {
 	Optional<FriendRequest> findByIdAndRequesterId(Long id, Long requesterId);
 
 	List<FriendRequest> findAllByReceiverId(Long receiverId);
+
+	Optional<FriendRequest> findByMemberId(Long myId, Long friendId);
 }
