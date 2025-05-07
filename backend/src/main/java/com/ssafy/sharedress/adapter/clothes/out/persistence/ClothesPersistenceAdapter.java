@@ -10,6 +10,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
 import com.ssafy.sharedress.domain.brand.entity.QBrand;
+import com.ssafy.sharedress.domain.category.entity.QCategory;
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
 import com.ssafy.sharedress.domain.clothes.entity.QClothes;
 import com.ssafy.sharedress.domain.clothes.repository.ClothesRepository;
@@ -49,6 +50,7 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 		QClothes clothes = QClothes.clothes;
 		QBrand brand = QBrand.brand;
 		QShoppingMall shop = QShoppingMall.shoppingMall;
+		QCategory category = QCategory.category;
 
 		BooleanBuilder condition = new BooleanBuilder();
 
@@ -82,11 +84,13 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 				clothes.name,
 				brand.nameKr,
 				clothes.imageUrl,
-				clothes.createdAt
+				clothes.createdAt,
+				clothes.category.id
 			))
 			.from(clothes)
 			.leftJoin(clothes.brand, brand)
 			.leftJoin(clothes.shoppingMall, shop)
+			.leftJoin(clothes.category, category)
 			.where(condition)
 			.orderBy(clothes.id.desc())
 			.limit(size + 1)
