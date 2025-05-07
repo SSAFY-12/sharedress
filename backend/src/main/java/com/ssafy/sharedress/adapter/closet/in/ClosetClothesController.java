@@ -20,6 +20,11 @@ import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AddLibraryClothesToClosetRequest;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
+import com.ssafy.sharedress.application.guest.annotation.CurrentGuest;
+import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.domain.common.context.UserContext;
+import com.ssafy.sharedress.domain.guest.entity.Guest;
+import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
@@ -35,15 +40,16 @@ public class ClosetClothesController {
 
 	@GetMapping("/closet/{memberId}")
 	public ResponseEntity<ResponseWrapper<List<ClosetClothesResponse>>> getMemberClosetClothes(
+		@CurrentMember(required = false) Member member,
+		@CurrentGuest(required = false) Guest guest,
 		@PathVariable("memberId") Long targetMemberId,
 		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Long cursor,
 		@RequestParam(defaultValue = "20") int size
 	) {
-		// TODO[준]: security context 에서 myId 가져오기
-		Long myId = 1L;
+		UserContext userContext = new UserContext(member, guest);
 		CursorPageResult<ClosetClothesResponse> result = closetClothesQueryUseCase.getMemberClosetClothes(
-			myId,
+			userContext,
 			targetMemberId,
 			categoryId,
 			cursor,

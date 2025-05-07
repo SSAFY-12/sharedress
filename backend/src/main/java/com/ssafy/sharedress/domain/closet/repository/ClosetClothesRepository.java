@@ -11,7 +11,8 @@ public interface ClosetClothesRepository {
 		Long memberId,
 		Long categoryId,
 		Long cursorId,
-		int size
+		int size,
+		boolean isMe
 	);
 
 	ClosetClothes save(ClosetClothes closetClothes);

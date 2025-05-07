@@ -2,11 +2,12 @@ package com.ssafy.sharedress.application.closet.usecase;
 
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
+import com.ssafy.sharedress.domain.common.context.UserContext;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 
 public interface ClosetClothesQueryUseCase {
 	CursorPageResult<ClosetClothesResponse> getMemberClosetClothes(
-		Long myId,
+		UserContext userContext,
 		Long targetMemberId,
 		Long categoryId,
 		Long cursor,

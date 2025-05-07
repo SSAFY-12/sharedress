@@ -28,7 +28,8 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 		Long memberId,
 		Long categoryId,
 		Long cursorId,
-		int size
+		int size,
+		boolean isMe
 	) {
 		QClosetClothes cc = QClosetClothes.closetClothes;
 		QClothes cl = QClothes.clothes;
@@ -46,6 +47,10 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 
 		if (cursorId != null) {
 			condition.and(cc.id.lt(cursorId));
+		}
+
+		if (!isMe) {
+			condition.and(cc.isPublic.isTrue());
 		}
 
 		List<ClosetClothes> results = queryFactory.selectFrom(cc)
