@@ -104,9 +104,9 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 		BooleanBuilder condition = new BooleanBuilder();
 
 		if (isMember) {
-			condition.and(cd.originCreator.id.eq(userId));
+			condition.and(cd.creator.id.eq(userId));
 		} else {
-			condition.and(cd.originCreatorGuest.id.eq(userId));
+			condition.and(cd.creatorGuest.id.eq(userId));
 		}
 
 		return queryFactory

@@ -1,5 +1,6 @@
 package com.ssafy.sharedress.application.member.dto;
 
+import com.ssafy.sharedress.domain.guest.entity.Guest;
 import com.ssafy.sharedress.domain.member.entity.Member;
 
 public record MemberProfileResponse(
@@ -8,7 +9,8 @@ public record MemberProfileResponse(
 	String nickname,
 	String code,
 	String profileImage,
-	String oneLiner
+	String oneLiner,
+	Boolean isGuest
 ) {
 	public static MemberProfileResponse from(Member member) {
 		return new MemberProfileResponse(
@@ -17,7 +19,20 @@ public record MemberProfileResponse(
 			member.getNickname(),
 			member.getCode(),
 			member.getProfileUrl(),
-			member.getStatusMessage()
+			member.getStatusMessage(),
+			false
+		);
+	}
+
+	public static MemberProfileResponse from(Guest guest) {
+		return new MemberProfileResponse(
+			guest.getId(),
+			null,
+			guest.getNickname(),
+			guest.getCode(),
+			null,
+			null,
+			true
 		);
 	}
 }
