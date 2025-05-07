@@ -48,6 +48,7 @@ public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 
 	@Override
 	public ClosetClothesDetailResponse getClosetClothesDetail(Long memberId, Long closetClothesId) {
+		// TODO[준]: 검증 로직 필요
 		return closetClothesRepository.findById(closetClothesId)
 			.map(ClosetClothesDetailResponse::from)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));

@@ -57,6 +57,10 @@ public class Coordination extends BaseTimeEntity {
 	@JoinColumn(name = "creator_guest_id")
 	private Guest creatorGuest;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "origin_creator_guest_id")
+	private Guest originCreatorGuest;
+
 	@OneToMany(mappedBy = "coordination", cascade = CascadeType.ALL)
 	private List<CoordinationClothes> coordinationClothes = new ArrayList<>();
 
@@ -76,6 +80,18 @@ public class Coordination extends BaseTimeEntity {
 		this.originCreator = originCreator;
 	}
 
+	public Coordination(String title, String content, Boolean isPublic, Boolean isTemplate, Guest creatorGuest,
+		Member owner,
+		Guest originCreatorGuest) {
+		this.title = title;
+		this.content = content;
+		this.isPublic = isPublic;
+		this.isTemplate = isTemplate;
+		this.owner = owner;
+		this.creatorGuest = creatorGuest;
+		this.originCreatorGuest = originCreatorGuest;
+	}
+
 	// -- 생성자 팩토리 메서드 -- //
 	public static Coordination createByMember(
 		String title,
@@ -87,6 +103,18 @@ public class Coordination extends BaseTimeEntity {
 		Member originCreator
 	) {
 		return new Coordination(title, content, isPublic, isTemplate, creator, owner, originCreator);
+	}
+
+	public static Coordination createByGuest(
+		String title,
+		String content,
+		Boolean isPublic,
+		Boolean isTemplate,
+		Guest creatorGuest,
+		Member owner,
+		Guest originCreatorGuest
+	) {
+		return new Coordination(title, content, isPublic, isTemplate, creatorGuest, owner, originCreatorGuest);
 	}
 
 	// -- 연관관계 편의 메서드 -- //
