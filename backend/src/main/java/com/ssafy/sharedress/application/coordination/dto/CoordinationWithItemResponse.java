@@ -11,6 +11,7 @@ public record CoordinationWithItemResponse(
 	String description,
 	Boolean isPublic,
 	Boolean isTemplate,
+	String thumbnail,
 	List<CoordinationClothesResponse> items,
 	LocalDateTime createdAt
 ) {
@@ -23,6 +24,7 @@ public record CoordinationWithItemResponse(
 			coordination.getContent(),
 			coordination.getIsPublic(),
 			coordination.getIsTemplate(),
+			coordination.getThumbnail(),
 			coordination.getCoordinationClothes().stream()
 				.map(CoordinationClothesResponse::fromEntity)
 				.toList(),

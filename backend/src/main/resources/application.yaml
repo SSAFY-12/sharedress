@@ -52,5 +52,6 @@ cloud:
             bucket: sharedress-profile-img
             path:
                 profile: profile
+                coordination: coordination
         stack:
             auto: false
