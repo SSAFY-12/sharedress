@@ -1,6 +1,6 @@
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { MainModal } from '@/components/modals/main-modal/MainModal';
-import useRequest from '../hooks/useRequest';
+import useRequest from '@/features/social/hooks/useRequest';
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 
 interface FriendRequestActionModalProps {
