@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { APIError, getErrorMessage } from './errorHandler';
 import { useAuthStore } from '@/store/useAuthStore';
-import useRefresh from '@/features/auth/hooks/useRefresh';
+import { authApi } from '@/features/auth/api/authApi';
 
 export const client = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
@@ -66,15 +66,21 @@ client.interceptors.response.use(
 
 		// 401 에러 (인증 실패) 처리
 		if (status === 401) {
-			// 토큰 만료 시 401 에러 발생 * 인증 실패
-			// 우선순위 2
 			try {
-				const { mutateAsync: refreshAsync } = useRefresh(); // 인터셉터 자체에서 단순 훅 사용
+				// 직접 refresh API 호출
+				const response = await authApi.refresh();
+				const newToken = response.content.accessToken;
 
-				await refreshAsync(); // 토큰 갱신 -> 명시적 비동기 처리(토큰 갱신 완료까지 기다림)
-				return axios(error.config); // 토큰 갱신 후 원래 요청 재시도
+				// 새 토큰 저장
+				useAuthStore.getState().setAccessToken(newToken);
+
+				// 원래 요청의 헤더에 새 토큰 설정
+				error.config.headers['Authorization'] = `Bearer ${newToken}`;
+
+				// 원래 요청 재시도
+				return axios(error.config);
 			} catch (refreshError) {
-				// 갱신 실패시 로그아웃 처리 및 로그인 페이지로 리다이렉트
+				console.error('토큰 리프레시 받아오는 과정에서 에러:', refreshError);
 				useAuthStore.getState().logout();
 				window.location.href = '/auth';
 				return Promise.reject(refreshError);
@@ -84,7 +90,6 @@ client.interceptors.response.use(
 		// 전역 에러 처리
 		handleGlobalError(status, serverMessage);
 
-		// APIError 형태로 에러 반환
 		return Promise.reject(
 			new APIError(
 				status || 500,

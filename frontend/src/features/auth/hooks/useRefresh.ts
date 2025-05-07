@@ -3,29 +3,36 @@ import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/useAuthStore';
 import { TokenResponse } from '@/features/auth/types/auth';
 import { isTokenValid } from '@/features/auth/utils/tokenUtils';
-const useRefresh = () => {
-	const { setAccessToken } = useAuthStore();
 
-	// mutation 반환값 -> mutate, mutateAsync, isPending, isSuccess, isError, error
+const useRefresh = () => {
+	const { setAccessToken } = useAuthStore(); // 토큰 저장
+
 	const mutation = useMutation({
-		mutationFn: () => authApi.refresh(), // 리프레시 토큰 갱신
+		mutationFn: async () => {
+			// 토큰 리프레시
+			const response = await authApi.refresh();
+			return response;
+		},
 		onSuccess: (data: TokenResponse) => {
+			// 토큰 리프레시 성공
 			if (!isTokenValid(data.content.accessToken)) {
 				throw new Error('무효한 토큰');
 			}
-			console.log('BE 데이터 값 확인 : ', data, 'refresh 토큰 갱신');
-			setAccessToken(data.content.accessToken); // refresh 토큰 갱신
+			setAccessToken(data.content.accessToken);
 		},
 		onError: (error) => {
-			console.error('토큰 갱신 실패:', error);
-			// 특정 기능에 대한 구체적인 에러 처리
-			if (error instanceof Error && error.message === '무효한 토큰') {
-				window.location.href = '/login'; // 로그인 페이지로 리다이렉트
-			}
+			// 토큰 리프레시 실패
+			console.error('토큰 리프레시 실패:', error);
+			useAuthStore.getState().logout();
+			window.location.href = '/auth';
 		},
 	});
 
-	return mutation;
+	return {
+		...mutation,
+		refreshToken: mutation.mutate,
+		refreshTokenAsync: mutation.mutateAsync,
+	};
 };
 
 export default useRefresh;

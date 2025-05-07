@@ -315,3 +315,109 @@ key={user.memberId}
   다면 서버와 협의하여 필드명을 통일하는 것이 가장 바람직하다.
 
 ---
+
+## [트러블슈팅] React 훅 사용 관련 트러블슈팅: 토큰 갱신 로직(2025/05/07-안주민)
+
+### 문제상황
+
+- 토큰 갱신(refresh) 로직이 제대로 동작하지 않음
+- 새로고침 시 로그아웃되는 현상 발생
+- Network 탭에서 refresh 요청이 보이지 않음
+
+### 원인 분석
+
+1. React 훅 사용 규칙 위반
+
+   - React 훅은 컴포넌트나 다른 훅 내부에서만 사용 가능
+   - 인터셉터는 React 컴포넌트 외부에서 실행되므로 훅 사용 불가
+   - `useRefresh` 훅을 인터셉터에서 직접 호출하려 했던 것이 문제
+
+2. 토큰 갱신 로직의 구조적 문제
+   - `useMutation`을 사용한 토큰 갱신 로직이 컴포넌트 외부에서 실행될 수 없음
+   - 인터셉터에서 훅을 사용하려 했던 접근 방식이 잘못됨
+
+### 해결방법
+
+1. `useRefresh.ts` 수정
+
+   ```typescript
+   const useRefresh = () => {
+   	const { setAccessToken } = useAuthStore();
+   	const mutation = useMutation({
+   		mutationFn: async () => {
+   			console.log('Refreshing token...');
+   			const response = await authApi.refresh();
+   			return response;
+   		},
+   		onSuccess: (data) => {
+   			setAccessToken(data.content.accessToken);
+   		},
+   		onError: (error) => {
+   			useAuthStore.getState().logout();
+   			window.location.href = '/auth';
+   		},
+   	});
+   	return {
+   		...mutation,
+   		refreshToken: mutation.mutate,
+   		refreshTokenAsync: mutation.mutateAsync,
+   	};
+   };
+   ```
+
+2. `client.ts` 인터셉터 수정
+   ```typescript
+   if (status === 401) {
+   	try {
+   		const response = await authApi.refresh();
+   		const newToken = response.content.accessToken;
+   		useAuthStore.getState().setAccessToken(newToken);
+   		error.config.headers['Authorization'] = `Bearer ${newToken}`;
+   		return axios(error.config);
+   	} catch (refreshError) {
+   		useAuthStore.getState().logout();
+   		window.location.href = '/auth';
+   	}
+   }
+   ```
+
+### 예시
+
+#### 올바른 사용 방법
+
+```typescript
+// 컴포넌트 내부에서 사용
+const MyComponent = () => {
+	const { refreshToken } = useRefresh();
+	// refreshToken() 호출 가능
+};
+
+// 인터셉터에서는 직접 API 호출
+const response = await authApi.refresh();
+```
+
+#### 잘못된 사용 방법
+
+```typescript
+// 인터셉터에서 훅 사용 (X)
+const { mutateAsync } = useRefresh(); // 에러 발생
+```
+
+### 결론 및 정리
+
+1. React 훅 사용 규칙
+
+   - 훅은 반드시 React 컴포넌트나 다른 훅 내부에서만 사용
+   - 컴포넌트 외부(인터셉터 등)에서는 직접 API 호출 방식 사용
+
+2. 토큰 갱신 로직 분리
+
+   - 컴포넌트 내부: `useRefresh` 훅 사용
+   - 인터셉터: `authApi.refresh()` 직접 호출
+
+3. 디버깅 포인트
+   - 브라우저 콘솔 로그 확인
+   - Network 탭에서 refresh 요청 모니터링
+   - 토큰 저장 상태 확인
+
+이러한 구조로 변경함으로써 토큰 갱신 로직이 정상적으로 동작하게 되었습니다.
