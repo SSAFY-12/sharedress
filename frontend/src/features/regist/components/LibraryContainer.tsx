@@ -1,62 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { categoryConfig } from '@/constants/categoryConfig';
 import { SearchBar } from '@/components/inputs/search-bar';
-import { RegistApis, Clothes } from '@/features/regist/api/registApis';
-
-// 카테고리 매핑
-const categoryMapping: { [key: string]: string } = {
-	전체: '0',
-	아우터: '1',
-	상의: '2',
-	하의: '3',
-	신발: '4',
-	악세사리: '5',
-};
+import { categoryMapping } from '@/constants/categoryConfig';
+import {
+	RegistApis,
+	Clothes,
+	ClothesRequestParams,
+	ClothesResponse,
+} from '@/features/regist/api/registApis';
+import { useInfiniteQuery } from '@tanstack/react-query';
 
 const LibraryContainer = () => {
 	const [selectedCategory, setSelectedCategory] = useState<
 		(typeof categoryConfig)[number]
 	>(categoryConfig[0]);
 	const [value, setValue] = useState('');
-	const [items, setItems] = useState<ClothItem[]>([]);
-	const [isLoading, setIsLoading] = useState(false);
 
-	useEffect(() => {
-		const fetchClothes = async () => {
-			try {
-				setIsLoading(true);
-				const response = await RegistApis.getClothes({
+	const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isPending } =
+		useInfiniteQuery<ClothesResponse>({
+			queryKey: ['clothes', selectedCategory, value.trim()],
+			queryFn: async ({ pageParam }) => {
+				const request = {
 					size: 12,
 					keyword: value || undefined,
 					categoryIds:
 						selectedCategory === '전체'
 							? undefined
 							: categoryMapping[selectedCategory],
+				};
+				const response = await RegistApis.getClothes({
+					...request,
+					cursor: pageParam as number | undefined,
 				});
-
-				// API 응답 데이터를 ClothItem 형식으로 변환
-				const transformedItems: ClothItem[] = response.content.map(
-					(item: Clothes) => ({
-						id: item.id.toString(),
-						name: item.name,
-						category: selectedCategory,
-						imageUrl: item.image,
-						brand: item.brandName,
-					}),
-				);
-
-				setItems(transformedItems);
-			} catch (error) {
-				console.error('옷장 데이터를 불러오는데 실패했습니다:', error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchClothes();
-	}, [selectedCategory, value]);
+				console.log('API 요청:', request);
+				console.log('API 응답:', response);
+				return response;
+			},
+			getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
+			initialPageParam: undefined,
+			staleTime: 1000 * 5, // 5초 내엔 refetch 안 함
+			placeholderData: () => ({
+				pages: [],
+				pageParams: [],
+			}),
+		});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValue(e.target.value);
@@ -74,6 +63,32 @@ const LibraryContainer = () => {
 		console.log('선택된 아이템:', item);
 	};
 
+	const sentinel = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		if (!sentinel.current) return;
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ root: null, threshold: 0.1 },
+		);
+		io.observe(sentinel.current);
+		return () => io.disconnect();
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+	const allItems =
+		data?.pages.flatMap((page: ClothesResponse) =>
+			page.content.map((item: Clothes) => ({
+				id: item.id,
+				name: item.name,
+				imageUrl: item.image,
+				brand: item.brandName,
+			})),
+		) || [];
+
 	return (
 		<div className='flex flex-col gap-2 w-full items-center'>
 			<SearchBar
@@ -81,19 +96,24 @@ const LibraryContainer = () => {
 				value={value}
 				onChange={handleChange}
 				onSubmit={handleSubmit}
+				className='sticky top-20 z-10'
 			/>
-			{isLoading ? (
+			{isPending ? (
 				<div>로딩 중...</div>
 			) : (
-				<ClothListContainer
-					isForRegist={true}
-					categories={categoryConfig}
-					items={items}
-					selectedCategory={selectedCategory}
-					onCategoryChange={handleCategoryChange}
-					onItemClick={handleItemClick}
-					className='flex flex-col w-full gap-4'
-				/>
+				<div className='w-full '>
+					<ClothListContainer
+						isForRegist={true}
+						categories={categoryConfig}
+						items={allItems as ClothItem[]}
+						selectedCategory={selectedCategory}
+						onCategoryChange={handleCategoryChange}
+						onItemClick={handleItemClick}
+						className='flex flex-col w-full gap-4'
+					/>
+					<div ref={sentinel} className='h-1' />
+					{isFetchingNextPage && <div>추가 로딩 중...</div>}
+				</div>
 			)}
 		</div>
 	);

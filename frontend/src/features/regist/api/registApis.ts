@@ -1,7 +1,7 @@
 import { client } from '@/api/client';
-
+import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 // API 응답 타입 정의
-export interface Clothes {
+export interface Clothes extends ClothItem {
 	id: number;
 	name: string;
 	brandName: string;
@@ -29,7 +29,7 @@ export interface ClothesResponse {
 // API 요청 파라미터 타입 정의
 export interface ClothesRequestParams {
 	keyword?: string;
-	categoryIds?: string;
+	categoryIds?: number;
 	shopId?: string;
 	cursor?: number;
 	size?: number;
@@ -51,6 +51,4 @@ export const RegistApis = {
 		});
 		return response.data;
 	},
-
-
 };

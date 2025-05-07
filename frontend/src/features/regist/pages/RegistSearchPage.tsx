@@ -14,15 +14,14 @@ const RegistSearchPage = () => {
 				menu={registSearchMenuConfig}
 				selected={selected}
 				setSelected={setSelected}
+				className='sticky top-1.5 bg-white z-10'
 			/>
-			{selected === registSearchMenuConfig[0] ? (
-				<>
-					<LibraryContainer />
-				</>
-			) : (
-				<></>
-			)}
+
+			<div className='flex-1 w-full '>
+				{selected === registSearchMenuConfig[0] ? <LibraryContainer /> : <></>}
+			</div>
 		</div>
 	);
 };
+
 export default RegistSearchPage;
