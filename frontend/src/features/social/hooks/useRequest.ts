@@ -1,8 +1,11 @@
 import { socialApi } from '@/features/social/api/socialApi';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FriendRequestList } from '@/features/social/types/social';
+import {
+	FriendRequest,
+	FriendRequestList,
+} from '@/features/social/types/social';
 
-const useRequest = () => {
+const useRequest = (memberId?: number) => {
 	const queryClient = useQueryClient();
 
 	// 내가 보낸 친구 요청 목록 조회
@@ -22,6 +25,19 @@ const useRequest = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['searchUser'] }); // 친구 요청 보내기 성공 시 친구 검색 목록 갱신
 		},
+	});
+
+	// 특정 친구 요청 조회
+	const {
+		data: friendRequest,
+		isLoading: isFriendRequestLoading,
+		error: friendRequestError,
+	} = useQuery<FriendRequest, Error>({
+		queryKey: ['friendRequest', memberId], // 특정 친구 요청 조회, 해당 memberId 키값으로 조회
+		queryFn: (
+			{ queryKey }, //객체값으로 전달
+		) => socialApi.getFriendRequest(queryKey[1] as number),
+		enabled: !!memberId,
 	});
 
 	// 친구 요청 수락
@@ -53,6 +69,11 @@ const useRequest = () => {
 		friendRequests: friendRequests?.content,
 		isFriendRequestsLoading,
 		friendRequestsError,
+
+		// 특정 친구 요청 조회
+		friendRequest: friendRequest?.content,
+		isFriendRequestLoading,
+		friendRequestError,
 
 		// 친구 요청 보내기
 		requestFriend: requestFriend.mutate, // 친구 요청 보내기

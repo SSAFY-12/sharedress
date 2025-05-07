@@ -29,6 +29,7 @@ export const socialApi = {
 		const response = await client.get(url);
 		return response.data;
 	},
+
 	// 전체 사용자 -> 친구 요청
 	requestFriend: async (receiverId: number, message: string) => {
 		const response = await client.post(`/api/friends/request`, {
@@ -37,6 +38,13 @@ export const socialApi = {
 		});
 		return response.data;
 	},
+
+	// 특정 친구 요청 조회
+	getFriendRequest: async (memberId: number) => {
+		const response = await client.get(`/api/friends/${memberId}/request`);
+		return response.data;
+	},
+
 	//  전체 사용자 -> 친구 요청 수락
 	acceptFriendRequest: async (requestId: number) => {
 		const response = await client.post(

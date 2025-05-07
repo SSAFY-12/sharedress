@@ -50,6 +50,14 @@ export interface SearchFriend {
 	}[]; //여러명의 친구 검색 결과
 }
 
+// 특정 친구 요청 조회
+export interface FriendRequest {
+	content: {
+		id: number; //친구 요청 고유 아이디 -> requestId로 전달될 것 : 친구 수락 / 거절 / 취소에 사용될 내용
+		message: string; //메시지
+	};
+}
+
 export interface FriendRequest {
 	// 친구 요청
 	receiverId: number; //받는 사람 고유 아이디
