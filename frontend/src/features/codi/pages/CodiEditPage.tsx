@@ -1,18 +1,11 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { myCodiSaveApi } from '@/features/codi/api/codiApi';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layouts/Header';
-import CodiCanvas from '@/features/codi/components/CodiCanvas';
-import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSection';
-import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
-import { ChangeEvent } from 'react';
+import CodiCanvas from '../components/CodiCanvas';
+import CodiEditBottomSection from '../components/CodiEditBottomSection';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const EMPTY_FN = () => {};
-
-const CodiCreatePage = () => {
+const CodiEditPage = () => {
 	const navigate = useNavigate();
-	const [mode, setMode] = useState<'edit' | 'save'>('edit');
 
 	const categories = [
 		{ id: 'all', label: '전체' },
@@ -100,9 +93,6 @@ const CodiCreatePage = () => {
 	const [activeCategory, setActiveCategory] = useState('all');
 	const [canvasItems, setCanvasItems] = useState<any[]>([]);
 	const [maxZIndex, setMaxZIndex] = useState(0);
-	const [description, setDescription] = useState('');
-	const [isPublic, setIsPublic] = useState(true);
-	const [isLoading, setIsLoading] = useState(false);
 
 	// 카테고리 필터링
 	const filteredProducts =
@@ -174,119 +164,50 @@ const CodiCreatePage = () => {
 		};
 	}, []);
 
-	useEffect(() => {
-		if (mode === 'save') {
-			const savedItems = localStorage.getItem('codiItems');
-			if (savedItems) {
-				setCanvasItems(JSON.parse(savedItems));
-			}
-		}
-	}, [mode]);
-
 	const handleBackClick = () => {
-		if (mode === 'save') {
-			setMode('edit');
+		if (window.history.length > 1) {
+			navigate(-1);
 		} else {
-			if (window.history.length > 1) {
-				navigate(-1);
-			} else {
-				navigate('/');
-			}
+			navigate('/');
 		}
 	};
 
 	const handleNextClick = () => {
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
-		setMode('save');
-	};
-
-	const handleComplete = async () => {
-		try {
-			setIsLoading(true);
-			const formattedItems = canvasItems.map((item) => ({
-				id: Number(item.id),
-				position: {
-					x: item.position.x,
-					y: item.position.y,
-					z: item.zIndex,
-				},
-				scale: item.scale,
-				rotation: item.rotation,
-			}));
-
-			const payload = {
-				title: '임시 제목',
-				description,
-				isPublic,
-				isTemplate: false,
-				items: formattedItems,
-			};
-
-			console.log('payload 확인:', payload);
-
-			const response = await myCodiSaveApi(payload);
-			console.log(response);
-			alert('코디가 저장되었습니다!');
-			navigate('/');
-		} catch (error) {
-			console.error('코디 저장 실패:', error);
-			alert('코디 저장 실패');
-		} finally {
-			setIsLoading(false);
-		}
+		navigate('/codi/save');
 	};
 
 	const headerProps = {
 		showBack: true,
-		badgeText: mode === 'save' ? '완료' : '다음',
+		badgeText: '다음',
 		onBackClick: handleBackClick,
-		onBadgeClick: mode === 'edit' ? handleNextClick : handleComplete,
-	};
-
-	const handleDescriptionChange = (
-		e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => {
-		setDescription(e.target.value);
-	};
-
-	const handlePublicToggle = () => {
-		setIsPublic(!isPublic);
+		onBadgeClick: handleNextClick,
 	};
 
 	return (
 		<div className='max-w-md mx-auto h-screen flex flex-col bg-white overflow-hidden'>
 			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-hidden'>
-				<div className={`${mode === 'edit' ? 'flex-shrink-0' : 'bg-gray-50'}`}>
+				<div className='flex-shrink-0'>
 					<CodiCanvas
 						items={canvasItems}
-						isEditable={mode === 'edit'}
-						updateItem={mode === 'edit' ? updateCanvasItem : EMPTY_FN}
-						removeItem={mode === 'edit' ? removeFromCanvas : EMPTY_FN}
-						maxZIndex={mode === 'edit' ? maxZIndex : 0}
-						setMaxZIndex={mode === 'edit' ? setMaxZIndex : EMPTY_FN}
+						isEditable={true}
+						updateItem={updateCanvasItem}
+						removeItem={removeFromCanvas}
+						maxZIndex={maxZIndex}
+						setMaxZIndex={setMaxZIndex}
 					/>
 				</div>
-				{mode === 'edit' ? (
-					<CodiEditBottomSection
-						categories={categories}
-						activeCategory={activeCategory}
-						filteredProducts={filteredProducts}
-						onCategoryChange={setActiveCategory}
-						onItemClick={addItemToCanvas}
-					/>
-				) : (
-					<CodiSaveBottomSection
-						description={description}
-						isPublic={isPublic}
-						isLoading={isLoading}
-						onDescriptionChange={handleDescriptionChange}
-						onPublicToggle={handlePublicToggle}
-					/>
-				)}
+				<CodiEditBottomSection
+					categories={categories}
+					activeCategory={activeCategory}
+					filteredProducts={filteredProducts}
+					onCategoryChange={setActiveCategory}
+					onItemClick={addItemToCanvas}
+				/>
 			</div>
 		</div>
 	);
 };
 
-export default CodiCreatePage;
+export default CodiEditPage;
