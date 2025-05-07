@@ -1,11 +1,7 @@
 import { FC, useState } from 'react';
 import NotificationItem from './NotificationItem';
 import {
-	// Wallet,
-	// Scale,
 	FileText,
-	// RefreshCw,
-	// Ban,
 	UserPlus,
 	UserCheck,
 	MessageCircle,
@@ -25,13 +21,13 @@ import {
 
 // 알림 타입별 아이콘 매핑
 const typeIconMap: Record<string, any> = {
-	friend_request: UserPlus,
-	friend_accept: UserCheck,
-	comment: MessageCircle,
-	reply: CornerDownRight,
-	recommend: ThumbsUp,
-	adopt: Shuffle,
-	coordi_request: Send,
+	friend_request: UserPlus, // 친구 추가 요청
+	friend_accept: UserCheck, // 친구 수락 확정
+	comment: MessageCircle, // 댓글 알림
+	reply: CornerDownRight, // 답글 알림
+	recommend: ThumbsUp, // 코디 추천
+	adopt: Shuffle, // 코디 편입
+	coordi_request: Send, // 코디 요청
 };
 
 // 샘플 알림 데이터
@@ -95,6 +91,8 @@ const sampleNotifications = [
 ];
 
 const NotificationList: FC = () => {
+	// 추후 서버 측에서 로직이 내려오면 달라질 수 있음
+
 	// 읽음/안읽음 상태 관리
 	const [notifications, setNotifications] = useState(sampleNotifications);
 
