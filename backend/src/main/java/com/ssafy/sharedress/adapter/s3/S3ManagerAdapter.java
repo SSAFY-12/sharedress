@@ -1,4 +1,4 @@
-package com.ssafy.sharedress.adapter.member.out.s3;
+package com.ssafy.sharedress.adapter.s3;
 
 import java.io.IOException;
 import java.net.URI;

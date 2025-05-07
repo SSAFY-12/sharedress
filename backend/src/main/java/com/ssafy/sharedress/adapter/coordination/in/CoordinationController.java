@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.sharedress.application.coordination.dto.CoordinationDetailResponse;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestRequest;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
@@ -62,6 +63,15 @@ public class CoordinationController {
 	) {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		List<CoordinationWithItemResponse> response = coordinationQueryUseCase.getCoordinations(myId, memberId, scope);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
+	}
+
+	@GetMapping("/coordinations/{coordinationId}")
+	public ResponseEntity<ResponseWrapper<CoordinationDetailResponse>> getCoordinationDetail(
+		@PathVariable("coordinationId") Long coordinationId
+	) {
+		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
+		CoordinationDetailResponse response = coordinationQueryUseCase.getCoordinationDetail(myId, coordinationId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
 	}
 

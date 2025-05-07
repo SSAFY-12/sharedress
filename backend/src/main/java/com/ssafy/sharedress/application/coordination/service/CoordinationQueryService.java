@@ -6,11 +6,14 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.application.coordination.dto.CoordinationDetailResponse;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationWithItemResponse;
 import com.ssafy.sharedress.application.coordination.dto.Scope;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationQueryUseCase;
 import com.ssafy.sharedress.domain.coordination.entity.Coordination;
+import com.ssafy.sharedress.domain.coordination.error.CoordinationErrorCode;
 import com.ssafy.sharedress.domain.coordination.repository.CoordinationRepository;
+import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,6 +49,13 @@ public class CoordinationQueryService implements CoordinationQueryUseCase {
 				.toList();
 		}
 		throw new IllegalArgumentException("Invalid scope: " + scope);
+	}
+
+	@Override
+	public CoordinationDetailResponse getCoordinationDetail(Long myId, Long coordinationId) {
+		return coordinationRepository.findByIdWithOwnerAndOriginCreator(coordinationId)
+			.map(CoordinationDetailResponse::fromEntity)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
 	}
 
 }
