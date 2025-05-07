@@ -16,7 +16,13 @@ export const authApi = {
 
 	// -------------------- 리프레시 ------------------------//
 	refresh: async () => {
-		const response = await client.post(`/api/auth/refresh`);
+		const response = await client.post(
+			`/api/auth/refresh`,
+			{},
+			{
+				withCredentials: true,
+			},
+		);
 		return response.data;
 	},
 };

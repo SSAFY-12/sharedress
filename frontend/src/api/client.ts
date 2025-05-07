@@ -1,4 +1,8 @@
-import axios from 'axios';
+import axios, {
+	AxiosError,
+	InternalAxiosRequestConfig,
+	AxiosHeaders,
+} from 'axios';
 import { toast } from 'react-toastify';
 import { APIError, getErrorMessage } from './errorHandler';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -6,6 +10,7 @@ import { authApi } from '@/features/auth/api/authApi';
 
 export const client = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
+	withCredentials: true, // 쿠키를 포함하여 요청
 });
 
 /**
@@ -32,6 +37,13 @@ const handleGlobalError = (status: number, serverMessage?: string) => {
 
 client.interceptors.request.use(
 	async (config) => {
+		console.log('📤 Request interceptor:', {
+			url: config.url,
+			method: config.method,
+			headers: config.headers,
+			withCredentials: config.withCredentials,
+		});
+
 		if (!config.url?.includes('/api/auth/refresh')) {
 			const token = useAuthStore.getState().accessToken;
 			if (token) {
@@ -48,57 +60,97 @@ client.interceptors.request.use(
 
 			return config;
 		} catch (error) {
-			console.error('[Request Interceptor Error]:', error);
+			console.error('❌ Request interceptor error:', error);
 			handleGlobalError(0, '요청 처리 중 오류가 발생했습니다.');
 			return Promise.reject(new APIError(0, '요청 처리 실패'));
 		}
 	},
 	(error) => {
+		console.error('❌ Request interceptor error:', error);
 		handleGlobalError(0, '요청 구성에 실패했습니다.');
 		return Promise.reject(new APIError(0, '요청 구성 오류', error));
 	},
 );
 
 client.interceptors.response.use(
-	(response) => response,
-	async (error) => {
+	(response) => {
+		console.log('📥 Response interceptor success:', {
+			url: response.config.url,
+			status: response.status,
+			headers: response.headers,
+			cookies: document.cookie,
+		});
+		return response;
+	},
+	async (error: unknown) => {
+		if (!(error instanceof AxiosError)) {
+			console.error('❌ Unknown error in response interceptor:', error);
+			return Promise.reject(error);
+		}
+
 		const status = error.response?.status;
 		const serverMessage = error.response?.data?.message;
 		const originalRequest = error.config;
 
-		// refresh 요청에서 401이 발생하면 재시도하지 않음
+		console.error('❌ Response interceptor error:', {
+			url: originalRequest?.url,
+			status,
+			message: serverMessage,
+			headers: error.response?.headers,
+			cookies: document.cookie,
+			withCredentials: originalRequest?.withCredentials,
+		});
+
+		if (!originalRequest) {
+			console.error('❌ No original request found');
+			return Promise.reject(error);
+		}
+
 		if (originalRequest.url?.includes('/api/auth/refresh')) {
+			console.log('🔄 Refresh token request failed, redirecting to auth...');
 			useAuthStore.getState().logout();
 			window.location.href = '/auth';
 			return Promise.reject(error);
 		}
 
-		// 401 에러 (인증 실패) 처리
 		if (status === 401) {
+			console.log('🔄 Attempting token refresh...');
 			try {
-				// 직접 refresh API 호출
 				const response = await authApi.refresh();
-				const newToken = response.content.accessToken;
+				console.log('✅ Token refresh successful:', {
+					hasNewToken: !!response.content.accessToken,
+				});
 
-				// 새 토큰 저장
+				const newToken = response.content.accessToken;
 				useAuthStore.getState().setAccessToken(newToken);
 
-				// 원래 요청의 헤더에 새 토큰 설정
-				error.config.headers['Authorization'] = `Bearer ${newToken}`;
+				// 새로운 요청 설정 생성
+				const newConfig: InternalAxiosRequestConfig = {
+					...originalRequest,
+					headers: new AxiosHeaders({
+						...originalRequest.headers,
+						Authorization: `Bearer ${newToken}`,
+					}),
+				};
 
-				// 원래 요청 재시도
-				return axios(error.config);
+				return axios(newConfig);
 			} catch (refreshError) {
-				console.error('토큰 리프레시 받아오는 과정에서 에러:', refreshError);
+				if (refreshError instanceof AxiosError) {
+					console.error('❌ Token refresh failed:', {
+						error: refreshError,
+						status: refreshError.response?.status,
+						data: refreshError.response?.data,
+					});
+				} else {
+					console.error('❌ Unknown error during token refresh:', refreshError);
+				}
 				useAuthStore.getState().logout();
 				window.location.href = '/auth';
 				return Promise.reject(refreshError);
 			}
 		}
 
-		// 전역 에러 처리
-		handleGlobalError(status, serverMessage);
-
+		handleGlobalError(status || 500, serverMessage);
 		return Promise.reject(
 			new APIError(
 				status || 500,
