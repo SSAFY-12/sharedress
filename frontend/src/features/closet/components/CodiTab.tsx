@@ -29,7 +29,7 @@ const CodiTab = ({ memberId }: CodiTabProps) => {
 		id: coordi.id.toString(),
 		name: coordi.description,
 		category: activeSubTab === 'my' ? '나의 코디' : '친구의 추천',
-		imageUrl: coordi.items[0].image ?? 'https://picsum.photos/200',
+		imageUrl: coordi.thumbnail || 'https://picsum.photos/200',
 	}));
 
 	const handleItemClick = (item: ClothItem) => {

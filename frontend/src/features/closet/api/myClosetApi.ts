@@ -29,13 +29,7 @@ export interface CoordinationItem {
 	description: string;
 	isPublic: boolean;
 	isTemplate: boolean;
-	items: {
-		id: number;
-		image: string;
-		position: { x: number; y: number; z: number };
-		scale: number;
-		rotation: number;
-	}[];
+	thumbnail: string;
 	createdAt: string;
 }
 
