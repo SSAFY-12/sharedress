@@ -68,9 +68,15 @@ public class Coordination extends BaseTimeEntity {
 	private List<CoordinationComment> coordinationComments = new ArrayList<>();
 
 	// -- 생성자 -- //
-	public Coordination(String title, String content, Boolean isPublic, Boolean isTemplate, Member creator,
+	public Coordination(
+		String title,
+		String content,
+		Boolean isPublic,
+		Boolean isTemplate,
+		Member creator,
 		Member owner,
-		Member originCreator) {
+		Member originCreator
+	) {
 		this.title = title;
 		this.content = content;
 		this.isPublic = isPublic;
@@ -80,15 +86,41 @@ public class Coordination extends BaseTimeEntity {
 		this.originCreator = originCreator;
 	}
 
-	public Coordination(String title, String content, Boolean isPublic, Boolean isTemplate, Guest creatorGuest,
+	public Coordination(
+		String title,
+		String content,
+		Boolean isPublic,
+		Boolean isTemplate,
+		Guest creatorGuest,
 		Member owner,
-		Guest originCreatorGuest) {
+		Guest originCreatorGuest
+	) {
 		this.title = title;
 		this.content = content;
 		this.isPublic = isPublic;
 		this.isTemplate = isTemplate;
 		this.owner = owner;
 		this.creatorGuest = creatorGuest;
+		this.originCreatorGuest = originCreatorGuest;
+	}
+
+	public Coordination(
+		String title,
+		String content,
+		Boolean isPublic,
+		Boolean isTemplate,
+		Member creator,
+		Member originCreator,
+		Member owner,
+		Guest originCreatorGuest
+	) {
+		this.title = title;
+		this.content = content;
+		this.isPublic = isPublic;
+		this.isTemplate = isTemplate;
+		this.creator = creator;
+		this.originCreator = originCreator;
+		this.owner = owner;
 		this.originCreatorGuest = originCreatorGuest;
 	}
 
@@ -102,7 +134,15 @@ public class Coordination extends BaseTimeEntity {
 		Member owner,
 		Member originCreator
 	) {
-		return new Coordination(title, content, isPublic, isTemplate, creator, owner, originCreator);
+		return new Coordination(
+			title,
+			content,
+			isPublic,
+			isTemplate,
+			creator,
+			owner,
+			originCreator
+		);
 	}
 
 	public static Coordination createByGuest(
@@ -114,7 +154,37 @@ public class Coordination extends BaseTimeEntity {
 		Member owner,
 		Guest originCreatorGuest
 	) {
-		return new Coordination(title, content, isPublic, isTemplate, creatorGuest, owner, originCreatorGuest);
+		return new Coordination(
+			title,
+			content,
+			isPublic,
+			isTemplate,
+			creatorGuest,
+			owner,
+			originCreatorGuest
+		);
+	}
+
+	public static Coordination copyCoordination(
+		String title,
+		String content,
+		Boolean isPublic,
+		Boolean isTemplate,
+		Member creator,
+		Member originCreator,
+		Member owner,
+		Guest originCreatorGuest
+	) {
+		return new Coordination(
+			title,
+			content,
+			isPublic,
+			isTemplate,
+			creator,
+			originCreator,
+			owner,
+			originCreatorGuest
+		);
 	}
 
 	// -- 연관관계 편의 메서드 -- //

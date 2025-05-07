@@ -12,6 +12,7 @@ import com.ssafy.sharedress.domain.coordination.entity.Coordination;
 import com.ssafy.sharedress.domain.coordination.entity.QCoordination;
 import com.ssafy.sharedress.domain.coordination.entity.QCoordinationClothes;
 import com.ssafy.sharedress.domain.coordination.repository.CoordinationRepository;
+import com.ssafy.sharedress.domain.guest.entity.QGuest;
 import com.ssafy.sharedress.domain.member.entity.QMember;
 
 import lombok.RequiredArgsConstructor;
@@ -117,6 +118,7 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 		QCoordination cd = QCoordination.coordination;
 		QMember owner = new QMember("owner");
 		QMember originCreator = new QMember("originCreator");
+		QGuest guest = new QGuest("guest");
 		QCoordinationClothes cc = QCoordinationClothes.coordinationClothes;
 		QClosetClothes clc = QClosetClothes.closetClothes;
 		QClothes cl = QClothes.clothes;
@@ -126,6 +128,7 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 				.selectFrom(cd)
 				.leftJoin(cd.owner, owner).fetchJoin()
 				.leftJoin(cd.originCreator, originCreator).fetchJoin()
+				.leftJoin(cd.originCreatorGuest, guest).fetchJoin()
 				.leftJoin(cd.coordinationClothes, cc).fetchJoin()
 				.leftJoin(cc.closetClothes, clc).fetchJoin()
 				.leftJoin(clc.clothes, cl).fetchJoin()

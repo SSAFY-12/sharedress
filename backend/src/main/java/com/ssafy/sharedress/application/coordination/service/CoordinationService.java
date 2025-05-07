@@ -109,20 +109,21 @@ public class CoordinationService implements CoordinationUseCase {
 			ExceptionUtil.throwException(CoordinationErrorCode.COORDINATION_IS_NOT_MINE);
 		}
 
-		if (Objects.equals(coordination.getOriginCreator().getId(), myId)) {
+		if (coordination.getOriginCreator() != null && Objects.equals(coordination.getOriginCreator().getId(), myId)) {
 			ExceptionUtil.throwException(CoordinationErrorCode.COORDINATION_ALREADY_MINE);
 		}
 
 		Member member = memberRepository.getReferenceById(myId);
 
-		Coordination copyCoordination = Coordination.createByMember(
+		Coordination copyCoordination = Coordination.copyCoordination(
 			coordination.getTitle(),
 			coordination.getContent(),
 			coordination.getIsPublic(),
 			coordination.getIsTemplate(),
 			member,
-			coordination.getOwner(),
-			coordination.getOriginCreator()
+			coordination.getOriginCreator(),
+			member,
+			coordination.getOriginCreatorGuest()
 		);
 
 		// deep copy 필요
