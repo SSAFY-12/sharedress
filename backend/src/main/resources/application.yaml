@@ -50,3 +50,7 @@ cloud:
             queue-name: MyQueue
         s3:
             bucket: sharedress-profile-img
+            path:
+                profile: profile
+        stack:
+            auto: false
