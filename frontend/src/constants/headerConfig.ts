@@ -20,11 +20,7 @@ export const headerConfig: HeaderConfig = {
 		subtitle: '알림',
 		badgeIcon: 'bell',
 	},
-	'/social': {
-		showBack: false,
-		logo: '쉐어드레스',
-		badgeIcon: 'profile',
-	},
+
 	'/social/add': {
 		showBack: true,
 		subtitle: '친구 ID로 추가',

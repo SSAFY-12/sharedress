@@ -353,8 +353,9 @@ key={user.memberId}
    			setAccessToken(data.content.accessToken);
    		},
    		onError: (error) => {
-   			useAuthStore.getState().logout();
-   			window.location.href = '/auth';
+   			// useAuthStore.getState().logout();
+   			// window.location.href = '/auth';
+   			return Promise.reject(error);
    		},
    	});
    	return {
@@ -375,8 +376,9 @@ key={user.memberId}
    		error.config.headers['Authorization'] = `Bearer ${newToken}`;
    		return axios(error.config);
    	} catch (refreshError) {
-   		useAuthStore.getState().logout();
-   		window.location.href = '/auth';
+   		// useAuthStore.getState().logout();
+   		// window.location.href = '/auth';
+   		return Promise.reject(refreshError);
    	}
    }
    ```
@@ -421,3 +423,130 @@ const { mutateAsync } = useRefresh(); // 에러 발생
    - 토큰 저장 상태 확인
 
 이러한 구조로 변경함으로써 토큰 갱신 로직이 정상적으로 동작하게 되었습니다.
+
+아래는 이번 토큰 리프레시 문제의 시행착오, 원인, 해결과정, 그리고 코드 예시를
+README 스타일로 정리한 예시입니다.
+
+---
+
+## [트러블슈팅] Axios 토큰 리프레시 문제 해결기(2025/05/07-안주민)
+
+### 문제 상황
+
+- 프론트엔드에서 accessToken이 만료되면 `/api/auth/refresh`로 토큰 재발급을 요청
+  함.
+- **Authorization 헤더**에 accessToken이 정상적으로 포함되어 서버로 전송되고 있
+  었음.
+- 서버 응답:
+  ```json
+  { "status": { "code": "401", "message": "토큰이 존재하지 않습니다." } }
+  ```
+- 이로 인해 401 에러가 반복적으로 발생, 재시도 로직 때문에 서버에 수천 건의 요청
+  이 쏟아짐.
+
+---
+
+### 원인 분석
+
+1. **Authorization 헤더 자동 추가**
+
+   - axios 인스턴스의 request 인터셉터가 모든 요청에 accessToken을 Authorization
+     헤더로 추가하고 있었음.
+   - `/api/auth/refresh` 요청에도 accessToken이 붙어서 서버가 이를 거부(401)함.
+
+2. **서버의 기대값과 불일치**
+
+   - API 문서상 `/api/auth/refresh`는 아무런 헤더나 바디 없이 POST만 하면 됨.
+   - 실제로는 Authorization 헤더가 계속 붙어서 요청되고 있었음.
+
+3. **무한 재시도**
+   - 401이 발생하면 refresh를 시도하고, refresh도 401이 발생하면 또다시 재시도하
+     는 무한루프가 발생.
+
+---
+
+### 해결 방법
+
+#### 1. `/api/auth/refresh` 요청에는 Authorization 헤더를 붙이지 않도록 예외 처리
+
+```ts
+client.interceptors.request.use(
+	async (config) => {
+		// /api/auth/refresh 요청에는 Authorization 헤더를 붙이지 않는다
+		if (!config.url?.includes('/api/auth/refresh')) {
+			const token = useAuthStore.getState().accessToken;
+			if (token) {
+				config.headers['Authorization'] = `Bearer ${token}`;
+			}
+		}
+		// Content-Type 설정 등 기타 로직
+		return config;
+	},
+	(error) => Promise.reject(error),
+);
+```
+
+#### 2. refresh 함수도 헤더 없이 요청
+
+```ts
+refresh: async () => {
+    const response = await client.post(`/api/auth/refresh`);
+    return response.data;
+},
+```
+
+#### 3. 무한 재시도 방지
+
+```ts
+client.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		const status = error.response?.status;
+		const originalRequest = error.config;
+
+		// refresh 요청에서 401이 발생하면 재시도하지 않고 바로 로그아웃 처리
+		if (originalRequest.url?.includes('/api/auth/refresh')) {
+			// useAuthStore.getState().logout();
+			// window.location.href = '/auth';
+			return Promise.reject(error);
+		}
+
+		// 일반 401 처리 (accessToken 만료 시)
+		if (status === 401) {
+			try {
+				const response = await authApi.refresh();
+				const newToken = response.content.accessToken;
+				useAuthStore.getState().setAccessToken(newToken);
+				originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+				return axios(originalRequest);
+			} catch (refreshError) {
+				// useAuthStore.getState().logout();
+				// window.location.href = '/auth';
+				return Promise.reject(refreshError);
+			}
+		}
+
+		return Promise.reject(error);
+	},
+);
+```
+
+---
+
+### 결론 및 정리
+
+- **/api/auth/refresh** 요청에는 Authorization 헤더를 붙이지 않아야 한다.
+- request 인터셉터에서 예외처리를 통해 불필요한 헤더 추가를 막아야 한다.
+- response 인터셉터에서 refresh 요청에 대한 401은 재시도하지 않고 바로 로그아웃
+  처리해야 한다.
+- 이렇게 하면 401 무한루프와 서버 과부하를 막을 수 있다.
+
+---
+
+### 시행착오 요약
+
+- 처음에는 accessToken을 Authorization에 넣어 refresh 요청을 보냈으나, 서버가 이
+  를 거부(401)함.
+- API 문서를 재확인하여, refresh 요청에는 아무런 헤더도 필요 없음을 알게 됨.
+- 인터셉터에서 예외처리를 추가하여 문제를 해결함.
+- 무한 재시도 문제도 함께 방지할 수 있었음.

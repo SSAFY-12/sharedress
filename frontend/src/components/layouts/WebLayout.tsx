@@ -6,7 +6,7 @@ import SocialHeader from './SocialHeader';
 
 export const WebLayout = () => {
 	const location = useLocation();
-	const isSocial = location.pathname.startsWith('/social');
+	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const headerProps = headerConfig[
 		location.pathname as keyof typeof headerConfig
 	] || {

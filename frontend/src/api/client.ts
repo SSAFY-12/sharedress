@@ -32,10 +32,11 @@ const handleGlobalError = (status: number, serverMessage?: string) => {
 
 client.interceptors.request.use(
 	async (config) => {
-		const token = useAuthStore.getState().accessToken;
-		console.log('인터셉터에서 읽은 토큰:', token);
-		if (token) {
-			config.headers['Authorization'] = `Bearer ${token}`;
+		if (!config.url?.includes('/api/auth/refresh')) {
+			const token = useAuthStore.getState().accessToken;
+			if (token) {
+				config.headers['Authorization'] = `Bearer ${token}`;
+			}
 		}
 		try {
 			// FormData인 경우 multipart/form-data로 설정
@@ -63,6 +64,14 @@ client.interceptors.response.use(
 	async (error) => {
 		const status = error.response?.status;
 		const serverMessage = error.response?.data?.message;
+		const originalRequest = error.config;
+
+		// refresh 요청에서 401이 발생하면 재시도하지 않음
+		if (originalRequest.url?.includes('/api/auth/refresh')) {
+			useAuthStore.getState().logout();
+			window.location.href = '/auth';
+			return Promise.reject(error);
+		}
 
 		// 401 에러 (인증 실패) 처리
 		if (status === 401) {

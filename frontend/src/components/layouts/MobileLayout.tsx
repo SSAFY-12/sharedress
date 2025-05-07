@@ -6,7 +6,7 @@ import { headerConfig } from '@/constants/headerConfig';
 
 export const MobileLayout = () => {
 	const location = useLocation();
-	const isSocial = location.pathname.startsWith('/social');
+	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const headerProps = headerConfig[
 		location.pathname as keyof typeof headerConfig
 	] || {
