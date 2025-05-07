@@ -45,6 +45,8 @@ const useRequest = (memberId?: number) => {
 		mutationFn: (requestId: number) => socialApi.acceptFriendRequest(requestId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['searchUser'] }); // 친구 요청 수락 성공 시 친구 검색 목록 갱신
+			// 친구 요청 목록 갱신
+			queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
 		},
 	});
 
@@ -61,6 +63,8 @@ const useRequest = (memberId?: number) => {
 		mutationFn: (requestId: number) => socialApi.rejectFriendRequest(requestId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['searchUser'] }); // 친구 요청 거절 성공 시 친구 검색 목록 갱신
+			// 친구 요청 목록 갱신
+			queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
 		},
 	});
 

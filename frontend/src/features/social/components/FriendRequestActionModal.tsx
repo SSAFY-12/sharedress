@@ -70,9 +70,9 @@ export const FriendRequestActionModal = ({
 							className='mb-3'
 						/>
 						<h2 className='font-bold mb-1'>{friend.nickname}</h2>
-						{/* <div className='mt-4 mb-2 text-sm text-gray-600'>
+						<div className='mt-4 mb-2 text-sm text-gray-600'>
 							{friendRequest.message}
-						</div> */}
+						</div>
 						<PrimaryBtn
 							size='compact'
 							name={getActionButtonText()}
