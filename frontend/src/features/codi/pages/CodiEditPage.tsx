@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Header from '@/components/layouts/Header';
-import CodiCanvas from '../components/CodiCanvas';
-import CodiEditBottomSection from '../components/CodiEditBottomSection';
+import CodiCanvas from '@/features/codi/components/CodiCanvas';
+import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSection';
 
 const CodiEditPage = () => {
 	const navigate = useNavigate();
