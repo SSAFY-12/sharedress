@@ -2,14 +2,18 @@ package com.ssafy.sharedress.application.coordination.service;
 
 import java.util.Objects;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
+import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationThumbnailResponse;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationUseCase;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
 import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
+import com.ssafy.sharedress.domain.common.port.ImageStoragePort;
 import com.ssafy.sharedress.domain.coordination.entity.Coordination;
 import com.ssafy.sharedress.domain.coordination.entity.CoordinationClothes;
 import com.ssafy.sharedress.domain.coordination.error.CoordinationErrorCode;
@@ -25,9 +29,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CoordinationService implements CoordinationUseCase {
 
+	@Value("${cloud.aws.s3.path.coordination}")
+	private String coordinationPath;
+
 	private final MemberRepository memberRepository;
 	private final ClosetClothesRepository closetClothesRepository;
 	private final CoordinationRepository coordinationRepository;
+	private final ImageStoragePort imageStoragePort;
 
 	@Transactional
 	@Override
@@ -140,5 +148,27 @@ public class CoordinationService implements CoordinationUseCase {
 		return CoordinationResponse.fromEntity(
 			coordinationRepository.save(copyCoordination)
 		);
+	}
+
+	@Transactional
+	@Override
+	public UpdateCoordinationThumbnailResponse updateThumbnail(MultipartFile thumbnail, Long coordinationId) {
+		if (thumbnail == null || thumbnail.isEmpty()) {
+			ExceptionUtil.throwException(CoordinationErrorCode.INVALID_THUMBNAIL);
+		}
+
+		Coordination coordination = coordinationRepository.findById(coordinationId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
+
+		String previousUrl = coordination.getThumbnail();
+		if (previousUrl != null && !previousUrl.isBlank()) {
+			String previousKey = imageStoragePort.extractKeyFromUrl(previousUrl);
+			imageStoragePort.delete(previousKey);
+		}
+
+		String thumbnailUrl = imageStoragePort.upload(coordinationPath, thumbnail);
+		coordination.updateThumbnail(thumbnailUrl);
+
+		return new UpdateCoordinationThumbnailResponse(thumbnailUrl);
 	}
 }

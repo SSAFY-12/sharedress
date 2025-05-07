@@ -8,7 +8,8 @@ public enum CoordinationErrorCode implements ResponseCode {
 
 	COORDINATION_NOT_FOUND("404", "코디를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	COORDINATION_IS_NOT_MINE("400", "코디가 본인의 소유물이 아닙니다.", HttpStatus.BAD_REQUEST),
-	COORDINATION_ALREADY_MINE("400", "이미 본인의 코디입니다.", HttpStatus.BAD_REQUEST);
+	COORDINATION_ALREADY_MINE("400", "이미 본인의 코디입니다.", HttpStatus.BAD_REQUEST),
+	INVALID_THUMBNAIL("400", "썸네일 이미지를 첨부해주세요.", HttpStatus.BAD_REQUEST);
 
 	private final String code;
 	private final String message;

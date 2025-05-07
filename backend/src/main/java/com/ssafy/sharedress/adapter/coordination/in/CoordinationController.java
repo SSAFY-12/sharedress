@@ -5,11 +5,14 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.application.coordination.dto.CoordinationDetailResponse;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
@@ -17,6 +20,7 @@ import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestRequ
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationWithItemResponse;
 import com.ssafy.sharedress.application.coordination.dto.Scope;
+import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationThumbnailResponse;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationQueryUseCase;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationRequestUseCase;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationUseCase;
@@ -91,5 +95,15 @@ public class CoordinationController {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		CoordinationResponse response = coordinationUseCase.copyCoordination(myId, coordinationId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, response);
+	}
+
+	@PatchMapping("/coordinations/{coordinationId}/thumbnail")
+	public ResponseEntity<ResponseWrapper<UpdateCoordinationThumbnailResponse>> updateCoordinationThumbnail(
+		@PathVariable("coordinationId") Long coordinationId,
+		@RequestPart("thumbnail") MultipartFile thumbnail
+	) {
+		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
+			coordinationUseCase.updateThumbnail(thumbnail, coordinationId));
 	}
 }
