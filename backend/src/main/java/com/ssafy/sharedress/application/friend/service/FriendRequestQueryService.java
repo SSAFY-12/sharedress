@@ -7,7 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.application.friend.dto.FriendRequestResponse;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestQueryUseCase;
+import com.ssafy.sharedress.domain.friend.error.FriendRequestErrorCode;
 import com.ssafy.sharedress.domain.friend.repository.FriendRequestRepository;
+import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,5 +26,12 @@ public class FriendRequestQueryService implements FriendRequestQueryUseCase {
 			.stream()
 			.map(FriendRequestResponse::fromEntity)
 			.toList();
+	}
+
+	@Override
+	public FriendRequestResponse getFriendRequest(Long memberId, Long friendId) {
+		return friendRequestRepository.findByMemberId(memberId, friendId)
+			.map(FriendRequestResponse::fromEntity)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(FriendRequestErrorCode.FRIEND_REQUEST_NOT_FOUND));
 	}
 }

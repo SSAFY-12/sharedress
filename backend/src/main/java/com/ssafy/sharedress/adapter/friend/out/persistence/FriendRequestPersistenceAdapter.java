@@ -44,4 +44,9 @@ public class FriendRequestPersistenceAdapter implements FriendRequestRepository 
 	public List<FriendRequest> findAllByReceiverId(Long receiverId) {
 		return friendRequestJpaRepository.findAllByReceiverId(receiverId);
 	}
+
+	@Override
+	public Optional<FriendRequest> findByMemberId(Long myId, Long friendId) {
+		return friendRequestJpaRepository.findByMemberId(myId, friendId);
+	}
 }
