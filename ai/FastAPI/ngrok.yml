@@ -1,0 +1,8 @@
+version: "3"
+authtoken: 2v4Jbo0Es4BO3grc1zXFMFKoLgO_2BSvosPvsirX5jF7QEL9Z
+region: ap
+tunnels:
+  fastapi:
+    proto: http
+    addr: 8000
+    subdomain: your-custom-subdomain  # 유료 계정만 가능
