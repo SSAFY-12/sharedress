@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useDeferredValue, useEffect, useRef, useState } from 'react';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { categoryConfig } from '@/constants/categoryConfig';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { categoryMapping } from '@/constants/categoryConfig';
 import {
-	RegistApis,
+	LibraryApis,
 	Clothes,
-	ClothesRequestParams,
 	ClothesResponse,
 } from '@/features/regist/api/registApis';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -17,30 +16,40 @@ const LibraryContainer = () => {
 		(typeof categoryConfig)[number]
 	>(categoryConfig[0]);
 	const [value, setValue] = useState('');
+	const [debouncedValue, setDebouncedValue] = useState(value);
+	const deferredValue = useDeferredValue(debouncedValue); // 검색어 랜더링 최적화
+
+	// 디바운스 처리 - 검색어 입력후 200ms 뒤에 api 호출
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedValue(value);
+		}, 200);
+
+		return () => clearTimeout(timer);
+	}, [value]);
 
 	const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isPending } =
 		useInfiniteQuery<ClothesResponse>({
-			queryKey: ['clothes', selectedCategory, value.trim()],
+			queryKey: ['clothes', selectedCategory, deferredValue.trim()],
 			queryFn: async ({ pageParam }) => {
 				const request = {
 					size: 12,
-					keyword: value || undefined,
-					categoryIds:
+					keyword: deferredValue || undefined,
+					categoryId:
 						selectedCategory === '전체'
 							? undefined
 							: categoryMapping[selectedCategory],
 				};
-				const response = await RegistApis.getClothes({
+				const response = await LibraryApis.getClothes({
 					...request,
 					cursor: pageParam as number | undefined,
 				});
-				console.log('API 요청:', request);
-				console.log('API 응답:', response);
+
 				return response;
 			},
 			getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
 			initialPageParam: undefined,
-			staleTime: 1000 * 5, // 5초 내엔 refetch 안 함
+			staleTime: 1000 * 5,
 			placeholderData: () => ({
 				pages: [],
 				pageParams: [],
@@ -96,25 +105,22 @@ const LibraryContainer = () => {
 				value={value}
 				onChange={handleChange}
 				onSubmit={handleSubmit}
-				className='sticky top-20 z-10'
 			/>
-			{isPending ? (
-				<div>로딩 중...</div>
-			) : (
-				<div className='w-full '>
-					<ClothListContainer
-						isForRegist={true}
-						categories={categoryConfig}
-						items={allItems as ClothItem[]}
-						selectedCategory={selectedCategory}
-						onCategoryChange={handleCategoryChange}
-						onItemClick={handleItemClick}
-						className='flex flex-col w-full gap-4'
-					/>
-					<div ref={sentinel} className='h-1' />
-					{isFetchingNextPage && <div>추가 로딩 중...</div>}
-				</div>
-			)}
+			<div className='w-full '>
+				<ClothListContainer
+					isForRegist={true}
+					categories={categoryConfig}
+					items={allItems as ClothItem[]}
+					selectedCategory={selectedCategory}
+					onCategoryChange={handleCategoryChange}
+					onItemClick={handleItemClick}
+					className='flex flex-col w-full gap-4'
+					scrollRef={sentinel}
+					isPending={isPending}
+					isFetchingNextPage={isFetchingNextPage}
+					columns={2}
+				/>
+			</div>
 		</div>
 	);
 };

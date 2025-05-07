@@ -14,7 +14,6 @@ const RegistSearchPage = () => {
 				menu={registSearchMenuConfig}
 				selected={selected}
 				setSelected={setSelected}
-				className='sticky top-1.5 bg-white z-10'
 			/>
 
 			<div className='flex-1 w-full '>

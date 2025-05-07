@@ -3,6 +3,7 @@ import { ClothCard } from '@/components/cards/cloth-card/ClothCard';
 import { ItemCategoryBtn } from '@/components/etc/item-category-btn/ItemCategoryBtn';
 import { ClothCardRegist } from '@/components/cards/cloth-card-regist/ClothCardRegist';
 import { ForwardedRef, forwardRef } from 'react';
+import { ClothCardRegistEmpty } from '@/components/cards/cloth-card-regist/ClothCardRegistEmpty';
 
 interface ClothListContainerProps {
 	items: ClothItem[];
@@ -14,24 +15,24 @@ interface ClothListContainerProps {
 	className?: string;
 	isForRegist?: boolean; // 옷 등록시 사용되는것인지 여부
 	isPending?: boolean; // 로딩 상태
+	isFetchingNextPage?: boolean; // 다음 페이지 로딩 상태
 	scrollRef?: ForwardedRef<HTMLDivElement>;
 }
 
 const ClothListContainer = forwardRef<HTMLDivElement, ClothListContainerProps>(
-	(
-		{
-			items,
-			categories = [],
-			onItemClick,
-			onCategoryChange,
-			selectedCategory = '',
-			columns = 3,
-			className = '',
-			isForRegist = false,
-			scrollRef,
-		},
-		ref,
-	) => (
+	({
+		items,
+		categories = [],
+		onItemClick,
+		onCategoryChange,
+		selectedCategory = '',
+		columns = 3,
+		className = '',
+		isForRegist = false,
+		isPending = false,
+		isFetchingNextPage = false,
+		scrollRef,
+	}) => (
 		<div className={`${className} flex flex-col h-full `}>
 			{/* 고정된 헤더 영역 */}
 			<div className='flex-none'>
@@ -63,6 +64,18 @@ const ClothListContainer = forwardRef<HTMLDivElement, ClothListContainerProps>(
 						columns === 2 ? 'grid-cols-2' : 'grid-cols-3'
 					}`}
 				>
+					{isPending ? (
+						<>
+							<ClothCardRegistEmpty />
+							<ClothCardRegistEmpty />
+							<ClothCardRegistEmpty />
+							<ClothCardRegistEmpty />
+							<ClothCardRegistEmpty />
+						</>
+					) : (
+						<></>
+					)}
+
 					{items.map((item) =>
 						!isForRegist ? (
 							<ClothCard
@@ -81,7 +94,14 @@ const ClothListContainer = forwardRef<HTMLDivElement, ClothListContainerProps>(
 							/>
 						),
 					)}
+					{isFetchingNextPage && (
+						<>
+							<ClothCardRegistEmpty />
+							<ClothCardRegistEmpty />
+						</>
+					)}
 				</div>
+				<div className='h-20' />
 				<div ref={scrollRef} className='h-1' />
 			</div>
 		</div>
