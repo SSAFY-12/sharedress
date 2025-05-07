@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { myCodiSaveApi } from '../api/codiApi';
+import { myCodiSaveApi } from '@/features/codi/api/codiApi';
 import Header from '@/components/layouts/Header';
-import CodiCanvas from '../components/CodiCanvas';
-import CodiEditBottomSection from '../components/CodiEditBottomSection';
-import CodiSaveBottomSection from '../components/CodiSaveBottomSection';
+import CodiCanvas from '@/features/codi/components/CodiCanvas';
+import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSection';
+import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
 import { ChangeEvent } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
