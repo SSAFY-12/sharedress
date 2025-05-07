@@ -28,13 +28,13 @@ public class ClothesController {
 	@GetMapping("/clothes")
 	public ResponseEntity<ResponseWrapper<List<ClothesSearchResponse>>> getClothes(
 		@RequestParam(required = false) String keyword,
-		@RequestParam(required = false) List<Long> categoryIds,
+		@RequestParam(required = false) Long categoryId,
 		@RequestParam(required = false) Long shopId,
 		@RequestParam(required = false) Long cursor,
 		@RequestParam(defaultValue = "12") int size
 	) {
 		CursorPageResult<ClothesSearchResponse> result =
-			clothesUseCase.getLibraryClothes(keyword, categoryIds, shopId, cursor, size);
+			clothesUseCase.getLibraryClothes(keyword, categoryId, shopId, cursor, size);
 
 		return ResponseWrapperFactory.toPageResponseEntity(HttpStatus.OK, result);
 	}

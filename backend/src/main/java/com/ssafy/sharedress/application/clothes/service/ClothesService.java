@@ -1,7 +1,5 @@
 package com.ssafy.sharedress.application.clothes.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,12 +22,12 @@ public class ClothesService implements ClothesUseCase {
 	@Override
 	public CursorPageResult<ClothesSearchResponse> getLibraryClothes(
 		String keyword,
-		List<Long> categoryIds,
+		Long categoryId,
 		Long shopId,
 		Long cursorId,
 		int size
 	) {
-		return clothesRepository.searchClothesWithCursor(keyword, categoryIds, shopId, cursorId, size);
+		return clothesRepository.searchClothesWithCursor(keyword, categoryId, shopId, cursorId, size);
 	}
 
 	@Transactional

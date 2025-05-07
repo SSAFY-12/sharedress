@@ -41,7 +41,7 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 	@Override
 	public CursorPageResult<ClothesSearchResponse> searchClothesWithCursor(
 		String keyword,
-		List<Long> categoryIds,
+		Long categoryId,
 		Long shopId,
 		Long cursorId,
 		int size
@@ -51,10 +51,10 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 		QShoppingMall shop = QShoppingMall.shoppingMall;
 
 		BooleanBuilder condition = new BooleanBuilder();
-
+		
 		// 카테고리 필터
-		if (categoryIds != null && !categoryIds.isEmpty()) {
-			condition.and(clothes.category.id.in(categoryIds));
+		if (categoryId != null) {
+			condition.and(clothes.category.id.eq(categoryId));
 		}
 
 		// 쇼핑몰 필터

@@ -14,7 +14,7 @@ public interface ClothesRepository {
 
 	CursorPageResult<ClothesSearchResponse> searchClothesWithCursor(
 		String keyword,
-		List<Long> categoryIds,
+		Long categoryId,
 		Long shopId,
 		Long cursorId,
 		int size
