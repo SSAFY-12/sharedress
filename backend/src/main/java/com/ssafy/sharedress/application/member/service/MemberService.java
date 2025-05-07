@@ -2,10 +2,13 @@ package com.ssafy.sharedress.application.member.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.sharedress.adapter.member.out.s3.S3Uploader;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
+import com.ssafy.sharedress.application.member.dto.UpdateProfileImageResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
 import com.ssafy.sharedress.application.member.usecase.MemberUseCase;
 import com.ssafy.sharedress.domain.member.entity.Member;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class MemberService implements MemberUseCase {
 	private final MemberRepository memberRepository;
+	private final S3Uploader s3Uploader;
 
 	@Override
 	public MyProfileResponse getMyProfile(Long memberId) {
@@ -65,5 +69,17 @@ public class MemberService implements MemberUseCase {
 		if (request.notificationStatus() != null) {
 			member.updateNotificationStatus(request.notificationStatus());
 		}
+	}
+
+	@Override
+	@Transactional
+	public UpdateProfileImageResponse updateProfileImage(MultipartFile profileImage, Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		String imageUrl = s3Uploader.upload(profileImage, "profile");
+		member.updateProfileImage(imageUrl);
+
+		return new UpdateProfileImageResponse(imageUrl);
 	}
 }

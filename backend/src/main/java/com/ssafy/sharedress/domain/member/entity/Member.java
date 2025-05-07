@@ -59,4 +59,8 @@ public class Member extends BaseTimeEntity {
 	public void updateNotificationStatus(boolean notificationStatus) {
 		this.notificationStatus = notificationStatus;
 	}
+
+	public void updateProfileImage(String profileUrl) {
+		this.profileUrl = profileUrl;
+	}
 }

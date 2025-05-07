@@ -1,8 +1,11 @@
 package com.ssafy.sharedress.application.member.usecase;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
+import com.ssafy.sharedress.application.member.dto.UpdateProfileImageResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
 
 public interface MemberUseCase {
@@ -14,4 +17,5 @@ public interface MemberUseCase {
 
 	void updateNotificationStatus(UpdateNotificationStatusRequest request, Long myId);
 
+	UpdateProfileImageResponse updateProfileImage(MultipartFile profileImage, Long memberId);
 }
