@@ -72,6 +72,12 @@ export const FriendSearchResultPage = () => {
 		}
 	};
 
+	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.value.length <= 20) {
+			setSearchValue(e.target.value);
+		}
+	};
+
 	const handleSubmit = () => {
 		if (selectedFriend) {
 			requestFriend({
@@ -89,7 +95,7 @@ export const FriendSearchResultPage = () => {
 				<SearchBar
 					placeholder='친구 ID'
 					value={searchValue}
-					onChange={(e) => setSearchValue(e.target.value)}
+					onChange={handleSearchChange}
 					onKeyDown={handleSearch}
 				/>
 			</div>

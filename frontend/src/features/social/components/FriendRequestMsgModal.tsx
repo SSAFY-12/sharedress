@@ -40,12 +40,18 @@ export const FriendRequestMsgModal = ({
 						className='mb-3'
 					/>
 					<h2 className='font-bold mb-1'>{friend.nickname}</h2>
-					<label className='mt-4 mb-2 text-sm'>친구 요청 메시지</label>
+					<label className='mt-4 mb-2 text-sm'>
+						친구 요청 메시지(10자 제한)
+					</label>
 					<input
 						className='w-full border rounded px-3 py-2 mb-4'
 						placeholder='메시지 입력'
 						value={message}
-						onChange={(e) => onMessageChange(e.target.value)}
+						onChange={(e) => {
+							if (e.target.value.length <= 10) {
+								onMessageChange(e.target.value);
+							}
+						}}
 					/>
 					<PrimaryBtn
 						size='compact'
