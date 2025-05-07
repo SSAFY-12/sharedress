@@ -105,6 +105,9 @@ dependencies {
 
 	// HashIds
 	implementation 'org.hashids:hashids:1.0.3'
+
+	// S3
+	implementation "software.amazon.awssdk:s3"
 }
 
 tasks.named('test') {

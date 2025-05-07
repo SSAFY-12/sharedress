@@ -1,13 +1,17 @@
 package com.ssafy.sharedress.application.member.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
+import com.ssafy.sharedress.application.member.dto.UpdateProfileImageResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
 import com.ssafy.sharedress.application.member.usecase.MemberUseCase;
+import com.ssafy.sharedress.domain.common.port.ImageStoragePort;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.error.MemberErrorCode;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
@@ -21,7 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberService implements MemberUseCase {
+
+	@Value("${cloud.aws.s3.path.profile}")
+	private String profilePath;
+
 	private final MemberRepository memberRepository;
+	private final ImageStoragePort imageStoragePort;
 
 	@Override
 	public MyProfileResponse getMyProfile(Long memberId) {
@@ -65,5 +74,27 @@ public class MemberService implements MemberUseCase {
 		if (request.notificationStatus() != null) {
 			member.updateNotificationStatus(request.notificationStatus());
 		}
+	}
+
+	@Override
+	@Transactional
+	public UpdateProfileImageResponse updateProfileImage(MultipartFile profileImage, Long memberId) {
+		if (profileImage == null || profileImage.isEmpty()) {
+			ExceptionUtil.throwException(MemberErrorCode.INVALID_PROFILE_IMAGE);
+		}
+
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		String previousUrl = member.getProfileUrl();
+		if (previousUrl != null && !previousUrl.isBlank()) {
+			String previousKey = imageStoragePort.extractKeyFromUrl(previousUrl);
+			imageStoragePort.delete(previousKey);
+		}
+
+		String imageUrl = imageStoragePort.upload(profilePath, profileImage);
+		member.updateProfileImage(imageUrl);
+
+		return new UpdateProfileImageResponse(imageUrl);
 	}
 }

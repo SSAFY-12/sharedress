@@ -7,7 +7,8 @@ import com.ssafy.sharedress.global.response.ResponseCode;
 public enum MemberErrorCode implements ResponseCode {
 
 	MEMBER_NOT_FOUND("404", "존재하지 않는 사용자입니다.", HttpStatus.NOT_FOUND),
-	MEMBER_UNAUTHORIZED("401", "인증되지 않은 사용자입니다.", HttpStatus.UNAUTHORIZED);
+	MEMBER_UNAUTHORIZED("401", "인증되지 않은 사용자입니다.", HttpStatus.UNAUTHORIZED),
+	INVALID_PROFILE_IMAGE("400", "프로필 이미지를 첨부해주세요.", HttpStatus.BAD_REQUEST);
 
 	private final String code;
 	private final String message;
