@@ -7,6 +7,7 @@ public record ClothesSearchResponse(
 	String name,
 	String brandName, // 브랜드 한글 이름
 	String image,
-	LocalDateTime createdAt
+	LocalDateTime createdAt,
+	Long categoryId
 ) {
 }
