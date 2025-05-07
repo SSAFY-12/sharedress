@@ -18,16 +18,16 @@ export interface NotificationItemProps {
 }
 
 const NotificationItem: FC<NotificationItemProps> = ({
-	icon: IconComponent,
-	title,
-	message,
-	time,
-	read = false,
-	onClick,
+	icon: IconComponent, // 아이콘 컴포넌트
+	title, // 알림 제목
+	message, // 알림 메시지
+	time, // 알림 시간
+	read = false, // 읽음/안읽음 상태
+	onClick, // 클릭 핸들러
 }) => (
 	<div
 		className={`w-full flex items-start gap-3 px-4 py-4 transition-colors cursor-pointer relative ${
-			read ? 'bg-white' : 'bg-gray-100'
+			read ? 'bg-white' : '' // 읽음/안읽음 상태에 따른 배경색 변경
 		}`}
 		onClick={onClick}
 		tabIndex={0}
