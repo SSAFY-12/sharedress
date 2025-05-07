@@ -147,7 +147,8 @@ public class CoordinationService implements CoordinationUseCase {
 
 	@Transactional
 	@Override
-	public UpdateCoordinationThumbnailResponse updateThumbnail(MultipartFile thumbnail, Long coordinationId) {
+	public UpdateCoordinationThumbnailResponse updateThumbnail(Long myId, MultipartFile thumbnail,
+		Long coordinationId) {
 		if (thumbnail == null || thumbnail.isEmpty()) {
 			ExceptionUtil.throwException(CoordinationErrorCode.INVALID_THUMBNAIL);
 		}

@@ -16,7 +16,7 @@ public interface CoordinationUseCase {
 
 	CoordinationResponse copyCoordination(Long myId, Long targetCoordinationId);
 
-	UpdateCoordinationThumbnailResponse updateThumbnail(MultipartFile thumbnail, Long coordinationId);
+	UpdateCoordinationThumbnailResponse updateThumbnail(Long myId, MultipartFile thumbnail, Long coordinationId);
 
 	void removeCoordination(Long myId, Long coordinationId);
 

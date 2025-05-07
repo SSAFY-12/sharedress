@@ -72,11 +72,14 @@ public class CoordinationController {
 
 	@GetMapping("/coordinations")
 	public ResponseEntity<ResponseWrapper<List<CoordinationWithItemResponse>>> getCoordinations(
+		@CurrentMember(required = false) Member member,
+		@CurrentGuest(required = false) Guest guest,
 		@RequestParam(name = "memberId") Long memberId,
 		@RequestParam(name = "scope", defaultValue = "CREATED") Scope scope
 	) {
-		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
-		List<CoordinationWithItemResponse> response = coordinationQueryUseCase.getCoordinations(myId, memberId, scope);
+		UserContext userContext = new UserContext(member, guest);
+		List<CoordinationWithItemResponse> response = coordinationQueryUseCase.getCoordinations(userContext, memberId,
+			scope);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
 	}
 
@@ -114,7 +117,7 @@ public class CoordinationController {
 	) {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
-			coordinationUseCase.updateThumbnail(thumbnail, coordinationId));
+			coordinationUseCase.updateThumbnail(myId, thumbnail, coordinationId));
 	}
 
 	@PatchMapping("/coordinations/{coordinationId}")

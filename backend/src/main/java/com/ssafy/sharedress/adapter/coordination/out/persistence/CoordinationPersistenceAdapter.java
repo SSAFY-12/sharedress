@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.sharedress.domain.closet.entity.QClosetClothes;
 import com.ssafy.sharedress.domain.clothes.entity.QClothes;
@@ -86,6 +87,7 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 			.where(
 				cd.creator.id.eq(friendId)
 					.and(cd.owner.id.eq(friendId))
+					.and(cd.isPublic.isTrue())
 			)
 			.orderBy(cd.id.desc())
 			.distinct()
@@ -93,11 +95,19 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 	}
 
 	@Override
-	public List<Coordination> findMyRecommendToFriend(Long myId, Long friendId) {
+	public List<Coordination> findUserRecommendToFriend(Long userId, Long friendId, boolean isMember) {
 		QCoordination cd = QCoordination.coordination;
 		QCoordinationClothes cc = QCoordinationClothes.coordinationClothes;
 		QClosetClothes clc = QClosetClothes.closetClothes;
 		QClothes cl = QClothes.clothes;
+
+		BooleanBuilder condition = new BooleanBuilder();
+
+		if (isMember) {
+			condition.and(cd.originCreator.id.eq(userId));
+		} else {
+			condition.and(cd.originCreatorGuest.id.eq(userId));
+		}
 
 		return queryFactory
 			.selectFrom(cd)
@@ -105,7 +115,7 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 			.leftJoin(cc.closetClothes, clc).fetchJoin()
 			.leftJoin(clc.clothes, cl).fetchJoin()
 			.where(
-				cd.originCreator.id.eq(myId)
+				condition
 					.and(cd.owner.id.eq(friendId))
 			)
 			.orderBy(cd.id.desc())
