@@ -1,23 +1,22 @@
-import Header from '@/components/layouts/Header';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ResultCodiCanvas from '@/features/codi/components/ResultCodiCanvas';
-import { InputField } from '@/components/inputs/input-field';
-import { SwitchToggle } from '@/components/buttons/switch-toggle';
+import React, { useEffect, useState } from 'react';
 import { myCodiSaveApi } from '@/features/codi/api/codiApi';
+import Header from '@/components/layouts/Header';
+import CodiCanvas from '@/features/codi/components/CodiCanvas';
+import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const EMPTY_FN = () => {};
 
 const CodiSavePage = () => {
 	const navigate = useNavigate();
-	// 상태 관리
 	const [codiItems, setCodiItems] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [description, setDescription] = useState('');
 	const [isPublic, setIsPublic] = useState(true);
 
 	useEffect(() => {
-		// 로컬 스토리지에서 코디 아이템 정보 가져오기
 		const savedItems = localStorage.getItem('codiItems');
-		console.log(savedItems);
 		if (savedItems) {
 			setCodiItems(JSON.parse(savedItems));
 		}
@@ -32,10 +31,8 @@ const CodiSavePage = () => {
 		}
 	};
 
-	// 여기서부터는 코디 저장 로직인데 여기는 추후 api와 연결해야 한다.
 	const handleComplete = async () => {
 		try {
-			console.log('코디 저장 로직 이전 확인:', codiItems);
 			const formattedItems = codiItems.map((item) => ({
 				id: Number(item.id),
 				position: {
@@ -55,10 +52,7 @@ const CodiSavePage = () => {
 				items: formattedItems,
 			};
 
-			console.log('payload 확인:', payload);
-
-			const response = await myCodiSaveApi(payload);
-			console.log(response);
+			await myCodiSaveApi(payload);
 			alert('코디가 저장되었습니다!');
 			navigate('/');
 		} catch (error) {
@@ -67,15 +61,26 @@ const CodiSavePage = () => {
 		}
 	};
 
+	const handleDescriptionChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+	) => {
+		setDescription(e.target.value);
+	};
+
+	const handlePublicToggle = () => {
+		setIsPublic(!isPublic);
+	};
+
+	const headerProps = {
+		showBack: true,
+		badgeText: '완료',
+		onBackClick: handleBackClick,
+		onBadgeClick: handleComplete,
+	};
+
 	return (
 		<div className='max-w-md mx-auto h-screen flex flex-col bg-white'>
-			<Header
-				showBack={true}
-				badgeText='완료'
-				onBackClick={handleBackClick}
-				onBadgeClick={handleComplete}
-			/>
-
+			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-auto'>
 				{isLoading ? (
 					<div className='flex-1 flex items-center justify-center'>
@@ -83,38 +88,23 @@ const CodiSavePage = () => {
 					</div>
 				) : (
 					<>
-						{/* 코디 결과 이미지 */}
 						<div className='bg-gray-50'>
-							<ResultCodiCanvas items={codiItems} />
+							<CodiCanvas
+								items={codiItems}
+								isEditable={false}
+								updateItem={EMPTY_FN}
+								removeItem={EMPTY_FN}
+								maxZIndex={0}
+								setMaxZIndex={EMPTY_FN}
+							/>
 						</div>
-
-						{/* 코디 설명 및 공개 설정 */}
-						<div className='p-4 flex-1'>
-							<div className='mb-6'>
-								<label
-									htmlFor='description'
-									className='block text-sm font-medium text-gray-700 mb-2 text-left'
-								>
-									코디 설명
-								</label>
-								<InputField
-									type='text'
-									placeholder='어떤 코디인가요?'
-									value={description}
-									onChange={(e) => setDescription(e.target.value)}
-								/>
-							</div>
-
-							<div className='flex items-center justify-between'>
-								<span className='text-sm font-medium text-gray-700'>
-									다른 사람에게 공개
-								</span>
-								<SwitchToggle
-									checked={isPublic}
-									onToggle={() => setIsPublic(!isPublic)}
-								/>
-							</div>
-						</div>
+						<CodiSaveBottomSection
+							description={description}
+							isPublic={isPublic}
+							isLoading={isLoading}
+							onDescriptionChange={handleDescriptionChange}
+							onPublicToggle={handlePublicToggle}
+						/>
 					</>
 				)}
 			</div>
