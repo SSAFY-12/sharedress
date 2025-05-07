@@ -39,6 +39,8 @@ public class Coordination extends BaseTimeEntity {
 
 	private Boolean isTemplate;
 
+	private String thumbnail;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "creator_id")
 	private Member creator;
@@ -88,5 +90,9 @@ public class Coordination extends BaseTimeEntity {
 	public void addCoordinationClothes(CoordinationClothes coordinationClothes) {
 		this.coordinationClothes.add(coordinationClothes);
 		coordinationClothes.setCoordination(this);
+	}
+
+	public void updateThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 }
