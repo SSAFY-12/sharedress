@@ -2,6 +2,7 @@ package com.ssafy.sharedress.application.member.usecase;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.sharedress.application.member.dto.FcmTokenRequest;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
@@ -18,4 +19,6 @@ public interface MemberUseCase {
 	void updateNotificationStatus(UpdateNotificationStatusRequest request, Long myId);
 
 	UpdateProfileImageResponse updateProfileImage(MultipartFile profileImage, Long memberId);
+
+	void saveFcmToken(FcmTokenRequest request, Long memberId);
 }

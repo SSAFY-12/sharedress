@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.sharedress.application.member.dto.FcmTokenRequest;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
@@ -96,5 +97,16 @@ public class MemberService implements MemberUseCase {
 		member.updateProfileImage(imageUrl);
 
 		return new UpdateProfileImageResponse(imageUrl);
+	}
+
+	@Override
+	@Transactional
+	public void saveFcmToken(FcmTokenRequest request, Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		if (request.fcmToken() != null) {
+			member.updateFcmToken(request.fcmToken());
+		}
 	}
 }
