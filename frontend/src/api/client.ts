@@ -74,8 +74,9 @@ client.interceptors.response.use(
 				await refreshAsync(); // 토큰 갱신 -> 명시적 비동기 처리(토큰 갱신 완료까지 기다림)
 				return axios(error.config); // 토큰 갱신 후 원래 요청 재시도
 			} catch (refreshError) {
-				// 갱신 실패시 로그인 페이지로 리다이렉트
-				window.location.href = '/login';
+				// 갱신 실패시 로그아웃 처리 및 로그인 페이지로 리다이렉트
+				useAuthStore.getState().logout();
+				window.location.href = '/auth';
 				return Promise.reject(refreshError);
 			}
 		}

@@ -16,6 +16,7 @@ export const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
+				// element: <Navigate to='/wardrobe' />,
 				element: <Navigate to='/wardrobe' replace />,
 				// 초기 세팅값 wardrobe
 			},
@@ -44,10 +45,10 @@ export const router = createBrowserRouter([
 				path: 'social/request',
 				element: <FriendRequestListPage />,
 			},
-			{
-				path: '*',
-				element: <Navigate to='/wardrobe' replace />,
-			},
+			// {
+			// 	path: '*',
+			// 	element: <Navigate to='/wardrobe' replace />,
+			// },
 		],
 	},
 	{
