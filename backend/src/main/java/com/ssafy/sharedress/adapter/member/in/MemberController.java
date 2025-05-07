@@ -27,9 +27,12 @@ import com.ssafy.sharedress.application.member.dto.UpdateProfileImageResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
 import com.ssafy.sharedress.application.member.usecase.MemberQueryUseCase;
 import com.ssafy.sharedress.application.member.usecase.MemberUseCase;
+import com.ssafy.sharedress.domain.common.context.UserContext;
+import com.ssafy.sharedress.domain.common.context.UserContextErrorCode;
 import com.ssafy.sharedress.domain.guest.entity.Guest;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
+import com.ssafy.sharedress.global.exception.ExceptionUtil;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
@@ -46,8 +49,20 @@ public class MemberController {
 	private final MemberUseCase memberUseCase;
 
 	@GetMapping("/me")
-	public ResponseEntity<ResponseWrapper<Member>> getMe(@CurrentMember Member member) {
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, member);
+	public ResponseEntity<ResponseWrapper<MemberProfileResponse>> getMe(
+		@CurrentMember(required = false) Member member,
+		@CurrentGuest(required = false) Guest guest
+	) {
+		UserContext userContext = new UserContext(member, guest);
+		MemberProfileResponse response = null;
+		if (userContext.isMember()) {
+			response = MemberProfileResponse.from(member);
+		} else if (userContext.isGuest()) {
+			response = MemberProfileResponse.from(guest);
+		} else {
+			ExceptionUtil.throwException(UserContextErrorCode.USER_UNAUTHORIZED);
+		}
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
 	}
 
 	@GetMapping("/members/search")
