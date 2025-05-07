@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClothListContainer } from '@/containers/ClothListContainer';
-import CodiCanvas from '@/features/codi/components/CodiCanvas';
-import CodiCategoryTabs from '@/features/codi/components/CodiCategoryTabs';
+import { myCodiSaveApi } from '../api/codiApi';
 import Header from '@/components/layouts/Header';
+import CodiCanvas from '../components/CodiCanvas';
+import CodiEditBottomSection from '../components/CodiEditBottomSection';
+import CodiSaveBottomSection from '../components/CodiSaveBottomSection';
+import { ChangeEvent } from 'react';
 
-const CodiEditPage = () => {
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const EMPTY_FN = () => {};
+
+const CodiCreatePage = () => {
 	const navigate = useNavigate();
+	const [mode, setMode] = useState<'edit' | 'save'>('edit');
+
 	const categories = [
 		{ id: 'all', label: '전체' },
 		{ id: 'top', label: '상의' },
@@ -93,6 +100,9 @@ const CodiEditPage = () => {
 	const [activeCategory, setActiveCategory] = useState('all');
 	const [canvasItems, setCanvasItems] = useState<any[]>([]);
 	const [maxZIndex, setMaxZIndex] = useState(0);
+	const [description, setDescription] = useState('');
+	const [isPublic, setIsPublic] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
 
 	// 카테고리 필터링
 	const filteredProducts =
@@ -162,53 +172,121 @@ const CodiEditPage = () => {
 		return () => {
 			document.removeEventListener('touchstart', preventDoubleTapZoom);
 		};
-	});
+	}, []);
+
+	useEffect(() => {
+		if (mode === 'save') {
+			const savedItems = localStorage.getItem('codiItems');
+			if (savedItems) {
+				setCanvasItems(JSON.parse(savedItems));
+			}
+		}
+	}, [mode]);
+
+	const handleBackClick = () => {
+		if (mode === 'save') {
+			setMode('edit');
+		} else {
+			if (window.history.length > 1) {
+				navigate(-1);
+			} else {
+				navigate('/');
+			}
+		}
+	};
 
 	const handleNextClick = () => {
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
+		setMode('save');
+	};
 
-		navigate('/codi/save');
+	const handleComplete = async () => {
+		try {
+			setIsLoading(true);
+			const formattedItems = canvasItems.map((item) => ({
+				id: Number(item.id),
+				position: {
+					x: item.position.x,
+					y: item.position.y,
+					z: item.zIndex,
+				},
+				scale: item.scale,
+				rotation: item.rotation,
+			}));
+
+			const payload = {
+				title: '임시 제목',
+				description,
+				isPublic,
+				isTemplate: false,
+				items: formattedItems,
+			};
+
+			console.log('payload 확인:', payload);
+
+			const response = await myCodiSaveApi(payload);
+			console.log(response);
+			alert('코디가 저장되었습니다!');
+			navigate('/');
+		} catch (error) {
+			console.error('코디 저장 실패:', error);
+			alert('코디 저장 실패');
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const headerProps = {
+		showBack: true,
+		badgeText: mode === 'save' ? '완료' : '다음',
+		onBackClick: handleBackClick,
+		onBadgeClick: mode === 'edit' ? handleNextClick : handleComplete,
+	};
+
+	const handleDescriptionChange = (
+		e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+	) => {
+		setDescription(e.target.value);
+	};
+
+	const handlePublicToggle = () => {
+		setIsPublic(!isPublic);
 	};
 
 	return (
 		<div className='max-w-md mx-auto h-screen flex flex-col bg-white overflow-hidden'>
-			<Header showBack={true} badgeText='다음' onBadgeClick={handleNextClick} />
+			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-hidden'>
-				{/* 코디 캔버스 부분 */}
-				<div className='flex-shrink-0'>
+				<div className={`${mode === 'edit' ? 'flex-shrink-0' : 'bg-gray-50'}`}>
 					<CodiCanvas
 						items={canvasItems}
-						updateItem={updateCanvasItem}
-						removeItem={removeFromCanvas}
-						maxZIndex={maxZIndex}
-						setMaxZIndex={setMaxZIndex}
+						isEditable={mode === 'edit'}
+						updateItem={mode === 'edit' ? updateCanvasItem : EMPTY_FN}
+						removeItem={mode === 'edit' ? removeFromCanvas : EMPTY_FN}
+						maxZIndex={mode === 'edit' ? maxZIndex : 0}
+						setMaxZIndex={mode === 'edit' ? setMaxZIndex : EMPTY_FN}
 					/>
 				</div>
-
-				{/* 아이템 선택 영역 */}
-				<div className='flex-1 flex flex-col min-h-0 bg-white border-t border-gray-100'>
-					{/* 카테고리 탭 */}
-					<div className='flex-shrink-0'>
-						<CodiCategoryTabs
-							categories={categories}
-							activeCategory={activeCategory}
-							onCategoryChange={setActiveCategory}
-						/>
-					</div>
-
-					{/* 옷 나열되는 부분 */}
-					<div className='flex-1 overflow-y-auto'>
-						<div className='p-4'>
-							<ClothListContainer
-								items={filteredProducts}
-								onItemClick={addItemToCanvas}
-							/>
-						</div>
-					</div>
-				</div>
+				{mode === 'edit' ? (
+					<CodiEditBottomSection
+						categories={categories}
+						activeCategory={activeCategory}
+						filteredProducts={filteredProducts}
+						onCategoryChange={setActiveCategory}
+						onItemClick={addItemToCanvas}
+					/>
+				) : (
+					<CodiSaveBottomSection
+						description={description}
+						isPublic={isPublic}
+						isLoading={isLoading}
+						onDescriptionChange={handleDescriptionChange}
+						onPublicToggle={handlePublicToggle}
+					/>
+				)}
 			</div>
 		</div>
 	);
 };
 
-export default CodiEditPage;
+export default CodiCreatePage;
