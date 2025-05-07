@@ -51,7 +51,7 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 		QShoppingMall shop = QShoppingMall.shoppingMall;
 
 		BooleanBuilder condition = new BooleanBuilder();
-		
+
 		// 카테고리 필터
 		if (categoryId != null) {
 			condition.and(clothes.category.id.eq(categoryId));
