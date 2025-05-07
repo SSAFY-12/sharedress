@@ -171,4 +171,10 @@ public class CoordinationService implements CoordinationUseCase {
 
 		return new UpdateCoordinationThumbnailResponse(thumbnailUrl);
 	}
+
+	@Override
+	public void removeCoordination(Long myId, Long coordinationId) {
+		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
+		coordinationRepository.deleteById(coordinationId);
+	}
 }

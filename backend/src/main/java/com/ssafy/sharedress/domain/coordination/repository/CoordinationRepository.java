@@ -19,4 +19,6 @@ public interface CoordinationRepository {
 	Optional<Coordination> findByIdWithOwnerAndOriginCreator(Long id);
 
 	Optional<Coordination> findById(Long id);
+
+	void deleteById(Long id);
 }

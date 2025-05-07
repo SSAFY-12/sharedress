@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -105,5 +106,14 @@ public class CoordinationController {
 		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
 			coordinationUseCase.updateThumbnail(thumbnail, coordinationId));
+	}
+
+	@DeleteMapping("/coordinations/{coordinationId}")
+	public ResponseEntity<ResponseWrapper<Void>> removeCoordination(
+		@PathVariable("coordinationId") Long coordinationId
+	) {
+		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
+		coordinationUseCase.removeCoordination(myId, coordinationId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 }
