@@ -85,9 +85,10 @@ public class MemberController {
 
 	// TODO[지윤] : @CurrentMember 어노테이션을 사용하여 로그인한 사용자의 정보를 가져오는 방법으로 변경
 	@GetMapping("/members/profile/my")
-	public ResponseEntity<ResponseWrapper<MyProfileResponse>> getMyProfile() {
-		Long myId = 1L;
-		MyProfileResponse result = memberUseCase.getMyProfile(myId);
+	public ResponseEntity<ResponseWrapper<MyProfileResponse>> getMyProfile(
+		@CurrentMember Member member
+	) {
+		MyProfileResponse result = memberUseCase.getMyProfile(member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 
@@ -99,11 +100,10 @@ public class MemberController {
 
 	@PatchMapping("/members/profile")
 	public ResponseEntity<ResponseWrapper<MyProfileResponse>> updateMyProfile(
-		@RequestBody UpdateProfileRequest request
+		@RequestBody UpdateProfileRequest request,
+		@CurrentMember Member member
 	) {
-		// TODO[지윤] : @CurrentMember 어노테이션을 사용하여 로그인한 사용자의 정보를 가져오는 방법으로 변경
-		Long myId = 1L;
-		MyProfileResponse result = memberUseCase.updateProfile(request, myId);
+		MyProfileResponse result = memberUseCase.updateProfile(request, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 
@@ -135,28 +135,28 @@ public class MemberController {
 
 	@PatchMapping("/members/profile/notification")
 	public ResponseEntity<ResponseWrapper<Void>> updateNotificationStatus(
-		@RequestBody UpdateNotificationStatusRequest request
+		@RequestBody UpdateNotificationStatusRequest request,
+		@CurrentMember Member member
 	) {
-		Long myId = 1L;
-		memberUseCase.updateNotificationStatus(request, myId);
+		memberUseCase.updateNotificationStatus(request, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
 	@PatchMapping("/members/profile/image")
 	public ResponseEntity<ResponseWrapper<UpdateProfileImageResponse>> updateMyProfileImage(
-		@RequestPart("profileImage") MultipartFile profileImage
+		@RequestPart("profileImage") MultipartFile profileImage,
+		@CurrentMember Member member
 	) {
-		Long myId = 1L;
-		UpdateProfileImageResponse result = memberUseCase.updateProfileImage(profileImage, myId);
+		UpdateProfileImageResponse result = memberUseCase.updateProfileImage(profileImage, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 
 	@PostMapping("/members/fcm-token")
 	public ResponseEntity<ResponseWrapper<Void>> saveFcmToken(
-		@RequestBody FcmTokenRequest request
+		@RequestBody FcmTokenRequest request,
+		@CurrentMember Member member
 	) {
-		Long memberId = 1L;
-		memberUseCase.saveFcmToken(request, memberId);
+		memberUseCase.saveFcmToken(request, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
