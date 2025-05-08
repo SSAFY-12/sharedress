@@ -91,7 +91,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	@Override
 	public void removeClosetClothes(Long memberId, Long closetClothesId) {
 		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
-		if (closetClothesRepository.existsById(closetClothesId)) {
+		if (!closetClothesRepository.existsById(closetClothesId)) {
 			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND);
 		}
 
