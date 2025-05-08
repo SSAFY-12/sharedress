@@ -779,3 +779,57 @@ https://lh3.googleusercontent.com/a/ACg8ocKA2rKTYFTRCmV6mmsWcupxFlKVWkQm9cOmYu2u
 
 이러한 변경으로 Google 프로필 이미지 로딩 관련 문제가 해결되어, 더 나은 사용자경
 험을 제공할 수 있게 되었습니다.
+
+## [트러블슈팅] FriendRequestPage 레이아웃 문제 트러블슈팅(2025/05/08-안주민)
+
+### 문제상황
+
+- FriendRequestPage가 웹 레이아웃에서 컨텐츠가 보이지 않는 문제 발생
+- 모바일 레이아웃에서는 정상 작동하나 웹 레이아웃에서만 문제 발생
+- 헤더와 컨텐츠가 겹치는 현상 발생
+
+### 원인 분석
+
+1. 레이아웃 구조의 차이
+
+   - WebLayout: header가 `absolute` 포지션 사용
+   - MobileLayout: header가 `fixed` 포지션 사용
+   - MobileLayout은 `mt-16`으로 헤더 높이만큼 마진을 주고 있었으나, WebLayout은
+     이 마진이 없었음
+
+2. 컴포넌트 구조의 문제
+   - FriendRequestListPage에서 불필요한 div 래퍼로 인한 스타일 중첩
+   - FriendRequestPage에서 직접 레이아웃 관련 스타일을 처리하려 시도
+
+### 해결방법
+
+1. FriendRequestListPage 수정
+
+   - 불필요한 div 래퍼 제거
+   - 컴포넌트 구조 단순화
+
+2. FriendRequestPage 수정
+
+   - 레이아웃 관련 스타일 제거
+   - 컨텐츠에만 집중하도록 수정
+
+3. WebLayout 수정
+   - main 태그에 `mt-16` 추가하여 헤더 높이만큼 마진 부여
+   - MobileLayout과 동일한 방식으로 컨텐츠 영역 조정
+
+### 예시
+
+```tsx
+// WebLayout.tsx 수정 전
+<main className='flex-1 h-full flex flex-col overflow-y-auto'>
+
+// WebLayout.tsx 수정 후
+<main className='flex-1 h-full flex flex-col overflow-y-auto mt-16'>
+```
+
+### 결론 및 정리
+
+1. 레이아웃 관련 스타일은 레이아웃 컴포넌트에서 일관되게 처리해야 함
+2. 웹/모바일 레이아웃 간의 차이점을 명확히 이해하고 일관된 스타일 적용 필요
+3. 불필요한 컴포넌트 래핑은 스타일 중첩 문제를 일으킬 수 있으므로 주의 필요
+4. 레이아웃과 컨텐츠의 책임을 명확히 분리하여 관리하는 것이 중요
