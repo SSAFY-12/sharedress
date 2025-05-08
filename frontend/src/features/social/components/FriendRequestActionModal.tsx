@@ -2,6 +2,7 @@ import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { MainModal } from '@/components/modals/main-modal/MainModal';
 import useRequest from '@/features/social/hooks/useRequest';
 import { PrimaryBtn } from '@/components/buttons/primary-button';
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 
 interface FriendRequestActionModalProps {
 	isOpen: boolean;
@@ -65,7 +66,7 @@ export const FriendRequestActionModal = ({
 				<MainModal.Body>
 					<div className='flex flex-col items-center'>
 						<UserMiniAvatar
-							src={friend.profileImage}
+							src={getOptimizedImageUrl(friend.profileImage)}
 							size='lg'
 							className='mb-3'
 						/>

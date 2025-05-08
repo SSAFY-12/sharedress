@@ -3,10 +3,11 @@ import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { FriendRequestMsgModal } from '@/features/social/components/FriendRequestMsgModal';
 import { FriendRequestActionModal } from '@/features/social/components/FriendRequestActionModal';
+import { RelationStatus } from '@/features/social/types/social';
 import React, { useState, useRef, useCallback } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 import useSearchUser from '@/features/social/hooks/useSearchUser';
-import { RelationStatus } from '@/features/social/types/social';
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 
 export const FriendSearchResultPage = () => {
 	const [searchValue, setSearchValue] = useState('');
@@ -109,7 +110,7 @@ export const FriendSearchResultPage = () => {
 							key={user.memberId}
 						>
 							<UserMiniAvatar
-								src={user.profileImage}
+								src={getOptimizedImageUrl(user.profileImage)}
 								size='lg'
 								className='mb-3'
 							/>
