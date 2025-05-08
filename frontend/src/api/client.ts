@@ -10,8 +10,24 @@ import { authApi } from '@/features/auth/api/authApi';
 
 export const client = axios.create({
 	baseURL: import.meta.env.VITE_API_URL,
-	withCredentials: true, // 쿠키를 포함하여 요청
+	withCredentials: true,
+	headers: {
+		'Content-Type': 'application/json',
+	},
+	// 쿠키 관련 설정 추가
+	withXSRFToken: true,
+	xsrfCookieName: 'XSRF-TOKEN',
+	xsrfHeaderName: 'X-XSRF-TOKEN',
 });
+
+// 쿠키 설정을 위한 헬퍼 함수
+// const setCookie = (name: string, value: string, days: number) => {
+// 	const expires = new Date();
+// 	expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+// 	document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;domain=${
+// 		window.location.hostname
+// 	};SameSite=Strict`;
+// };
 
 /**
  * 전역 에러 처리 함수
@@ -42,6 +58,7 @@ client.interceptors.request.use(
 			method: config.method,
 			headers: config.headers,
 			withCredentials: config.withCredentials,
+			cookies: document.cookie,
 		});
 
 		if (!config.url?.includes('/api/auth/refresh')) {
@@ -50,8 +67,8 @@ client.interceptors.request.use(
 				config.headers['Authorization'] = `Bearer ${token}`;
 			}
 		}
+
 		try {
-			// FormData인 경우 multipart/form-data로 설정
 			if (config.data instanceof FormData) {
 				config.headers['Content-Type'] = 'multipart/form-data';
 			} else {
@@ -79,7 +96,15 @@ client.interceptors.response.use(
 			status: response.status,
 			headers: response.headers,
 			cookies: document.cookie,
+			setCookie: response.headers['set-cookie'],
 		});
+
+		// Set-Cookie 헤더가 있는 경우 처리
+		const setCookieHeader = response.headers['set-cookie'];
+		if (setCookieHeader) {
+			console.log('🍪 Received Set-Cookie header:', setCookieHeader);
+		}
+
 		return response;
 	},
 	async (error: unknown) => {
@@ -108,45 +133,60 @@ client.interceptors.response.use(
 
 		if (originalRequest.url?.includes('/api/auth/refresh')) {
 			console.log('🔄 Refresh token request failed, redirecting to auth...');
-			useAuthStore.getState().logout();
-			window.location.href = '/auth';
+			// useAuthStore.getState().logout();
+			// window.location.href = '/auth';
 			return Promise.reject(error);
 		}
 
 		if (status === 401) {
-			console.log('🔄 Attempting token refresh...');
-			try {
-				const response = await authApi.refresh();
-				console.log('✅ Token refresh successful:', {
-					hasNewToken: !!response.content.accessToken,
-				});
+			const retryCount = (originalRequest as any)._retryCount || 0;
 
-				const newToken = response.content.accessToken;
-				useAuthStore.getState().setAccessToken(newToken);
+			if (retryCount < 2) {
+				(originalRequest as any)._retryCount = retryCount + 1;
+				console.log(
+					`🔄 Token refresh attempt ${retryCount + 1}/2, cookies:`,
+					document.cookie,
+				);
 
-				// 새로운 요청 설정 생성
-				const newConfig: InternalAxiosRequestConfig = {
-					...originalRequest,
-					headers: new AxiosHeaders({
-						...originalRequest.headers,
-						Authorization: `Bearer ${newToken}`,
-					}),
-				};
+				try {
+					const response = await authApi.refresh();
+					console.log('✅ Token refresh successful:', {
+						hasNewToken: !!response.content.accessToken,
+						attempt: retryCount + 1,
+						cookies: document.cookie,
+					});
 
-				return axios(newConfig);
-			} catch (refreshError) {
-				if (refreshError instanceof AxiosError) {
+					const newToken = response.content.accessToken;
+					useAuthStore.getState().setAccessToken(newToken);
+
+					const newConfig: InternalAxiosRequestConfig = {
+						...originalRequest,
+						headers: new AxiosHeaders({
+							...originalRequest.headers,
+							Authorization: `Bearer ${newToken}`,
+						}),
+					};
+
+					return axios(newConfig);
+				} catch (refreshError) {
 					console.error('❌ Token refresh failed:', {
 						error: refreshError,
-						status: refreshError.response?.status,
-						data: refreshError.response?.data,
+						attempt: retryCount + 1,
+						cookies: document.cookie,
 					});
-				} else {
-					console.error('❌ Unknown error during token refresh:', refreshError);
+
+					if (retryCount === 1) {
+						// 마지막 시도에서 실패한 경우에만 로그아웃
+						// useAuthStore.getState().logout();
+						// window.location.href = '/auth';
+					}
+					return Promise.reject(refreshError);
 				}
-				useAuthStore.getState().logout();
-				window.location.href = '/auth';
-				return Promise.reject(refreshError);
+			} else {
+				console.error('❌ Max retry attempts reached for token refresh');
+				// useAuthStore.getState().logout();
+				// window.location.href = '/auth';
+				return Promise.reject(error);
 			}
 		}
 

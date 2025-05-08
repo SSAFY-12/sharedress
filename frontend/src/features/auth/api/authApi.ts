@@ -5,24 +5,37 @@ import { client } from '@/api/client';
 export const authApi = {
 	// --------------------로그인 ------------------------
 	login: async (accessToken: string) => {
-		//url코드
-		//OAuth 인증 토큰 -> token이 있을때만 들어갈 것이기 때문에
-		const response = await client.post(`/api/auth/google`, {
-			//axios자체를 활용했으니까
-			accessToken: accessToken,
-		});
+		console.log('🔑 Login request - Current cookies:', document.cookie);
+		const response = await client.post(
+			`/api/auth/google`,
+			{
+				accessToken: accessToken,
+			},
+			{
+				withCredentials: true,
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			},
+		);
+		console.log('✅ Login response - New cookies:', document.cookie);
 		return response.data;
 	},
 
 	// -------------------- 리프레시 ------------------------//
 	refresh: async () => {
+		console.log('🔄 Refresh token request - Current cookies:', document.cookie);
 		const response = await client.post(
 			`/api/auth/refresh`,
 			{},
 			{
 				withCredentials: true,
+				headers: {
+					'Content-Type': 'application/json',
+				},
 			},
 		);
+		console.log('✅ Refresh token response - New cookies:', document.cookie);
 		return response.data;
 	},
 };
