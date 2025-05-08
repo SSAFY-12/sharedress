@@ -31,6 +31,7 @@ export default {
 				white: '#FFFFFF',
 				light: '#E6E5E5',
 				description: '#B4B2B1',
+				descriptionColor: '#B4B2B1', //색상이랑 글씨 모두 description 으로 존재?
 				brownButton: '#584B4B',
 				main: '#3A3636',
 				modify: '#3B98DF',
@@ -38,5 +39,7 @@ export default {
 			},
 		},
 	},
-	plugins: [],
+	plugins: [
+		require('tailwind-scrollbar-hide')
+	],
 };

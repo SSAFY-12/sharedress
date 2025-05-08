@@ -6,6 +6,7 @@ export const InputField = ({
 	placeholder,
 	value,
 	onChange,
+	onFocus,
 	disabled = false,
 	name,
 	optionList = [],
@@ -20,6 +21,7 @@ export const InputField = ({
 			placeholder={placeholder}
 			value={value}
 			onChange={onChange as React.ChangeEventHandler<HTMLInputElement>}
+			onFocus={onFocus}
 			disabled={disabled}
 			name={name}
 			className={`${baseClass} ${className}`}
@@ -28,6 +30,7 @@ export const InputField = ({
 		<select
 			value={value}
 			onChange={onChange as React.ChangeEventHandler<HTMLSelectElement>}
+			onFocus={onFocus}
 			disabled={disabled}
 			name={name}
 			className={`${baseClass} ${className}`}

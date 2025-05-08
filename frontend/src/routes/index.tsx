@@ -5,10 +5,14 @@ import FriendAddPage from '@/pages/social/FriendAddPage';
 import FriendRequestListPage from '@/pages/social/FriendRequestListPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import MyClosetPage from '@/features/closet/pages/MyClosetPage';
+import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
-import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
+import RegistPage from '@/pages/RegistPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import FriendPage from '@/pages/social/FriendPage';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -42,6 +46,14 @@ export const router = createBrowserRouter([
 				element: <FriendAddPage />,
 			},
 			{
+				path: 'regist/*',
+				element: <RegistPage />,
+			},
+			{
+				path: '*',
+				element: <Navigate to='/wardrobe' replace />,
+			},
+			{
 				path: 'social/request',
 				element: <FriendRequestListPage />,
 			},
@@ -50,6 +62,10 @@ export const router = createBrowserRouter([
 			// 	element: <Navigate to='/wardrobe' replace />,
 			// },
 		],
+	},
+	{
+		path: 'mypage',
+		element: <MyClosetPage />,
 	},
 	{
 		path: '/auth',
@@ -66,5 +82,13 @@ export const router = createBrowserRouter([
 	{
 		path: 'codi/save',
 		element: <CodiSavePage />,
+	},
+	{
+		path: 'cloth/:id',
+		element: <ClothDetailPage />,
+	},
+	{
+		path: 'codi/:id',
+		element: <CodiDetailPage />,
 	},
 ]);
