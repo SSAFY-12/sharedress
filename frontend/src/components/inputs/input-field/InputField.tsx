@@ -1,45 +1,58 @@
 import { InputFieldProps } from './InputField.types';
-import React from 'react';
 
 export const InputField = ({
 	type,
 	placeholder,
 	value,
 	onChange,
-	onFocus,
+	onClick,
 	disabled = false,
-	name,
-	optionList = [],
 	className = '',
+	hexCode,
 }: InputFieldProps) => {
 	const baseClass =
-		'border rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-gray-100';
+		'border border-gray-300 rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-gray-100';
 
-	return type === 'text' ? (
-		<input
-			type='text'
-			placeholder={placeholder}
-			value={value}
-			onChange={onChange as React.ChangeEventHandler<HTMLInputElement>}
-			onFocus={onFocus}
+	if (type === 'text') {
+		return (
+			<input
+				type='text'
+				value={value}
+				onChange={onChange}
+				placeholder={placeholder}
+				disabled={disabled}
+				className={`${baseClass} ${className}`}
+			/>
+		);
+	}
+
+	if (type === 'color') {
+		return (
+			<button
+				type='button'
+				className={`${baseClass} flex items-center gap-2 ${className}`}
+				onClick={onClick}
+				disabled={disabled}
+			>
+				{hexCode && (
+					<div
+						className='w-4 h-4 rounded-full'
+						style={{ backgroundColor: hexCode }}
+					/>
+				)}
+				<span className='text-left'>{value}</span>
+			</button>
+		);
+	}
+
+	return (
+		<button
+			type='button'
+			className={`${baseClass} ${className} text-left`}
+			onClick={onClick}
 			disabled={disabled}
-			name={name}
-			className={`${baseClass} ${className}`}
-		/>
-	) : (
-		<select
-			value={value}
-			onChange={onChange as React.ChangeEventHandler<HTMLSelectElement>}
-			onFocus={onFocus}
-			disabled={disabled}
-			name={name}
-			className={`${baseClass} ${className}`}
 		>
-			{optionList.map((option) => (
-				<option key={option} value={option}>
-					{option}
-				</option>
-			))}
-		</select>
+			{value}
+		</button>
 	);
 };
