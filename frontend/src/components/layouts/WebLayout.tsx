@@ -27,7 +27,7 @@ export const WebLayout = () => {
 				{isSocial ? <SocialHeader /> : <Header {...headerProps} />}
 			</header>
 
-			<main className='flex-1 h-full flex flex-col overflow-y-auto'>
+			<main className='flex-1 h-full flex flex-col overflow-y-auto mt-16'>
 				<Outlet />
 			</main>
 			{showNav && (
