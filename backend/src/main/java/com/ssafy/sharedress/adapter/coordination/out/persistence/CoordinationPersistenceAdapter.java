@@ -65,7 +65,7 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 			.leftJoin(clc.clothes, cl).fetchJoin()
 			.where(
 				cd.owner.id.eq(myId)
-					.and(cd.originCreator.id.ne(myId))
+					.and(cd.creator.id.ne(myId))
 			)
 			.orderBy(cd.id.desc())
 			.distinct()
