@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
 import { headerConfig } from '@/constants/headerConfig';
@@ -7,6 +7,7 @@ import { NavConfig } from '@/constants/navConfig';
 
 export const WebLayout = () => {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const headerProps = headerConfig[
 		location.pathname as keyof typeof headerConfig
@@ -24,7 +25,14 @@ export const WebLayout = () => {
 	return (
 		<div className='relative min-h-screen flex flex-col'>
 			<header className='absolute top-0 left-0 right-0 bg-white z-10'>
-				{isSocial ? <SocialHeader /> : <Header {...headerProps} />}
+				{isSocial ? (
+					<SocialHeader
+						onProfileClick={() => navigate('/social/add')}
+						onAddClick={() => navigate('/social/request')}
+					/>
+				) : (
+					<Header {...headerProps} />
+				)}
 			</header>
 
 			<main className='flex-1 h-full flex flex-col overflow-y-auto mt-16'>

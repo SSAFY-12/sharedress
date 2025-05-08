@@ -1,4 +1,4 @@
-import { useLocation, Outlet } from 'react-router-dom';
+import { useLocation, Outlet, useNavigate } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
 import SocialHeader from './SocialHeader';
@@ -7,6 +7,7 @@ import { NavConfig } from '@/constants/navConfig';
 
 export const MobileLayout = () => {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const headerProps = headerConfig[
 		location.pathname as keyof typeof headerConfig
@@ -25,7 +26,14 @@ export const MobileLayout = () => {
 	return (
 		<div className='min-h-screen flex flex-col'>
 			<header className='fixed top-0 left-0 right-0 bg-white z-10'>
-				{isSocial ? <SocialHeader /> : <Header {...headerProps} />}
+				{isSocial ? (
+					<SocialHeader
+						onProfileClick={() => navigate('/social/add')}
+						onAddClick={() => navigate('/social/request')}
+					/>
+				) : (
+					<Header {...headerProps} />
+				)}
 			</header>
 			<main
 				className={`flex-1 mt-16 ${
