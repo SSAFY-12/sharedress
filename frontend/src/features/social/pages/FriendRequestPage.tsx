@@ -1,47 +1,96 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
+import { useState } from 'react';
+import useRequest from '@/features/social/hooks/useRequest';
+import { FriendRequestActionModal } from '@/features/social/components/FriendRequestActionModal';
 
 // 메인 컴포넌트
 export const FriendRequestsPage = () => {
-	// 더미 데이터
-	const friendRequests = [
-		{
-			id: 1,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=50&width=50',
-			message: '나 갓긴데 안받아줄거야?',
-		},
-		{
-			id: 1,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=50&width=50',
-			message: '나 갓긴데 안받아줄거야?',
-		},
-	];
+	const { friendRequests } = useRequest();
+
+	// 모달 관련 상태
+	const [actionModalOpen, setActionModalOpen] = useState(false);
+	const [actionType, setActionType] = useState<'accept' | 'reject'>('accept');
+	const [selectedRequest, setSelectedRequest] = useState<{
+		id: number;
+		profileImage: string;
+		nickname: string;
+		memberId: number;
+	} | null>(null);
+
+	const handleActionClick = (type: 'accept' | 'reject', request: any) => {
+		setActionType(type);
+		setSelectedRequest({
+			id: request.id,
+			profileImage: request.requester.profileImage,
+			nickname: request.requester.nickname,
+			memberId: request.requester.id,
+		});
+		setActionModalOpen(true);
+	};
 
 	return (
-		<div className='flex flex-col h-screen max-w-md mx-auto bg-white'>
+		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
 			{/* 친구 요청 목록 */}
 			<div className='flex-1 p-4'>
-				{friendRequests.map((request) => (
+				{friendRequests?.map((request) => (
 					<div
 						key={request.id}
-						className='flex items-center mb-4 border-b pb-4 last:border-b-0'
+						className='relative mb-4 pb-4 border-b border-gray-100'
 					>
-						<UserMiniAvatar src={request.avatar} size='md' />
-						<div className='ml-3 flex-1'>
-							<h3 className='font-medium'>{request.name}</h3>
-							<p className='text-sm text-gray-500'>{request.message}</p>
+						<div className='flex items-center justify-between'>
+							<div className='flex items-center text-left'>
+								<UserMiniAvatar
+									src={request.requester.profileImage}
+									size='md'
+								/>
+								<div className='ml-3 flex-1'>
+									<h3 className='font-medium text-button'>
+										{request.requester.nickname}
+									</h3>
+									<p className='text-sm text-gray-500 text-description'>
+										{request.message}
+									</p>
+								</div>
+							</div>
+							<div className='flex gap-2'>
+								<PrimaryBtn
+									size='compact'
+									name='수락'
+									color='black'
+									onClick={() => handleActionClick('accept', request)}
+									className='whitespace-nowrap min-w-[70px] text-sm font-medium'
+								/>
+								<PrimaryBtn
+									size='compact'
+									name='거절'
+									color='black'
+									onClick={() => handleActionClick('reject', request)}
+									className='whitespace-nowrap min-w-[70px] text-sm font-medium'
+								/>
+							</div>
 						</div>
-						<PrimaryBtn
-							size='compact'
-							name='친구 수락'
-							color='black'
-							onClick={() => console.log('Accept friend request')}
-						/>
 					</div>
 				))}
 			</div>
+
+			{/* 친구 요청 수락/거절 모달 */}
+			{selectedRequest && (
+				<FriendRequestActionModal
+					isOpen={actionModalOpen}
+					onClose={() => {
+						setActionModalOpen(false);
+						setSelectedRequest(null);
+					}}
+					memberId={selectedRequest.memberId}
+					actionType={actionType}
+					friend={{
+						profileImage: selectedRequest.profileImage,
+						nickname: selectedRequest.nickname,
+						memberId: selectedRequest.memberId,
+					}}
+				/>
+			)}
 		</div>
 	);
 };
