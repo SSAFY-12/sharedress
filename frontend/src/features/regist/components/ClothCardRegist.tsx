@@ -2,8 +2,8 @@ import { ClosetApis, LibraryApis } from '@/features/regist/api/registApis';
 import { useState, useEffect } from 'react';
 import React from 'react';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
-import { useRegistCloth } from '@/hooks/useRegistCloth';
-import { useDeleteCloth } from '@/hooks/useRegistCloth';
+import { useRegistCloth } from '@/features/regist/hooks/useRegistCloth';
+import { useDeleteCloth } from '@/features/regist/hooks/useRegistCloth';
 
 export interface ClothCardRegistProps {
 	item: ClothItem;
