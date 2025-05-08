@@ -40,7 +40,10 @@ public class AuthController {
 		cookie.setPath("/");
 		cookie.setMaxAge(7 * 24 * 60 * 60); // 7일
 
-		response.addCookie(cookie);
+		response.addHeader(
+			"Set-Cookie",
+			String.format("%s=%s; Path=/; HttpOnly; Secure; SameSite=None", cookie.getName(), cookie.getValue())
+		);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, new TokenResponse(token.accessToken()));
 	}
 
