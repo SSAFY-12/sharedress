@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.adapter.auth.in;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +15,6 @@ import com.ssafy.sharedress.application.jwt.TokenUseCase;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,17 +33,16 @@ public class AuthController {
 	) {
 		TokenWithRefresh token = googleLoginUseCase.login(request.accessToken());
 
-		// refreshToken을 HttpOnly 쿠키로 설정
-		Cookie cookie = new Cookie("refreshToken", token.refreshToken());
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true); // https 환경에서만 사용
-		cookie.setPath("/");
-		cookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+		// ✅ ResponseCookie를 통해 SameSite 설정
+		ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", token.refreshToken())
+			.httpOnly(true)
+			.secure(true)                // HTTPS 환경에서만 전송
+			.path("/")
+			.maxAge(7 * 24 * 60 * 60)    // 7일
+			.sameSite("None")            // SameSite=None 설정
+			.build();
 
-		response.addHeader(
-			"Set-Cookie",
-			String.format("%s=%s; Path=/; HttpOnly; Secure; SameSite=None", cookie.getName(), cookie.getValue())
-		);
+		response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, new TokenResponse(token.accessToken()));
 	}
 
