@@ -158,6 +158,7 @@ export const fetchCoordinationComments = async (coordinationId: number) => {
 	const response = await client.get(
 		`/api/coordinations/${coordinationId}/comments`,
 	);
+	console.log(response.data.content);
 	return response.data.content as CoordinationComment[];
 };
 

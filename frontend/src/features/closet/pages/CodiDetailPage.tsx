@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { formatDistanceToNow, parseISO } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import Header from '@/components/layouts/Header';
 import { CodiEditor } from '@/containers/CodiEditor';
 import CommentList from '@/features/closet/components/CommentList';
@@ -100,6 +102,35 @@ const CodiDetailPage = () => {
 		});
 	};
 
+	const customKo = {
+		...ko,
+		formatDistance: (token: any, count: number, options?: any) => {
+			const result = ko.formatDistance(token, count, options);
+			return result.replace(/^약\s/, '');
+		},
+	};
+
+	const sanitizeISOString = (dateString: string) =>
+		dateString.replace(/(\.\d{3})\d+/, '$1');
+
+	const toRelativeTime = (dateString: string) => {
+		try {
+			if (!dateString) return '';
+			const sanitized = sanitizeISOString(dateString);
+			const date = parseISO(sanitized);
+
+			if (isNaN(date.getTime())) return '';
+
+			return formatDistanceToNow(date, {
+				addSuffix: true,
+				locale: customKo,
+			});
+		} catch (error) {
+			console.error('오류 발생:', dateString, error);
+			return '';
+		}
+	};
+
 	if (isLoading) return <div className='p-4'>불러오는 중...</div>;
 	if (isError || !coordination)
 		return <div className='p-4'>코디 정보를 불러오지 못했습니다.</div>;
@@ -137,7 +168,7 @@ const CodiDetailPage = () => {
 						<div className='flex flex-col items-start'>
 							<p className='text-lg mb-1'>{coordination.description}</p>
 							<p className='text-sm text-gray-500 mb-6'>
-								{new Date(coordination.createdAt).toLocaleString()}
+								{toRelativeTime(coordination.createdAt)}
 							</p>
 						</div>
 

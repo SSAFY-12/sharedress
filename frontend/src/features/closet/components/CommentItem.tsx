@@ -1,5 +1,8 @@
 import { MoreVertical } from 'lucide-react';
 import { CommentItemProps } from './CommentItem.types';
+import { formatDistanceToNow } from 'date-fns';
+import { parseISO } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 const CommentItem = ({ comment, onMoreClick }: CommentItemProps) => {
 	const handleMoreClick = () => {
@@ -7,6 +10,36 @@ const CommentItem = ({ comment, onMoreClick }: CommentItemProps) => {
 			onMoreClick(comment);
 		}
 	};
+
+	const customKo = {
+		...ko,
+		formatDistance: (token: any, count: number, options?: any) => {
+			const result = ko.formatDistance(token, count, options);
+			return result.replace(/^약\s/, '');
+		},
+	};
+
+	const sanitizeISOString = (dateString: string) =>
+		dateString.replace(/(\.\d{3})\d+/, '$1');
+
+	const toRelativeTime = (dateString: string) => {
+		try {
+			if (!dateString) return '';
+			const sanitized = sanitizeISOString(dateString);
+			const date = parseISO(sanitized);
+
+			if (isNaN(date.getTime())) return '';
+
+			return formatDistanceToNow(date, {
+				addSuffix: true,
+				locale: customKo,
+			});
+		} catch (error) {
+			console.error('오류 발생:', dateString, error);
+			return '';
+		}
+	};
+
 	return (
 		<div className='flex items-center'>
 			<img
@@ -18,7 +51,9 @@ const CommentItem = ({ comment, onMoreClick }: CommentItemProps) => {
 				<div className='flex flex-col items-start'>
 					<div className='flex items-center gap-4'>
 						<span className='font-medium'>{comment.author.name}</span>
-						<span className='text-xs text-gray-500'>{comment.createdAt}</span>
+						<span className='text-xs text-gray-500'>
+							{toRelativeTime(comment.createdAt)}
+						</span>
 					</div>
 					<p className='mt-1'>{comment.content}</p>
 				</div>
