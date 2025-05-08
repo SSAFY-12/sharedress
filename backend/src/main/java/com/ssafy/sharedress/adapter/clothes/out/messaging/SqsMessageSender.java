@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.adapter.clothes.out.messaging;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,19 +22,29 @@ public class SqsMessageSender {
 	private final SqsTemplate sqsTemplate;
 	private final ObjectMapper objectMapper;
 
-	@Value("${cloud.aws.sqs.queue-name}")
-	private String queueName;
+	@Value("${cloud.aws.sqs.url}")
+	private String queueUrl;
 
 	public void send(AiProcessMessageRequest message) {
 		try {
 			String json = objectMapper.writeValueAsString(message);
-			SendResult sendResult = sqsTemplate.send(to -> to.queue(queueName).payload(json));
-			log.info("SQS 메시지 전송 완료. messageId={}", sendResult.messageId());
+
+			String deduplicationId = UUID.randomUUID().toString();
+
+			SendResult<String> sendResult = sqsTemplate.send(to -> to
+				.queue(queueUrl)
+				.payload(json)
+				.header("MessageGroupId", "default") // FIFO 큐의 메시지 그룹 ID
+				.header("MessageDeduplicationId", deduplicationId)
+			);
+
+			log.info("FIFO SQS 메시지 전송 완료. messageId={}", sendResult.messageId());
 		} catch (JsonProcessingException e) {
 			log.error("메시지 직렬화 실패", e);
+			throw new RuntimeException("메시지 변환 중 오류가 발생했습니다", e);
 		} catch (Exception e) {
 			log.error("SQS 전송 실패", e);
+			throw new RuntimeException("SQS 메시지 전송 중 오류가 발생했습니다", e);
 		}
 	}
-
 }
