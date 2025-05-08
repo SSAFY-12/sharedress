@@ -62,96 +62,9 @@ module.exports = {
 		// 배열 인덱스를 key로 사용 경고 (React 성능/버그 예방)
 		'react/no-array-index-key': 'warn',
 
-		// --- 네이밍 컨벤션 ---
-		'@typescript-eslint/naming-convention': [
-			'warn',
-			// 변수: camelCase, PascalCase, UPPER_CASE 허용
-			{
-				selector: 'variable',
-				format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
-				leadingUnderscore: 'allow',
-				trailingUnderscore: 'allow',
-				filter: {
-					regex: '(Api|Client)$',
-					match: true,
-				},
-			},
-			// 함수: camelCase, PascalCase 허용
-			{
-				selector: 'function',
-				format: ['camelCase', 'PascalCase'],
-				leadingUnderscore: 'allow',
-				trailingUnderscore: 'allow',
-			},
-			// 타입/인터페이스/enum: PascalCase
-			{ selector: 'typeLike', format: ['PascalCase'] },
-			// 클래스: PascalCase
-			{ selector: 'class', format: ['PascalCase'] },
-			// const/전역 변수: UPPER_CASE
-			{
-				selector: 'variable',
-				format: ['UPPER_CASE', 'PascalCase'],
-				modifiers: ['const', 'global'],
-			},
-			// useXxx, withXxx, handleXxx 함수: camelCase 강제
-			{
-				selector: 'function',
-				format: ['camelCase'],
-				filter: { regex: '^use[A-Z]', match: true },
-			},
-			{
-				selector: 'function',
-				format: ['camelCase'],
-				filter: { regex: '^with[A-Z]', match: true },
-			},
-			{
-				selector: 'function',
-				format: ['camelCase'],
-				filter: { regex: '^handle[A-Z].*[A-Z]', match: true },
-			},
-			// API 관련 변수/함수 예외
-			{
-				selector: 'variable',
-				format: ['camelCase'],
-				filter: { regex: '^(client|headerConfig|router)$', match: true },
-			},
-			{
-				selector: 'function',
-				format: ['camelCase'],
-				filter: { regex: '^(getErrorMessage|handleGlobalError)$', match: true },
-			},
-			// const/전역 변수: UPPER_CASE
-			{
-				selector: 'variable',
-				format: ['UPPER_CASE', 'PascalCase'],
-				modifiers: ['const', 'global'],
-			},
-			// use로 시작하는 훅: camelCase 강제
-			{
-				selector: 'variable',
-				format: ['camelCase'],
-				filter: { regex: '^use[A-Z]', match: true },
-			},
-			// handle로 시작하는 함수: camelCase 강제
-			{
-				selector: 'function',
-				format: ['camelCase'],
-				filter: { regex: '^handle[A-Z]', match: true },
-			},
-			// get로 시작하는 함수: camelCase 강제
-			{
-				selector: 'function',
-				format: ['camelCase'],
-				filter: { regex: '^get[A-Z]', match: true },
-			},
-			// const로 선언된 함수: camelCase 강제
-			{
-				selector: 'variable',
-				format: ['camelCase'],
-				modifiers: ['const'],
-				filter: { regex: '^(handle|get)[A-Z]', match: true },
-			},
-		],
+		// --- 네이밍 컨벤션 비활성화 ---
+		'@typescript-eslint/naming-convention': 'off',
+
 		'@typescript-eslint/no-explicit-any': 'off', // any 타입 허용
 
 		// --- 파일/폴더명 규칙 (check-file 플러그인) ---

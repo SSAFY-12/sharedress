@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
 			{
 				index: true,
 				// element: <Navigate to='/wardrobe' />,
-				element: <Navigate to='/wardrobe' replace />,
+				element: <Navigate to='/wardrobe' />,
 				// 초기 세팅값 wardrobe
 			},
 			// {

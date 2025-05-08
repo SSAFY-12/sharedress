@@ -1,8 +1,9 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { useState } from 'react';
-import useRequest from '@/features/social/hooks/useRequest';
 import { FriendRequestActionModal } from '@/features/social/components/FriendRequestActionModal';
+import useRequest from '@/features/social/hooks/useRequest';
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 
 // 메인 컴포넌트
 export const FriendRequestsPage = () => {
@@ -41,7 +42,7 @@ export const FriendRequestsPage = () => {
 						<div className='flex items-center justify-between'>
 							<div className='flex items-center text-left'>
 								<UserMiniAvatar
-									src={request.requester.profileImage}
+									src={getOptimizedImageUrl(request.requester.profileImage)}
 									size='md'
 								/>
 								<div className='ml-3 flex-1'>

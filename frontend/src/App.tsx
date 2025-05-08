@@ -4,10 +4,27 @@ import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
 import { ToastContainer } from 'react-toastify';
 import { useTokenValidation } from './features/auth/hooks/useTokenValidation';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from './store/useAuthStore';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
-	useTokenValidation(); //인증이 필요한 애플리케이셔의 최상위 컴포넌트
+	const initializeAuth = useAuthStore((state) => state.initializeAuth);
+	// const isInitialized = useAuthStore((state) => state.isInitialized);
+	const [isLoading, setIsLoading] = useState(true);
+
+	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
+	useTokenValidation();
+
+	// 앱 시작 시 토큰 초기화
+	useEffect(() => {
+		const init = async () => {
+			await initializeAuth();
+			setIsLoading(false);
+		};
+		init();
+	}, [initializeAuth]);
+
 	// const handleManualError = () => {
 	// 	try {
 	// 		console.log('수동 에러 발생 시도');
@@ -19,6 +36,10 @@ export const App = () => {
 	// 		console.error('에러 처리 중 오류 발생:', error);
 	// 	}
 	// };
+
+	if (isLoading) {
+		return <div>Loading...</div>; // 또는 로딩 스피너 컴포넌트
+	}
 
 	return (
 		<>
