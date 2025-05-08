@@ -53,7 +53,7 @@ export const LibraryApis = {
 	},
 	// --------------------라이브러리 옷 등록------------------------
 	registCloth: async (itemsId: number) => {
-		const response = await client.post('/api/clothes/regist', {
+		const response = await client.post('/api/closet/clothes/library', {
 			itemsId,
 		});
 		return response.data;
