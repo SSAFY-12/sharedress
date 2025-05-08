@@ -109,6 +109,7 @@ public class Coordination extends BaseTimeEntity {
 		String content,
 		Boolean isPublic,
 		Boolean isTemplate,
+		String thumbnail,
 		Member creator,
 		Member originCreator,
 		Member owner,
@@ -118,6 +119,7 @@ public class Coordination extends BaseTimeEntity {
 		this.content = content;
 		this.isPublic = isPublic;
 		this.isTemplate = isTemplate;
+		this.thumbnail = thumbnail;
 		this.creator = creator;
 		this.originCreator = originCreator;
 		this.owner = owner;
@@ -170,6 +172,7 @@ public class Coordination extends BaseTimeEntity {
 		String content,
 		Boolean isPublic,
 		Boolean isTemplate,
+		String thumbnail,
 		Member creator,
 		Member originCreator,
 		Member owner,
@@ -180,6 +183,7 @@ public class Coordination extends BaseTimeEntity {
 			content,
 			isPublic,
 			isTemplate,
+			thumbnail,
 			creator,
 			originCreator,
 			owner,

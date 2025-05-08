@@ -120,6 +120,7 @@ public class CoordinationService implements CoordinationUseCase {
 			coordination.getContent(),
 			coordination.getIsPublic(),
 			coordination.getIsTemplate(),
+			coordination.getThumbnail(),
 			member,
 			coordination.getOriginCreator(),
 			member,
