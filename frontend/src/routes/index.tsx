@@ -4,14 +4,13 @@ import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
 import MyClosetPage from '@/features/closet/pages/MyClosetPage';
-import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 import SocialPage from '@/pages/SocialPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
-import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
 import RegistPage from '@/pages/RegistPage';
-
+import CodiSavePage from '@/features/codi/pages/CodiSavePage';
+import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 export const router = createBrowserRouter([
 	{
 		path: '/',
