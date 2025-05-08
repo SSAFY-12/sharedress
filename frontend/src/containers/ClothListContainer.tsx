@@ -1,9 +1,9 @@
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ClothCard } from '@/components/cards/cloth-card/ClothCard';
 import { ItemCategoryBtn } from '@/components/etc/item-category-btn/ItemCategoryBtn';
-import { ClothCardRegist } from '@/components/cards/cloth-card-regist/ClothCardRegist';
+import { ClothCardRegist } from '@/features/regist/components/ClothCardRegist';
 import { ForwardedRef, forwardRef } from 'react';
-import { ClothCardRegistEmpty } from '@/components/cards/cloth-card-regist/ClothCardRegistEmpty';
+import { ClothCardRegistEmpty } from '@/features/regist/components/ClothCardRegistEmpty';
 
 interface ClothListContainerProps {
 	items: ClothItem[];
@@ -66,7 +66,6 @@ const ClothListContainer = forwardRef<HTMLDivElement, ClothListContainerProps>(
 				>
 					{isPending ? (
 						<>
-							<ClothCardRegistEmpty />
 							<ClothCardRegistEmpty />
 							<ClothCardRegistEmpty />
 							<ClothCardRegistEmpty />

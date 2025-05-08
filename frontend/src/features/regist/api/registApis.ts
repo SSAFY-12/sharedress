@@ -52,10 +52,12 @@ export const LibraryApis = {
 		return response.data;
 	},
 	// --------------------라이브러리 옷 등록------------------------
-	registCloth: async (itemsId: number) => {
+	registCloth: async (itemId: number) => {
 		const response = await client.post('/api/closet/clothes/library', {
-			itemsId,
+			itemId: itemId,
 		});
+		console.log(itemId, 'request');
+		console.log(response.data, 'response');
 		return response.data;
 	},
 };
