@@ -9,31 +9,17 @@ const useRefresh = () => {
 
 	return useMutation({
 		mutationFn: async () => {
-			console.log('🔄 토큰 갱신 요청 시작:', {
-				시간: new Date().toLocaleString('ko-KR'), // 현재 시간
-				쿠키: document.cookie, // 현재 쿠키 상태
-			});
-
+			// 토큰 갱신 요청(자동 재시도)
 			try {
-				const response = await authApi.refresh(); // 토큰 갱신 요청
-
-				console.log('✅ 토큰 갱신 응답:', {
-					시간: new Date().toLocaleString('ko-KR'),
-					쿠키: document.cookie, // 현재 쿠키 상태
-					새토큰: !!response.content.accessToken, // 새로운 토큰 존재 여부
-				});
-
+				//서버에 보내는 작업
+				const response = await authApi.refresh(); // 토큰 갱신 요청(Promise를 반환)
 				if (response.content.accessToken) {
-					console.log('🔑 새 액세스 토큰 설정:', {
-						시간: new Date().toLocaleString('ko-KR'),
-						토큰존재: !!response.content.accessToken,
-					});
+					// 토큰 저장
 					setAccessToken(response.content.accessToken);
 				} else {
 					console.error('❌ 토큰 갱신 실패: 새 토큰이 없습니다');
 					throw new Error('토큰 갱신 실패: 새 토큰이 없습니다');
 				}
-
 				return response;
 			} catch (error) {
 				console.error('❌ 토큰 갱신 중 에러 발생:', {
@@ -43,12 +29,7 @@ const useRefresh = () => {
 				throw error;
 			}
 		},
-		onError: (error) => {
-			console.error('❌ 토큰 갱신 실패:', {
-				에러: error,
-				시간: new Date().toLocaleString('ko-KR'),
-			});
-
+		onError: () => {
 			// 리프레시 토큰이 없는 경우에만 로그인 페이지로 이동
 			if (!document.cookie.includes('refreshToken')) {
 				clearAuth(); // 토큰 저장 및 로그아웃 함수
