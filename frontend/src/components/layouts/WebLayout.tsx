@@ -22,7 +22,7 @@ export const WebLayout = () => {
 	const firstDepth = '/' + location.pathname.split('/')[1];
 	const showNav = NavConfig[firstDepth] === true;
 	return (
-		<div className='relative h-full flex flex-col'>
+		<div className='relative min-h-screen flex flex-col'>
 			<header className='absolute top-0 left-0 right-0 bg-white z-10'>
 				{isSocial ? <SocialHeader /> : <Header {...headerProps} />}
 			</header>

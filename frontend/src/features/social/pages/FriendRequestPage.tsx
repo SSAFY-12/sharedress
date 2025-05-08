@@ -29,11 +29,11 @@ export const FriendRequestsPage = () => {
 		});
 		setActionModalOpen(true);
 	};
-
+	console.log('friendRequests', friendRequests);
 	return (
-		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
+		<div className='w-full min-h-screen bg-white flex flex-col items-stretch'>
 			{/* 친구 요청 목록 */}
-			<div className='flex-1 p-4'>
+			<div className='p-4'>
 				{friendRequests?.map((request) => (
 					<div
 						key={request.id}
