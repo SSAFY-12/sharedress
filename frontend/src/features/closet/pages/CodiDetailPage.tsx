@@ -12,8 +12,8 @@ import { useCoordinationDetail } from '@/features/closet/hooks/useCoordinationDe
 import { useCoordinationComments } from '@/features/closet/hooks/useCoordinationComments';
 import { usePostCoordinationComment } from '@/features/closet/hooks/usePostCoordinationComment';
 import { useCopyCoordination } from '@/features/closet/hooks/useCopyCoordination';
-import { useDeleteCoordination } from '../hooks/useDeleteCoordinations';
-import { useDeleteCoordinationComment } from '../hooks/useDeleteCoordinationComment';
+import { useDeleteCoordination } from '@/features/closet/hooks/useDeleteCoordinations';
+import { useDeleteCoordinationComment } from '@/features/closet/hooks/useDeleteCoordinationComment';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
