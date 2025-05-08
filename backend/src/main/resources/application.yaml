@@ -42,14 +42,15 @@ logging.level:
 ---
 cloud:
     aws:
-        region: ap-southeast-2
+        region: ap-northeast-2
         credentials:
             access-key: ${AWS_ACCESS_KEY}
             secret-key: ${AWS_SECRET_KEY}
         sqs:
-            queue-name: MyQueue
+            url: https://sqs.ap-northeast-2.amazonaws.com/273354621375/ai-processing.fifo
+            queue-name: ai-processing.fifo
         s3:
-            bucket: sharedress-profile-img
+            bucket: ai-processing-output
             path:
                 profile: profile
                 coordination: coordination

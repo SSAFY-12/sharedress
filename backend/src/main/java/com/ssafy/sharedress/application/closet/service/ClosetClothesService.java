@@ -172,11 +172,18 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			closetClothesRepository.save(closetClothes);
 			log.info("내 옷장 등록 완료: clothesId={}, closetId={}", clothes.getId(), closet.getId());
 		});
-		// 한번에 SQS로 전송
+
 		if (!itemsToProcess.isEmpty()) {
 			AiProcessMessageRequest message = new AiProcessMessageRequest(memberId, member.getFcmToken(),
 				itemsToProcess);
-			sqsMessageSender.send(message);
+
+			try {
+				sqsMessageSender.send(message);
+				log.debug("SQS 전송 성공");
+			} catch (Exception e) {
+				log.error("SQS 전송 중 예외 발생: {}", e.getMessage(), e);
+				throw new RuntimeException("메시지 전송 실패", e);
+			}
 		}
 	}
 }
