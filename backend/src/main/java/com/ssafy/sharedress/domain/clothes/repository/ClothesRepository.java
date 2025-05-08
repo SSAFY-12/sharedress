@@ -21,4 +21,6 @@ public interface ClothesRepository {
 	);
 
 	List<Clothes> findAllByIds(List<Long> ids);
+
+	Optional<Clothes> findById(Long id);
 }

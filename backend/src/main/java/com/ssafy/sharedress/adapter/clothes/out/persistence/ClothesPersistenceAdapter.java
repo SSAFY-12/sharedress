@@ -107,4 +107,9 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 	public List<Clothes> findAllByIds(List<Long> ids) {
 		return clothesJpaRepository.findAllById(ids);
 	}
+
+	@Override
+	public Optional<Clothes> findById(Long id) {
+		return clothesJpaRepository.findById(id);
+	}
 }

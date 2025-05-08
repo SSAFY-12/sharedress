@@ -94,12 +94,13 @@ public class ClosetClothesController {
 	}
 
 	@PostMapping("/closet/clothes/library")
-	public ResponseEntity<ResponseWrapper<Void>> addClothesToCloset(
+	public ResponseEntity<ResponseWrapper<Long>> addClothesToCloset(
 		@RequestBody AddLibraryClothesToClosetRequest request
 	) {
 		Long myId = 1L; // TODO: 시큐리티 컨텍스트에서 추출 예정
-		closetClothesUseCase.addLibraryClothesToCloset(request.itemsId(), myId);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, null);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED,
+			closetClothesUseCase.addLibraryClothesToCloset(request.itemId(), myId)
+		);
 	}
 
 	@PostMapping("/closet/clothes/purchase-history")

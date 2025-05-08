@@ -1,10 +1,8 @@
 package com.ssafy.sharedress.application.closet.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,29 +96,24 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 	@Transactional
 	@Override
-	public void addLibraryClothesToCloset(List<Long> clothesIds, Long memberId) {
+	public Long addLibraryClothesToCloset(Long clothesId, Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		Closet closet = closetRepository.findByMemberId(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
-		List<Clothes> clothesList = clothesRepository.findAllByIds(clothesIds);
+		Clothes clothes = clothesRepository.findById(clothesId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
 
-		Set<Long> existingClothesIds = new HashSet<>(
-			closetClothesRepository
-				.findClothesIdsByClosetIdAndClothesIdIn(closet.getId(), clothesIds));
-
-		for (Clothes clothes : clothesList) {
-			if (existingClothesIds.contains(clothes.getId())) {
-				continue; // 이미 내 옷장에 있는 옷은 추가 X
-			}
-
-			ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
-			closetClothes.updateImgUrl(clothes.getImageUrl());
-			closetClothes.updateIsPublic(true);
-			closetClothesRepository.save(closetClothes);
+		if (closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(), clothes.getId())) {
+			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOTHES_ALREADY_EXISTS);
 		}
+
+		ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
+		closetClothes.updateImgUrl(clothes.getImageUrl());
+		closetClothes.updateIsPublic(true);
+		return closetClothesRepository.save(closetClothes).getId();
 	}
 
 	@Transactional
