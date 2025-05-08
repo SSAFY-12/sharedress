@@ -1,17 +1,19 @@
 import { useLocation, Outlet } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
+import SocialHeader from './SocialHeader';
 import { headerConfig } from '@/constants/headerConfig';
 import { NavConfig } from '@/constants/navConfig';
 
 export const MobileLayout = () => {
 	const location = useLocation();
+	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const headerProps = headerConfig[
 		location.pathname as keyof typeof headerConfig
 	] || {
 		showBack: false,
 		subtitle: '',
-		badgeType: 'info' as const,
+		badgeIcon: 'info',
 		badgeText: '',
 	};
 
@@ -23,7 +25,7 @@ export const MobileLayout = () => {
 	return (
 		<div className='min-h-screen flex flex-col'>
 			<header className='fixed top-0 left-0 right-0 bg-white z-10'>
-				<Header {...headerProps} />
+				{isSocial ? <SocialHeader /> : <Header {...headerProps} />}
 			</header>
 			<main
 				className={`flex-1 mt-16 ${

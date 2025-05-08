@@ -1,148 +1,86 @@
 import { SearchBar } from '@/components/inputs/search-bar';
 import { UserRowItem } from '@/containers/UserRowItem';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import useFriendList from '@/features/social/hooks/useFriendList';
+import useSearchFriend from '@/features/social/hooks/useSearchFriend';
 
 // 메인 컴포넌트
 export const FriendsListPage = () => {
-	const [searchValue, setSearchValue] = useState('');
+	const [searchValue, setSearchValue] = useState(''); // 검색어 입력값(현재 검색어 저장)
+	const [keyword, setKeyword] = useState(''); // 실제 검색에 사용될 키워드 === 검색 API 호출시 사용되는 최종 검색어
+	// 내 친구 목록 검색
+	const { data: friends } = useFriendList();
+	const { searchMyFriend } = useSearchFriend(keyword);
 
-	// 더미 데이터
-	const friends = [
-		{
-			id: 1,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=40&width=40',
-			status: '난 도날드 덕이 좋아!',
-		},
-		{
-			id: 2,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=40&width=40',
-			status: '난 도날드 덕이 좋아!',
-		},
-		{
-			id: 3,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=40&width=40',
-			status: '난 도날드 덕이 좋아!',
-		},
-		{
-			id: 4,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=40&width=40',
-			status: '난 도날드 덕이 좋아!',
-		},
-		{
-			id: 5,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=40&width=40',
-			status: '난 도날드 덕이 좋아!',
-		},
-		{
-			id: 6,
-			name: '예승아기',
-			avatar: '/placeholder.svg?height=40&width=40',
-			status: '난 도날드 덕이 좋아!',
-		},
-	];
-
+	// 친구 검색 전송 이벤트
 	const handleSearch = (e: any) => {
-		e.preventDefault();
-		// 검색 로직 구현
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			setKeyword(searchValue);
+		}
 	};
 
+	// 친구 검색 이름 제한 20글자이내
+	const handleSearchChange = ({
+		target: { value },
+	}: React.ChangeEvent<HTMLInputElement>) => {
+		if (value.length <= 20) {
+			setSearchValue(value);
+		}
+	};
+
+	// 친구 검색 이름 제한 20글자이내
 	return (
-		<div className='flex flex-col h-screen max-w-md mx-auto bg-white'>
+		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
 			{/* 검색 영역 */}
-			<div className='px-4 py-3'>
+			<div className='py-3 px-3'>
 				<SearchBar
-					placeholder='검색'
+					placeholder='친구 검색 (최대 20자)'
 					value={searchValue}
-					onChange={(e) => setSearchValue(e.target.value)}
-					onSubmit={handleSearch}
+					onChange={handleSearchChange}
+					onKeyDown={handleSearch}
 				/>
 			</div>
 
+			{/* 검색을 하고 나면 검색 결과 목록 보여줘야함 -> 검색 결과 목록 컴포넌트 만들어야함 (친구 목록 영역이 아닌 검색 결과 목록 영역) */}
+			{/* 전환될 영역 하위 -> searchValue 여부에 따라 */}
+			{/* attribute button text넣어야함 */}
 			{/* 친구 목록 영역 */}
-			<div className='flex-1 overflow-auto'>
-				{friends.map((friend) => (
-					<UserRowItem
-						key={friend.id}
-						userName={friend.name}
-						userAvatar={friend.avatar}
-						onClick={() => console.log('Navigate to user profile')}
-					/>
-				))}
-			</div>
-
-			{/* 현재 채팅 표시 */}
-			<div className='fixed bottom-20 right-6'>
-				<div className='bg-rose-500 text-white rounded-full p-3 shadow-lg'>
-					<span className='text-sm font-medium'>현재</span>
+			{!keyword ? (
+				<div>
+					{friends?.map((friend) => (
+						//id, nickname, profileImage, oneLiner
+						<UserRowItem
+							key={friend.id}
+							userName={friend.nickname}
+							userAvatar={friend.profileImage}
+							userStatus={friend.oneLiner}
+							actionType='arrow'
+							onClick={() => console.log('Navigate to user profile')}
+							// user 클릭시 프로필 이동
+						/>
+					))}
 				</div>
-			</div>
-
-			{/* 네비게이션 바 */}
-			<div className='border-t py-3 flex justify-around items-center'>
-				<div className='flex flex-col items-center'>
-					<div className='h-6 w-6 flex items-center justify-center'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							width='24'
-							height='24'
-							viewBox='0 0 24 24'
-							fill='none'
-							stroke='currentColor'
-							strokeWidth='2'
-							strokeLinecap='round'
-							strokeLinejoin='round'
-						>
-							<path d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'></path>
-							<circle cx='12' cy='7' r='4'></circle>
-						</svg>
-					</div>
-					<span className='text-xs mt-1'>FRIENDS</span>
+			) : (
+				// 검색 결과 목록
+				<div>
+					{Array.isArray(searchMyFriend) && searchMyFriend.length > 0 ? (
+						searchMyFriend.map((friend) => (
+							<UserRowItem
+								key={friend.id}
+								userName={friend.nickname}
+								userAvatar={friend.profileImage}
+								userStatus={friend.oneLiner}
+								actionType='arrow'
+								onClick={() => console.log('Navigate to user profile')}
+								//user 클릭시 프로필 이동
+							/>
+						))
+					) : (
+						<p>검색 결과가 없습니다.</p>
+					)}
 				</div>
-
-				<div className='flex flex-col items-center -mt-5'>
-					<div className='bg-gray-800 rounded-full p-3'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							width='24'
-							height='24'
-							viewBox='0 0 24 24'
-							fill='none'
-							stroke='white'
-							strokeWidth='2'
-							strokeLinecap='round'
-							strokeLinejoin='round'
-						>
-							<path d='M5 12h14'></path>
-							<path d='M12 5v14'></path>
-						</svg>
-					</div>
-				</div>
-
-				<div className='flex flex-col items-center'>
-					<div className='h-6 w-6 flex items-center justify-center'>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							width='24'
-							height='24'
-							viewBox='0 0 24 24'
-							fill='none'
-							stroke='currentColor'
-							strokeWidth='2'
-							strokeLinecap='round'
-							strokeLinejoin='round'
-						>
-							<path d='M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z'></path>
-							<path d='M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'></path>
-						</svg>
-					</div>
-					<span className='text-xs mt-1'>CLOSET</span>
-				</div>
-			</div>
+			)}
 		</div>
 	);
 };

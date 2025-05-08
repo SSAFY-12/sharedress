@@ -4,6 +4,7 @@ export const SearchBar = ({
 	placeholder,
 	value,
 	onChange,
+	onKeyDown,
 	onSubmit,
 	className = '',
 }: SearchBarProps) => (
@@ -15,6 +16,7 @@ export const SearchBar = ({
 				placeholder={placeholder}
 				value={value}
 				onChange={onChange}
+				onKeyDown={onKeyDown}
 				className='bg-background text-default text-regular placeholder:text-default placeholder:text-description outline-none'
 			/>
 		</div>
