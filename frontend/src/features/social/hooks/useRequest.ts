@@ -27,17 +27,15 @@ const useRequest = (memberId?: number) => {
 		},
 	});
 
-	// 특정 친구 요청 조회
+	// 특정 친구 요청 조회 - memberId가 있을 때만 실행
 	const {
 		data: friendRequest,
 		isLoading: isFriendRequestLoading,
 		error: friendRequestError,
 	} = useQuery<FriendRequest, Error>({
-		queryKey: ['friendRequest', memberId], // 특정 친구 요청 조회, 해당 memberId 키값으로 조회
-		queryFn: (
-			{ queryKey }, //객체값으로 전달
-		) => socialApi.getFriendRequest(queryKey[1] as number),
-		enabled: !!memberId,
+		queryKey: ['friendRequest', memberId],
+		queryFn: () => socialApi.getFriendRequest(memberId as number),
+		enabled: !!memberId, // memberId가 있을 때만 실행
 	});
 
 	// 친구 요청 수락
