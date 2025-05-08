@@ -107,7 +107,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
 
 		if (closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(), clothes.getId())) {
-			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOTHES_ALREADY_EXISTS);
+			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOSET_CLOTHES_ALREADY_EXISTS);
 		}
 
 		ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
