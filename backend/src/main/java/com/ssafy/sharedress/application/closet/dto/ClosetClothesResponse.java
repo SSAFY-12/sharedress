@@ -11,7 +11,8 @@ public record ClosetClothesResponse(
 	String name,
 	String brandName,
 	Boolean isPublic,
-	LocalDateTime createdAt
+	LocalDateTime createdAt,
+	Long libraryId
 ) {
 	public static ClosetClothesResponse from(ClosetClothes entity) {
 		Clothes clothes = entity.getClothes();
@@ -22,7 +23,8 @@ public record ClosetClothesResponse(
 			entity.getCustomName() != null ? entity.getCustomName() : clothes.getName(),
 			entity.getCustomBrand() != null ? entity.getCustomBrand().getNameKr() : clothes.getBrand().getNameKr(),
 			Boolean.TRUE.equals(entity.getIsPublic()),
-			entity.getCreatedAt()
+			entity.getCreatedAt(),
+			clothes != null ? clothes.getId() : null
 		);
 	}
 }
