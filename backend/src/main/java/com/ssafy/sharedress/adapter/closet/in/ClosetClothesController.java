@@ -61,11 +61,11 @@ public class ClosetClothesController {
 
 	@GetMapping("/closet/clothes/{closetClothesId}")
 	public ResponseEntity<ResponseWrapper<ClosetClothesDetailResponse>> getClosetClothesDetail(
-		@PathVariable("closetClothesId") Long closetClothesId
+		@PathVariable("closetClothesId") Long closetClothesId,
+		@CurrentMember Member member
 	) {
-		// TODO[준]: security context 에서 myId 가져오기
-		Long myId = 1L;
-		ClosetClothesDetailResponse result = closetClothesQueryUseCase.getClosetClothesDetail(myId, closetClothesId);
+		ClosetClothesDetailResponse result = closetClothesQueryUseCase.getClosetClothesDetail(member.getId(),
+			closetClothesId);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
@@ -73,43 +73,41 @@ public class ClosetClothesController {
 	@PutMapping("/closet/clothes/{closetClothesId}")
 	public ResponseEntity<ResponseWrapper<ClosetClothesDetailResponse>> updateClosetClothes(
 		@PathVariable("closetClothesId") Long closetClothesId,
-		@RequestBody ClosetClothesUpdateRequest request
+		@RequestBody ClosetClothesUpdateRequest request,
+		@CurrentMember Member member
 	) {
-		// TODO[준]: security context 에서 myId 가져오기
-		Long myId = 1L;
-		ClosetClothesDetailResponse result = closetClothesUseCase.updateClosetClothes(myId, closetClothesId, request);
+		ClosetClothesDetailResponse result = closetClothesUseCase.updateClosetClothes(member.getId(), closetClothesId,
+			request);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 
 	@DeleteMapping("/closet/clothes/{closetClothesId}")
 	public ResponseEntity<ResponseWrapper<Void>> removeClosetClothes(
-		@PathVariable("closetClothesId") Long closetClothesId
+		@PathVariable("closetClothesId") Long closetClothesId,
+		@CurrentMember Member member
 	) {
-		// TODO[준]: security context 에서 myId 가져오기
-		Long myId = 1L;
-		closetClothesUseCase.removeClosetClothes(myId, closetClothesId);
+		closetClothesUseCase.removeClosetClothes(member.getId(), closetClothesId);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
 	@PostMapping("/closet/clothes/library")
 	public ResponseEntity<ResponseWrapper<Long>> addClothesToCloset(
-		@RequestBody AddLibraryClothesToClosetRequest request
+		@RequestBody AddLibraryClothesToClosetRequest request,
+		@CurrentMember Member member
 	) {
-		Long myId = 1L; // TODO: 시큐리티 컨텍스트에서 추출 예정
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED,
-			closetClothesUseCase.addLibraryClothesToCloset(request.itemId(), myId)
+			closetClothesUseCase.addLibraryClothesToCloset(request.itemId(), member.getId())
 		);
 	}
 
 	@PostMapping("/closet/clothes/purchase-history")
 	public ResponseEntity<ResponseWrapper<Void>> registerClothesFromPurchase(
-		@RequestBody PurchaseHistoryRequest request) {
-
-		// TODO[지윤]: security context에서 memberId를 가져오는 로직 추가
-		Long myId = 1L;
-		closetClothesUseCase.registerClothesFromPurchase(request, myId);
+		@RequestBody PurchaseHistoryRequest request,
+		@CurrentMember Member member
+	) {
+		closetClothesUseCase.registerClothesFromPurchase(request, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
 	}
 }

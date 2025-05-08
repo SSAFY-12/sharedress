@@ -17,6 +17,8 @@ import com.ssafy.sharedress.application.coordination.dto.CreateCommentRequest;
 import com.ssafy.sharedress.application.coordination.dto.UpdateCommentRequest;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationCommentQueryUseCase;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationCommentUseCase;
+import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
@@ -32,10 +34,10 @@ public class CoordinationCommentController {
 	@PostMapping("/coordinations/{coordinationId}/comments")
 	public ResponseEntity<ResponseWrapper<CoordinationCommentResponse>> createComment(
 		@PathVariable Long coordinationId,
-		@RequestBody CreateCommentRequest request
+		@RequestBody CreateCommentRequest request,
+		@CurrentMember Member member
 	) {
-		Long memberId = 1L; // TODO[지윤]: @CurrentMember로 변경하기
-		CoordinationCommentResponse result = commentUseCase.createComment(coordinationId, request, memberId);
+		CoordinationCommentResponse result = commentUseCase.createComment(coordinationId, request, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, result);
 	}
 
@@ -43,31 +45,32 @@ public class CoordinationCommentController {
 	public ResponseEntity<ResponseWrapper<CoordinationCommentResponse>> updateComment(
 		@PathVariable Long coordinationId,
 		@PathVariable Long commentId,
-		@RequestBody UpdateCommentRequest request
+		@RequestBody UpdateCommentRequest request,
+		@CurrentMember Member member
 	) {
-		Long memberId = 1L; // TODO[지윤]: @CurrentMember로 변경하기
-		CoordinationCommentResponse result = commentUseCase.updateComment(coordinationId, commentId, request, memberId);
+		CoordinationCommentResponse result = commentUseCase.updateComment(coordinationId, commentId, request,
+			member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 
 	@DeleteMapping("/coordinations/{coordinationId}/comments/{commentId}")
 	public ResponseEntity<ResponseWrapper<Void>> deleteComment(
 		@PathVariable Long coordinationId,
-		@PathVariable Long commentId
+		@PathVariable Long commentId,
+		@CurrentMember Member member
 	) {
-		Long memberId = 1L; // TODO[지윤]: @CurrentMember로 변경하기
-		commentUseCase.removeComment(coordinationId, commentId, memberId);
+		commentUseCase.removeComment(coordinationId, commentId, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
 	@GetMapping("/coordinations/{coordinationId}/comments")
 	public ResponseEntity<ResponseWrapper<List<CoordinationCommentResponse>>> getComments(
-		@PathVariable Long coordinationId
+		@PathVariable Long coordinationId,
+		@CurrentMember Member member
 	) {
-		Long memberId = 1L; // TODO[준]: @CurrentMember로 변경하기
 		List<CoordinationCommentResponse> result = commentQueryUseCase.getCoordinationComments(
 			coordinationId,
-			memberId
+			member.getId()
 		);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
