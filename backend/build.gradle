@@ -108,9 +108,6 @@ dependencies {
 
 	// S3
 	implementation "software.amazon.awssdk:s3"
-
-	// Firebase
-	implementation 'com.google.firebase:firebase-admin:9.4.3'
 }
 
 tasks.named('test') {
