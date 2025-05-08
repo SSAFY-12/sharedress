@@ -49,33 +49,37 @@ export default defineConfig(({ mode }) => {
 			react(), // https 환경을 위한 setting
 			mkcert(), // 타입스크립트/ESLint 실시간 체크 플러그인
 			VitePWA({
-				registerType: 'autoUpdate', // 서비스워커가 항상 최신 상태로 자동 업데이트
-				injectRegister: 'auto', // 서비스워커 등록 스크립트 자동 삽입
-				devOptions: { enabled: true, type: 'module' }, // 개발 모드에서도 PWA 테스트 가능
-				includeAssets: [
-					'favicon.ico', // 파비콘
-					'apple-touch-icon.png', // iOS 홈화면 아이콘
-					'favicon-16x16.png',
-					'favicon-32x32.png',
-					'android-chrome-192x192.png',
-					'android-chrome-512x512.png',
-				],
+				registerType: 'autoUpdate',
+				injectRegister: 'auto',
+				devOptions: {
+					enabled: true,
+					type: 'classic',
+				},
+				strategies: 'injectManifest',
+				srcDir: 'src',
+				filename: 'sw.js',
+				workbox: {
+					disableDevLogs: true,
+					clientsClaim: true,
+					skipWaiting: true,
+					globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'],
+				},
 				manifest: {
-					name: '쉐어드레스', // 앱 전체 이름
-					short_name: '쉐어드레스', // 앱 짧은 이름
-					description: 'share + dress, share + address', // 앱 설명
-					theme_color: '#242424', // 앱 테마 색상(상단바 등)
-					background_color: '#ffffff', // 앱 배경색
-					display: 'standalone', // 앱처럼 보이게(상태바 등은 보임)
-					orientation: 'portrait-primary', // 세로모드 고정
-					start_url: '/', // 앱 시작 경로
-					scope: '/', // PWA 적용 범위
+					name: '쉐어드레스',
+					short_name: '쉐어드레스',
+					description: 'share + dress, share + address',
+					theme_color: '#242424',
+					background_color: '#ffffff',
+					display: 'standalone',
+					orientation: 'portrait-primary',
+					start_url: '/',
+					scope: '/',
 					icons: [
 						{
 							src: '/android-chrome-192x192.png',
 							sizes: '192x192',
 							type: 'image/png',
-							purpose: 'any maskable', // 마스커블 아이콘 지원
+							purpose: 'any maskable',
 						},
 						{
 							src: '/android-chrome-512x512.png',
@@ -85,13 +89,14 @@ export default defineConfig(({ mode }) => {
 						},
 					],
 				},
-				workbox: {
-					disableDevLogs: true,
-					clientsClaim: true, // 새 서비스워커가 즉시 모든 탭을 제어
-					skipWaiting: true, // 새 서비스워커가 대기 없이 즉시 활성화
-					globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'], // precache할 파일 확장자
-					// 필요하다면 runtimeCaching 등 추가 가능 => API 생성 후 추가 권장
-				},
+				includeAssets: [
+					'favicon.ico',
+					'apple-touch-icon.png',
+					'favicon-16x16.png',
+					'favicon-32x32.png',
+					'android-chrome-192x192.png',
+					'android-chrome-512x512.png',
+				],
 			}),
 			checker({
 				typescript: true, // 타입스크립트 타입 체크
