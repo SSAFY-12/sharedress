@@ -1,19 +1,16 @@
-import { ClothItem } from '@/components/cards/cloth-card';
 import Header from '@/components/layouts/Header';
 import { CodiEditor } from '@/containers/CodiEditor';
 import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
 import NavBar from '@/components/layouts/NavBar';
-import { useNavigate } from 'react-router-dom';
-
-const SampleClothItem: ClothItem = {
-	id: '1',
-	category: '아우터',
-	name: '빈티지 워싱 카라 투웨이 크롭 데님자켓',
-	imageUrl: 'https://picsum.photos/200',
-};
+import { useNavigate, useParams } from 'react-router-dom';
+import { useClothDetail } from '../hooks/useClothDetail';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
+	const { id } = useParams();
+	const clothId = Number(id);
+
+	const { data: cloth, isLoading, isError } = useClothDetail(clothId);
 
 	const handleBackClick = () => {
 		if (window.history.length > 1) {
@@ -23,20 +20,28 @@ const ClothDetailPage = () => {
 		}
 	};
 
+	if (isLoading) return <div className='p-4'>불러오는 중...</div>;
+	if (isError || !cloth)
+		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
+
 	return (
 		<div className='flex flex-col h-screen bg-white max-w-md mx-auto'>
 			<Header showBack={true} onBackClick={handleBackClick} />
 
 			<div className='flex-1 overflow-auto pb-20'>
-				<CodiEditor item={SampleClothItem}>
+				<CodiEditor
+					item={{
+						id: cloth.id.toString(),
+						name: cloth.name,
+						imageUrl: cloth.image,
+						category: cloth.category.name,
+					}}
+				>
 					<div className='px-4'>
-						<ClothDetailItem label='상품명' value={SampleClothItem.name} />
-						<ClothDetailItem
-							label='카테고리'
-							value={SampleClothItem.category}
-						/>
-						<ClothDetailItem label='브랜드' value='앤드모어' />
-						<ClothDetailItem label='색깔' value='데님' />
+						<ClothDetailItem label='상품명' value={cloth.name} />
+						<ClothDetailItem label='카테고리' value={cloth.category.name} />
+						<ClothDetailItem label='브랜드' value={cloth.brandName} />
+						<ClothDetailItem label='색깔' value={cloth.color.name} />
 					</div>
 				</CodiEditor>
 			</div>

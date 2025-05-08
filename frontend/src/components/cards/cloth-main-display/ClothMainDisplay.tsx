@@ -9,6 +9,7 @@ export const ClothMainDisplay = ({
 	className = '',
 	showMoreButton = false,
 	onMoreButtonClick,
+	recommender = null,
 }: ClothMainDisplayProps) => (
 	<div
 		className={`relative w-full aspect-[10/11] border rounded-md overflow-hidden ${className}`}
@@ -29,6 +30,21 @@ export const ClothMainDisplay = ({
 				<MoreVertical size={20} className='text-gray-400' />
 			</button>
 		)}
+
+		{/* 추천인 정보 */}
+		{recommender && (
+			<div className='absolute bottom-2 right-2 flex items-center'>
+				<img
+					src={recommender.imageUrl}
+					alt={recommender.name}
+					className='w-7 h-7 rounded-full mr-2 object-cover'
+				/>
+				<span className='text-xs font-medium text-[#3a3636'>
+					{recommender.name}님의 추천 코디
+				</span>
+			</div>
+		)}
+
 		{editable && (
 			<div
 				onClick={onClick}
