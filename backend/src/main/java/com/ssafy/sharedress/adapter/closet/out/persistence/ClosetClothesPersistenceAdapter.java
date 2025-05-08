@@ -116,7 +116,7 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	}
 
 	@Override
-	public List<Long> findClothesIdsByClosetIdAndClothesIdIn(Long closetId, List<Long> clothesIds) {
-		return closetClothesJpaRepository.findClothesIdsByClosetIdAndClothesIdIn(closetId, clothesIds);
+	public Boolean existsById(Long closetClothesId) {
+		return closetClothesJpaRepository.existsById(closetClothesId);
 	}
 }

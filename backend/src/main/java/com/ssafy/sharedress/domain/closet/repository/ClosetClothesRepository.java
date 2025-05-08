@@ -1,6 +1,5 @@
 package com.ssafy.sharedress.domain.closet.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
@@ -25,5 +24,5 @@ public interface ClosetClothesRepository {
 
 	void deleteById(Long closetClothesId);
 
-	List<Long> findClothesIdsByClosetIdAndClothesIdIn(Long closetId, List<Long> clothesIds);
+	Boolean existsById(Long closetClothesId);
 }
