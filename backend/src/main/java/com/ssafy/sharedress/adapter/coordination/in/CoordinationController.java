@@ -49,7 +49,6 @@ public class CoordinationController {
 		@RequestBody CoordinationRequestDto request,
 		@CurrentMember Member member
 	) {
-		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
 		CoordinationResponse response = coordinationUseCase.saveMyCoordination(member.getId(), request);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, response);
 	}
@@ -87,10 +86,11 @@ public class CoordinationController {
 	@GetMapping("/coordinations/{coordinationId}")
 	public ResponseEntity<ResponseWrapper<CoordinationDetailResponse>> getCoordinationDetail(
 		@PathVariable("coordinationId") Long coordinationId,
-		@CurrentMember(required = false) Member member
+		@CurrentMember(required = false) Member member,
+		@CurrentGuest(required = false) Guest guest
 	) {
-		Long myId = 1L; // TODO[준]: security context 에서 myId 가져오기
-		CoordinationDetailResponse response = coordinationQueryUseCase.getCoordinationDetail(member.getId(),
+		UserContext userContext = new UserContext(member, guest);
+		CoordinationDetailResponse response = coordinationQueryUseCase.getCoordinationDetail(userContext.getId(),
 			coordinationId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
 	}

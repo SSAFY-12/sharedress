@@ -19,4 +19,9 @@ public class ClosetPersistenceAdapter implements ClosetRepository {
 	public Optional<Closet> findByMemberId(Long memberId) {
 		return closetJpaRepository.findByMemberId(memberId);
 	}
+
+	@Override
+	public void save(Closet closet) {
+		closetJpaRepository.save(closet);
+	}
 }

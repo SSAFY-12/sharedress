@@ -11,6 +11,8 @@ import com.ssafy.sharedress.application.auth.dto.GoogleUserInfoResponse;
 import com.ssafy.sharedress.application.auth.dto.TokenWithRefresh;
 import com.ssafy.sharedress.application.auth.usecase.GoogleLoginUseCase;
 import com.ssafy.sharedress.application.jwt.TokenUseCase;
+import com.ssafy.sharedress.domain.closet.entity.Closet;
+import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 
@@ -23,6 +25,7 @@ public class GoogleLoginService implements GoogleLoginUseCase {
 	private final GoogleUserInfoClient googleUserInfoClient;
 	private final MemberRepository memberRepository;
 	private final TokenUseCase tokenUseCase;
+	private final ClosetRepository closetRepository;
 
 	@Transactional
 	@Override
@@ -37,6 +40,7 @@ public class GoogleLoginService implements GoogleLoginUseCase {
 			String code = generateUniqueNicknameCode(userInfo.name());
 			Member newMember = new Member(userInfo.email(), userInfo.picture(), userInfo.name(), code);
 			member = Optional.ofNullable(memberRepository.save(newMember));
+			closetRepository.save(new Closet(member.get()));
 		}
 
 		// 3. JWT 토큰 발급 & 저장

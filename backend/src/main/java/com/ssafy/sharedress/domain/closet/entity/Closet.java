@@ -27,4 +27,8 @@ public class Closet {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
+
+	public Closet(Member member) {
+		this.member = member;
+	}
 }

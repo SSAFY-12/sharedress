@@ -40,7 +40,12 @@ public class SecurityConfig {
 				.accessDeniedHandler(accessDeniedHandler)
 			)
 			.authorizeHttpRequests(auth -> auth
-				// .requestMatchers("/api/auth/**").permitAll()
+				.requestMatchers("/api/auth/**").permitAll()
+				.requestMatchers("/api/clothes").permitAll()
+				.requestMatchers("/api/clothes/categories").permitAll()
+				.requestMatchers("/api/clothes/colors").permitAll()
+				.requestMatchers("/api/clothes/brands").permitAll()
+				.requestMatchers("/api/clothes/shoppingmalls").permitAll()
 				// .anyRequest().authenticated()
 				.anyRequest().permitAll() // 개발 테스트 위해 모든 요청 허용
 			)
