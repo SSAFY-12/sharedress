@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getTokenExpiration } from '@/features/auth/utils/tokenUtils';
 import useRefresh from './useRefresh';
+import { useNavigate } from 'react-router-dom';
 
 const TOKEN_EXPIRATION_BUFFER = 10 * 60 * 1000; // 10분 버퍼
 
@@ -24,6 +25,7 @@ if (token) {
 export const useTokenValidation = () => {
 	const { accessToken, isInitialized } = useAuthStore();
 	const { mutateAsync: refreshAsync } = useRefresh();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		// 초기화가 완료되지 않았다면 토큰 검증을 하지 않음
@@ -48,6 +50,10 @@ export const useTokenValidation = () => {
 						에러: error,
 						시간: new Date().toLocaleString('ko-KR'),
 					});
+					// 리프레시 토큰이 없는 경우 로그인 페이지로 이동
+					if (!document.cookie.includes('refreshToken')) {
+						navigate('/auth');
+					}
 				});
 			return;
 		}
@@ -67,6 +73,10 @@ export const useTokenValidation = () => {
 						에러: error,
 						시간: new Date().toLocaleString('ko-KR'),
 					});
+					// 리프레시 토큰이 없는 경우 로그인 페이지로 이동
+					if (!document.cookie.includes('refreshToken')) {
+						navigate('/auth');
+					}
 				});
 			return;
 		}
@@ -97,6 +107,10 @@ export const useTokenValidation = () => {
 						에러: error,
 						시간: new Date().toLocaleString('ko-KR'),
 					});
+					// 리프레시 토큰이 없는 경우 로그인 페이지로 이동
+					if (!document.cookie.includes('refreshToken')) {
+						navigate('/auth');
+					}
 				});
 		}
 
@@ -117,6 +131,10 @@ export const useTokenValidation = () => {
 							에러: error,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
+						// 리프레시 토큰이 없는 경우 로그인 페이지로 이동
+						if (!document.cookie.includes('refreshToken')) {
+							navigate('/auth');
+						}
 					});
 				return;
 			}
@@ -136,6 +154,10 @@ export const useTokenValidation = () => {
 							에러: error,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
+						// 리프레시 토큰이 없는 경우 로그인 페이지로 이동
+						if (!document.cookie.includes('refreshToken')) {
+							navigate('/auth');
+						}
 					});
 				return;
 			}
@@ -157,6 +179,10 @@ export const useTokenValidation = () => {
 							에러: error,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
+						// 리프레시 토큰이 없는 경우 로그인 페이지로 이동
+						if (!document.cookie.includes('refreshToken')) {
+							navigate('/auth');
+						}
 					});
 			}
 		}, 30000);
@@ -164,5 +190,5 @@ export const useTokenValidation = () => {
 		return () => {
 			clearInterval(intervalId);
 		};
-	}, [accessToken, refreshAsync, isInitialized]);
+	}, [accessToken, refreshAsync, isInitialized, navigate]);
 };

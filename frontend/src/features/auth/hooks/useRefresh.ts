@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/useAuthStore';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const useRefresh = () => {
-	// const navigate = useNavigate();
+	const navigate = useNavigate();
 	const { setAccessToken, clearAuth } = useAuthStore(); // 토큰 저장 및 로그아웃 함수
 
 	return useMutation({
@@ -52,7 +52,7 @@ const useRefresh = () => {
 			// 리프레시 토큰이 없는 경우에만 로그인 페이지로 이동
 			if (!document.cookie.includes('refreshToken')) {
 				clearAuth(); // 토큰 저장 및 로그아웃 함수
-				// navigate('/auth'); // 로그인 페이지로 이동
+				navigate('/auth'); // 로그인 페이지로 이동
 			}
 		},
 	});
