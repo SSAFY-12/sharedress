@@ -5,11 +5,18 @@ import ClosetTab from '@/features/closet/components/ClosetTab';
 import CodiTab from '@/features/closet/components/CodiTab';
 import NavBar from '@/components/layouts/NavBar';
 import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
+import { useLocation } from 'react-router-dom';
 
 const MyClosetPage = () => {
+	const location = useLocation();
+	const initialTab = location.state?.initialTab as
+		| 'closet'
+		| 'codi'
+		| undefined;
+
 	// 상태 관리
 	const [activeMainTab, setActiveMainTab] = useState<'closet' | 'codi'>(
-		'closet',
+		initialTab ?? 'closet',
 	);
 	const { data: profile } = useMyProfile();
 

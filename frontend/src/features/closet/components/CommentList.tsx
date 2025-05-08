@@ -1,3 +1,4 @@
+import { useProfileStore } from '@/store/useProfileStore';
 import CommentItem from './CommentItem';
 
 interface Comment {
@@ -22,6 +23,8 @@ const CommentList = ({
 	onCommentMoreClick,
 	className,
 }: CommentListProps) => {
+	const profile = useProfileStore((state) => state.profile);
+
 	if (comments.length === 0) {
 		return (
 			<p className='text-gray-500 text-center py-4'>아직 댓글이 없습니다.</p>
@@ -34,6 +37,7 @@ const CommentList = ({
 				<CommentItem
 					key={comment.id}
 					comment={comment}
+					isMine={comment.author.id === profile?.id.toString()}
 					onMoreClick={onCommentMoreClick}
 				/>
 			))}

@@ -12,6 +12,8 @@ import { useCoordinationDetail } from '@/features/closet/hooks/useCoordinationDe
 import { useCoordinationComments } from '@/features/closet/hooks/useCoordinationComments';
 import { usePostCoordinationComment } from '@/features/closet/hooks/usePostCoordinationComment';
 import { useCopyCoordination } from '@/features/closet/hooks/useCopyCoordination';
+import { useDeleteCoordination } from '../hooks/useDeleteCoordinations';
+import { useDeleteCoordinationComment } from '../hooks/useDeleteCoordinationComment';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
@@ -27,6 +29,9 @@ const CodiDetailPage = () => {
 		isError,
 	} = useCoordinationDetail(coordinationId);
 	const { data: commentsRaw = [] } = useCoordinationComments(coordinationId);
+	const { mutate: deleteCoordination } = useDeleteCoordination();
+	const { mutate: deleteComment } =
+		useDeleteCoordinationComment(coordinationId);
 
 	const comments = commentsRaw.map((comment) => ({
 		id: comment.id,
@@ -45,6 +50,8 @@ const CodiDetailPage = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isCommentFocused, setIsCommentFocused] = useState(false);
 	const [commentText, setCommentText] = useState('');
+	const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
+	const [isCommentMenuOpen, setIsCommentMenuOpen] = useState(false);
 
 	const handleBackClick = () => {
 		navigate(-1);
@@ -64,9 +71,23 @@ const CodiDetailPage = () => {
 	};
 
 	const handleDelete = () => {
-		console.log('삭제하기 클릭');
+		if (!window.confirm('정말 삭제하시겠습니까?')) return;
+
+		deleteCoordination(coordinationId, {
+			onSuccess: () => {
+				alert('코디가 삭제되었습니다.');
+				navigate('/mypage', {
+					state: {
+						initialTab: 'codi',
+					},
+				});
+			},
+			onError: () => {
+				alert('코디 삭제에 실패했습니다. 다시 시도해주세요.');
+			},
+		});
+
 		setIsMenuOpen(false);
-		navigate(-1);
 	};
 
 	const handleCommentChange = (
@@ -87,17 +108,37 @@ const CodiDetailPage = () => {
 	};
 
 	const handleCommentMoreClick = (comment: Comment) => {
-		console.log('댓글 더보기 클릭', comment);
+		setSelectedComment(comment);
+		setIsCommentMenuOpen(true);
 	};
 
 	const handleAddToMyCloset = () => {
 		copyCoordination(id!, {
 			onSuccess: () => {
 				alert('코디가 내 코디에 추가되었습니다.');
-				navigate(`/mypage`);
+				navigate(`/mypage`, {
+					state: {
+						initialTab: 'codi',
+					},
+				});
 			},
 			onError: () => {
 				alert('코디 추가에 실패했습니다.');
+			},
+		});
+	};
+
+	const handleCommentDelete = () => {
+		if (!selectedComment) return;
+		const confirmed = window.confirm('댓글을 삭제하시겠습니까?');
+		if (!confirmed) return;
+
+		deleteComment(selectedComment.id, {
+			onSuccess: () => {
+				setIsCommentMenuOpen(false);
+			},
+			onError: () => {
+				alert('댓글 삭제에 실패했습니다. 다시 시도해주세요.');
 			},
 		});
 	};
@@ -244,6 +285,22 @@ const CodiDetailPage = () => {
 						</button>
 					</div>
 				)}
+			</BottomSheet>
+
+			<BottomSheet
+				isOpen={isCommentMenuOpen}
+				onClose={() => setIsCommentMenuOpen(false)}
+				snapPoints={[1]}
+				initialSnap={0}
+			>
+				<div className='p-4 space-y-4'>
+					<button
+						className='w-full py-3 text-red-500 font-medium text-center'
+						onClick={handleCommentDelete}
+					>
+						삭제하기
+					</button>
+				</div>
 			</BottomSheet>
 		</div>
 	);

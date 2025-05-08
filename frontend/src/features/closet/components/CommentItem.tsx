@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
-const CommentItem = ({ comment, onMoreClick }: CommentItemProps) => {
+const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 	const handleMoreClick = () => {
 		if (onMoreClick) {
 			onMoreClick(comment);
@@ -58,13 +58,15 @@ const CommentItem = ({ comment, onMoreClick }: CommentItemProps) => {
 					<p className='mt-1'>{comment.content}</p>
 				</div>
 			</div>
-			<button
-				onClick={handleMoreClick}
-				className='text-gray-400 p-1'
-				aria-label='댓글 더보기'
-			>
-				<MoreVertical size={16} />
-			</button>
+			{isMine && (
+				<button
+					onClick={handleMoreClick}
+					className='text-gray-400 p-1'
+					aria-label='댓글 더보기'
+				>
+					<MoreVertical size={16} />
+				</button>
+			)}
 		</div>
 	);
 };

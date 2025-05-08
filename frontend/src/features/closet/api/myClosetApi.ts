@@ -183,8 +183,27 @@ export const postCopyCoordination = async (coordinationId: string) => {
 };
 
 export const deleteCloth = async (closetClothesId: number) => {
+	console.log(closetClothesId);
 	const response = await client.delete(
 		`/api/closet/clothes/${closetClothesId}`,
+	);
+	return response.data;
+};
+
+export const deleteCoordination = async (coordinationId: number) => {
+	const response = await client.delete(`/api/coordinations/${coordinationId}`);
+	return response.data;
+};
+
+export const deleteCoordinationComment = async ({
+	coordinationId,
+	commentId,
+}: {
+	coordinationId: number;
+	commentId: number;
+}) => {
+	const response = await client.delete(
+		`/api/coordinations/${coordinationId}/comments/${commentId}`,
 	);
 	return response.data;
 };
