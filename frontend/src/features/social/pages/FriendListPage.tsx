@@ -3,6 +3,7 @@ import { UserRowItem } from '@/containers/UserRowItem';
 import React, { useState } from 'react';
 import useFriendList from '@/features/social/hooks/useFriendList';
 import useSearchFriend from '@/features/social/hooks/useSearchFriend';
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 
 // 메인 컴포넌트
 export const FriendsListPage = () => {
@@ -53,7 +54,7 @@ export const FriendsListPage = () => {
 						<UserRowItem
 							key={friend.id}
 							userName={friend.nickname}
-							userAvatar={friend.profileImage}
+							userAvatar={getOptimizedImageUrl(friend.profileImage)}
 							userStatus={friend.oneLiner}
 							actionType='arrow'
 							onClick={() => console.log('Navigate to user profile')}
@@ -69,7 +70,7 @@ export const FriendsListPage = () => {
 							<UserRowItem
 								key={friend.id}
 								userName={friend.nickname}
-								userAvatar={friend.profileImage}
+								userAvatar={getOptimizedImageUrl(friend.profileImage)}
 								userStatus={friend.oneLiner}
 								actionType='arrow'
 								onClick={() => console.log('Navigate to user profile')}

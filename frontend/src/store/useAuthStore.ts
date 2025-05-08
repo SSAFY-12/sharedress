@@ -1,57 +1,96 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { toast } from 'react-toastify';
+import { authApi } from '@/features/auth/api/authApi';
 
 interface AuthState {
 	accessToken: string | null;
 	isAuthenticated: boolean;
+	isInitialized: boolean;
 	setAccessToken: (token: string | null) => void;
 	logout: () => void;
 	clearAuth: () => void;
+	initializeAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>()(
-	persist<AuthState>(
-		(set) => ({
+// localStorage에서 토큰 복원
+const getStoredToken = (): string | null => {
+	try {
+		return localStorage.getItem('accessToken');
+	} catch (error) {
+		console.error('토큰 복원 실패:', error);
+		return null;
+	}
+};
+
+export const useAuthStore = create<AuthState>()((set) => ({
+	accessToken: getStoredToken(),
+	isAuthenticated: !!getStoredToken(),
+	isInitialized: false,
+	setAccessToken: (token) => {
+		console.log('🔑 setAccessToken 호출됨:', {
+			토큰존재: !!token,
+			시간: new Date().toLocaleString('ko-KR'),
+		});
+
+		if (token) {
+			localStorage.setItem('accessToken', token);
+		} else {
+			localStorage.removeItem('accessToken');
+		}
+
+		set({ accessToken: token, isAuthenticated: !!token });
+	},
+	logout: () => {
+		console.log('🚪 로그아웃 호출됨:', {
+			시간: new Date().toLocaleString('ko-KR'),
+		});
+		toast.info('로그아웃되었습니다.');
+		localStorage.removeItem('accessToken');
+		set({
 			accessToken: null,
 			isAuthenticated: false,
-			setAccessToken: (token) => {
-				console.log('🔑 setAccessToken 호출됨:', {
-					토큰존재: !!token,
-					시간: new Date().toLocaleString('ko-KR'),
-				});
-				set({ accessToken: token, isAuthenticated: !!token });
-			},
-			logout: () => {
-				console.log('🚪 로그아웃 호출됨:', {
-					시간: new Date().toLocaleString('ko-KR'),
-				});
-				toast.info('로그아웃되었습니다.');
+		});
+	},
+	clearAuth: () => {
+		console.log('🧹 clearAuth 호출됨:', {
+			시간: new Date().toLocaleString('ko-KR'),
+		});
+		localStorage.removeItem('accessToken');
+		set({ accessToken: null, isAuthenticated: false });
+	},
+	initializeAuth: async () => {
+		try {
+			// 이미 초기화되었다면 중복 실행 방지
+			if (useAuthStore.getState().isInitialized) {
+				return;
+			}
+
+			// 저장된 토큰이 있으면 먼저 설정
+			const storedToken = getStoredToken();
+			if (storedToken) {
 				set({
-					accessToken: null,
-					isAuthenticated: false,
+					accessToken: storedToken,
+					isAuthenticated: true,
 				});
-				// 로컬 스토리지의 모든 인증 관련 데이터 삭제
-				localStorage.removeItem('auth-storage');
-				localStorage.removeItem('마지막갱신');
-			},
-			clearAuth: () => {
-				console.log('🧹 clearAuth 호출됨:', {
-					시간: new Date().toLocaleString('ko-KR'),
+			}
+
+			// 리프레시 토큰으로 새로운 토큰 발급 시도
+			const response = await authApi.refresh();
+			if (response.content.accessToken) {
+				set({
+					accessToken: response.content.accessToken,
+					isAuthenticated: true,
+					isInitialized: true,
 				});
-				set({ accessToken: null, isAuthenticated: false });
-			},
-		}),
-		{
-			name: 'auth-storage',
-			partialize: (state) => ({ ...state }),
-			// 토큰이 변경될 때마다 로컬 스토리지 업데이트
-			onRehydrateStorage: () => (state) => {
-				console.log('🔄 Auth state rehydrated:', {
-					토큰존재: !!state?.accessToken,
-					시간: new Date().toLocaleString('ko-KR'),
-				});
-			},
-		},
-	),
-);
+				console.log('🔄 토큰 자동 갱신 성공');
+			}
+		} catch (error) {
+			console.log('❌ 토큰 자동 갱신 실패');
+			set({
+				accessToken: null,
+				isAuthenticated: false,
+				isInitialized: true,
+			});
+		}
+	},
+}));

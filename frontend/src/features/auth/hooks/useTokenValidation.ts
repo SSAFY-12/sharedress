@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { getTokenExpiration } from '@/features/auth/utils/tokenUtils';
 import useRefresh from './useRefresh';
 
-const TOKEN_EXPIRATION_BUFFER = 14 * 60 * 1000; // 14분 버퍼
+const TOKEN_EXPIRATION_BUFFER = 10 * 60 * 1000; // 10분 버퍼
 
 // 브라우저 콘솔에서 토큰 만료 시간 확인용
 const token = useAuthStore.getState().accessToken; // 토큰 상태
@@ -22,10 +22,15 @@ if (token) {
 }
 
 export const useTokenValidation = () => {
-	const { accessToken } = useAuthStore(); // 토큰 상태
-	const { mutateAsync: refreshAsync } = useRefresh(); // 토큰 갱신 요청
+	const { accessToken, isInitialized } = useAuthStore();
+	const { mutateAsync: refreshAsync } = useRefresh();
 
 	useEffect(() => {
+		// 초기화가 완료되지 않았다면 토큰 검증을 하지 않음
+		if (!isInitialized) {
+			return;
+		}
+
 		// 토큰이 없을 때도 리프레시 시도
 		if (!accessToken) {
 			console.log('🔄 토큰이 없어 리프레시 시도:', {
@@ -34,8 +39,8 @@ export const useTokenValidation = () => {
 			refreshAsync()
 				.then((response) => {
 					console.log('✅ 토큰 갱신 성공:', {
-						새토큰: !!response.content.accessToken, // 새로운 토큰 존재 여부
-						시간: new Date().toLocaleString('ko-KR'), // 현재 시간
+						새토큰: !!response.content.accessToken,
+						시간: new Date().toLocaleString('ko-KR'),
 					});
 				})
 				.catch((error) => {
@@ -50,11 +55,11 @@ export const useTokenValidation = () => {
 		const expirationTime = getTokenExpiration(accessToken);
 		if (!expirationTime) {
 			console.log('❌ 토큰 만료 시간을 파싱할 수 없습니다. 리프레시 시도');
-			refreshAsync() // 토큰 갱신 요청
+			refreshAsync()
 				.then((response) => {
 					console.log('✅ 토큰 갱신 성공:', {
-						새토큰: !!response.content.accessToken, // 새로운 토큰 존재 여부
-						시간: new Date().toLocaleString('ko-KR'), // 현재 시간
+						새토큰: !!response.content.accessToken,
+						시간: new Date().toLocaleString('ko-KR'),
 					});
 				})
 				.catch((error) => {
@@ -66,33 +71,15 @@ export const useTokenValidation = () => {
 			return;
 		}
 
-		const currentTime = Date.now() / 1000; // 현재 시간
-		const timeUntilExpiration = (expirationTime - currentTime) * 1000; // 토큰 만료 시간
+		const currentTime = Date.now() / 1000;
+		const timeUntilExpiration = (expirationTime - currentTime) * 1000;
 
 		console.log('🔄 토큰 유효성 검사:', {
-			현재시간: new Date(currentTime * 1000).toLocaleString('ko-KR', {
-				timeZone: 'Asia/Seoul', // 시간대
-				year: 'numeric', // 년
-				month: '2-digit', // 월
-				day: '2-digit', // 일
-				hour: '2-digit', // 시
-				minute: '2-digit', // 분
-				second: '2-digit', // 초
-				hour12: true,
-			}),
-			만료시간: new Date(expirationTime * 1000).toLocaleString('ko-KR', {
-				timeZone: 'Asia/Seoul', // 시간대
-				year: 'numeric', // 년
-				month: '2-digit', // 월
-				day: '2-digit', // 일
-				hour: '2-digit', // 시
-				minute: '2-digit', // 분
-				second: '2-digit', // 초
-				hour12: true,
-			}),
-			만료까지남은시간: Math.floor(timeUntilExpiration / 1000) + ' 초', // 토큰 만료 시간
-			리프레시필요: timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER, // 토큰 갱신 필요 여부
-			버퍼시간: TOKEN_EXPIRATION_BUFFER / 1000 + ' 초', // 토큰 갱신 버퍼 시간
+			현재시간: new Date(currentTime * 1000).toLocaleString('ko-KR'),
+			만료시간: new Date(expirationTime * 1000).toLocaleString('ko-KR'),
+			만료까지남은시간: Math.floor(timeUntilExpiration / 1000) + ' 초',
+			리프레시필요: timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER,
+			버퍼시간: TOKEN_EXPIRATION_BUFFER / 1000 + ' 초',
 		});
 
 		// 토큰 갱신이 필요한 경우
@@ -115,14 +102,14 @@ export const useTokenValidation = () => {
 
 		// 주기적으로 토큰 상태 확인 (30초마다)
 		const intervalId = setInterval(() => {
-			const currentToken = useAuthStore.getState().accessToken; // 토큰 상태
+			const currentToken = useAuthStore.getState().accessToken;
 			if (!currentToken) {
 				console.log('⚠️ 토큰이 없어졌습니다. 리프레시 시도');
-				refreshAsync() // 토큰 갱신 요청
+				refreshAsync()
 					.then((response) => {
 						console.log('✅ 주기적 토큰 갱신 성공:', {
-							새토큰: !!response.content.accessToken, // 새로운 토큰 존재 여부
-							시간: new Date().toLocaleString('ko-KR'), // 현재 시간
+							새토큰: !!response.content.accessToken,
+							시간: new Date().toLocaleString('ko-KR'),
 						});
 					})
 					.catch((error) => {
@@ -140,8 +127,8 @@ export const useTokenValidation = () => {
 				refreshAsync()
 					.then((response) => {
 						console.log('✅ 주기적 토큰 갱신 성공:', {
-							새토큰: !!response.content.accessToken, // 새로운 토큰 존재 여부
-							시간: new Date().toLocaleString('ko-KR'), // 현재 시간
+							새토큰: !!response.content.accessToken,
+							시간: new Date().toLocaleString('ko-KR'),
 						});
 					})
 					.catch((error) => {
@@ -153,16 +140,16 @@ export const useTokenValidation = () => {
 				return;
 			}
 
-			const currentTime = Date.now() / 1000; // 현재 시간
-			const timeUntilExpiration = (currentExpirationTime - currentTime) * 1000; // 토큰 만료 시간
+			const currentTime = Date.now() / 1000;
+			const timeUntilExpiration = (currentExpirationTime - currentTime) * 1000;
 
 			if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER) {
 				console.log('🔄 주기적 토큰 갱신 시도 중...');
-				refreshAsync() // 토큰 갱신 요청
+				refreshAsync()
 					.then((response) => {
 						console.log('✅ 주기적 토큰 갱신 성공:', {
-							새토큰: !!response.content.accessToken, // 새로운 토큰 존재 여부
-							시간: new Date().toLocaleString('ko-KR'), // 현재 시간
+							새토큰: !!response.content.accessToken,
+							시간: new Date().toLocaleString('ko-KR'),
 						});
 					})
 					.catch((error) => {
@@ -172,10 +159,10 @@ export const useTokenValidation = () => {
 						});
 					});
 			}
-		}, 30000); // 30초마다 체크
+		}, 30000);
 
 		return () => {
 			clearInterval(intervalId);
 		};
-	}, [accessToken, refreshAsync]);
+	}, [accessToken, refreshAsync, isInitialized]);
 };

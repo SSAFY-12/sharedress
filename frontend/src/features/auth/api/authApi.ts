@@ -1,6 +1,6 @@
 import { client } from '@/api/client';
 // import client from '@/api/client';
-import { TokenResponse } from '../types/auth';
+import { TokenResponse } from '@/features/auth/types/auth';
 
 // axios의 기본 구조 -> data, status : 상태코드, statusText : 상태정보, headers, config, request
 export const authApi = {
