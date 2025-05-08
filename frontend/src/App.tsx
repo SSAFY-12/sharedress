@@ -51,8 +51,10 @@ export const App = () => {
 
 			{/* 웹 레이아웃 - 모바일 에뮬레이션 */}
 			<div className='hidden sm:flex min-h-screen items-center justify-center bg-neutral-900'>
-				<div className='w-[390px] h-[844px] bg-white rounded-xl overflow-hidden shadow-xl'>
-					<WebLayout />
+				<div className='w-[560px] h-screen bg-white rounded-xl overflow-hidden shadow-xl'>
+					<div className='relative h-full flex flex-col'>
+						<WebLayout />
+					</div>
 				</div>
 			</div>
 

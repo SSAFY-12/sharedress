@@ -3,29 +3,76 @@ import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/useAuthStore';
 import { TokenResponse } from '@/features/auth/types/auth';
 import { isTokenValid } from '@/features/auth/utils/tokenUtils';
-const useRefresh = () => {
-	const { setAccessToken } = useAuthStore();
+import { AxiosError } from 'axios';
 
-	// mutation 반환값 -> mutate, mutateAsync, isPending, isSuccess, isError, error
+/**
+ * 토큰 갱신을 위한 커스텀 훅
+ * @returns mutation 객체와 갱신 함수들
+ */
+
+const useRefresh = () => {
+	const { setAccessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
+
 	const mutation = useMutation({
-		mutationFn: () => authApi.refresh(), // 리프레시 토큰 갱신
+		mutationFn: async () => {
+			try {
+				const response = await authApi.refresh();
+				// console.log('✅ 갱신 API 응답:', {
+				//   토큰존재: !!response.content.accessToken,
+				//   시간: new Date().toLocaleString('ko-KR')
+				// });
+				return response;
+			} catch (error) {
+				if (error instanceof AxiosError) {
+					// console.error('❌ 갱신 API 오류:', {
+					//   에러: error,
+					//   상태: error.response?.status,
+					//   데이터: error.response?.data,
+					//   헤더: error.response?.headers,
+					// 쿠키: document.cookie
+					// });
+				} else {
+					// console.error('❌ 알 수 없는 갱신 오류:', error);
+				}
+				throw error;
+			}
+		},
 		onSuccess: (data: TokenResponse) => {
+			console.log('🎉 갱신 성공:', {
+				새토큰: !!data.content.accessToken,
+				토큰유효: isTokenValid(data.content.accessToken),
+			});
+
 			if (!isTokenValid(data.content.accessToken)) {
+				// console.error('❌ 유효하지 않은 토큰이 수신됨');
 				throw new Error('무효한 토큰');
 			}
-			console.log('BE 데이터 값 확인 : ', data, 'refresh 토큰 갱신');
-			setAccessToken(data.content.accessToken); // refresh 토큰 갱신
+			setAccessToken(data.content.accessToken);
+			localStorage.setItem('마지막갱신', new Date().toLocaleString('ko-KR'));
 		},
-		onError: (error) => {
-			console.error('토큰 갱신 실패:', error);
-			// 특정 기능에 대한 구체적인 에러 처리
-			if (error instanceof Error && error.message === '무효한 토큰') {
-				window.location.href = '/login'; // 로그인 페이지로 리다이렉트
+		onError: (error: unknown) => {
+			if (error instanceof AxiosError) {
+				// console.error('❌ 갱신 오류:', {
+				//   에러: error,
+				//   메시지: error.message,
+				//   응답: error.response?.data,
+				//   상태: error.response?.status,
+				//   쿠키: document.cookie
+				// });
+			} else {
+				// console.error('❌ 알 수 없는 갱신 오류:', error);
 			}
+			localStorage.removeItem('마지막갱신');
+			// useAuthStore.getState().logout();
+			// window.location.href = '/auth';
 		},
 	});
 
-	return mutation;
+	return {
+		...mutation,
+		refreshToken: mutation.mutate,
+		refreshTokenAsync: mutation.mutateAsync,
+	};
 };
 
 export default useRefresh;

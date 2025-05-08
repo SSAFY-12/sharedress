@@ -8,6 +8,8 @@ import {
 	Info,
 	AlertTriangle,
 	XCircle,
+	User,
+	UserPlus,
 } from 'lucide-react';
 
 export const Badge = ({ icon, onClick, text, className = '' }: BadgeProps) => {
@@ -30,6 +32,10 @@ export const Badge = ({ icon, onClick, text, className = '' }: BadgeProps) => {
 				return <AlertTriangle className='h-4 w-4' />;
 			case 'error':
 				return <XCircle className='h-4 w-4' />;
+			case 'profile':
+				return <User className='h-4 w-4' />;
+			case 'add':
+				return <UserPlus className='h-4 w-4' />;
 			default:
 				return null;
 		}

@@ -29,6 +29,7 @@ export const MainModal = ({
 	onClose,
 	children,
 	className,
+	overlayClassName,
 }: ModalProps) => {
 	// 모달의 애니메이션을 위한 상태
 	const [isVisible, setIsVisible] = useState(false);
@@ -58,6 +59,7 @@ export const MainModal = ({
 			<div
 				className={CN(
 					'fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300',
+					overlayClassName,
 					isOpen ? 'opacity-100' : 'opacity-0',
 				)}
 				onClick={(e) => {
