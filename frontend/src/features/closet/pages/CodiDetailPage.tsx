@@ -6,10 +6,10 @@ import CommentList from '@/features/closet/components/CommentList';
 import { Comment } from '@/features/closet/components/CommentItem.types';
 import { InputField } from '@/components/inputs/input-field';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
-import { useCoordinationDetail } from '../hooks/useCoordinationDetail';
-import { useCoordinationComments } from '../hooks/useCoordinationComments';
-import { usePostCoordinationComment } from '../hooks/usePostCoordinationComment';
-import { useCopyCoordination } from '../hooks/useCopyCoordination';
+import { useCoordinationDetail } from '@/features/closet/hooks/useCoordinationDetail';
+import { useCoordinationComments } from '@/features/closet/hooks/useCoordinationComments';
+import { usePostCoordinationComment } from '@/features/closet/hooks/usePostCoordinationComment';
+import { useCopyCoordination } from '@/features/closet/hooks/useCopyCoordination';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();

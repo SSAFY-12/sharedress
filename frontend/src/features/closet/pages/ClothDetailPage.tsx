@@ -3,7 +3,7 @@ import { CodiEditor } from '@/containers/CodiEditor';
 import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
 import NavBar from '@/components/layouts/NavBar';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useClothDetail } from '../hooks/useClothDetail';
+import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();

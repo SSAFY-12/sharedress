@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchCoordinationDetail } from '../api/myClosetApi';
+import { fetchCoordinationDetail } from '@/features/closet/api/myClosetApi';
 
 export const useCoordinationDetail = (coordinationId: number) =>
 	useQuery({
