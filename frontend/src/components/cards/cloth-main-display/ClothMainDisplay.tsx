@@ -35,7 +35,7 @@ export const ClothMainDisplay = ({
 		{recommender && (
 			<div className='absolute bottom-2 right-2 flex items-center'>
 				<img
-					src={recommender.imageUrl}
+					src={recommender.imageUrl || 'https://picsum.photos/200'}
 					alt={recommender.name}
 					className='w-7 h-7 rounded-full mr-2 object-cover'
 				/>
