@@ -6,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 import { useState } from 'react';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
-import { useDeleteCloth } from '../hooks/useDeleteCloth';
+import { useDeleteCloth } from '@/features/closet/hooks/useDeleteCloth';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
