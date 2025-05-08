@@ -14,7 +14,7 @@ public interface CoordinationRepository {
 
 	List<Coordination> findFriendCoordinations(Long friendId);
 
-	List<Coordination> findMyRecommendToFriend(Long myId, Long friendId);
+	List<Coordination> findUserRecommendToFriend(Long userId, Long friendId, boolean isMember);
 
 	Optional<Coordination> findByIdWithOwnerAndOriginCreator(Long id);
 

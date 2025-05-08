@@ -1,7 +1,5 @@
 package com.ssafy.sharedress.application.closet.usecase;
 
-import java.util.List;
-
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
@@ -15,7 +13,7 @@ public interface ClosetClothesUseCase {
 
 	void removeClosetClothes(Long memberId, Long closetClothesId);
 
-	void addLibraryClothesToCloset(List<Long> clothesIds, Long memberId);
+	Long addLibraryClothesToCloset(Long clothesId, Long memberId);
 
 	void registerClothesFromPurchase(PurchaseHistoryRequest request, Long memberId);
 }
