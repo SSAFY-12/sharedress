@@ -181,3 +181,10 @@ export const postCopyCoordination = async (coordinationId: string) => {
 	);
 	return response.data.content as CopeidCoordination;
 };
+
+export const deleteCloth = async (closetClothesId: number) => {
+	const response = await client.delete(
+		`/api/closet/clothes/${closetClothesId}`,
+	);
+	return response.data;
+};

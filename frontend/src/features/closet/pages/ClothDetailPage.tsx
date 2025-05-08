@@ -4,13 +4,19 @@ import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
 import NavBar from '@/components/layouts/NavBar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
+import { useState } from 'react';
+import { BottomSheet } from '@/components/modals/bottom-sheet';
+import { useDeleteCloth } from '../hooks/useDeleteCloth';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
 	const { id } = useParams();
 	const clothId = Number(id);
 
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 	const { data: cloth, isLoading, isError } = useClothDetail(clothId);
+	const { mutate: deleteCloth } = useDeleteCloth();
 
 	const handleBackClick = () => {
 		if (window.history.length > 1) {
@@ -18,6 +24,32 @@ const ClothDetailPage = () => {
 		} else {
 			navigate('/');
 		}
+	};
+
+	const handleMenuClick = () => {
+		setIsMenuOpen(true);
+	};
+
+	const handleMenuClose = () => {
+		setIsMenuOpen(false);
+	};
+
+	const handleEdit = () => {
+		console.log('수정하기 클릭');
+	};
+
+	const handleDelete = () => {
+		if (!window.confirm('정말 삭제하시겠습니까?')) return;
+
+		deleteCloth(clothId, {
+			onSuccess: () => {
+				alert('삭제되었습니다.');
+				navigate('/mypage');
+			},
+			onError: () => {
+				alert('삭제에 실패했습니다. 다시 시도해주세요.');
+			},
+		});
 	};
 
 	if (isLoading) return <div className='p-4'>불러오는 중...</div>;
@@ -36,6 +68,8 @@ const ClothDetailPage = () => {
 						imageUrl: cloth.image,
 						category: cloth.category.name,
 					}}
+					showMoreButton={true}
+					onMoreButtonClick={handleMenuClick}
 				>
 					<div className='px-4'>
 						<ClothDetailItem label='상품명' value={cloth.name} />
@@ -45,6 +79,30 @@ const ClothDetailPage = () => {
 					</div>
 				</CodiEditor>
 			</div>
+
+			{/* 수정 삭제 바텀 시트 */}
+			<BottomSheet
+				isOpen={isMenuOpen}
+				onClose={handleMenuClose}
+				snapPoints={[1]}
+				initialSnap={0}
+			>
+				<div className='p-4 space-y-4'>
+					<button
+						className='w-full py-3 text-blue-500 font-medium text-center'
+						onClick={handleEdit}
+					>
+						수정하기
+					</button>
+					<div className='border-t border-gray-200'></div>
+					<button
+						className='w-full py-3 text-red-500 font-medium text-center'
+						onClick={handleDelete}
+					>
+						삭제하기
+					</button>
+				</div>
+			</BottomSheet>
 
 			<NavBar />
 		</div>
