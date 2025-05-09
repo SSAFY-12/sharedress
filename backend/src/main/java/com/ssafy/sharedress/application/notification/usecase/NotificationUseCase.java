@@ -2,6 +2,7 @@ package com.ssafy.sharedress.application.notification.usecase;
 
 import java.util.List;
 
+import com.ssafy.sharedress.application.notification.dto.NotificationReadResponse;
 import com.ssafy.sharedress.application.notification.dto.NotificationResponse;
 
 public interface NotificationUseCase {
@@ -16,4 +17,6 @@ public interface NotificationUseCase {
 	void sendCoordinationCopyNotification(Long coordinationId);
 
 	List<NotificationResponse> getNotifications(Long memberId);
+
+	NotificationReadResponse readNotification(Long notificationId, Long memberId);
 }

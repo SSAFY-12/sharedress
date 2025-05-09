@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.application.notification.dto.NotificationReadResponse;
 import com.ssafy.sharedress.application.notification.dto.NotificationResponse;
 import com.ssafy.sharedress.application.notification.usecase.NotificationUseCase;
 import com.ssafy.sharedress.domain.coordination.repository.CoordinationRepository;
@@ -14,7 +15,9 @@ import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 import com.ssafy.sharedress.domain.notification.entity.Notification;
 import com.ssafy.sharedress.domain.notification.entity.NotificationType;
+import com.ssafy.sharedress.domain.notification.error.NotificationErrorCode;
 import com.ssafy.sharedress.domain.notification.repository.NotificationRepository;
+import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -114,6 +117,25 @@ public class NotificationService implements NotificationUseCase {
 			.stream()
 			.map(NotificationResponse::from)
 			.toList();
+	}
+
+	@Override
+	@Transactional
+	public NotificationReadResponse readNotification(Long notificationId, Long memberId) {
+		Notification notification = notificationRepository.findById(notificationId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+
+		if (!notification.getReceiver().getId().equals(memberId)) {
+			ExceptionUtil.throwException(NotificationErrorCode.FORBIDDEN_NOTIFICATION_ACCESS);
+		}
+
+		boolean isFirstRead = false; // 최초 읽음 여부
+		if (!notification.getIsRead()) {
+			notification.updateIsRead(true);
+			isFirstRead = true;
+		}
+
+		return NotificationReadResponse.from(notification, isFirstRead);
 	}
 
 	private void saveNotification(Member sender, Member receiver, String title, String message, NotificationType type) {

@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.adapter.notification.out.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -23,5 +24,10 @@ public class NotificationPersistenceAdapter implements NotificationRepository {
 	@Override
 	public List<Notification> findByReceiverId(Long receiverId) {
 		return notificationJpaRepository.findAllByReceiverIdOrderByCreatedAtDesc(receiverId);
+	}
+
+	@Override
+	public Optional<Notification> findById(Long id) {
+		return notificationJpaRepository.findById(id);
 	}
 }
