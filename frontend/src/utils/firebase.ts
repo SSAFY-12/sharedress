@@ -42,27 +42,17 @@ const messaging = getMessaging(app);
 // 알림 권한 요청 및 토큰 발급
 export const requestNotificationPermission = async () => {
 	try {
-		// 알림 권한 요청
-		const permission = await Notification.requestPermission(); // 알림 권한 요청
-
+		const permission = await Notification.requestPermission();
 		if (permission === 'granted') {
-			// 알림 권한 허용
-			// FCM 토큰 발급
 			const token = await getToken(messaging, {
-				// FCM 토큰 발급
-				vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY, // VAPID 키 사용
+				vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
 			});
-
-			// TODO: 토큰을 서버에 저장하는 로직 구현
-			console.log('FCM Token:', token); // FCM 토큰 콘솔 로깅
-			return token; // 토큰 반환
-		} else {
-			console.log('알림 권한이 거부되었습니다.'); // 알림 권한 거부
-			return null; // 토큰 반환 없음
+			return token;
 		}
+		return null;
 	} catch (error) {
-		console.error('FCM 토큰 요청 중 오류 발생:', error); // 오류 콘솔 로깅
-		return null; // 토큰 반환 없음
+		console.error('알림 권한 요청 실패:', error);
+		return null;
 	}
 };
 
@@ -76,7 +66,6 @@ export const requestNotificationPermission = async () => {
 export const onMessageListener = () =>
 	new Promise((resolve) => {
 		onMessage(messaging, (payload) => {
-			console.log('포그라운드 메시지 수신:', payload); // 포그라운드 메시지 수신
-			resolve(payload); // 페이로드 반환
+			resolve(payload);
 		});
 	});

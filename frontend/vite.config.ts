@@ -131,6 +131,18 @@ export default defineConfig(({ mode }) => {
 		},
 		build: {
 			sourcemap: true,
+			rollupOptions: {
+				input: {
+					main: path.resolve(__dirname, 'index.html'),
+					'service-worker': path.resolve(
+						__dirname,
+						'public/firebase-messaging-sw.js',
+					),
+				},
+			},
+		},
+		define: {
+			'process.env': process.env,
 		},
 	};
 });
