@@ -6,7 +6,7 @@ import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
 import { useLocation } from 'react-router-dom';
 import SelectMenu from '@/components/menu/two-selection-menu/SelectMenu';
 import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
-import SubTabNavigation from '../components/SubTabNavigation';
+import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 
 const closetTab = ['옷장', '코디'];
 const CATEGORIES = ['전체', '아우터', '상의', '하의', '신발', '기타'];
