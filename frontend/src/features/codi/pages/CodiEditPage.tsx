@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClothListContainer } from '@/containers/ClothListContainer';
-import CodiCanvas from '@/features/codi/components/CodiCanvas';
-import CodiCategoryTabs from '@/features/codi/components/CodiCategoryTabs';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layouts/Header';
+import CodiCanvas from '@/features/codi/components/CodiCanvas';
+import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSection';
 
 const CodiEditPage = () => {
 	const navigate = useNavigate();
+
 	const categories = [
 		{ id: 'all', label: '전체' },
 		{ id: 'top', label: '상의' },
@@ -162,50 +162,49 @@ const CodiEditPage = () => {
 		return () => {
 			document.removeEventListener('touchstart', preventDoubleTapZoom);
 		};
-	});
+	}, []);
+
+	const handleBackClick = () => {
+		if (window.history.length > 1) {
+			navigate(-1);
+		} else {
+			navigate('/');
+		}
+	};
 
 	const handleNextClick = () => {
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
-
 		navigate('/codi/save');
+	};
+
+	const headerProps = {
+		showBack: true,
+		badgeText: '다음',
+		onBackClick: handleBackClick,
+		onBadgeClick: handleNextClick,
 	};
 
 	return (
 		<div className='max-w-md mx-auto h-screen flex flex-col bg-white overflow-hidden'>
-			<Header showBack={true} badgeText='다음' onBadgeClick={handleNextClick} />
+			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-hidden'>
-				{/* 코디 캔버스 부분 */}
 				<div className='flex-shrink-0'>
 					<CodiCanvas
 						items={canvasItems}
+						isEditable={true}
 						updateItem={updateCanvasItem}
 						removeItem={removeFromCanvas}
 						maxZIndex={maxZIndex}
 						setMaxZIndex={setMaxZIndex}
 					/>
 				</div>
-
-				{/* 아이템 선택 영역 */}
-				<div className='flex-1 flex flex-col min-h-0 bg-white border-t border-gray-100'>
-					{/* 카테고리 탭 */}
-					<div className='flex-shrink-0'>
-						<CodiCategoryTabs
-							categories={categories}
-							activeCategory={activeCategory}
-							onCategoryChange={setActiveCategory}
-						/>
-					</div>
-
-					{/* 옷 나열되는 부분 */}
-					<div className='flex-1 overflow-y-auto'>
-						<div className='p-4'>
-							<ClothListContainer
-								items={filteredProducts}
-								onItemClick={addItemToCanvas}
-							/>
-						</div>
-					</div>
-				</div>
+				<CodiEditBottomSection
+					categories={categories}
+					activeCategory={activeCategory}
+					filteredProducts={filteredProducts}
+					onCategoryChange={setActiveCategory}
+					onItemClick={addItemToCanvas}
+				/>
 			</div>
 		</div>
 	);

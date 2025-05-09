@@ -23,6 +23,7 @@ interface CanvasItem {
 
 interface CodiCanvasProps {
 	items: CanvasItem[];
+	isEditable?: boolean;
 	updateItem: (item: CanvasItem) => void;
 	removeItem: (id: string) => void;
 	maxZIndex: number;
@@ -36,7 +37,14 @@ const DEFAULT_WIDTH = 80;
 // 너비 기준 카테고리 목록
 const WIDTH_BASED_CATEGORIES = ['shoes'];
 
-const CodiCanvas = (props: CodiCanvasProps) => {
+const CodiCanvas = ({
+	items,
+	isEditable = true,
+	updateItem,
+	removeItem,
+	maxZIndex = 0,
+	setMaxZIndex,
+}: CodiCanvasProps) => {
 	const [activeItem, setActiveItem] = useState<string | null>(null);
 	const [interactionMode, setInteractionMode] = useState<
 		'move' | 'transform' | null
@@ -54,6 +62,7 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 		e: React.SyntheticEvent<HTMLImageElement>,
 		item: CanvasItem,
 	) => {
+		if (!isEditable) return;
 		const img = e.currentTarget;
 		const aspectRatio = img.naturalWidth / img.naturalHeight;
 
@@ -69,7 +78,7 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 			initialWidth = DEFAULT_HEIGHT * aspectRatio;
 		}
 
-		props.updateItem({
+		updateItem({
 			...item,
 			aspectRatio,
 			initialWidth,
@@ -80,31 +89,34 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 
 	const handleItemSelect = useCallback(
 		(e: React.MouseEvent | React.TouchEvent, canvasId: string) => {
+			if (!isEditable) return;
 			e.stopPropagation();
 
 			if (activeItem === canvasId) return;
 
-			const item = props.items.find((item) => item.canvasId === canvasId);
+			const item = items.find((item) => item.canvasId === canvasId);
 			if (item) {
-				const newZIndex = props.maxZIndex + 1;
-				props.setMaxZIndex(newZIndex);
-				props.updateItem({
+				const newZIndex = maxZIndex + 1;
+				setMaxZIndex(newZIndex);
+				updateItem({
 					...item,
 					zIndex: newZIndex,
 				});
 				setActiveItem(canvasId);
 			}
 		},
-		[activeItem, props],
+		[activeItem, items, maxZIndex, updateItem, setMaxZIndex, isEditable],
 	);
 
 	const handleCanvasClick = useCallback(() => {
+		if (!isEditable) return;
 		setActiveItem(null);
 		setInteractionMode(null);
-	}, []);
+	}, [isEditable]);
 
 	const handleMoveStart = useCallback(
 		(e: React.MouseEvent | React.TouchEvent, item: CanvasItem) => {
+			if (!isEditable) return;
 			e.stopPropagation();
 
 			const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -113,9 +125,9 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 			setInteractionMode('move');
 			setActiveItem(item.canvasId);
 
-			const newZIndex = props.maxZIndex + 1;
-			props.setMaxZIndex(newZIndex);
-			props.updateItem({
+			const newZIndex = maxZIndex + 1;
+			setMaxZIndex(newZIndex);
+			updateItem({
 				...item,
 				zIndex: newZIndex,
 			});
@@ -127,11 +139,12 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 				scale: item.scale,
 			});
 		},
-		[props],
+		[isEditable, maxZIndex, updateItem, setMaxZIndex],
 	);
 
 	const handleTransformStart = useCallback(
 		(e: React.MouseEvent | React.TouchEvent, item: CanvasItem) => {
+			if (!isEditable) return;
 			e.stopPropagation();
 
 			const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
@@ -140,9 +153,9 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 			setInteractionMode('transform');
 			setActiveItem(item.canvasId);
 
-			const newZIndex = props.maxZIndex + 1;
-			props.setMaxZIndex(newZIndex);
-			props.updateItem({
+			const newZIndex = maxZIndex + 1;
+			setMaxZIndex(newZIndex);
+			updateItem({
 				...item,
 				zIndex: newZIndex,
 			});
@@ -166,26 +179,24 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 				});
 			}
 		},
-		[props],
+		[isEditable, maxZIndex, updateItem, setMaxZIndex],
 	);
 
 	const handleMove = useCallback(
 		(e: MouseEvent | TouchEvent) => {
-			if (!activeItem || !interactionMode) return;
+			if (!activeItem || !interactionMode || !isEditable) return;
 
 			const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
 			const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
-			const activeItemObj = props.items.find(
-				(item) => item.canvasId === activeItem,
-			);
+			const activeItemObj = items.find((item) => item.canvasId === activeItem);
 			if (!activeItemObj) return;
 
 			if (interactionMode === 'move') {
 				const deltaX = clientX - startPoint.x;
 				const deltaY = clientY - startPoint.y;
 
-				props.updateItem({
+				updateItem({
 					...activeItemObj,
 					position: {
 						x: startValues.position.x + deltaX,
@@ -203,31 +214,42 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 					Math.min(3.0, (startValues.scale * distance) / 100),
 				);
 
-				props.updateItem({
+				updateItem({
 					...activeItemObj,
 					rotation: startValues.rotation + angle,
 					scale: newScale,
 				});
 			}
 		},
-		[activeItem, interactionMode, props, startPoint, startValues],
+		[
+			activeItem,
+			interactionMode,
+			items,
+			startPoint,
+			startValues,
+			updateItem,
+			isEditable,
+		],
 	);
 
 	const handleInteractionEnd = useCallback(() => {
+		if (!isEditable) return;
 		setInteractionMode(null);
-	}, []);
+	}, [isEditable]);
 
 	const handleDelete = useCallback(
 		(e: React.MouseEvent | React.TouchEvent, canvasId: string) => {
+			if (!isEditable) return;
 			e.stopPropagation();
-			props.removeItem(canvasId);
+			removeItem(canvasId);
 			setActiveItem(null);
 			setInteractionMode(null);
 		},
-		[props],
+		[removeItem, isEditable],
 	);
 
 	useEffect(() => {
+		if (!isEditable) return;
 		const handleMouseMove = (e: MouseEvent) => handleMove(e);
 		const handleTouchMove = (e: TouchEvent) => handleMove(e);
 
@@ -247,9 +269,10 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 			window.removeEventListener('mouseup', handleMouseUp);
 			window.removeEventListener('touchend', handleTouchEnd);
 		};
-	}, [interactionMode, handleMove, handleInteractionEnd]);
+	}, [interactionMode, handleMove, handleInteractionEnd, isEditable]);
 
 	useEffect(() => {
+		if (!isEditable) return;
 		const preventDefaultTouch = (e: TouchEvent) => {
 			if (interactionMode) {
 				e.preventDefault();
@@ -263,28 +286,30 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 		return () => {
 			window.removeEventListener('touchmove', preventDefaultTouch);
 		};
-	}, [interactionMode]);
+	}, [interactionMode, isEditable]);
 
 	return (
 		<div
 			ref={canvasRef}
 			className='relative w-full aspect-square bg-gray-50 overflow-hidden touch-pan-x'
-			onClick={handleCanvasClick}
-			onTouchEnd={handleCanvasClick}
+			onClick={isEditable ? handleCanvasClick : undefined}
+			onTouchEnd={isEditable ? handleCanvasClick : undefined}
 		>
-			{props.items.length === 0 && (
+			{items.length === 0 && (
 				<div className='absolute inset-0 flex items-center justify-center text-gray-400'>
-					아이템을 선택하여 코디를 만들어보세요
+					{isEditable
+						? '아이템을 선택하여 코디를 만들어보세요'
+						: '선택된 아이템이 없습니다'}
 				</div>
 			)}
 
-			{props.items.map((item) => (
+			{items.map((item) => (
 				<div
 					id={item.canvasId}
 					key={item.canvasId}
 					className={`absolute ${
-						activeItem === item.canvasId
-							? 'outline outline-1 outline-dashed outline-gray-400'
+						isEditable && activeItem === item.canvasId
+							? 'outline-1 outline-dashed outline-gray-400'
 							: ''
 					}`}
 					style={{
@@ -293,17 +318,25 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 						transform: `rotate(${item.rotation}deg) scale(${item.scale})`,
 						transformOrigin: 'center',
 						zIndex: item.zIndex,
-						opacity: item.isLoaded ? 1 : 0,
-						transition: 'opaticy 0.2s ease-in-out',
+						opacity: isEditable ? (item.isLoaded ? 1 : 0) : 1,
+						transition: isEditable ? 'opaticy 0.2s ease-in-out' : 'none',
 					}}
-					onClick={(e) => handleItemSelect(e, item.canvasId)}
-					onTouchStart={(e) => handleItemSelect(e, item.canvasId)}
+					onClick={
+						isEditable ? (e) => handleItemSelect(e, item.canvasId) : undefined
+					}
+					onTouchStart={
+						isEditable ? (e) => handleItemSelect(e, item.canvasId) : undefined
+					}
 				>
 					{/* 아이템 이미지 */}
 					<div
-						className='relative cursor-move'
-						onMouseDown={(e) => handleMoveStart(e, item)}
-						onTouchStart={(e) => handleMoveStart(e, item)}
+						className={isEditable ? 'relative cursor-move' : 'relative'}
+						onMouseDown={
+							isEditable ? (e) => handleMoveStart(e, item) : undefined
+						}
+						onTouchStart={
+							isEditable ? (e) => handleMoveStart(e, item) : undefined
+						}
 					>
 						<img
 							src={item.imageUrl || 'https://picsum.photos/200'}
@@ -316,12 +349,12 @@ const CodiCanvas = (props: CodiCanvasProps) => {
 								minHeight: '40px',
 							}}
 							draggable={false}
-							onLoad={(e) => handleImageLoad(e, item)}
+							onLoad={isEditable ? (e) => handleImageLoad(e, item) : undefined}
 						/>
 					</div>
 
 					{/* 선택된 아이템의 컨트롤 핸들 */}
-					{activeItem === item.canvasId && (
+					{isEditable && activeItem === item.canvasId && (
 						<>
 							{/* 회전 및 확대축소 핸들 */}
 							<div

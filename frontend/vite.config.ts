@@ -1,5 +1,5 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import checker from 'vite-plugin-checker';
 import tailwindcss from 'tailwindcss';
@@ -108,46 +108,120 @@ export default defineConfig(({ mode }) => {
 			}),
 		],
 
-		css: {
-			postcss: {
-				plugins: [tailwindcss, autoprefixer], // TailwindCSS와 브라우저 접두사 자동 추가
-			},
-		},
+		const env = loadEnv(mode, process.cwd(), '');
+		const isDevelopment = mode === 'development';
 
-		resolve: {
-			alias: { '@': path.resolve(__dirname, './src') }, // @로 src 경로 별칭
-		},
+		return {
+			plugins: [
+				// React HMR 및 JSX 변환 지원
+				// PWA(Progressive Web App) 플러그인 설정
+				react(), // https 환경을 위한 setting
+				mkcert(), // 타입스크립트/ESLint 실시간 체크 플러그인
+				VitePWA({
+					registerType: 'autoUpdate',
+					injectRegister: 'auto',
+					devOptions: {
+						enabled: true,
+						type: 'classic',
+					},
+					strategies: 'injectManifest',
+					srcDir: 'src',
+					filename: 'sw.js',
+					workbox: {
+						disableDevLogs: true,
+						clientsClaim: true,
+						skipWaiting: true,
+						globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'],
+					},
+					manifest: {
+						name: '쉐어드레스',
+						short_name: '쉐어드레스',
+						description: 'share + dress, share + address',
+						theme_color: '#242424',
+						background_color: '#ffffff',
+						display: 'standalone',
+						orientation: 'portrait-primary',
+						start_url: '/',
+						scope: '/',
+						icons: [
+							{
+								src: '/android-chrome-192x192.png',
+								sizes: '192x192',
+								type: 'image/png',
+								purpose: 'any maskable',
+							},
+							{
+								src: '/android-chrome-512x512.png',
+								sizes: '512x512',
+								type: 'image/png',
+								purpose: 'any maskable',
+							},
+						],
+					},
+					includeAssets: [
+						'favicon.ico',
+						'apple-touch-icon.png',
+						'favicon-16x16.png',
+						'favicon-32x32.png',
+						'android-chrome-192x192.png',
+						'android-chrome-512x512.png',
+					],
+				}),
+				checker({
+					typescript: true, // 타입스크립트 타입 체크
+					eslint: {
+						lintCommand: 'eslint "./src/**/*.{ts,tsx}"', // ESLint 검사 명령어
+						dev: { logLevel: ['error', 'warning'] }, // 에러/경고만 표시
+					},
+				}),
+				sentryVitePlugin({
+					org: 'ssafy-d6',
+					project: 'javascript-react',
+				}),
+			],
 
-		server: {
-			// https: true,
-			port: 5173,
-			headers: {
-				'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-				'Cross-Origin-Embedder-Policy': 'credentialless',
-				'Referrer-Policy': 'strict-origin-when-cross-origin',
-				'Access-Control-Allow-Origin': '*',
-				'Cross-Origin-Resource-Policy': 'cross-origin',
-				'Content-Security-Policy': cspHeader,
-			},
-			proxy: {
-				'/api': {
-					// 프론트에서 /api로 시작하는 요청을 아래 설정대로 프록시
-					target: 'http://www.sharedress.co.kr', // 실제 백엔드 서버 주소
-					changeOrigin: true, // CORS 우회(Origin 헤더 변경)
-					secure: false, // HTTPS 인증서 검증 생략(개발용)
-					// rewrite: (path) => path.replace(/^\/api/, ''), // 백엔드가 /api 필요 없으면 주석 해제
-					// configure: (proxy, _options) => {
-					//   proxy.on('proxyRes', (proxyRes, req, res) => {
-					//     // 쿠키 헤더 로깅 등 디버깅 가능
-					//     console.log('쿠키 헤더:', proxyRes.headers['set-cookie']);
-					//   });
-					// },
+			css: {
+				postcss: {
+					plugins: [tailwindcss, autoprefixer], // TailwindCSS와 브라우저 접두사 자동 추가
 				},
 			},
-		},
 
-		build: {
-			sourcemap: true,
-		},
-	};
-});
+			resolve: {
+				alias: { '@': path.resolve(__dirname, './src') }, // @로 src 경로 별칭
+			},
+
+			server: {
+
+				https: true,
+				port: 5173,
+				headers: {
+					'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+					'Cross-Origin-Embedder-Policy': 'credentialless',
+					'Referrer-Policy': 'strict-origin-when-cross-origin',
+					'Access-Control-Allow-Origin': '*',
+					'Cross-Origin-Resource-Policy': 'cross-origin',
+					'Content-Security-Policy': cspHeader,
+				},
+				proxy: {
+					'/api': {
+						// 프론트에서 /api로 시작하는 요청을 아래 설정대로 프록시
+						target: 'http://www.sharedress.co.kr', // 실제 백엔드 서버 주소
+						changeOrigin: true, // CORS 우회(Origin 헤더 변경)
+						secure: false, // HTTPS 인증서 검증 생략(개발용)
+						// rewrite: (path) => path.replace(/^\/api/, ''), // 백엔드가 /api 필요 없으면 주석 해제
+						// configure: (proxy, _options) => {
+						//   proxy.on('proxyRes', (proxyRes, req, res) => {
+						//     // 쿠키 헤더 로깅 등 디버깅 가능
+						//     console.log('쿠키 헤더:', proxyRes.headers['set-cookie']);
+						//   });
+						// },
+					},
+				},
+			},
+
+			build: {
+				sourcemap: true,
+			},
+		}
+	}
+})
