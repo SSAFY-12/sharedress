@@ -1,9 +1,12 @@
 package com.ssafy.sharedress.application.notification.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.application.notification.dto.NotificationResponse;
 import com.ssafy.sharedress.application.notification.usecase.NotificationUseCase;
 import com.ssafy.sharedress.domain.coordination.repository.CoordinationRepository;
 import com.ssafy.sharedress.domain.friend.repository.FriendRequestRepository;
@@ -102,6 +105,21 @@ public class NotificationService implements NotificationUseCase {
 					NotificationType.COORDINATION_COPY
 				);
 			});
+	}
+
+	@Override
+	public List<NotificationResponse> getNotifications(Long memberId) {
+		return notificationRepository.findByReceiverId(memberId)
+			.stream()
+			.map(notification -> NotificationResponse.from(
+				notification.getId(),
+				notification.getType().getCode().toString(),
+				notification.getTitle(),
+				notification.getBody(),
+				notification.getIsRead(),
+				notification.getCreatedAt().toString()
+			))
+			.toList();
 	}
 
 	private void saveNotification(Member sender, Member receiver, String title, String message, NotificationType type) {
