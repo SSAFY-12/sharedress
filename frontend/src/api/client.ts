@@ -1,203 +1,100 @@
-import axios, {
-	AxiosError,
-	InternalAxiosRequestConfig,
-	AxiosHeaders,
-} from 'axios';
+import axios from 'axios';
 import { toast } from 'react-toastify';
-import { APIError, getErrorMessage } from './errorHandler';
+import { getErrorMessage } from './errorHandler';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authApi } from '@/features/auth/api/authApi';
 
+const baseURL = import.meta.env.VITE_API_URL || 'https://www.sharedress.co.kr';
+
 export const client = axios.create({
-	baseURL: import.meta.env.VITE_API_URL,
-	withCredentials: true,
+	baseURL,
+	withCredentials: true, // 크로스 사이트 요청 시 쿠키 전송 필수
+	// 리프레시 토큰이 쿠키로 전송됨 -> 크로스 도메인 요청에서 쿠키 전송 허용
+	// 리프레시 토큰 자동 전송
 	headers: {
 		'Content-Type': 'application/json',
 	},
-	// 쿠키 관련 설정 추가
-	withXSRFToken: true,
-	xsrfCookieName: 'XSRF-TOKEN',
-	xsrfHeaderName: 'X-XSRF-TOKEN',
 });
 
-// 쿠키 설정을 위한 헬퍼 함수
-// const setCookie = (name: string, value: string, days: number) => {
-// 	const expires = new Date();
-// 	expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-// 	document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;domain=${
-// 		window.location.hostname
-// 	};SameSite=Strict`;
-// };
-
-/**
- * 전역 에러 처리 함수
- * - status code에 따른 에러 메시지 표시
- * - 서버에서 전달된 추가 에러 메시지가 있다면 함께 표시
- */
+// 전역 에러 처리 함수
 const handleGlobalError = (status: number, serverMessage?: string) => {
 	// 기본 에러 메시지 표시
-	const defaultMessage = getErrorMessage(status);
+	const defaultMessage = getErrorMessage(status); // 에러 메시지 표시
 	toast.error(defaultMessage, {
-		position: 'top-right',
-		autoClose: 3000,
+		// 토스트 메시지 표시
+		position: 'top-right', // 토스트 위치
+		autoClose: 3000, // 토스트 자동 닫기 시간
 	});
 
 	// 서버에서 추가 에러 메시지가 있다면 표시
 	if (serverMessage && typeof serverMessage === 'string') {
+		// 서버에서 추가 에러 메시지가 있다면 표시
 		toast.error(serverMessage, {
-			position: 'top-right',
-			autoClose: 3000,
+			// 토스트 메시지 표시
+			position: 'top-right', // 토스트 위치
+			autoClose: 3000, // 토스트 자동 닫기 시간
 		});
 	}
 };
 
+// 요청 인터셉터
 client.interceptors.request.use(
-	async (config) => {
-		console.log('📤 Request interceptor:', {
-			url: config.url,
-			method: config.method,
-			headers: config.headers,
-			withCredentials: config.withCredentials,
-			cookies: document.cookie,
-		});
-
-		if (!config.url?.includes('/api/auth/refresh')) {
-			const token = useAuthStore.getState().accessToken;
-			if (token) {
-				config.headers['Authorization'] = `Bearer ${token}`;
-			}
+	(config) => {
+		const token = useAuthStore.getState().accessToken; // 토큰 가져오기
+		if (token) {
+			config.headers.Authorization = `Bearer ${token}`; // 토큰 헤더에 추가
 		}
-
-		try {
-			if (config.data instanceof FormData) {
-				config.headers['Content-Type'] = 'multipart/form-data';
-			} else {
-				config.headers['Content-Type'] = 'application/json';
-			}
-
-			return config;
-		} catch (error) {
-			console.error('❌ Request interceptor error:', error);
-			handleGlobalError(0, '요청 처리 중 오류가 발생했습니다.');
-			return Promise.reject(new APIError(0, '요청 처리 실패'));
-		}
+		return config;
 	},
 	(error) => {
-		console.error('❌ Request interceptor error:', error);
-		handleGlobalError(0, '요청 구성에 실패했습니다.');
-		return Promise.reject(new APIError(0, '요청 구성 오류', error));
+		console.error('❌ 요청 인터셉터 에러 발생 :', error);
+		return Promise.reject(error);
 	},
 );
 
+// 응답 인터셉터
 client.interceptors.response.use(
-	(response) => {
-		console.log('📥 Response interceptor success:', {
-			url: response.config.url,
-			status: response.status,
-			headers: response.headers,
-			cookies: document.cookie,
-			setCookie: response.headers['set-cookie'],
-		});
+	(response) => response,
+	async (error) => {
+		const originalRequest = error.config; // 원래 요청 정보 저장(실패한 요청의 정보)
+		// config 속성은 원래 요청했던 API 설정 정보를 가지고 있음(어떤 메서드, 데이터)
 
-		// Set-Cookie 헤더가 있는 경우 처리
-		const setCookieHeader = response.headers['set-cookie'];
-		if (setCookieHeader) {
-			console.log('🍪 Received Set-Cookie header:', setCookieHeader);
-		}
+		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도(아직 재시도하지 않은 경우)
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			// originalRequest._retry 초기화를 통해서 무한 루프 방지(직접 만든 플래그 === 재시도 여부 판단)
+			// retry flag true로 설정 -> 재시도 여부 판단
+			originalRequest._retry = true;
 
-		return response;
-	},
-	async (error: unknown) => {
-		if (!(error instanceof AxiosError)) {
-			console.error('❌ Unknown error in response interceptor:', error);
-			return Promise.reject(error);
-		}
+			try {
+				// 리프레시 토큰으로 새로운 액세스 토큰 요청
+				const { content } = await authApi.refresh(); // 리프레시 토큰 요청 => TokenResponse
+				const { accessToken } = content; // 새로운 액세스 토큰 저장
 
-		const status = error.response?.status;
-		const serverMessage = error.response?.data?.message;
-		const originalRequest = error.config;
+				useAuthStore.getState().setAccessToken(accessToken); // 새로운 액세스 토큰 저장
 
-		console.error('❌ Response interceptor error:', {
-			url: originalRequest?.url,
-			status,
-			message: serverMessage,
-			headers: error.response?.headers,
-			cookies: document.cookie,
-			withCredentials: originalRequest?.withCredentials,
-		});
-
-		if (!originalRequest) {
-			console.error('❌ No original request found');
-			return Promise.reject(error);
-		}
-
-		if (originalRequest.url?.includes('/api/auth/refresh')) {
-			console.log('🔄 Refresh token request failed, redirecting to auth...');
-			// useAuthStore.getState().logout();
-			// window.location.href = '/auth';
-			return Promise.reject(error);
-		}
-
-		if (status === 401) {
-			const retryCount = (originalRequest as any)._retryCount || 0;
-
-			if (retryCount < 2) {
-				(originalRequest as any)._retryCount = retryCount + 1;
-				console.log(
-					`🔄 Token refresh attempt ${retryCount + 1}/2, cookies:`,
-					document.cookie,
-				);
-
-				try {
-					const response = await authApi.refresh();
-					console.log('✅ Token refresh successful:', {
-						hasNewToken: !!response.content.accessToken,
-						attempt: retryCount + 1,
-						cookies: document.cookie,
-					});
-
-					const newToken = response.content.accessToken;
-					useAuthStore.getState().setAccessToken(newToken);
-
-					const newConfig: InternalAxiosRequestConfig = {
-						...originalRequest,
-						headers: new AxiosHeaders({
-							...originalRequest.headers,
-							Authorization: `Bearer ${newToken}`,
-						}),
-					};
-
-					return axios(newConfig);
-				} catch (refreshError) {
-					console.error('❌ Token refresh failed:', {
-						error: refreshError,
-						attempt: retryCount + 1,
-						cookies: document.cookie,
-					});
-
-					if (retryCount === 1) {
-						// 마지막 시도에서 실패한 경우에만 로그아웃
-						// useAuthStore.getState().logout();
-						// window.location.href = '/auth';
-					}
-					return Promise.reject(refreshError);
-				}
-			} else {
-				console.error('❌ Max retry attempts reached for token refresh');
-				// useAuthStore.getState().logout();
-				// window.location.href = '/auth';
-				return Promise.reject(error);
+				// 원래 요청 재시도
+				originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+				return client(originalRequest); // 재시도 => 새로운 액세스 토큰 요청
+			} catch (refreshError) {
+				// 리프레시 토큰 갱신 실패 시 로그아웃 처리
+				const { clearAuth } = useAuthStore.getState(); // 로그아웃 처리
+				clearAuth();
+				// 로그인 페이지로 리다이렉트
+				window.location.href = '/auth';
 			}
 		}
 
-		handleGlobalError(status || 500, serverMessage);
-		return Promise.reject(
-			new APIError(
-				status || 500,
-				error.message || '서버 오류',
-				error.response?.data,
-			),
-		);
+		// 전역 에러 처리
+		if (error.response) {
+			const { status } = error.response; // 에러 상태 코드
+			const serverMessage = error.response.data?.message; // 서버 에러 메시지
+			handleGlobalError(status, serverMessage); // 전역 에러 처리
+		} else {
+			// 네트워크 에러 등 response가 없는 경우
+			handleGlobalError(0, '서버와의 통신에 실패했습니다.'); // 전역 에러 처리
+		}
+
+		return Promise.reject(error);
 	},
 );
 

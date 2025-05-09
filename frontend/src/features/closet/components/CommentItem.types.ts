@@ -14,4 +14,5 @@ export interface Comment {
 export interface CommentItemProps {
 	comment: Comment;
 	onMoreClick?: (comment: Comment) => void;
+	isMine: boolean;
 }

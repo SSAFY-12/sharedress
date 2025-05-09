@@ -1,4 +1,4 @@
-import { Camera, MoreVertical } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { ClothMainDisplayProps } from './ClothMainDisplay.types';
 
 // 메인 옷 이미지, 수정 모드 시 오버레이 표시
@@ -9,6 +9,7 @@ export const ClothMainDisplay = ({
 	className = '',
 	showMoreButton = false,
 	onMoreButtonClick,
+	recommender = null,
 }: ClothMainDisplayProps) => (
 	<div
 		className={`relative w-full aspect-[10/11] border rounded-md overflow-hidden ${className}`}
@@ -23,12 +24,27 @@ export const ClothMainDisplay = ({
 		{showMoreButton && (
 			<button
 				onClick={onMoreButtonClick}
-				className='absolute top-2 right-2 p-2 bg-black/20 hover:bg-black/30 rounded-full transition-colors z-10'
+				className='absolute top-5 right-5 p-0 z-10'
 				aria-label='더보기'
 			>
-				<MoreVertical size={20} className='text-gray-400' />
+				<img src='/icons/more.svg' alt='more' />
 			</button>
 		)}
+
+		{/* 추천인 정보 */}
+		{recommender && (
+			<div className='absolute bottom-2 right-2 flex items-center'>
+				<img
+					src={recommender.imageUrl || 'https://picsum.photos/200'}
+					alt={recommender.name}
+					className='w-7 h-7 rounded-full mr-2 object-cover'
+				/>
+				<span className='text-xs font-medium text-[#3a3636'>
+					{recommender.name}님의 추천 코디
+				</span>
+			</div>
+		)}
+
 		{editable && (
 			<div
 				onClick={onClick}

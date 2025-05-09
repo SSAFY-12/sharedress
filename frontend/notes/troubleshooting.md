@@ -550,3 +550,232 @@ client.interceptors.response.use(
 - API 문서를 재확인하여, refresh 요청에는 아무런 헤더도 필요 없음을 알게 됨.
 - 인터셉터에서 예외처리를 추가하여 문제를 해결함.
 - 무한 재시도 문제도 함께 방지할 수 있었음.
+
+## [트러블슈팅] 토큰 갱신 및 인증 관련 문제 해결 (2025/05/08-안주민)
+
+### 문제상황
+
+1. 페이지 새로고침 시 인증 상태가 초기화되어 401 Unauthorized 에러 발생
+2. 토큰 갱신 과정에서 화면이 깜빡이고 서비스가 끊기는 현상 발생
+3. 리프레시 토큰이 쿠키에 있음에도 불구하고 액세스 토큰 갱신이 제대로 이루어지지
+   않음
+
+### 원인 분석
+
+1. **초기화 타이밍 문제**
+
+   - 앱 시작 시 여러 API 요청이 동시에 발생
+   - 토큰 갱신이 완료되기 전에 다른 API 요청이 실행되어 401 에러 발생
+   - React Hook 규칙 위반으로 인한 토큰 검증 로직 실행 순서 문제
+
+2. **토큰 관리 방식의 문제**
+
+   - 액세스 토큰을 메모리에서만 관리하여 페이지 새로고침 시 소실
+   - localStorage 사용을 제거하면서 발생한 인증 상태 유지 문제
+   - 토큰 갱신 로직이 초기화 상태를 고려하지 않음
+
+3. **React Hook 사용 문제**
+   - `useTokenValidation` 훅을 조건부로 호출하여 React Hook 규칙 위반
+   - 컴포넌트 외부에서 훅을 사용하려는 시도로 인한 에러 발생
+
+### 해결방법
+
+1. **초기화 상태 관리 추가**
+
+   ```typescript
+   interface AuthState {
+   	isInitialized: boolean;
+   	// ... 기존 상태들
+   }
+   ```
+
+2. **토큰 검증 로직 개선**
+
+   ```typescript
+   useEffect(() => {
+   	if (!isInitialized) return;
+   	// 토큰 검증 로직
+   }, [isInitialized]);
+   ```
+
+3. **앱 초기화 로직 수정**
+   ```typescript
+   useEffect(() => {
+   	const init = async () => {
+   		await initializeAuth();
+   		setIsLoading(false);
+   	};
+   	init();
+   }, []);
+   ```
+
+### 예시
+
+```typescript
+// App.tsx
+export const App = () => {
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		const init = async () => {
+			await initializeAuth();
+			setIsLoading(false);
+		};
+		init();
+	}, []);
+
+	if (isLoading) return <div>Loading...</div>;
+
+	return <AppContent />;
+};
+
+// useTokenValidation.ts
+export const useTokenValidation = () => {
+	const { isInitialized } = useAuthStore();
+
+	useEffect(() => {
+		if (!isInitialized) return;
+		// 토큰 검증 로직
+	}, [isInitialized]);
+};
+```
+
+### 결론 및 정리
+
+1. **보안 강화**
+
+   - 액세스 토큰은 메모리에서 관리
+   - 리프레시 토큰은 HttpOnly 쿠키로 안전하게 관리
+   - localStorage 사용 제거로 XSS 공격 위험 감소
+
+2. **사용자 경험 개선**
+
+   - 초기화가 완료될 때까지 로딩 화면 표시
+   - 토큰 갱신이 완료된 후에 API 요청 시작
+   - 서비스 끊김 현상 제거
+
+3. **코드 품질 향상**
+   - React Hook 규칙 준수
+   - 명확한 초기화 상태 관리
+   - 에러 처리 및 로깅 개선
+
+이러한 변경으로 인해 앱의 안정성이 크게 향상되었으며, 사용자 경험도 개선되었습니
+다. 특히 토큰 갱신 과정에서 발생하던 서비스 끊김 현상이 해결되었습니다.
+
+## [트러블슈팅] Google 프로필 이미지 429 에러 해결 (2025/05/08-안주민)
+
+### 문제상황
+
+- `FriendListPage.tsx`에서 Google 프로필 이미지를 불러올 때 429 (Too Many
+  Requests) 에러 발생
+- 동일한 이미지에 대한 반복적인 요청으로 인한 서버 부하 발생
+- 이미지 로딩이 느리고 불안정한 현상 발생
+
+### 원인 분석
+
+1. **이미지 캐싱 부재**
+
+   - `UserRowItem` 컴포넌트에서 매번 새로운 이미지 요청 발생
+   - 브라우저 캐시를 활용하지 않아 동일 이미지 반복 다운로드
+
+2. **이미지 최적화 부재**
+   - Google 프로필 이미지 URL에 크기 파라미터가 없어 원본 크기로 다운로드
+   - 불필요하게 큰 이미지 파일로 인한 성능 저하
+
+### 해결방법
+
+1. **이미지 컴포넌트 최적화**
+
+```typescript
+// UserRowItem.tsx
+const UserRowItem = ({ userAvatar, ...props }) => {
+	const [imgError, setImgError] = useState(false);
+
+	return (
+		<img
+			src={imgError ? '/default-profile.png' : userAvatar}
+			onError={() => setImgError(true)}
+			alt='프로필 이미지'
+			loading='lazy'
+			crossOrigin='anonymous'
+			referrerPolicy='no-referrer'
+			className='w-12 h-12 rounded-full object-cover'
+		/>
+	);
+};
+```
+
+2. **이미지 URL 최적화**
+
+```typescript
+// utils/imageUtils.ts
+export const getOptimizedImageUrl = (url: string) => {
+	if (!url) return '/default-profile.png';
+	// 이미지 크기를 96x96으로 제한
+	return `${url}=s96-c`;
+};
+```
+
+3. **FriendListPage.tsx 수정**
+
+```typescript
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
+
+export const FriendsListPage = () => {
+  // ... 기존 코드 ...
+
+  return (
+    <div className='flex flex-col h-full max-w-md mx-auto bg-white'>
+      {/* ... 기존 코드 ... */}
+      {!keyword ? (
+        <div>
+          {friends?.map((friend) => (
+            <UserRowItem
+              key={friend.id}
+              userName={friend.nickname}
+              userAvatar={getOptimizedImageUrl(friend.profileImage)}
+              userStatus={friend.oneLiner}
+              actionType='arrow'
+              onClick={() => console.log('Navigate to user profile')}
+            />
+          ))}
+        </div>
+      ) : (
+        // ... 검색 결과 목록 ...
+      )}
+    </div>
+  );
+};
+```
+
+### 예시
+
+```typescript
+// 이미지 최적화 전
+https://lh3.googleusercontent.com/a/ACg8ocKA2rKTYFTRCmV6mmsWcupxFlKVWkQm9cOmYu2uodC8Iqr9Lg
+
+// 이미지 최적화 후
+https://lh3.googleusercontent.com/a/ACg8ocKA2rKTYFTRCmV6mmsWcupxFlKVWkQm9cOmYu2uodC8Iqr9Lg=s96-c
+```
+
+### 결론 및 정리
+
+1. **성능 최적화**
+
+   - `loading="lazy"` 속성으로 이미지 지연 로딩
+   - 이미지 크기 제한으로 다운로드 용량 감소
+   - 브라우저 캐시 활용으로 반복 요청 방지
+
+2. **에러 처리 강화**
+
+   - 이미지 로드 실패 시 기본 이미지 표시
+   - `crossOrigin` 및 `referrerPolicy` 설정으로 보안 강화
+   - 이미지 로딩 상태 관리 개선
+
+3. **사용자 경험 개선**
+   - 이미지 로딩 속도 향상
+   - 429 에러 발생 감소
+   - 안정적인 이미지 표시
+
+이러한 변경으로 Google 프로필 이미지 로딩 관련 문제가 해결되어, 더 나은 사용자경
+험을 제공할 수 있게 되었습니다.

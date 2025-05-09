@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
 			{
 				index: true,
 				// element: <Navigate to='/wardrobe' />,
-				element: <Navigate to='/wardrobe' replace />,
+				element: <Navigate to='/wardrobe' />,
 				// 초기 세팅값 wardrobe
 			},
 			// {
@@ -64,7 +64,7 @@ export const router = createBrowserRouter([
 		],
 	},
 	{
-		path: 'mypage',
+		path: '/mypage',
 		element: <MyClosetPage />,
 	},
 	{
@@ -76,19 +76,19 @@ export const router = createBrowserRouter([
 		element: <GoogleCallbackHandler />,
 	},
 	{
-		path: 'codi/edit',
+		path: '/codi/edit',
 		element: <CodiEditPage />,
 	},
 	{
-		path: 'codi/save',
+		path: '/codi/save',
 		element: <CodiSavePage />,
 	},
 	{
-		path: 'cloth/:id',
+		path: '/cloth/:id',
 		element: <ClothDetailPage />,
 	},
 	{
-		path: 'codi/:id',
+		path: '/codi/:id',
 		element: <CodiDetailPage />,
 	},
 ]);
