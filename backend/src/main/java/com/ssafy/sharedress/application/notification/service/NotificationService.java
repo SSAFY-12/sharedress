@@ -108,6 +108,7 @@ public class NotificationService implements NotificationUseCase {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<NotificationResponse> getNotifications(Long memberId) {
 		return notificationRepository.findByReceiverId(memberId)
 			.stream()
