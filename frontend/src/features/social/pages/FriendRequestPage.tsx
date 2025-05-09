@@ -31,7 +31,7 @@ export const FriendRequestsPage = () => {
 	};
 	console.log('friendRequests', friendRequests);
 	return (
-		<div className='w-full bg-white flex flex-col items-stretch'>
+		<div className='w-full bg-white flex flex-col items-stretch px-5'>
 			{/* 친구 요청 목록 */}
 			<div className='p-4'>
 				{friendRequests?.map((request) => (

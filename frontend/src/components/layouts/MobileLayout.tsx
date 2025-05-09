@@ -18,8 +18,17 @@ export const MobileLayout = () => {
 		badgeText: '',
 	};
 
-	/* 네비게이션 바 표시 여부 결정	*/
+	// 뒤로가기 핸들러 추가
+	const handleBackClick = () => {
+		if (
+			location.pathname === '/social/add' ||
+			location.pathname === '/social/request'
+		) {
+			navigate('/social');
+		}
+	};
 
+	/* 네비게이션 바 표시 여부 결정	*/
 	const firstDepth = '/' + location.pathname.split('/')[1];
 	const showNav = NavConfig[firstDepth] === true;
 
@@ -32,7 +41,7 @@ export const MobileLayout = () => {
 						onAddClick={() => navigate('/social/request')}
 					/>
 				) : (
-					<Header {...headerProps} />
+					<Header {...headerProps} onBackClick={handleBackClick} />
 				)}
 			</header>
 			<main
