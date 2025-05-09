@@ -34,35 +34,41 @@ const LibraryContainer = () => {
 	추후에 공통 컴포넌트 사용하는걸로 수정필요 
 	*/
 	const { data: profile } = useMyProfile();
-	const { data: closet } = useCloset(profile?.id ?? 0);
+	const { data: closet } = useCloset(profile?.id ?? 0); // 추후 삭제 필요
 
-	const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isPending } =
-		useInfiniteQuery<ClothesResponse>({
-			queryKey: ['clothes', selectedCategory, deferredValue.trim()],
-			queryFn: async ({ pageParam }) => {
-				const request = {
-					size: 12,
-					keyword: deferredValue || undefined,
-					categoryId:
-						selectedCategory === '전체'
-							? undefined
-							: categoryMapping[selectedCategory],
-				};
-				const response = await LibraryApis.getClothes({
-					...request,
-					cursor: pageParam as number | undefined,
-				});
+	const {
+		data,
+		isFetchingNextPage,
+		hasNextPage,
+		fetchNextPage,
+		isFetching,
+		isLoading,
+	} = useInfiniteQuery<ClothesResponse>({
+		queryKey: ['clothes', selectedCategory, deferredValue.trim()],
+		queryFn: async ({ pageParam }) => {
+			const request = {
+				size: 12,
+				keyword: deferredValue || undefined,
+				categoryId:
+					selectedCategory === '전체'
+						? undefined
+						: categoryMapping[selectedCategory],
+			};
+			const response = await LibraryApis.getClothes({
+				...request,
+				cursor: pageParam as number | undefined,
+			});
 
-				return response;
-			},
-			getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
-			initialPageParam: undefined,
-			staleTime: 1000 * 5,
-			placeholderData: () => ({
-				pages: [],
-				pageParams: [],
-			}),
-		});
+			return response;
+		},
+		getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
+		initialPageParam: undefined,
+		staleTime: 1000 * 5,
+		placeholderData: () => ({
+			pages: [],
+			pageParams: [],
+		}),
+	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValue(e.target.value);
@@ -124,7 +130,8 @@ const LibraryContainer = () => {
 					onItemClick={handleItemClick}
 					className='flex flex-col w-full gap-4'
 					scrollRef={sentinel}
-					isPending={isPending}
+					isLoading={isLoading}
+					isFetching={isFetching}
 					isFetchingNextPage={isFetchingNextPage}
 					columns={2}
 				/>

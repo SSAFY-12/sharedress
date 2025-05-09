@@ -14,7 +14,8 @@ interface ClothListContainerProps {
 	columns?: 2 | 3;
 	className?: string;
 	isForRegist?: boolean; // 옷 등록시 사용되는것인지 여부
-	isPending?: boolean; // 로딩 상태
+	isLoading?: boolean; // 로딩 상태
+	isFetching?: boolean; // 다음 페이지 로딩 상태
 	isFetchingNextPage?: boolean; // 다음 페이지 로딩 상태
 	scrollRef?: ForwardedRef<HTMLDivElement>;
 }
@@ -29,7 +30,8 @@ const ClothListContainer = forwardRef<HTMLDivElement, ClothListContainerProps>(
 		columns = 3,
 		className = '',
 		isForRegist = false,
-		isPending = false,
+		isLoading = false,
+		isFetching = false,
 		isFetchingNextPage = false,
 		scrollRef,
 	}) => (
@@ -64,7 +66,7 @@ const ClothListContainer = forwardRef<HTMLDivElement, ClothListContainerProps>(
 						columns === 2 ? 'grid-cols-2' : 'grid-cols-3'
 					}`}
 				>
-					{isPending ? (
+					{(isLoading || isFetching) && !isFetchingNextPage ? (
 						<>
 							<ClothCardRegistEmpty />
 							<ClothCardRegistEmpty />
@@ -72,26 +74,23 @@ const ClothListContainer = forwardRef<HTMLDivElement, ClothListContainerProps>(
 							<ClothCardRegistEmpty />
 						</>
 					) : (
-						<></>
-					)}
-
-					{items.map((item) =>
-						!isForRegist ? (
-							<ClothCard
-								key={item.id}
-								item={item}
-								size={columns === 2 ? 'lg' : 'md'}
-								onClick={() => onItemClick?.(item)}
-								className='flex flex-col w-full gap-2.5'
-							/>
-						) : (
-							<ClothCardRegist
-								key={item.id}
-								item={item}
-								onClick={() => onItemClick?.(item)}
-								className='flex flex-col w-full gap-2.5 items-center'
-							/>
-						),
+						items.map((item) =>
+							!isForRegist ? (
+								<ClothCard
+									key={item.id}
+									item={item}
+									size={columns === 2 ? 'lg' : 'md'}
+									onClick={() => onItemClick?.(item)}
+									className='flex flex-col w-full gap-2.5'
+								/>
+							) : (
+								<ClothCardRegist
+									key={item.id}
+									item={item}
+									className='flex flex-col w-full gap-2.5 items-center'
+								/>
+							),
+						)
 					)}
 					{isFetchingNextPage && (
 						<>
