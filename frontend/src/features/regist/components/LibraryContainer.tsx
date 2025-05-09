@@ -11,7 +11,7 @@ import {
 } from '@/features/regist/api/registApis';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
-import { useMyCloset } from '@/features/closet/hooks/useCloset';
+import { useCloset } from '@/features/closet/hooks/useCloset';
 
 const LibraryContainer = () => {
 	const [selectedCategory, setSelectedCategory] = useState<
@@ -34,7 +34,7 @@ const LibraryContainer = () => {
 	추후에 공통 컴포넌트 사용하는걸로 수정필요 
 	*/
 	const { data: profile } = useMyProfile();
-	const { data: closet } = useMyCloset(profile?.id ?? 0);
+	const { data: closet } = useCloset(profile?.id ?? 0);
 
 	const { data, isFetchingNextPage, hasNextPage, fetchNextPage, isPending } =
 		useInfiniteQuery<ClothesResponse>({

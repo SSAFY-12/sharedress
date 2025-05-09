@@ -1,7 +1,6 @@
-// hooks/useRegistCloth.ts
-import { toast } from 'react-toastify';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LibraryApis, ClosetApis } from '@/features/regist/api/registApis';
+import { toast } from 'react-toastify';
 
 export const useRegistCloth = (id: number) => {
 	const qc = useQueryClient();
