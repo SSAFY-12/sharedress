@@ -10,4 +10,6 @@ public interface NotificationUseCase {
 	void sendCoordinationRecommendNotification(Long senderId, Long receiverId, String message);
 
 	void sendCoordinationCopyNotification(Long coordinationId);
+
+	void sendNotification(String fcmToken, String title, String body);
 }

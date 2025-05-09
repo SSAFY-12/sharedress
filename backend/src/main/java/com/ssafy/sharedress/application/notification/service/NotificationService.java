@@ -11,10 +11,13 @@ import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 import com.ssafy.sharedress.domain.notification.entity.Notification;
 import com.ssafy.sharedress.domain.notification.entity.NotificationType;
+import com.ssafy.sharedress.domain.notification.port.PushNotificationPort;
 import com.ssafy.sharedress.domain.notification.repository.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService implements NotificationUseCase {
@@ -23,6 +26,7 @@ public class NotificationService implements NotificationUseCase {
 	private final FriendRequestRepository friendRequestRepository;
 	private final CoordinationRepository coordinationRepository;
 	private final MemberRepository memberRepository;
+	private final PushNotificationPort pushNotificationPort;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
@@ -104,6 +108,11 @@ public class NotificationService implements NotificationUseCase {
 			});
 	}
 
+	@Override
+	public void sendNotification(String fcmToken, String title, String body) {
+		pushNotificationPort.send(fcmToken, title, body);
+	}
+
 	private void saveNotification(Member sender, Member receiver, String title, String message, NotificationType type) {
 		notificationRepository.save(new Notification(
 			sender,
@@ -113,5 +122,15 @@ public class NotificationService implements NotificationUseCase {
 			message,
 			false
 		));
+
+		String fcmToken = receiver.getFcmToken();
+		if (fcmToken != null && !fcmToken.isBlank()) {
+			try {
+				pushNotificationPort.send(fcmToken, title, message);
+			} catch (Exception e) {
+				log.warn("FCM 전송 실패: {}", e.getMessage(), e);
+			}
+		}
 	}
+
 }
