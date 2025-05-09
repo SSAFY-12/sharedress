@@ -1,96 +1,100 @@
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { APIError, getErrorMessage } from './errorHandler';
+import { getErrorMessage } from './errorHandler';
 import { useAuthStore } from '@/store/useAuthStore';
-import useRefresh from '@/features/auth/hooks/useRefresh';
+import { authApi } from '@/features/auth/api/authApi';
+
+const baseURL = import.meta.env.VITE_API_URL || 'https://www.sharedress.co.kr';
 
 export const client = axios.create({
-	baseURL: import.meta.env.VITE_API_URL,
+	baseURL,
+	withCredentials: true, // 크로스 사이트 요청 시 쿠키 전송 필수
+	// 리프레시 토큰이 쿠키로 전송됨 -> 크로스 도메인 요청에서 쿠키 전송 허용
+	// 리프레시 토큰 자동 전송
+	headers: {
+		'Content-Type': 'application/json',
+	},
 });
 
-/**
- * 전역 에러 처리 함수
- * - status code에 따른 에러 메시지 표시
- * - 서버에서 전달된 추가 에러 메시지가 있다면 함께 표시
- */
+// 전역 에러 처리 함수
 const handleGlobalError = (status: number, serverMessage?: string) => {
 	// 기본 에러 메시지 표시
-	const defaultMessage = getErrorMessage(status);
+	const defaultMessage = getErrorMessage(status); // 에러 메시지 표시
 	toast.error(defaultMessage, {
-		position: 'top-right',
-		autoClose: 3000,
+		// 토스트 메시지 표시
+		position: 'top-right', // 토스트 위치
+		autoClose: 3000, // 토스트 자동 닫기 시간
 	});
 
 	// 서버에서 추가 에러 메시지가 있다면 표시
 	if (serverMessage && typeof serverMessage === 'string') {
+		// 서버에서 추가 에러 메시지가 있다면 표시
 		toast.error(serverMessage, {
-			position: 'top-right',
-			autoClose: 3000,
+			// 토스트 메시지 표시
+			position: 'top-right', // 토스트 위치
+			autoClose: 3000, // 토스트 자동 닫기 시간
 		});
 	}
 };
 
+// 요청 인터셉터
 client.interceptors.request.use(
-	async (config) => {
-		const token = useAuthStore.getState().accessToken;
-		console.log('인터셉터에서 읽은 토큰:', token);
+	(config) => {
+		const token = useAuthStore.getState().accessToken; // 토큰 가져오기
 		if (token) {
-			config.headers['Authorization'] = `Bearer ${token}`;
+			config.headers.Authorization = `Bearer ${token}`; // 토큰 헤더에 추가
 		}
-		try {
-			// FormData인 경우 multipart/form-data로 설정
-			if (config.data instanceof FormData) {
-				config.headers['Content-Type'] = 'multipart/form-data';
-			} else {
-				config.headers['Content-Type'] = 'application/json';
-			}
-
-			return config;
-		} catch (error) {
-			console.error('[Request Interceptor Error]:', error);
-			handleGlobalError(0, '요청 처리 중 오류가 발생했습니다.');
-			return Promise.reject(new APIError(0, '요청 처리 실패'));
-		}
+		return config;
 	},
 	(error) => {
-		handleGlobalError(0, '요청 구성에 실패했습니다.');
-		return Promise.reject(new APIError(0, '요청 구성 오류', error));
+		console.error('❌ 요청 인터셉터 에러 발생 :', error);
+		return Promise.reject(error);
 	},
 );
 
+// 응답 인터셉터
 client.interceptors.response.use(
 	(response) => response,
 	async (error) => {
-		const status = error.response?.status;
-		const serverMessage = error.response?.data?.message;
+		const originalRequest = error.config; // 원래 요청 정보 저장(실패한 요청의 정보)
+		// config 속성은 원래 요청했던 API 설정 정보를 가지고 있음(어떤 메서드, 데이터)
 
-		// 401 에러 (인증 실패) 처리
-		if (status === 401) {
-			// 토큰 만료 시 401 에러 발생 * 인증 실패
-			// 우선순위 2
+		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도(아직 재시도하지 않은 경우)
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			// originalRequest._retry 초기화를 통해서 무한 루프 방지(직접 만든 플래그 === 재시도 여부 판단)
+			// retry flag true로 설정 -> 재시도 여부 판단
+			originalRequest._retry = true;
+
 			try {
-				const { mutateAsync: refreshAsync } = useRefresh(); // 인터셉터 자체에서 단순 훅 사용
+				// 리프레시 토큰으로 새로운 액세스 토큰 요청
+				const { content } = await authApi.refresh(); // 리프레시 토큰 요청 => TokenResponse
+				const { accessToken } = content; // 새로운 액세스 토큰 저장
 
-				await refreshAsync(); // 토큰 갱신 -> 명시적 비동기 처리(토큰 갱신 완료까지 기다림)
-				return axios(error.config); // 토큰 갱신 후 원래 요청 재시도
+				useAuthStore.getState().setAccessToken(accessToken); // 새로운 액세스 토큰 저장
+
+				// 원래 요청 재시도
+				originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+				return client(originalRequest); // 재시도 => 새로운 액세스 토큰 요청
 			} catch (refreshError) {
-				// 갱신 실패시 로그인 페이지로 리다이렉트
-				window.location.href = '/login';
-				return Promise.reject(refreshError);
+				// 리프레시 토큰 갱신 실패 시 로그아웃 처리
+				const { clearAuth } = useAuthStore.getState(); // 로그아웃 처리
+				clearAuth();
+				// 로그인 페이지로 리다이렉트
+				window.location.href = '/auth';
 			}
 		}
 
 		// 전역 에러 처리
-		handleGlobalError(status, serverMessage);
+		if (error.response) {
+			const { status } = error.response; // 에러 상태 코드
+			const serverMessage = error.response.data?.message; // 서버 에러 메시지
+			handleGlobalError(status, serverMessage); // 전역 에러 처리
+		} else {
+			// 네트워크 에러 등 response가 없는 경우
+			handleGlobalError(0, '서버와의 통신에 실패했습니다.'); // 전역 에러 처리
+		}
 
-		// APIError 형태로 에러 반환
-		return Promise.reject(
-			new APIError(
-				status || 500,
-				error.message || '서버 오류',
-				error.response?.data,
-			),
-		);
+		return Promise.reject(error);
 	},
 );
 

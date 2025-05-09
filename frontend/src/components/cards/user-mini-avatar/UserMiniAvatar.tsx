@@ -20,6 +20,8 @@ export const UserMiniAvatar = ({
 				src={src || '/placeholder.svg?height=100&width=100'}
 				alt='User Avatar'
 				className={`${sizeClass} rounded-full object-cover border border-gray-200`}
+				loading='lazy'
+				referrerPolicy='no-referrer'
 			/>
 			{withBadge && (
 				<span className='absolute bottom-0 right-0 bg-green-400 rounded-full w-3 h-3 border border-white' />
