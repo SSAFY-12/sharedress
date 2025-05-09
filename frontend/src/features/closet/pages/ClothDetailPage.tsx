@@ -1,7 +1,5 @@
-import Header from '@/components/layouts/Header';
 import { CodiEditor } from '@/containers/CodiEditor';
 import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
-import NavBar from '@/components/layouts/NavBar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 import { useState } from 'react';
@@ -17,14 +15,6 @@ const ClothDetailPage = () => {
 
 	const { data: cloth, isLoading, isError } = useClothDetail(clothId);
 	const { mutate: deleteCloth } = useDeleteCloth();
-
-	const handleBackClick = () => {
-		if (window.history.length > 1) {
-			navigate(-1);
-		} else {
-			navigate('/');
-		}
-	};
 
 	const handleMenuClick = () => {
 		setIsMenuOpen(true);
@@ -57,9 +47,7 @@ const ClothDetailPage = () => {
 		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
 
 	return (
-		<div className='flex flex-col h-screen bg-white max-w-md mx-auto'>
-			<Header showBack={true} onBackClick={handleBackClick} />
-
+		<div className='flex flex-col h-screen bg-white w-full'>
 			<div className='flex-1 overflow-auto pb-20'>
 				<CodiEditor
 					item={{
@@ -107,8 +95,6 @@ const ClothDetailPage = () => {
 					</button>
 				</div>
 			</BottomSheet>
-
-			<NavBar />
 		</div>
 	);
 };

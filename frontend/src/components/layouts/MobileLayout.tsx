@@ -2,21 +2,14 @@ import { useLocation, Outlet } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
 import SocialHeader from './SocialHeader';
-import { headerConfig } from '@/constants/headerConfig';
 import { NavConfig } from '@/constants/navConfig';
+import getHeaderProps from '@/utils/getHeaderProps';
 
 export const MobileLayout = () => {
 	const location = useLocation();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
-	const headerProps = headerConfig[
-		location.pathname as keyof typeof headerConfig
-	] || {
-		showBack: false,
-		subtitle: '',
-		badgeIcon: 'info',
-		badgeText: '',
-	};
+	const headerProps = getHeaderProps(location.pathname);
 
 	/* 네비게이션 바 표시 여부 결정	*/
 

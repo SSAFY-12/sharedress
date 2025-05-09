@@ -1,8 +1,11 @@
 import { HeaderProps } from '@/components/layouts/Header';
+import { useNavigate } from 'react-router-dom';
 
 type HeaderConfig = {
 	[key: string]: Partial<HeaderProps>;
 };
+
+const navigate = useNavigate();
 
 export const headerConfig: HeaderConfig = {
 	'/auth': {
@@ -50,5 +53,15 @@ export const headerConfig: HeaderConfig = {
 		showBack: true,
 		subtitle: '사진으로 등록',
 		badgeText: '',
+	},
+	'/cloth/:id': {
+		showBack: true,
+		onBackClick: () => {
+			if (window.history.length > 1) {
+				navigate(-1);
+			} else {
+				navigate('/');
+			}
+		},
 	},
 } as const;
