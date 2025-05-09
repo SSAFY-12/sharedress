@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ssafy.sharedress.application.aop.SendNotification;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestDto;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
 import com.ssafy.sharedress.application.coordination.dto.UpdateCoordinationIsPublicRequest;
@@ -27,6 +28,7 @@ import com.ssafy.sharedress.domain.guest.repository.GuestRepository;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.error.MemberErrorCode;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
+import com.ssafy.sharedress.domain.notification.entity.NotificationType;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -73,6 +75,7 @@ public class CoordinationService implements CoordinationUseCase {
 		);
 	}
 
+	@SendNotification(NotificationType.COORDINATION_RECOMMEND)
 	@Transactional
 	@Override
 	public CoordinationResponse recommendCoordination(UserContext userContext, Long targetMemberId,
@@ -98,6 +101,7 @@ public class CoordinationService implements CoordinationUseCase {
 		return null;
 	}
 
+	@SendNotification(NotificationType.COORDINATION_COPY)
 	@Transactional
 	@Override
 	public CoordinationResponse copyCoordination(Long myId, Long targetCoordinationId) {
@@ -138,8 +142,6 @@ public class CoordinationService implements CoordinationUseCase {
 			);
 			copyCoordination.addCoordinationClothes(copied);
 		}
-
-		// TODO[준]: 코디를 복사했다는 알림 전송 로직 추가
 
 		return CoordinationResponse.fromEntity(
 			coordinationRepository.save(copyCoordination)
@@ -215,8 +217,6 @@ public class CoordinationService implements CoordinationUseCase {
 			creator
 		);
 
-		// TODO[준]: 코디를 추천했다는 알림 전송 로직 추가
-
 		coordinationRequestDto.items().forEach(item -> {
 			// TODO[준]: 상대방의 옷장에 있는 옷인지 확인하는 로직 추가
 			ClosetClothes closetClothes = closetClothesRepository.getReferenceById(item.id());
@@ -254,8 +254,6 @@ public class CoordinationService implements CoordinationUseCase {
 			owner,
 			creator
 		);
-
-		// TODO[준]: 코디를 추천했다는 알림 전송 로직 추가
 
 		coordinationRequestDto.items().forEach(item -> {
 			// TODO[준]: 상대방의 옷장에 있는 옷인지 확인하는 로직 추가

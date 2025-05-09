@@ -1,13 +1,16 @@
 package com.ssafy.sharedress.application.coordination.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.application.aop.SendNotification;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestRequest;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationRequestUseCase;
 import com.ssafy.sharedress.domain.coordination.repository.CoordinationRequestRepository;
 import com.ssafy.sharedress.domain.friend.repository.FriendRepository;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
+import com.ssafy.sharedress.domain.notification.entity.NotificationType;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +22,8 @@ public class CoordinationRequestService implements CoordinationRequestUseCase {
 	private final FriendRepository friendRepository;
 	private final CoordinationRequestRepository coordinationRequestRepository;
 
+	@SendNotification(NotificationType.COORDINATION_REQUEST)
+	@Transactional
 	@Override
 	public void sendCoordinationRequest(Long myId, CoordinationRequestRequest request) {
 		Member requester = memberRepository.getReferenceById(myId);
@@ -34,7 +39,5 @@ public class CoordinationRequestService implements CoordinationRequestUseCase {
 				receiver
 			)
 		);
-
-		// TODO[준]: 알림 전송 로직 추가
 	}
 }

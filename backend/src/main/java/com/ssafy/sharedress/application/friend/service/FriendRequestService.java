@@ -3,6 +3,7 @@ package com.ssafy.sharedress.application.friend.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.application.aop.SendNotification;
 import com.ssafy.sharedress.application.friend.dto.FriendRequestDto;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestUseCase;
 import com.ssafy.sharedress.domain.friend.entity.Friend;
@@ -12,6 +13,7 @@ import com.ssafy.sharedress.domain.friend.repository.FriendRepository;
 import com.ssafy.sharedress.domain.friend.repository.FriendRequestRepository;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
+import com.ssafy.sharedress.domain.notification.entity.NotificationType;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class FriendRequestService implements FriendRequestUseCase {
 	private final FriendRequestRepository friendRequestRepository;
 	private final FriendRepository friendRepository;
 
+	@SendNotification(NotificationType.FRIEND_REQUEST)
 	@Transactional
 	@Override
 	public void sendFriendRequest(Long memberId, FriendRequestDto friendRequest) {
@@ -39,10 +42,9 @@ public class FriendRequestService implements FriendRequestUseCase {
 		Member receiver = memberRepository.getReferenceById(friendRequest.receiverId());
 
 		friendRequestRepository.save(friendRequest.toEntity(requester, receiver));
-
-		// TODO[준]: 알림 전송
 	}
 
+	@SendNotification(NotificationType.FRIEND_ACCEPT)
 	@Transactional
 	@Override
 	public void acceptFriendRequest(Long myId, Long friendRequestId) {
@@ -60,8 +62,6 @@ public class FriendRequestService implements FriendRequestUseCase {
 		friendRepository.save(friend);
 
 		friendRequestRepository.deleteById(friendRequestId);
-
-		// TODO[준]: 알림 전송
 	}
 
 	@Override

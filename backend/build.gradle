@@ -108,6 +108,9 @@ dependencies {
 
 	// S3
 	implementation "software.amazon.awssdk:s3"
+
+	// AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 }
 
 tasks.named('test') {
