@@ -1,5 +1,5 @@
 export interface ClothItem {
-	id: string;
+	id: number;
 	name: string;
 	brand?: string;
 	category: string;

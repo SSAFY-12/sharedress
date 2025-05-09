@@ -15,14 +15,13 @@ const RegistSearchPage = () => {
 				selected={selected}
 				setSelected={setSelected}
 			/>
-			{selected === registSearchMenuConfig[0] ? (
-				<>
-					<LibraryContainer />
-				</>
-			) : (
-				<></>
-			)}
+
+			<div className='flex-1 w-full '>
+				{selected === registSearchMenuConfig[0] ? <LibraryContainer /> : <></>}
+			</div>
+			<div></div>
 		</div>
 	);
 };
+
 export default RegistSearchPage;

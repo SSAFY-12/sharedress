@@ -1,13 +1,26 @@
-import { ClothCardRegistProps } from './ClothCardRegist.types';
+import { useState, useEffect } from 'react';
+import React from 'react';
+import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
+import { useRegistCloth } from '@/features/regist/hooks/useRegistCloth';
+import { useDeleteCloth } from '@/features/regist/hooks/useRegistCloth';
+import { RegisteredBedge } from './RegisteredBedge';
+
+export interface ClothCardRegistProps {
+	item: ClothItem;
+	className?: string;
+}
+
+interface RegisterState {
+	isRegistered: boolean;
+	id?: number;
+}
 
 // 선택 여부에 따라 테두리 색상 변경, 크기 동적 적용
 export const ClothCardRegist = ({
 	item,
-	selected = false,
-	onClick,
 	className = '',
 }: ClothCardRegistProps) => (
-	<div onClick={onClick} className={className}>
+	<div className={className}>
 		<div
 			className={`w-full aspect-[10/11] border border-light overflow-hidden rounded-md relative`}
 		>
@@ -16,16 +29,7 @@ export const ClothCardRegist = ({
 				alt={item.name}
 				className='object-cover w-full'
 			/>
-
-			{selected ? (
-				<div className='absolute top-1 right-1 bg-rose-500 rounded-full w-4 h-4 flex items-center justify-center'>
-					<span className='text-white text-xs'>✓</span>
-				</div>
-			) : (
-				<div className='absolute top-1 right-1 bg-black/50 rounded-full w-4 h-4 flex items-center justify-center'>
-					<span className='text-white text-xs'>✓</span>
-				</div>
-			)}
+			<RegisteredBedge libraryId={item.id} />
 		</div>
 
 		<div className='flex flex-col items-start gap-0.5 px-1'>

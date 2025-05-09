@@ -36,6 +36,7 @@ export default {
 				main: '#3A3636',
 				modify: '#3B98DF',
 				delete: '#E36969',
+				success: '#2079FF',
 			},
 		},
 	},
