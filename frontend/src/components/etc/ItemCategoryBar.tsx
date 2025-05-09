@@ -19,7 +19,7 @@ const ItemCategoryBar = ({
 
 		{/* 스크롤 가능한 영역 */}
 		<div className='overflow-x-auto scrollbar-hide'>
-			<div className='flex justify-start gap-1.5 min-w-max px-2 py-4'>
+			<div className='flex justify-start gap-1.5 min-w-max'>
 				{categories.map((category) => (
 					<ItemCategoryBtn
 						key={category}

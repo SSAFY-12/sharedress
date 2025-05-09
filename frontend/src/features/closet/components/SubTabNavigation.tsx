@@ -11,7 +11,7 @@ const SubTabNavigation = <T extends string>({
 	onTabChange,
 	className = '',
 }: SubTabNavigationProps<T>) => (
-	<div className={`flex gap-4 ${className}`}>
+	<div className={`flex gap-4${className}`}>
 		{tabs.map((tab) => (
 			<button
 				key={tab.id}
