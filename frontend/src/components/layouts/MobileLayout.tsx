@@ -4,17 +4,27 @@ import NavBar from './NavBar';
 import SocialHeader from './SocialHeader';
 import { NavConfig } from '@/constants/navConfig';
 import getHeaderProps from '@/utils/getHeaderProps';
+import { useNavigate } from 'react-router-dom';
 
 export const MobileLayout = () => {
 	const location = useLocation();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
 	const headerProps = getHeaderProps(location.pathname);
+	const navigate = useNavigate();
 
 	/* 네비게이션 바 표시 여부 결정	*/
-
 	const firstDepth = '/' + location.pathname.split('/')[1];
 	const showNav = NavConfig[firstDepth] === true;
+
+	// 뒤로가기 함수
+	const onBackClick = () => {
+		if (window.history.length > 1) {
+			navigate(-1);
+		} else {
+			navigate('/');
+		}
+	};
 
 	return (
 		<div className='min-h-screen flex flex-col'>
@@ -22,7 +32,7 @@ export const MobileLayout = () => {
 				{isMyPage ? null : isSocial ? (
 					<SocialHeader />
 				) : (
-					<Header {...headerProps} />
+					<Header {...headerProps} onBackClick={onBackClick} />
 				)}
 			</header>
 			<main

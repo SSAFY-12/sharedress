@@ -6,12 +6,14 @@ export const InputField = ({
 	value,
 	onChange,
 	onClick,
+	onFocus,
+	onBlur,
 	disabled = false,
 	className = '',
 	hexCode,
 }: InputFieldProps) => {
 	const baseClass =
-		'border border-gray-300 rounded-md px-3 py-2 w-full text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 disabled:bg-gray-100';
+		'border border-gray-300 bg-background h-12 rounded-md px-3 py-2 w-full text-default text-regular focus:outline-none focus:ring-2 focus:ring-light disabled:bg-gray-100';
 
 	if (type === 'text') {
 		return (
@@ -22,6 +24,8 @@ export const InputField = ({
 				placeholder={placeholder}
 				disabled={disabled}
 				className={`${baseClass} ${className}`}
+				onFocus={onFocus}
+				onBlur={onBlur}
 			/>
 		);
 	}

@@ -32,7 +32,7 @@ const CommentList = ({
 	}
 
 	return (
-		<div className={`space-y-4 ${className}`}>
+		<div className={`space-y-5 ${className}`}>
 			{comments.map((comment) => (
 				<CommentItem
 					key={comment.id}

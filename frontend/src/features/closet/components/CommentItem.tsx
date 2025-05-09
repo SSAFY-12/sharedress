@@ -1,4 +1,3 @@
-import { MoreVertical } from 'lucide-react';
 import { CommentItemProps } from './CommentItem.types';
 import { formatDistanceToNow, parse } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -38,30 +37,37 @@ const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 	};
 
 	return (
-		<div className='flex items-center'>
-			<img
-				src={comment.author.imageUrl || 'https://picsum.photos/200'}
-				alt={comment.author.name}
-				className='w-10 h-10 rounded-full mr-3'
-			/>
-			<div className='flex-1'>
-				<div className='flex flex-col items-start'>
-					<div className='flex items-center gap-4'>
-						<span className='font-medium'>{comment.author.name}</span>
-						<span className='text-xs text-gray-500'>
-							{toRelativeTime(comment.createdAt)}
-						</span>
+		<div className='flex items-start justify-between'>
+			<div className='flex items-center'>
+				<img
+					src={comment.author.imageUrl || 'https://picsum.photos/200'}
+					alt={comment.author.name}
+					className='w-11 h-11 rounded-full mr-4'
+				/>
+				<div className='flex-1'>
+					<div className='flex flex-col items-start'>
+						<div className='flex items-center gap-4'>
+							<span className='text-smallButton text-regular'>
+								{comment.author.name}
+							</span>
+							<span className='text-description text-descriptionColor'>
+								{toRelativeTime(comment.createdAt)}
+							</span>
+						</div>
+						<p className='mt-1.5 text-default text-regular'>
+							{comment.content}
+						</p>
 					</div>
-					<p className='mt-1'>{comment.content}</p>
 				</div>
 			</div>
+
 			{isMine && (
 				<button
 					onClick={handleMoreClick}
 					className='text-gray-400 p-1'
 					aria-label='댓글 더보기'
 				>
-					<MoreVertical size={16} />
+					<img src='/icons/more.svg' alt='더보기' />
 				</button>
 			)}
 		</div>

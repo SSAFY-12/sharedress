@@ -12,7 +12,7 @@ export const ClothMainDisplay = ({
 	recommender = null,
 }: ClothMainDisplayProps) => (
 	<div
-		className={`relative w-full aspect-[10/11] border rounded-md overflow-hidden ${className}`}
+		className={`relative w-full aspect-[10/11] overflow-hidden ${className}`}
 	>
 		<img
 			src={item.imageUrl || '/placeholder.svg?height=400&width=400'}
@@ -33,13 +33,13 @@ export const ClothMainDisplay = ({
 
 		{/* 추천인 정보 */}
 		{recommender && (
-			<div className='absolute bottom-2 right-2 flex items-center'>
+			<div className='absolute bottom-4 right-4 flex items-center'>
 				<img
 					src={recommender.imageUrl || 'https://picsum.photos/200'}
 					alt={recommender.name}
-					className='w-7 h-7 rounded-full mr-2 object-cover'
+					className='w-6 h-6 rounded-full mr-2 object-cover'
 				/>
-				<span className='text-xs font-medium text-[#3a3636'>
+				<span className='text-description text-regular'>
 					{recommender.name}님의 추천 코디
 				</span>
 			</div>

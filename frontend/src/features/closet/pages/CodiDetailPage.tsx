@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import Header from '@/components/layouts/Header';
 import { CodiEditor } from '@/containers/CodiEditor';
 import CommentList from '@/features/closet/components/CommentList';
 import { Comment } from '@/features/closet/components/CommentItem.types';
@@ -52,10 +51,6 @@ const CodiDetailPage = () => {
 	const [commentText, setCommentText] = useState('');
 	const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
 	const [isCommentMenuOpen, setIsCommentMenuOpen] = useState(false);
-
-	const handleBackClick = () => {
-		navigate(-1);
-	};
 
 	const handleMenuClick = () => {
 		setIsMenuOpen(true);
@@ -194,11 +189,9 @@ const CodiDetailPage = () => {
 		: null;
 
 	return (
-		<div className='flex flex-col h-screen bg-white max-w-md mx-auto overflow-hidden'>
-			<Header showBack={true} onBackClick={handleBackClick} />
-
+		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
 			{/* 메인 콘텐츠 */}
-			<div className='flex-1 overflow-y-auto pb-24 relative'>
+			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
 				<CodiEditor
 					item={item}
 					showMoreButton={true}
@@ -206,15 +199,17 @@ const CodiDetailPage = () => {
 					recommender={recommender}
 				>
 					<div className='px-4'>
-						<div className='flex flex-col items-start'>
-							<p className='text-lg mb-1'>{coordination.description}</p>
-							<p className='text-sm text-gray-500 mb-6'>
+						<div className='flex flex-col items-start gap-3'>
+							<p className='text-regular text-default'>
+								{coordination.description}
+							</p>
+							<p className='text-description text-descriptionColor mb-6'>
 								{toRelativeTime(coordination.createdAt)}
 							</p>
 						</div>
 
 						{/* 댓글 */}
-						<div className='pt-4'>
+						<div className='pb-4'>
 							<CommentList
 								comments={comments}
 								onCommentMoreClick={handleCommentMoreClick}
@@ -225,23 +220,26 @@ const CodiDetailPage = () => {
 			</div>
 
 			{/* 댓글 입력 영역 */}
-			<div className='fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t z-10'>
-				<div className='flex items-center p-4'>
-					<InputField
-						type='text'
-						placeholder='댓글을 입력하세요'
-						value={commentText}
-						onChange={handleCommentChange}
-						onFocus={() => setIsCommentFocused(true)}
-					/>
-					{isCommentFocused || commentText.trim() !== '' ? (
-						<button
-							className='ml-2 p-2 text-white rounded-full flex items-center justify-center'
-							onClick={handleCommentSubmit}
-						>
-							<img src='/icons/submit.svg' alt='전송' className='w-5 h-5' />
-						</button>
-					) : null}
+			<div className='absolute bottom-0 left-0 right-0 bg-white border-t z-10'>
+				<div className='w-full'>
+					<div className='flex items-center p-4'>
+						<InputField
+							type='text'
+							placeholder='댓글을 입력하세요'
+							value={commentText}
+							onChange={handleCommentChange}
+							onFocus={() => setIsCommentFocused(true)}
+							onBlur={() => setIsCommentFocused(false)}
+						/>
+						{isCommentFocused && (
+							<button
+								className='ml-2 p-2 text-white rounded-full flex items-center justify-center'
+								onClick={handleCommentSubmit}
+							>
+								<img src='/icons/submit.svg' alt='전송' className='w-5 h-5' />
+							</button>
+						)}
+					</div>
 				</div>
 			</div>
 

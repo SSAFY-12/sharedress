@@ -25,7 +25,7 @@ const ClothDetailPage = () => {
 	};
 
 	const handleEdit = () => {
-		console.log('수정하기 클릭');
+		navigate(`/cloth/${clothId}/edit`);
 	};
 
 	const handleDelete = () => {
@@ -47,7 +47,7 @@ const ClothDetailPage = () => {
 		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
 
 	return (
-		<div className='flex flex-col h-screen bg-white w-full'>
+		<div className='flex flex-col bg-white w-full'>
 			<div className='flex-1 overflow-auto pb-20'>
 				<CodiEditor
 					item={{
@@ -59,7 +59,7 @@ const ClothDetailPage = () => {
 					showMoreButton={true}
 					onMoreButtonClick={handleMenuClick}
 				>
-					<div className='px-4'>
+					<div className='px-4 flex flex-col gap-6'>
 						<ClothDetailItem label='상품명' value={cloth.name} />
 						<ClothDetailItem label='카테고리' value={cloth.category.name} />
 						<ClothDetailItem label='브랜드' value={cloth.brandName} />
