@@ -7,6 +7,7 @@ import autoprefixer from 'autoprefixer';
 import path from 'path';
 import mkcert from 'vite-plugin-mkcert';
 import { VitePWA } from 'vite-plugin-pwa';
+import fs from 'fs';
 
 const cspHeader = [
 	// 기본 설정
@@ -41,6 +42,49 @@ const cspHeader = [
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
 	const isDevelopment = mode === 'development';
+
+	// Service Worker 파일 생성
+	const swContent = `
+		importScripts(
+			'https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js',
+		);
+		importScripts(
+			'https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js',
+		);
+
+		firebase.initializeApp({
+			apiKey: '${env.VITE_FIREBASE_API_KEY}',
+			authDomain: '${env.VITE_FIREBASE_AUTH_DOMAIN}',
+			projectId: '${env.VITE_FIREBASE_PROJECT_ID}',
+			storageBucket: '${env.VITE_FIREBASE_STORAGE_BUCKET}',
+			messagingSenderId: '${env.VITE_FIREBASE_MESSAGING_SENDER_ID}',
+			appId: '${env.VITE_FIREBASE_APP_ID}',
+		});
+
+		const messaging = firebase.messaging();
+
+		messaging.onBackgroundMessage((payload) => {
+			console.log('백그라운드 메시지 수신:', payload);
+
+			const notificationTitle = payload.notification.title;
+			const notificationOptions = {
+				body: payload.notification.body,
+				icon: '/android-chrome-192x192.png',
+				badge: '/favicon-32x32.png',
+				data: payload.data,
+			};
+
+			self.registration.showNotification(notificationTitle, notificationOptions);
+		});
+	`;
+
+	// 빌드 시점에 Service Worker 파일 생성
+	if (mode === 'production') {
+		fs.writeFileSync(
+			path.resolve(__dirname, 'public/firebase-messaging-sw.js'),
+			swContent,
+		);
+	}
 
 	return {
 		plugins: [
