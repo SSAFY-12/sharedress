@@ -31,7 +31,7 @@ class S3Service:
                 file_name,
                 ExtraArgs={
                     'ContentType': 'image/png',
-                    'ACL': 'public-read'  # Make the image publicly accessible
+                    # 'ACL': 'public-read'  # Make the image publicly accessible
                 }
             )
 
