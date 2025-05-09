@@ -15,16 +15,17 @@ export const PrimaryBtn = ({
 	}[size];
 
 	const colorClass = {
-		primary: 'bg-rose-500 hover:bg-rose-600',
-		gray: 'bg-gray-400 hover:bg-gray-500',
-		black: 'bg-black hover:bg-gray-800',
+		primary: 'bg-regular hover:bg-regular/80 text-white',
+		gray: 'bg-gray-400 hover:bg-gray-500 text-white',
+		black: 'bg-black hover:bg-gray-800 text-white',
+		white: 'bg-white hover:bg-gray-100 text-regular',
 	}[color];
 
 	return (
 		<button
 			onClick={onClick}
 			disabled={!activate}
-			className={`${sizeClass} ${colorClass} text-white py-2 rounded-md text-sm font-semibold transition-colors ${
+			className={`${sizeClass} ${colorClass} py-3.5 rounded-md text-smallButton font-smallButton transition-colors ${
 				!activate ? 'opacity-50 cursor-not-allowed' : ''
 			} ${className}`}
 		>

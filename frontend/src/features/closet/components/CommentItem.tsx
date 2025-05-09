@@ -1,7 +1,6 @@
 import { MoreVertical } from 'lucide-react';
 import { CommentItemProps } from './CommentItem.types';
-import { formatDistanceToNow } from 'date-fns';
-import { parseISO } from 'date-fns';
+import { formatDistanceToNow, parse } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
@@ -11,28 +10,26 @@ const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 		}
 	};
 
-	const customKo = {
-		...ko,
-		formatDistance: (token: any, count: number, options?: any) => {
-			const result = ko.formatDistance(token, count, options);
-			return result.replace(/^약\s/, '');
-		},
-	};
-
-	const sanitizeISOString = (dateString: string) =>
-		dateString.replace(/(\.\d{3})\d+/, '$1');
-
 	const toRelativeTime = (dateString: string) => {
 		try {
-			if (!dateString) return '';
-			const sanitized = sanitizeISOString(dateString);
-			const date = parseISO(sanitized);
+			const date = parse(dateString, 'yyyy. M. d. a h:mm:ss', new Date(), {
+				locale: ko,
+			});
 
-			if (isNaN(date.getTime())) return '';
+			if (isNaN(date.getTime())) {
+				console.log('뭔가 이상하다');
+				return '';
+			}
 
 			return formatDistanceToNow(date, {
 				addSuffix: true,
-				locale: customKo,
+				locale: {
+					...ko,
+					formatDistance: (token: any, count: number, options?: any) => {
+						const result = ko.formatDistance(token, count, options);
+						return result.replace(/^약\s/, '');
+					},
+				},
 			});
 		} catch (error) {
 			console.error('오류 발생:', dateString, error);

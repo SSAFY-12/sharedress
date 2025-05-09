@@ -48,6 +48,7 @@ const CodiTab = ({ memberId }: CodiTabProps) => {
 				items={items}
 				onItemClick={handleItemClick}
 				columns={2}
+				type='codi'
 			/>
 		</div>
 	);

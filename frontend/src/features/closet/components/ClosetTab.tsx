@@ -3,7 +3,7 @@ import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '@/features/closet/hooks/useCloset';
-
+import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 interface ClosetTabProps {
 	memberId: number;
 }
@@ -27,22 +27,35 @@ const ClosetTab = ({ memberId }: ClosetTabProps) => {
 	};
 
 	return (
-		<div className='p-4'>
-			<ClothListContainer
-				items={
-					items?.map((item) => ({
-						id: item.id.toString(),
-						category: selectedCategory,
-						imageUrl: item.image,
-						name: item.name,
-					})) ?? []
-				}
-				categories={CATEGORIES}
-				selectedCategory={selectedCategory}
-				onCategoryChange={setSelectedCategory}
-				onItemClick={handleItemClick}
-				columns={3}
-			/>
+		<div className='flex flex-col h-full'>
+			<div className='px-4 shrink-0'>
+				<ItemCategoryBar
+					categories={CATEGORIES}
+					selectedCategory={selectedCategory}
+					onCategoryChange={setSelectedCategory}
+				/>
+			</div>
+
+			<div className='flex-1 overflow-y-auto scrollbar-hide px-4'>
+				<ClothListContainer
+					items={
+						items?.map((item) => ({
+							id: item.id.toString(),
+							category: selectedCategory,
+							imageUrl: item.image,
+							name: item.name,
+							brand: item.brandName,
+						})) ?? []
+					}
+					categories={CATEGORIES}
+					selectedCategory={selectedCategory}
+					onCategoryChange={setSelectedCategory}
+					onItemClick={handleItemClick}
+					columns={3}
+					className='mt-1'
+					type='cloth'
+				/>
+			</div>
 		</div>
 	);
 };

@@ -78,7 +78,7 @@ const CodiDetailPage = () => {
 				alert('코디가 삭제되었습니다.');
 				navigate('/mypage', {
 					state: {
-						initialTab: 'codi',
+						initialTab: '코디',
 					},
 				});
 			},
@@ -118,7 +118,7 @@ const CodiDetailPage = () => {
 				alert('코디가 내 코디에 추가되었습니다.');
 				navigate(`/mypage`, {
 					state: {
-						initialTab: 'codi',
+						initialTab: '코디',
 					},
 				});
 			},

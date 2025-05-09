@@ -63,11 +63,11 @@ export const router = createBrowserRouter([
 			// 	path: '*',
 			// 	element: <Navigate to='/wardrobe' replace />,
 			// },
+			{
+				path: 'mypage',
+				element: <MyClosetPage />,
+			},
 		],
-	},
-	{
-		path: '/mypage',
-		element: <MyClosetPage />,
 	},
 	{
 		path: '/auth',
