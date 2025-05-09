@@ -1,21 +1,25 @@
 package com.ssafy.sharedress.application.notification.dto;
 
+import java.time.LocalDateTime;
+
+import com.ssafy.sharedress.domain.notification.entity.Notification;
+
 public record NotificationResponse(
 	Long id,
-	String type,
+	Integer notificationType,
 	String title,
 	String body,
 	Boolean isRead,
-	String createdAt
+	LocalDateTime createdAt
 ) {
-	public static NotificationResponse from(
-		Long id,
-		String type,
-		String title,
-		String body,
-		Boolean isRead,
-		String createdAt
-	) {
-		return new NotificationResponse(id, type, title, body, isRead, createdAt);
+	public static NotificationResponse from(Notification notification) {
+		return new NotificationResponse(
+			notification.getId(),
+			notification.getType().code,
+			notification.getTitle(),
+			notification.getBody(),
+			notification.getIsRead(),
+			notification.getCreatedAt()
+		);
 	}
 }

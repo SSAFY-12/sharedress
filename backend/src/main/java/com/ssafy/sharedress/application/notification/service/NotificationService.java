@@ -111,14 +111,7 @@ public class NotificationService implements NotificationUseCase {
 	public List<NotificationResponse> getNotifications(Long memberId) {
 		return notificationRepository.findByReceiverId(memberId)
 			.stream()
-			.map(notification -> NotificationResponse.from(
-				notification.getId(),
-				notification.getType().getCode().toString(),
-				notification.getTitle(),
-				notification.getBody(),
-				notification.getIsRead(),
-				notification.getCreatedAt().toString()
-			))
+			.map(NotificationResponse::from)
 			.toList();
 	}
 
