@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { matchPath, Outlet, useLocation } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
 import SocialHeader from './SocialHeader';
@@ -10,6 +10,7 @@ export const WebLayout = () => {
 	const location = useLocation();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
+	const isClothEdit = matchPath('/cloth/:id/edit', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 	const navigate = useNavigate();
 
@@ -29,7 +30,7 @@ export const WebLayout = () => {
 	return (
 		<div className='relative h-full flex flex-col'>
 			<header className='absolute top-0 left-0 right-0 bg-white z-10'>
-				{isMyPage ? null : isSocial ? (
+				{isMyPage || isClothEdit ? null : isSocial ? (
 					<SocialHeader />
 				) : (
 					<Header {...headerProps} onBackClick={onBackClick} />
@@ -37,7 +38,7 @@ export const WebLayout = () => {
 			</header>
 
 			<main
-				className={`flex-1 ${isMyPage ? '' : 'mt-16'} ${
+				className={`flex-1 ${isMyPage || isClothEdit ? '' : 'mt-16'} ${
 					showNav ? 'mb-16' : 'mb-0'
 				} h-full flex flex-col overflow-y-auto`}
 			>

@@ -39,7 +39,19 @@ const ClothEditPage = () => {
 	const navigate = useNavigate();
 	const categories = ['아우터', '상의', '하의', '신발', '기타'];
 	const allBrands = useMemo(
-		() => ['유니클로', '나이키', '뉴발란스', '아디다스', '에잇세컨즈', 'H&M'],
+		() => [
+			'유니클로',
+			'나이키',
+			'뉴발란스',
+			'아디다스',
+			'에잇세컨즈',
+			'H&M',
+			'유자',
+			'유과',
+			'유재석',
+			'유느님',
+			'유혈사태',
+		],
 		[],
 	);
 
@@ -78,19 +90,19 @@ const ClothEditPage = () => {
 	};
 
 	return (
-		<div className='flex flex-col h-screen bg-white max-w-md mx-auto overflow-hidden'>
+		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
 			<Header
 				showBack={true}
 				badgeText='완료'
 				onBackClick={handleDone}
 				onBadgeClick={() => navigate(-1)}
 			/>
-			<div className='flex-1 overflow-y-auto pb-24'>
+			<div className='flex-1 overflow-y-auto pb-9 scrollbar-hide'>
 				<CodiEditor item={item}>
-					<div className='px-4 space-y-6'>
+					<div className='px-4 space-y-4'>
 						{/* 상품명 */}
 						<div className='flex flex-col gap-2 items-start'>
-							<label htmlFor='name' className='text-sm text-gray-500 mb-1'>
+							<label htmlFor='name' className='text-description text-low'>
 								상품명
 							</label>
 							<InputField
@@ -101,7 +113,7 @@ const ClothEditPage = () => {
 						</div>
 
 						<div className='flex flex-col gap-2 items-start'>
-							<label htmlFor='category' className='text-sm text-gray-500 mb-1'>
+							<label htmlFor='category' className='text-description text-low'>
 								카테고리
 							</label>
 							<InputField
@@ -112,7 +124,7 @@ const ClothEditPage = () => {
 						</div>
 
 						<div className='flex flex-col gap-2 items-start'>
-							<label htmlFor='brand' className='text-sm text-gray-500 mb-1'>
+							<label htmlFor='brand' className='text-description text-low'>
 								브랜드
 							</label>
 							<InputField
@@ -123,7 +135,7 @@ const ClothEditPage = () => {
 						</div>
 
 						<div className='flex flex-col gap-2 items-start'>
-							<label htmlFor='color' className='text-sm text-gray-500 mb-1'>
+							<label htmlFor='color' className='text-description text-low'>
 								색상
 							</label>
 							<InputField
@@ -144,8 +156,8 @@ const ClothEditPage = () => {
 				snapPoints={[1]}
 				initialSnap={0}
 			>
-				<div className='p-4'>
-					<p className='text-center text-sm text-gray-700 font-medium mb-4'>
+				<div className='p-4 pt-0'>
+					<p className='text-center text-button text-regular mb-4'>
 						카테고리 선택
 					</p>
 					<div className='flex flex-wrap gap-3 justify-center'>
@@ -156,7 +168,7 @@ const ClothEditPage = () => {
 									setCategory(category);
 									setIsCategorySheetOpen(false);
 								}}
-								className='px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 transition-colors'
+								className='px-4 py-2 rounded-full bg-background text-low text-default hover:bg-light/50 transition-colors'
 							>
 								{category}
 							</button>
@@ -172,7 +184,7 @@ const ClothEditPage = () => {
 				snapPoints={[1]}
 				initialSnap={0}
 			>
-				<div className='p-4'>
+				<div className='p-4 pt-2.5'>
 					<SearchBar
 						placeholder='검색'
 						value={inputQuery}
@@ -181,24 +193,26 @@ const ClothEditPage = () => {
 					/>
 					<div className='mt-4 flex flex-wrap justify-start gap-2'>
 						{searchQuery === '' ? (
-							<p className='text-sm text-center text-gray-400 w-full mt-6 mb-6'>
+							<p className='text-default text-center text-descriptionColor w-full mt-6 mb-6'>
 								브랜드 명을 검색해주세요.
 							</p>
 						) : filteredBrands.length > 0 ? (
-							filteredBrands.map((brand) => (
-								<button
-									key={brand}
-									className='px-4 py-2 rounded-full bg-gray-100 text-sm text-gray-800 hover:bg-gray-200 transition'
-									onClick={() => {
-										setBrand(brand);
-										setIsBrandSheetOpen(false);
-									}}
-								>
-									{brand}
-								</button>
-							))
+							<div className='mt-6 mb-6 flex flex-wrap gap-3'>
+								{filteredBrands.map((brand) => (
+									<button
+										key={brand}
+										className='px-4 py-2 rounded-full bg-background text-low text-default hover:bg-light/50 transition-colors'
+										onClick={() => {
+											setBrand(brand);
+											setIsBrandSheetOpen(false);
+										}}
+									>
+										{brand}
+									</button>
+								))}
+							</div>
 						) : (
-							<p className='text-sm text-center text-gray-400 w-full mt-6 mb-6'>
+							<p className='text-default text-center text-descriptionColor w-full mt-6 mb-6'>
 								검색 결과가 없습니다.
 							</p>
 						)}
@@ -213,12 +227,12 @@ const ClothEditPage = () => {
 				snapPoints={[1]}
 				initialSnap={0}
 			>
-				<div className='p-4'>
+				<div className='p-4 pt-2.5 pb-6'>
 					<div className='grid grid-cols-2 gap-3 justify-items-center'>
 						{colorOptions.map((color) => (
 							<button
 								key={`${color.name}-${color.tone}`}
-								className='px-4 py-2 rounded-full bg-gray-100 text-gray-800 text-sm flex items-center gap-2 hover:bg-gray-200 transition'
+								className='px-4 py-2 rounded-full bg-background text-low text-default flex items-center gap-2 hover:bg-light/50 transition-colors'
 								onClick={() => {
 									setColorName(color.name);
 									setColorHexCode(color.hex);
@@ -227,11 +241,13 @@ const ClothEditPage = () => {
 								}}
 							>
 								<span
-									className='w-4 h-4 rounded-full'
+									className='w-5 h-5 rounded-full'
 									style={{ backgroundColor: color.hex }}
 								/>
 								{color.name}
-								<span className='text-xs text-gray-500'>({color.tone})</span>
+								<span className='text-default text-descriptionColor'>
+									({color.tone})
+								</span>
 							</button>
 						))}
 					</div>

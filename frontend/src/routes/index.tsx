@@ -75,6 +75,10 @@ export const router = createBrowserRouter([
 				path: '/codi/:id',
 				element: <CodiDetailPage />,
 			},
+			{
+				path: '/cloth/:id/edit',
+				element: <ClothEditPage />,
+			},
 		],
 	},
 	{
@@ -92,9 +96,5 @@ export const router = createBrowserRouter([
 	{
 		path: '/codi/save',
 		element: <CodiSavePage />,
-	},
-	{
-		path: '/cloth/:id/edit',
-		element: <ClothEditPage />,
 	},
 ]);
