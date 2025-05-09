@@ -19,6 +19,7 @@ export interface ClosetItem {
 	shopName: string;
 	isPublic: boolean;
 	createdAt: string;
+	libraryId: number;
 }
 
 export type CoordinationScope = 'CREATED' | 'RECOMMENDED';
