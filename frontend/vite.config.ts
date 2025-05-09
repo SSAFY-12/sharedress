@@ -68,7 +68,6 @@ export default defineConfig(({ mode }) => {
 					orientation: 'portrait-primary',
 					start_url: '/',
 					scope: '/',
-					// gcm_sender_id: env.VITE_FIREBASE_MESSAGING_SENDER_ID, // 환경변수 적용 (주석 처리 또는 삭제)
 					icons: [
 						{
 							src: '/android-chrome-192x192.png',

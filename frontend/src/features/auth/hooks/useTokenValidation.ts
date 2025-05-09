@@ -4,7 +4,7 @@ import { getTokenExpiration } from '@/features/auth/utils/tokenUtils';
 import { useNavigate } from 'react-router-dom';
 import useRefresh from './useRefresh';
 
-const TOKEN_EXPIRATION_BUFFER = 10 * 60 * 1000; // 10분 버퍼
+const TOKEN_EXPIRATION_BUFFER = 3 * 60 * 1000; // 3분 버퍼
 
 export const useTokenValidation = () => {
 	// 토큰 상태 확인

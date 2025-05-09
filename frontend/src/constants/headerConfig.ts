@@ -15,7 +15,7 @@ export const headerConfig: HeaderConfig = {
 		subtitle: '내 옷장',
 		badgeText: '전체',
 	},
-	'/notifications': {
+	'/notification': {
 		showBack: true,
 		subtitle: '알림',
 		badgeIcon: 'bell',
