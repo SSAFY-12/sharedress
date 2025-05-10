@@ -26,7 +26,7 @@ const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
 
 	return (
 		<div className='flex flex-col h-full'>
-			<div className='flex-1 overflow-y-auto scrollbar-hide px-4'>
+			<div className='flex-1 px-4'>
 				<ClothListContainer
 					items={
 						closetItems?.map((item) => ({
