@@ -4,7 +4,7 @@ import CommentItem from './CommentItem';
 interface Comment {
 	id: number;
 	author: {
-		id: string;
+		id: number;
 		name: string;
 		imageUrl: string;
 	};
@@ -23,7 +23,7 @@ const CommentList = ({
 	onCommentMoreClick,
 	className,
 }: CommentListProps) => {
-	const profile = useProfileStore((state) => state.profile);
+	const profile = useProfileStore((state) => state.getMyId());
 
 	if (comments.length === 0) {
 		return (
@@ -37,7 +37,7 @@ const CommentList = ({
 				<CommentItem
 					key={comment.id}
 					comment={comment}
-					isMine={comment.author.id === profile?.id.toString()}
+					isMine={comment.author.id === profile}
 					onMoreClick={onCommentMoreClick}
 				/>
 			))}

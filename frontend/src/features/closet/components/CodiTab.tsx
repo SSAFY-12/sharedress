@@ -15,7 +15,7 @@ const CodiTab = ({ memberId, activeSubTab }: CodiTabProps) => {
 	const { data: coordinationList = [] } = useCoordinationList(memberId, scope);
 
 	const items: ClothItem[] = coordinationList.map((coordi) => ({
-		id: coordi.id.toString(),
+		id: coordi.id,
 		name: coordi.description,
 		category: activeSubTab === 'my' ? '나의 코디' : '친구의 추천',
 		imageUrl: coordi.thumbnail || 'https://picsum.photos/200',

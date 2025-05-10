@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { CodiEditor } from '@/containers/CodiEditor';
 import CommentList from '@/features/closet/components/CommentList';
 import { Comment } from '@/features/closet/components/CommentItem.types';
 import { InputField } from '@/components/inputs/input-field';
@@ -13,6 +12,7 @@ import { usePostCoordinationComment } from '@/features/closet/hooks/usePostCoord
 import { useCopyCoordination } from '@/features/closet/hooks/useCopyCoordination';
 import { useDeleteCoordination } from '@/features/closet/hooks/useDeleteCoordinations';
 import { useDeleteCoordinationComment } from '@/features/closet/hooks/useDeleteCoordinationComment';
+import { ImageDetailView } from '@/containers/ImageDetailView';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
@@ -37,7 +37,7 @@ const CodiDetailPage = () => {
 		content: comment.content,
 		createdAt: new Date(comment.createdAt).toLocaleString(),
 		author: {
-			id: comment.creator.id.toString(),
+			id: comment.creator.id,
 			name: comment.creator.nickname,
 			imageUrl: comment.creator.profileImage,
 		},
@@ -174,7 +174,7 @@ const CodiDetailPage = () => {
 	const isMyCodi = coordination.creator.id === coordination.owner.id;
 
 	const item = {
-		id: coordination.id.toString(),
+		id: coordination.id,
 		name: coordination.description,
 		imageUrl: coordination.thumbnail || 'https://picsum.photos/200/300',
 		category: '코디',
@@ -192,7 +192,7 @@ const CodiDetailPage = () => {
 		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
 			{/* 메인 콘텐츠 */}
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
-				<CodiEditor
+				<ImageDetailView
 					item={item}
 					showMoreButton={true}
 					onMoreButtonClick={handleMenuClick}
@@ -216,7 +216,7 @@ const CodiDetailPage = () => {
 							/>
 						</div>
 					</div>
-				</CodiEditor>
+				</ImageDetailView>
 			</div>
 
 			{/* 댓글 입력 영역 */}

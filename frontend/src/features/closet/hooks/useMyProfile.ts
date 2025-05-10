@@ -3,12 +3,13 @@ import { getMyProfile } from '@/features/closet/api/myClosetApi';
 import { useProfileStore } from '@/store/useProfileStore';
 
 export const useMyProfile = () => {
-	const setProfile = useProfileStore((state) => state.setProfile);
+	const setMyId = useProfileStore((state) => state.setMyId);
+
 	return useQuery({
 		queryKey: ['myProfile'],
 		queryFn: async () => {
 			const data = await getMyProfile();
-			setProfile(data);
+			setMyId(data.id);
 			return data;
 		},
 		staleTime: Infinity,

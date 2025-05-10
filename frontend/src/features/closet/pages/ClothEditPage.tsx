@@ -2,7 +2,7 @@ import { InputField } from '@/components/inputs/input-field';
 import { SearchBar } from '@/components/inputs/search-bar';
 import Header from '@/components/layouts/Header';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
-import { CodiEditor } from '@/containers/CodiEditor';
+import { ImageDetailView } from '@/containers/ImageDetailView';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -98,7 +98,7 @@ const ClothEditPage = () => {
 				onBadgeClick={() => navigate(-1)}
 			/>
 			<div className='flex-1 overflow-y-auto pb-9 scrollbar-hide'>
-				<CodiEditor item={item}>
+				<ImageDetailView item={item}>
 					<div className='px-4 space-y-4'>
 						{/* 상품명 */}
 						<div className='flex flex-col gap-2 items-start'>
@@ -146,7 +146,7 @@ const ClothEditPage = () => {
 							/>
 						</div>
 					</div>
-				</CodiEditor>
+				</ImageDetailView>
 			</div>
 
 			{/* 카테고리 BottomSheet */}

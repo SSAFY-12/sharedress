@@ -6,10 +6,11 @@ import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
 import { useLocation } from 'react-router-dom';
 import SelectMenu from '@/components/menu/two-selection-menu/SelectMenu';
 import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
+import { categoryConfig } from '@/constants/categoryConfig';
+
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 
 const closetTab = ['옷장', '코디'];
-const CATEGORIES = ['전체', '아우터', '상의', '하의', '신발', '기타'];
 const CodiTabs = [
 	{
 		id: 'my' as const,
@@ -30,7 +31,7 @@ const MyClosetPage = () => {
 	const [activeMainTab, setActiveMainTab] = useState<
 		(typeof closetTab)[number]
 	>(initialTab ?? '옷장');
-	const [selectedCategory, setSelectedCategory] = useState('전체');
+	const [selectedCategory, setSelectedCategory] = useState(categoryConfig[0]);
 	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friends'>('my');
 
 	const { data: profile } = useMyProfile();
@@ -68,7 +69,7 @@ const MyClosetPage = () => {
 			<div className='px-4 sticky top-[48px] z-10 bg-white py-4'>
 				{activeMainTab === '옷장' ? (
 					<ItemCategoryBar
-						categories={CATEGORIES}
+						categories={categoryConfig}
 						selectedCategory={selectedCategory}
 						onCategoryChange={setSelectedCategory}
 					/>
@@ -87,7 +88,6 @@ const MyClosetPage = () => {
 					<ClosetTab
 						memberId={profile?.id ?? 0}
 						selectedCategory={selectedCategory}
-						setSelectedCategory={setSelectedCategory}
 					/>
 				) : (
 					<CodiTab

@@ -1,10 +1,10 @@
-import { CodiEditor } from '@/containers/CodiEditor';
 import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 import { useState } from 'react';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
 import { useDeleteCloth } from '@/features/closet/hooks/useDeleteCloth';
+import { ImageDetailView } from '@/containers/ImageDetailView';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
@@ -49,9 +49,9 @@ const ClothDetailPage = () => {
 	return (
 		<div className='flex flex-col bg-white w-full'>
 			<div className='flex-1 overflow-auto pb-20'>
-				<CodiEditor
+				<ImageDetailView
 					item={{
-						id: cloth.id.toString(),
+						// id: cloth.id, id 안받도록 처리
 						name: cloth.name,
 						imageUrl: cloth.image,
 						category: cloth.category.name,
@@ -69,7 +69,7 @@ const ClothDetailPage = () => {
 							hexCode={cloth.color.hexCode}
 						/>
 					</div>
-				</CodiEditor>
+				</ImageDetailView>
 			</div>
 
 			{/* 수정 삭제 바텀 시트 */}
