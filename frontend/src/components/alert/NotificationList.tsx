@@ -1,14 +1,13 @@
 import { FC } from 'react';
 import NotificationItem from './NotificationItem';
 import {
-	FileText,
-	UserPlus,
-	UserCheck,
-	MessageCircle,
-	CornerDownRight,
-	ThumbsUp,
-	Shuffle,
-	Send,
+	UserPlus, // 친구 요청
+	UserCheck, // 친구 수락
+	Send, // 코디 요청
+	ThumbsUp, // 코디 추천
+	Shuffle, // 코디 복사
+	MessageCircle, // 코디 댓글
+	FileText, // (기본값)
 } from 'lucide-react';
 import useNotification from '@/features/alert/hooks/useNotification';
 import { formatDistanceToNow } from 'date-fns';
@@ -24,13 +23,12 @@ import { ko } from 'date-fns/locale';
 
 // 알림 타입별 아이콘 매핑
 const typeIconMap: Record<number, any> = {
-	1: UserPlus, // 친구 추가 요청
-	2: UserCheck, // 친구 수락 확정
-	3: MessageCircle, // 댓글 알림
-	4: CornerDownRight, // 답글 알림
-	5: Shuffle, // 코디 편입
-	6: ThumbsUp, // 코디 추천
-	7: Send, // 코디 요청
+	1: UserPlus, // 친구 요청
+	2: UserCheck, // 친구 수락
+	3: Send, // 코디 요청
+	4: ThumbsUp, // 코디 추천
+	5: Shuffle, // 코디 복사
+	6: MessageCircle, // 코디 댓글
 };
 
 const NotificationList: FC = () => {
