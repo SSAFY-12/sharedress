@@ -6,10 +6,10 @@ import com.ssafy.sharedress.global.response.ResponseCode;
 
 public enum NotificationErrorCode implements ResponseCode {
 
-	// TODO[지윤]: 에러코드 정리
-	NOTIFICATION_TYPE_NOT_FOUND("500", "데이터베이스 정합성 문제 / notification 테이블의 type 확인", HttpStatus.INTERNAL_SERVER_ERROR),
 	NOTIFICATION_NOT_FOUND("404", "알림을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-	FORBIDDEN_NOTIFICATION_ACCESS("403", "본인의 알림만 읽거나 수정할 수 있습니다.", HttpStatus.FORBIDDEN);
+	FORBIDDEN_NOTIFICATION_ACCESS("403", "본인의 알림만 읽거나 수정할 수 있습니다.", HttpStatus.FORBIDDEN),
+	NOTIFICATION_TYPE_NOT_FOUND("500", "데이터베이스 정합성 문제 / Clothes 테이블의 Type 확인", HttpStatus.INTERNAL_SERVER_ERROR),
+	INVALID_ARGUMENT_FCM_TOKEN("400", "잘못된 형식의 FCM 토큰입니다.", HttpStatus.BAD_REQUEST);
 
 	private final String code;
 	private final String message;

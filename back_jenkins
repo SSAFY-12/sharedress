@@ -96,16 +96,19 @@ pipeline {
                             ? '/opt/green/docker-compose.green.yml'
                             : '/opt/blue/docker-compose.blue.yml'
 
-          sshagent([sshCred]) {
-            sh """
-ssh -o StrictHostKeyChecking=no ${sshUser}@${targetIP} <<'EOF'
-  aws ecr get-login-password --region ${AWS_REGION} | \
-      docker login --username AWS --password-stdin ${ECR_URI}
+      /* ▼ 환경파일 동기화 블록 추가 ▼ */
+      configFileProvider([configFile(fileId: 'blue-env', variable: 'ENV_FILE')]) {
+        sshagent([sshCred]) {
+          sh """
+            scp -o StrictHostKeyChecking=no \$ENV_FILE ${sshUser}@${targetIP}:/opt/blue/blue.env
+            ssh -o StrictHostKeyChecking=no ${sshUser}@${targetIP} <<'EOF'
+              aws ecr get-login-password --region ${AWS_REGION} | \
+                  docker login --username AWS --password-stdin ${ECR_URI}
 
-  docker pull ${ECR_URI}/${APP_NAME}:${TAG}
-  docker compose -f ${composeFile} up -d
-EOF
-            """
+              docker pull ${ECR_URI}/${APP_NAME}:${TAG}
+              docker compose -f ${composeFile} up -d
+            EOF
+          """
           }
         }
       }
