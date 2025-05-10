@@ -1,5 +1,2 @@
 export { ClothMainDisplay } from './ClothMainDisplay';
-export type {
-	ClothMainDisplayProps,
-	ClothItem,
-} from './ClothMainDisplay.types';
+export type { ClothMainDisplayProps } from './ClothMainDisplay.types';

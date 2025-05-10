@@ -14,6 +14,8 @@ import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import FriendPage from '@/pages/social/FriendPage';
 import NotificationPage from '@/pages/NotificationPage';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
+import ClothEditPage from '@/features/closet/pages/ClothEditPage';
+
 export const router = createBrowserRouter([
 	{
 		path: '/',
@@ -67,11 +69,23 @@ export const router = createBrowserRouter([
 			// 	path: '*',
 			// 	element: <Navigate to='/wardrobe' replace />,
 			// },
+			{
+				path: 'mypage',
+				element: <MyClosetPage />,
+			},
+			{
+				path: '/cloth/:id',
+				element: <ClothDetailPage />,
+			},
+			{
+				path: '/codi/:id',
+				element: <CodiDetailPage />,
+			},
+			{
+				path: '/cloth/:id/edit',
+				element: <ClothEditPage />,
+			},
 		],
-	},
-	{
-		path: '/mypage',
-		element: <MyClosetPage />,
 	},
 	{
 		path: '/auth',
@@ -88,13 +102,5 @@ export const router = createBrowserRouter([
 	{
 		path: '/codi/save',
 		element: <CodiSavePage />,
-	},
-	{
-		path: '/cloth/:id',
-		element: <ClothDetailPage />,
-	},
-	{
-		path: '/codi/:id',
-		element: <CodiDetailPage />,
 	},
 ]);

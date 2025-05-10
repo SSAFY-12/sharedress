@@ -35,6 +35,7 @@ const CodiEditBottomSection = ({
 				<ClothListContainer
 					items={filteredProducts}
 					onItemClick={onItemClick}
+					type='cloth'
 				/>
 			</div>
 		</div>
