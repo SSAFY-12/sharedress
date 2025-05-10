@@ -4,7 +4,12 @@
  */
 
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import {
+	getMessaging,
+	getToken,
+	onMessage,
+	MessagePayload,
+} from 'firebase/messaging';
 // import { getAnalytics } from 'firebase/analytics';
 
 // Firebase 프로젝트 설정
@@ -31,16 +36,11 @@ const messaging = getMessaging(app);
 
 /**
  * FCM 알림 권한 요청 및 토큰 발급
- * @returns {Promise<string|null>} FCM 토큰 또는 null
- *
- * 이 함수는 다음과 같은 작업을 수행합니다:
- * 1. 사용자에게 알림 권한 요청
- * 2. 권한이 허용된 경우 FCM 토큰 발급
- * 3. 발급된 토큰을 서버에 저장 (구현 필요)
+ * 사용자에게 알림 권한을 요청하고, 권한이 허용된 경우 FCM 토큰을 발급합니다.
  */
-
-// 알림 권한 요청 및 토큰 발급
-export const requestNotificationPermission = async () => {
+export const requestNotificationPermission = async (): Promise<
+	string | null
+> => {
 	try {
 		const permission = await Notification.requestPermission();
 		if (permission === 'granted') {
@@ -58,12 +58,10 @@ export const requestNotificationPermission = async () => {
 
 /**
  * 포그라운드 메시지 수신 리스너
- * @returns {Promise<any>} 수신된 메시지 페이로드
- *
  * 앱이 포그라운드 상태일 때 메시지를 수신하면 실행됩니다.
  * 백그라운드 메시지는 firebase-messaging-sw.js에서 처리됩니다.
  */
-export const onMessageListener = () =>
+export const onMessageListener = (): Promise<MessagePayload> =>
 	new Promise((resolve) => {
 		onMessage(messaging, (payload) => {
 			resolve(payload);

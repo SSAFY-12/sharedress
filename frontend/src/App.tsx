@@ -2,14 +2,11 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { useTokenValidation } from './features/auth/hooks/useTokenValidation';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
-import {
-	requestNotificationPermission,
-	onMessageListener,
-} from '@/utils/firebase';
+import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
@@ -21,70 +18,7 @@ export const App = () => {
 	useTokenValidation();
 
 	// FCM 초기화
-	useEffect(() => {
-		const initializeFCM = async () => {
-			try {
-				// 현재 알림 권한 상태 확인
-				const permission = await Notification.permission;
-
-				if (permission === 'default') {
-					// 권한이 아직 요청되지 않은 경우
-					toast.info('알림을 받으시려면 알림 권한을 허용해주세요.', {
-						onClick: async () => {
-							const token = await requestNotificationPermission();
-							if (token) {
-								toast.success('알림 권한이 허용되었습니다!');
-								console.log('FCM Token:', token);
-
-								// 포그라운드 메시지 리스너 설정
-								onMessageListener()
-									.then((payload) => {
-										console.log('포그라운드 메시지 수신:', payload);
-									})
-									.catch((err) => {
-										console.error('메시지 수신 실패:', err);
-									});
-							}
-						},
-					});
-				} else if (permission === 'granted') {
-					// 이미 권한이 허용된 경우
-					const token = await requestNotificationPermission();
-					if (token) {
-						console.log('FCM Token:', token);
-
-						// 포그라운드 메시지 리스너 설정
-						onMessageListener()
-							.then((payload) => {
-								console.log('포그라운드 메시지 수신:', payload);
-							})
-							.catch((err) => {
-								console.error('메시지 수신 실패:', err);
-							});
-					}
-				} else {
-					// 권한이 거부된 경우
-					toast.warning(
-						'알림 권한이 거부되었습니다. 브라우저 설정에서 알림을 허용해주세요.',
-						{
-							onClick: () => {
-								// 브라우저 설정 페이지로 이동하는 방법은 브라우저마다 다름
-								window.open(
-									'chrome://settings/content/notifications',
-									'_blank',
-								);
-							},
-						},
-					);
-				}
-			} catch (error) {
-				console.error('FCM 초기화 실패:', error);
-				toast.error('알림 설정 중 오류가 발생했습니다.');
-			}
-		};
-
-		initializeFCM();
-	}, []);
+	useFcmInitialization();
 
 	// 앱 시작 시 토큰 초기화
 	useEffect(() => {
@@ -153,14 +87,14 @@ export const App = () => {
 			<ToastContainer
 				position='top-right'
 				autoClose={3000}
-				hideProgressBar={true} // 새로운 토스트가 위에 표시
+				hideProgressBar={true}
 				newestOnTop={false}
 				closeOnClick
-				rtl={false} // 오른쪽에서 왼쪽으로 표시
-				pauseOnFocusLoss // 포커스 손실 시 일시정지
-				draggable={false} // 드래그 가능 여부
-				pauseOnHover // 마우스 오버 시 일시정지
-				theme='light' // 테마 설정
+				rtl={false}
+				pauseOnFocusLoss
+				draggable={false}
+				pauseOnHover
+				theme='light'
 			/>
 		</>
 	);

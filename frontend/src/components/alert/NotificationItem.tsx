@@ -15,6 +15,15 @@ export interface NotificationItemProps {
 	time: string;
 	read?: boolean; // 읽음/안읽음 상태
 	onClick?: () => void; // 클릭 핸들러
+	requester: {
+		id: number;
+		email: string;
+		nickname: string;
+		code: string;
+		profileImage: string;
+		oneLiner: string;
+		isGuest: boolean;
+	};
 }
 
 const NotificationItem: FC<NotificationItemProps> = ({
@@ -24,6 +33,7 @@ const NotificationItem: FC<NotificationItemProps> = ({
 	time, // 알림 시간
 	read = false, // 읽음/안읽음 상태
 	onClick, // 클릭 핸들러
+	requester, // 요청자 정보
 }) => (
 	<div
 		className={`w-full flex items-start gap-3 px-4 py-4 transition-colors cursor-pointer relative ${
@@ -51,7 +61,9 @@ const NotificationItem: FC<NotificationItemProps> = ({
 				<span className='font-semibold text-gray-800 truncate'>{title}</span>
 				<span className='text-xs text-gray-400 flex-shrink-0'>{time}</span>
 			</div>
-			<div className='mt-1 text-sm text-gray-500 break-all'>{message}</div>
+			<div className='mt-1 text-sm text-gray-500 break-all'>
+				<span className='font-medium'>{requester.nickname}</span>님이 {message}
+			</div>
 		</div>
 	</div>
 );
