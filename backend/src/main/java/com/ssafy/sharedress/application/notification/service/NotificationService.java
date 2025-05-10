@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.application.notification.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -9,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ssafy.sharedress.application.notification.dto.NotificationReadResponse;
 import com.ssafy.sharedress.application.notification.dto.NotificationResponse;
 import com.ssafy.sharedress.application.notification.usecase.NotificationUseCase;
+import com.ssafy.sharedress.domain.coordination.entity.CoordinationComment;
+import com.ssafy.sharedress.domain.coordination.repository.CoordinationCommentRepository;
 import com.ssafy.sharedress.domain.coordination.repository.CoordinationRepository;
 import com.ssafy.sharedress.domain.friend.repository.FriendRequestRepository;
 import com.ssafy.sharedress.domain.member.entity.Member;
@@ -32,6 +35,7 @@ public class NotificationService implements NotificationUseCase {
 	private final FriendRequestRepository friendRequestRepository;
 	private final CoordinationRepository coordinationRepository;
 	private final MemberRepository memberRepository;
+	private final CoordinationCommentRepository coordinationCommentRepository;
 
 	private final PushNotificationPort pushNotificationPort;
 
@@ -138,6 +142,42 @@ public class NotificationService implements NotificationUseCase {
 					"코디 편입",
 					"코디를 복사했어요!",
 					NotificationType.COORDINATION_COPY
+				);
+			});
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Override
+	public void sendCommentNotification(Long senderId, Long coordinationId, Long parentId, String message) {
+		coordinationRepository.findById(coordinationId)
+			.ifPresent(coordination -> {
+				Member receiver = coordination.getCreator();
+				if (parentId != null) {
+					Optional<Member> member = coordinationCommentRepository.findById(parentId)
+						.map(CoordinationComment::getMember);
+					if (member.isPresent()) {
+						receiver = member.get();
+					} else {
+						return;
+					}
+				}
+
+				if (receiver == null) {
+					return;
+				}
+
+				sendFcmNotification(
+					receiver.getFcmToken(),
+					"코디 댓글",
+					message
+				);
+
+				saveNotification(
+					memberRepository.getReferenceById(senderId),
+					receiver,
+					"코디 댓글",
+					message,
+					NotificationType.COMMENT
 				);
 			});
 	}

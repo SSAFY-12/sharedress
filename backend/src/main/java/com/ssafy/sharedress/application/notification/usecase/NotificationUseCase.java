@@ -16,6 +16,8 @@ public interface NotificationUseCase {
 
 	void sendCoordinationCopyNotification(Long coordinationId);
 
+	void sendCommentNotification(Long senderId, Long coordinationId, Long parentId, String message);
+
 	List<NotificationResponse> getNotifications(Long memberId);
 
 	NotificationReadResponse readNotification(Long notificationId, Long memberId);

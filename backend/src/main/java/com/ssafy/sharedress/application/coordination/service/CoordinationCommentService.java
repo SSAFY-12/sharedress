@@ -3,6 +3,7 @@ package com.ssafy.sharedress.application.coordination.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ssafy.sharedress.application.aop.SendNotification;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationCommentResponse;
 import com.ssafy.sharedress.application.coordination.dto.CreateCommentRequest;
 import com.ssafy.sharedress.application.coordination.dto.UpdateCommentRequest;
@@ -16,6 +17,7 @@ import com.ssafy.sharedress.domain.coordination.repository.CoordinationRepositor
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.error.MemberErrorCode;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
+import com.ssafy.sharedress.domain.notification.entity.NotificationType;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class CoordinationCommentService implements CoordinationCommentUseCase {
 	private final MemberRepository memberRepository;
 	private final CoordinationCommentRepository coordinationCommentRepository;
 
+	@SendNotification(NotificationType.COMMENT)
 	@Override
 	@Transactional
 	public CoordinationCommentResponse createComment(Long coordinationId, CreateCommentRequest request, Long memberId) {
@@ -45,10 +48,11 @@ public class CoordinationCommentService implements CoordinationCommentUseCase {
 			parent = coordinationCommentRepository.findById(request.parentId())
 				.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationCommentErrorCode.PARENT_COMMENT_NOT_FOUND));
 
+			depth += 1;
+
 			if (parent.getDepth() >= 1) {
 				ExceptionUtil.throwException(CoordinationCommentErrorCode.CANNOT_REPLY_TO_CHILD_COMMENT);
 			}
-
 		}
 
 		CoordinationComment comment = new CoordinationComment(

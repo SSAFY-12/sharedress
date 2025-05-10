@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 import com.ssafy.sharedress.application.coordination.dto.CoordinationRequestRequest;
+import com.ssafy.sharedress.application.coordination.dto.CreateCommentRequest;
 import com.ssafy.sharedress.application.friend.dto.FriendRequestDto;
 import com.ssafy.sharedress.application.notification.usecase.NotificationUseCase;
 import com.ssafy.sharedress.domain.common.context.UserContext;
@@ -58,6 +59,12 @@ public class NotificationAspect {
 			case COORDINATION_COPY -> {
 				Long coordinationId = (Long)args[1];
 				notificationUseCase.sendCoordinationCopyNotification(coordinationId);
+			}
+			case COMMENT -> {
+				Long coordinationId = (Long)args[0];
+				CreateCommentRequest dto = (CreateCommentRequest)args[1];
+				Long memberId = (Long)args[2];
+				notificationUseCase.sendCommentNotification(memberId, coordinationId, dto.parentId(), dto.content());
 			}
 			// TODO: 알림이 필요한 부분 추가
 		}
