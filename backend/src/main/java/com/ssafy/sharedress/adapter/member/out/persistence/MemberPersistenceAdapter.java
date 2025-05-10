@@ -100,4 +100,9 @@ public class MemberPersistenceAdapter implements MemberRepository {
 		return new CursorPageResult<>(contents, hasNext, nextCursor);
 	}
 
+	@Override
+	public Optional<Member> findByFcmToken(String fcmToken) {
+		return memberJpaRepository.findByFcmToken(fcmToken);
+	}
+
 }

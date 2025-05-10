@@ -19,4 +19,6 @@ public interface MemberRepository {
 
 	// THINK projection 으로 application 레이어에 있는 MemberSearchResponse 를 사용
 	CursorPageResult<MemberSearchResponse> searchMembersWithCursor(Long myId, String keyword, Long cursorId, int size);
+
+	Optional<Member> findByFcmToken(String fcmToken);
 }

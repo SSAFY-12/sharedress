@@ -26,12 +26,20 @@ public class NotificationService implements NotificationUseCase {
 	private final FriendRequestRepository friendRequestRepository;
 	private final CoordinationRepository coordinationRepository;
 	private final MemberRepository memberRepository;
+
 	private final PushNotificationPort pushNotificationPort;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendFriendRequestNotification(Long senderId, Long receiverId, String message) {
-		// TODO: FCM 알림
+		sendFcmNotification(
+			memberRepository.findById(receiverId)
+				.map(Member::getFcmToken)
+				.orElse(null),
+			"친구 요청",
+			message
+		);
+
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
 			memberRepository.getReferenceById(receiverId),
@@ -46,7 +54,11 @@ public class NotificationService implements NotificationUseCase {
 	public void sendFriendAcceptNotification(Long receiverId, Long friendRequestId) {
 		friendRequestRepository.findByIdAndReceiverId(friendRequestId, receiverId)
 			.ifPresent(friendRequest -> {
-				// TODO: FCM 알림
+				sendFcmNotification(
+					friendRequest.getRequester().getFcmToken(),
+					"친구 요청 수락",
+					friendRequest.getMessage()
+				);
 
 				saveNotification(
 					friendRequest.getRequester(),
@@ -61,7 +73,13 @@ public class NotificationService implements NotificationUseCase {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendCoordinationRequestNotification(Long senderId, Long receiverId, String message) {
-		// TODO: FCM 알림
+		sendFcmNotification(
+			memberRepository.findById(receiverId)
+				.map(Member::getFcmToken)
+				.orElse(null),
+			"코디 요청",
+			message
+		);
 
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
@@ -75,7 +93,13 @@ public class NotificationService implements NotificationUseCase {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendCoordinationRecommendNotification(Long senderId, Long receiverId, String message) {
-		// TODO: FCM 알림
+		sendFcmNotification(
+			memberRepository.findById(receiverId)
+				.map(Member::getFcmToken)
+				.orElse(null),
+			"코디 추천",
+			message
+		);
 
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
@@ -96,7 +120,11 @@ public class NotificationService implements NotificationUseCase {
 					return;
 				}
 
-				// TODO: FCM 알림
+				sendFcmNotification(
+					originCreator.getFcmToken(),
+					"코디 편입",
+					"코디를 복사했어요!"
+				);
 
 				saveNotification(
 					coordination.getOwner(),
@@ -108,11 +136,6 @@ public class NotificationService implements NotificationUseCase {
 			});
 	}
 
-	@Override
-	public void sendNotification(String fcmToken, String title, String body) {
-		pushNotificationPort.send(fcmToken, title, body);
-	}
-
 	private void saveNotification(Member sender, Member receiver, String title, String message, NotificationType type) {
 		notificationRepository.save(new Notification(
 			sender,
@@ -122,15 +145,9 @@ public class NotificationService implements NotificationUseCase {
 			message,
 			false
 		));
-
-		String fcmToken = receiver.getFcmToken();
-		if (fcmToken != null && !fcmToken.isBlank()) {
-			try {
-				pushNotificationPort.send(fcmToken, title, message);
-			} catch (Exception e) {
-				log.warn("FCM 전송 실패: {}", e.getMessage(), e);
-			}
-		}
 	}
 
+	private void sendFcmNotification(String fcmToken, String title, String body) {
+		pushNotificationPort.send(fcmToken, title, body);
+	}
 }
