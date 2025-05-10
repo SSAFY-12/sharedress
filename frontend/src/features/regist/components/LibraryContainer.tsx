@@ -29,9 +29,6 @@ const LibraryContainer = () => {
 		return () => clearTimeout(timer);
 	}, [value]);
 
-
-	
-
 	const {
 		data,
 		isFetchingNextPage,

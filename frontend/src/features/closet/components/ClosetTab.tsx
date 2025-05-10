@@ -10,10 +10,7 @@ interface ClosetTabProps {
 
 const CATEGORIES = ['전체', '아우터', '상의', '하의', '신발', '기타'];
 
-const ClosetTab = ({
-	memberId,
-	selectedCategory,
-}: ClosetTabProps) => {
+const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
 	const navigate = useNavigate();
 
 	const categoryId =
@@ -29,8 +26,6 @@ const ClosetTab = ({
 
 	return (
 		<div className='flex flex-col h-full'>
-
-
 			<div className='flex-1 overflow-y-auto scrollbar-hide px-4'>
 				<ClothListContainer
 					items={
