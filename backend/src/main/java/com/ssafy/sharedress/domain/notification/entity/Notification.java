@@ -52,4 +52,8 @@ public class Notification extends BaseTimeEntity {
 		this.body = body;
 		this.isRead = isRead;
 	}
+
+	public void updateIsRead(Boolean isRead) {
+		this.isRead = isRead;
+	}
 }
