@@ -2,6 +2,7 @@ package com.ssafy.sharedress.application.notification.dto;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.domain.notification.entity.Notification;
 
 public record NotificationResponse(
@@ -10,6 +11,7 @@ public record NotificationResponse(
 	String title,
 	String body,
 	Boolean isRead,
+	MemberProfileResponse requester,
 	LocalDateTime createdAt
 ) {
 	public static NotificationResponse from(Notification notification) {
@@ -19,6 +21,7 @@ public record NotificationResponse(
 			notification.getTitle(),
 			notification.getBody(),
 			notification.getIsRead(),
+			MemberProfileResponse.from(notification.getSender()),
 			notification.getCreatedAt()
 		);
 	}

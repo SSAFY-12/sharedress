@@ -10,8 +10,10 @@ import com.ssafy.sharedress.domain.notification.entity.Notification;
 
 public interface NotificationJpaRepository extends JpaRepository<Notification, Long> {
 
-	@Query("""
-		SELECT n FROM Notification n WHERE n.receiver.id = :receiverId ORDER BY n.createdAt DESC
-		""")
+	@Query("SELECT n FROM Notification n "
+		+ "JOIN FETCH n.sender "
+		+ "WHERE n.receiver.id = :receiverId "
+		+ "ORDER BY n.createdAt DESC"
+	)
 	List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(@Param("receiverId") Long receiverId);
 }
