@@ -7,13 +7,16 @@ import { useTokenValidation } from './features/auth/hooks/useTokenValidation';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
+import useFcmStore from '@/store/useFcmStore';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	// const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
-
+	useEffect(() => {
+		console.log('FCM Token:', useFcmStore.getState().token);
+	}, []);
 	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 	useTokenValidation();
 
