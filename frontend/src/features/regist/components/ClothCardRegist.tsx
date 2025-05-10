@@ -1,18 +1,9 @@
-import { useState, useEffect } from 'react';
-import React from 'react';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
-import { useRegistCloth } from '@/features/regist/hooks/useRegistCloth';
-import { useDeleteCloth } from '@/features/regist/hooks/useRegistCloth';
 import { RegisteredBedge } from './RegisteredBedge';
 
-export interface ClothCardRegistProps {
+interface ClothCardRegistProps {
 	item: ClothItem;
 	className?: string;
-}
-
-interface RegisterState {
-	isRegistered: boolean;
-	id?: number;
 }
 
 // 선택 여부에 따라 테두리 색상 변경, 크기 동적 적용

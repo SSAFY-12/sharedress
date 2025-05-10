@@ -51,4 +51,10 @@ export const headerConfig: HeaderConfig = {
 		subtitle: '사진으로 등록',
 		badgeText: '',
 	},
+	'/cloth/:id': {
+		showBack: true,
+	},
+	'/codi/:id': {
+		showBack: true,
+	},
 } as const;

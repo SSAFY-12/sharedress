@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
-export default function RegistTestPage() {
+const RegistTestPage = () => {
 	const popupRef = useRef<Window | null>(null);
 	const [data, setData] = useState<any>(null);
 
@@ -14,10 +14,6 @@ export default function RegistTestPage() {
 		window.addEventListener('message', handleMessage);
 		return () => window.removeEventListener('message', handleMessage);
 	}, []);
-	const musinsa = 'https://www.musinsa.com/mypage/orders';
-	const two9cm = 'https://www.29cm.co.kr/mypage/orders';
-	const able = 'https://m.a-bly.com/mypage/orders';
-	const kream = 'https://kream.co.kr/mypage/orders';
 
 	// 팝업 열기
 	const openPopup = () => {
@@ -43,4 +39,6 @@ export default function RegistTestPage() {
 			)}
 		</div>
 	);
-}
+};
+
+export default RegistTestPage;

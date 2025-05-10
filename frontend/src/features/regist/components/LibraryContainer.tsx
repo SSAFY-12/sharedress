@@ -6,12 +6,11 @@ import { SearchBar } from '@/components/inputs/search-bar';
 import { categoryMapping } from '@/constants/categoryConfig';
 import {
 	LibraryApis,
-	Clothes,
-	ClothesResponse,
+	LibraryClothes,
+	LibraryResponse,
 } from '@/features/regist/api/registApis';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
-import { useCloset } from '@/features/closet/hooks/useCloset';
+import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 
 const LibraryContainer = () => {
 	const [selectedCategory, setSelectedCategory] = useState<
@@ -30,12 +29,6 @@ const LibraryContainer = () => {
 		return () => clearTimeout(timer);
 	}, [value]);
 
-	/*
-	추후에 공통 컴포넌트 사용하는걸로 수정필요 
-	*/
-	const { data: profile } = useMyProfile();
-	const { data: closet } = useCloset(profile?.id ?? 0); // 추후 삭제 필요
-
 	const {
 		data,
 		isFetchingNextPage,
@@ -43,7 +36,7 @@ const LibraryContainer = () => {
 		fetchNextPage,
 		isFetching,
 		isLoading,
-	} = useInfiniteQuery<ClothesResponse>({
+	} = useInfiniteQuery<LibraryResponse>({
 		queryKey: ['clothes', selectedCategory, deferredValue.trim()],
 		queryFn: async ({ pageParam }) => {
 			const request = {
@@ -103,8 +96,8 @@ const LibraryContainer = () => {
 	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
 	const allItems =
-		data?.pages.flatMap((page: ClothesResponse) =>
-			page.content.map((item: Clothes) => ({
+		data?.pages.flatMap((page: LibraryResponse) =>
+			page.content.map((item: LibraryClothes) => ({
 				id: item.id,
 				name: item.name,
 				imageUrl: item.image,
@@ -113,20 +106,25 @@ const LibraryContainer = () => {
 		) || [];
 
 	return (
-		<div className='flex flex-col gap-2 w-full items-center'>
-			<SearchBar
+		<div className='flex flex-col gap-5 w-full items-center'>
+			<div className='w-full flex flex-col py-2 gap-2 sticky top-[0px] z-10 bg-white '>
+				<SearchBar
 				placeholder='검색'
 				value={value}
 				onChange={handleChange}
 				onSubmit={handleSubmit}
-			/>
+				/>
+				<ItemCategoryBar
+					categories={categoryConfig}
+					selectedCategory={selectedCategory}
+					onCategoryChange={handleCategoryChange}
+					className='px-2 py-2.5'
+				/>
+			</div>
 			<div className='w-full '>
 				<ClothListContainer
 					isForRegist={true}
-					categories={categoryConfig}
 					items={allItems as ClothItem[]}
-					selectedCategory={selectedCategory}
-					onCategoryChange={handleCategoryChange}
 					onItemClick={handleItemClick}
 					className='flex flex-col w-full gap-4'
 					scrollRef={sentinel}

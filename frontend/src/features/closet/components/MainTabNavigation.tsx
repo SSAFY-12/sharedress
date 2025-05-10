@@ -7,7 +7,7 @@ const MainTabNavigation = ({
 	activeTab,
 	onTabChange,
 }: MainTabNavigationProps) => (
-	<div className='flex border-b border-[#e6e5e5]'>
+	<div className='flex border-b border-[#e6e5e5] mx-4'>
 		<button
 			className={`flex-1 py-4 text-center font-medium rounded-none ${
 				activeTab === 'closet'

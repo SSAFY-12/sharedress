@@ -1,12 +1,12 @@
 import { client } from '@/api/client';
-import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 // API 응답 타입 정의
-export interface Clothes extends ClothItem {
+export interface LibraryClothes {
 	id: number;
 	name: string;
 	brandName: string;
 	image: string;
 	createdAt: string;
+	categoryId: number;
 }
 
 export interface Page {
@@ -20,14 +20,14 @@ export interface Status {
 	message: string;
 }
 
-export interface ClothesResponse {
+export interface LibraryResponse {
 	status: Status;
-	content: Clothes[];
+	content: LibraryClothes[];
 	pagination: Page;
 }
 
 // API 요청 파라미터 타입 정의
-export interface ClothesRequestParams {
+export interface LibraryRequestParams {
 	keyword?: string;
 	categoryId?: number;
 	shopId?: string;
@@ -38,8 +38,8 @@ export interface ClothesRequestParams {
 export const LibraryApis = {
 	// --------------------라이브러리 옷 조회------------------------
 	getClothes: async (
-		params: ClothesRequestParams,
-	): Promise<ClothesResponse> => {
+		params: LibraryRequestParams,
+	): Promise<LibraryResponse> => {
 		const response = await client.get('/api/clothes', {
 			params: {
 				keyword: params.keyword,

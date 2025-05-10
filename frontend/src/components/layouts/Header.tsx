@@ -49,13 +49,16 @@ const Header = ({
 					)}
 				</div>
 			)}
-			{!showBack && logo && (
-				<h1 className='font-bold text-lg text-gray-800'>{logo}</h1>
-			)}
+			{!showBack && logo && <img src='/icons/logo_black.svg' alt='로고' />}
 		</div>
-		{(badgeIcon || badgeText) && (
+
+		{badgeIcon === 'bell' ? (
+			<button onClick={onBadgeClick} aria-label='알림' className='p-0'>
+				<img src='/icons/notification_black.svg' alt='알림 아이콘' />
+			</button>
+		) : badgeIcon || badgeText ? (
 			<Badge icon={badgeIcon} text={badgeText} onClick={onBadgeClick} />
-		)}
+		) : null}
 	</header>
 );
 
