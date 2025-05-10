@@ -11,10 +11,13 @@ import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 import com.ssafy.sharedress.domain.notification.entity.Notification;
 import com.ssafy.sharedress.domain.notification.entity.NotificationType;
+import com.ssafy.sharedress.domain.notification.port.PushNotificationPort;
 import com.ssafy.sharedress.domain.notification.repository.NotificationRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService implements NotificationUseCase {
@@ -24,10 +27,19 @@ public class NotificationService implements NotificationUseCase {
 	private final CoordinationRepository coordinationRepository;
 	private final MemberRepository memberRepository;
 
+	private final PushNotificationPort pushNotificationPort;
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendFriendRequestNotification(Long senderId, Long receiverId, String message) {
-		// TODO: FCM 알림
+		sendFcmNotification(
+			memberRepository.findById(receiverId)
+				.map(Member::getFcmToken)
+				.orElse(null),
+			"친구 요청",
+			message
+		);
+
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
 			memberRepository.getReferenceById(receiverId),
@@ -42,7 +54,11 @@ public class NotificationService implements NotificationUseCase {
 	public void sendFriendAcceptNotification(Long receiverId, Long friendRequestId) {
 		friendRequestRepository.findByIdAndReceiverId(friendRequestId, receiverId)
 			.ifPresent(friendRequest -> {
-				// TODO: FCM 알림
+				sendFcmNotification(
+					friendRequest.getRequester().getFcmToken(),
+					"친구 요청 수락",
+					friendRequest.getMessage()
+				);
 
 				saveNotification(
 					friendRequest.getRequester(),
@@ -57,7 +73,13 @@ public class NotificationService implements NotificationUseCase {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendCoordinationRequestNotification(Long senderId, Long receiverId, String message) {
-		// TODO: FCM 알림
+		sendFcmNotification(
+			memberRepository.findById(receiverId)
+				.map(Member::getFcmToken)
+				.orElse(null),
+			"코디 요청",
+			message
+		);
 
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
@@ -71,7 +93,13 @@ public class NotificationService implements NotificationUseCase {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendCoordinationRecommendNotification(Long senderId, Long receiverId, String message) {
-		// TODO: FCM 알림
+		sendFcmNotification(
+			memberRepository.findById(receiverId)
+				.map(Member::getFcmToken)
+				.orElse(null),
+			"코디 추천",
+			message
+		);
 
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
@@ -92,7 +120,11 @@ public class NotificationService implements NotificationUseCase {
 					return;
 				}
 
-				// TODO: FCM 알림
+				sendFcmNotification(
+					originCreator.getFcmToken(),
+					"코디 편입",
+					"코디를 복사했어요!"
+				);
 
 				saveNotification(
 					coordination.getOwner(),
@@ -113,5 +145,9 @@ public class NotificationService implements NotificationUseCase {
 			message,
 			false
 		));
+	}
+
+	private void sendFcmNotification(String fcmToken, String title, String body) {
+		pushNotificationPort.send(fcmToken, title, body);
 	}
 }
