@@ -112,7 +112,7 @@ export const BottomSheet = ({
 					>
 						{/* 드래그 표시 막대 */}
 						{showDragIndicator && (
-							<div className='flex w-full justify-center py-2'>
+							<div className='flex w-full justify-center py-4'>
 								<div className='h-1 w-12 rounded-full bg-gray-300' />
 							</div>
 						)}

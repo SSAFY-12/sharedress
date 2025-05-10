@@ -4,7 +4,7 @@ export const categoryConfig = [
 	'상의',
 	'하의',
 	'신발',
-	'악세사리',
+	'기타',
 ];
 
 // 카테고리 매핑
@@ -16,5 +16,5 @@ export const categoryMapping: {
 	상의: 2,
 	하의: 3,
 	신발: 4,
-	악세사리: 5,
+	기타: 5,
 };

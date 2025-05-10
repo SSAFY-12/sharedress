@@ -1,12 +1,10 @@
-import Header from '@/components/layouts/Header';
-import { CodiEditor } from '@/containers/CodiEditor';
 import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
-import NavBar from '@/components/layouts/NavBar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 import { useState } from 'react';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
 import { useDeleteCloth } from '@/features/closet/hooks/useDeleteCloth';
+import { ImageDetailView } from '@/containers/ImageDetailView';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
@@ -18,14 +16,6 @@ const ClothDetailPage = () => {
 	const { data: cloth, isLoading, isError } = useClothDetail(clothId);
 	const { mutate: deleteCloth } = useDeleteCloth();
 
-	const handleBackClick = () => {
-		if (window.history.length > 1) {
-			navigate(-1);
-		} else {
-			navigate('/');
-		}
-	};
-
 	const handleMenuClick = () => {
 		setIsMenuOpen(true);
 	};
@@ -35,7 +25,7 @@ const ClothDetailPage = () => {
 	};
 
 	const handleEdit = () => {
-		console.log('수정하기 클릭');
+		navigate(`/cloth/${clothId}/edit`);
 	};
 
 	const handleDelete = () => {
@@ -57,13 +47,11 @@ const ClothDetailPage = () => {
 		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
 
 	return (
-		<div className='flex flex-col h-screen bg-white max-w-md mx-auto'>
-			<Header showBack={true} onBackClick={handleBackClick} />
-
+		<div className='flex flex-col bg-white w-full'>
 			<div className='flex-1 overflow-auto pb-20'>
-				<CodiEditor
+				<ImageDetailView
 					item={{
-						id: cloth.id.toString(),
+						// id: cloth.id, id 안받도록 처리
 						name: cloth.name,
 						imageUrl: cloth.image,
 						category: cloth.category.name,
@@ -71,7 +59,7 @@ const ClothDetailPage = () => {
 					showMoreButton={true}
 					onMoreButtonClick={handleMenuClick}
 				>
-					<div className='px-4'>
+					<div className='px-4 flex flex-col gap-6'>
 						<ClothDetailItem label='상품명' value={cloth.name} />
 						<ClothDetailItem label='카테고리' value={cloth.category.name} />
 						<ClothDetailItem label='브랜드' value={cloth.brandName} />
@@ -81,7 +69,7 @@ const ClothDetailPage = () => {
 							hexCode={cloth.color.hexCode}
 						/>
 					</div>
-				</CodiEditor>
+				</ImageDetailView>
 			</div>
 
 			{/* 수정 삭제 바텀 시트 */}
@@ -107,8 +95,6 @@ const ClothDetailPage = () => {
 					</button>
 				</div>
 			</BottomSheet>
-
-			<NavBar />
 		</div>
 	);
 };
