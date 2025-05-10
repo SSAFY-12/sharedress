@@ -334,7 +334,7 @@ key={user.memberId}
 
 2. 토큰 갱신 로직의 구조적 문제
    - `useMutation`을 사용한 토큰 갱신 로직이 컴포넌트 외부에서 실행될 수 없음
-   - 인터셉터에서 훅을 사용하려 했던 접근 방식이 잘못됨
+   - 인터셉터에서 훅을 사용하려는 접근 방식이 잘못됨
 
 ### 해결방법
 
@@ -539,7 +539,7 @@ client.interceptors.response.use(
 - request 인터셉터에서 예외처리를 통해 불필요한 헤더 추가를 막아야 한다.
 - response 인터셉터에서 refresh 요청에 대한 401은 재시도하지 않고 바로 로그아웃
   처리해야 한다.
-- 이렇게 하면 401 무한루프와 서버 과부하를 막을 수 있다.
+- 이러한 구조로 변경함으로써 401 무한루프와 서버 과부하를 막을 수 있다.
 
 ---
 
@@ -833,3 +833,135 @@ https://lh3.googleusercontent.com/a/ACg8ocKA2rKTYFTRCmV6mmsWcupxFlKVWkQm9cOmYu2u
 2. 웹/모바일 레이아웃 간의 차이점을 명확히 이해하고 일관된 스타일 적용 필요
 3. 불필요한 컴포넌트 래핑은 스타일 중첩 문제를 일으킬 수 있으므로 주의 필요
 4. 레이아웃과 컨텐츠의 책임을 명확히 분리하여 관리하는 것이 중요
+
+## [트러블슈팅] 친구 요청 취소 시 UI 즉시 반영 문제 (2025/05/11-안주민)
+
+### 문제상황
+
+- 친구 요청 취소 시 UI가 즉시 반영되지 않는 문제 발생
+- 취소 버튼 클릭 후 모달은 닫히지만, 목록에서 해당 요청이 사라지지 않음
+- 새로고침해야만 취소된 요청이 목록에서 제거됨
+
+### 원인 분석
+
+1. **캐시 무효화(Invalidation) 문제**
+
+   - `cancelRequest` mutation의 `onSuccess` 콜백에서 `friendRequests` 쿼리키 무
+     효화 누락
+   - `acceptRequest`와 `rejectRequest`에서는 `friendRequests` 쿼리키를 무효화하
+     고 있었으나, `cancelRequest`에서는 누락
+
+2. **비동기 처리 순서 문제**
+
+   - `handleAction` 함수에서 mutation 완료를 기다리지 않고 바로 `onClose()` 호출
+   - UI 업데이트 전에 모달이 닫혀서 사용자에게 변경사항이 보이지 않음
+
+   **개선 전 문제점:**
+
+   - API 요청이 완료되기 전에 모달이 닫혀서 사용자에게 피드백이 없음
+   - 사용자는 요청이 성공했는지 실패했는지 알 수 없음
+   - UI가 업데이트되기 전에 모달이 닫혀서 변경사항을 볼 수 없음
+
+   **개선 후 효과:**
+
+   - API 요청이 완료될 때까지 기다려 안정적인 처리 보장
+   - 성공했을 때만 모달이 닫혀서 사용자에게 명확한 피드백 제공
+   - 실패했을 경우 에러 처리로 사용자에게 알림 가능
+   - UI가 업데이트된 후에 모달이 닫히므로 사용자가 변경사항을 확인할 수 있음
+
+### 해결방법
+
+1. **캐시 무효화 추가**
+
+   ```typescript
+   const cancelRequest = useMutation({
+   	mutationFn: (requestId: number) =>
+   		socialApi.cancelFriendRequest(requestId),
+   	onSuccess: () => {
+   		queryClient.invalidateQueries({ queryKey: ['searchUser'] });
+   		queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+   	},
+   });
+   ```
+
+2. **비동기 처리 개선**
+
+   ```typescript
+   const handleAction = async () => {
+   	if (!friendRequest) return;
+
+   	try {
+   		switch (actionType) {
+   			case 'cancel':
+   				await cancelRequest(friendRequest.id);
+   				break;
+   		}
+   		onClose();
+   	} catch (error) {
+   		console.error('Failed to process friend request:', error);
+   	}
+   };
+   ```
+
+### 예시
+
+**문제가 있는 코드**
+
+```typescript
+// 캐시 무효화 누락
+const cancelRequest = useMutation({
+	mutationFn: (requestId: number) => socialApi.cancelFriendRequest(requestId),
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['searchUser'] });
+	},
+});
+
+// 비동기 처리 미흡
+const handleAction = () => {
+	cancelRequest(friendRequest.id);
+	onClose(); // mutation 완료 전에 호출
+};
+```
+
+**개선된 코드**
+
+```typescript
+// 캐시 무효화 추가
+const cancelRequest = useMutation({
+	mutationFn: (requestId: number) => socialApi.cancelFriendRequest(requestId),
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['searchUser'] });
+		queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+	},
+});
+
+// 비동기 처리 개선
+const handleAction = async () => {
+	try {
+		await cancelRequest(friendRequest.id);
+		onClose(); // mutation 완료 후 호출
+	} catch (error) {
+		console.error('Failed to process friend request:', error);
+	}
+};
+```
+
+### 결론 및 정리
+
+1. **React Query 캐시 관리**
+
+   - mutation 성공 시 관련된 모든 쿼리키를 무효화하여 UI 동기화
+   - `friendRequests`와 `searchUser` 쿼리키 모두 무효화 필요
+
+2. **비동기 처리**
+
+   - mutation 완료를 기다린 후 UI 업데이트
+   - 에러 처리 추가로 안정성 향상
+
+3. **디버깅 포인트**
+   - Network 탭에서 API 호출 확인
+   - React Query DevTools로 캐시 상태 모니터링
+   - 서버 응답 상태 확인
+
+이러한 변경으로 친구 요청 취소 시 UI가 즉시 반영되어 더 나은 사용자 경험을 제공
+할 수 있게 되었습니다.
