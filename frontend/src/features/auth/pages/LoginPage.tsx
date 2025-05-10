@@ -9,10 +9,10 @@ export const LoginPage = () => {
 		<div className='min-h-screen p-6 flex flex-col items-center justify-center'>
 			{/* 로고와 설명 */}
 			<div className='flex flex-col items-center justify-center mb-8'>
-				<h1 className='text-3xl font-bold mb-2 font-logo text-white'>
+				<h1 className='text-4xl font-bold mb-2 font-logo text-white'>
 					쉐어드레스
 				</h1>
-				<p className='text-md font-logo text-white'>
+				<p className='text-md text-white'>
 					옷장 공유와 스타일 조언을 한번에
 				</p>
 			</div>
