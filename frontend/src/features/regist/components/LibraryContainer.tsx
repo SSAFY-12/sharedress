@@ -1,66 +1,67 @@
-import React, { useState } from 'react';
+import React, { useDeferredValue, useEffect, useRef, useState } from 'react';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { categoryConfig } from '@/constants/categoryConfig';
 import { SearchBar } from '@/components/inputs/search-bar';
-
-const dummyItems: ClothItem[] = [
-	{
-		id: '1',
-		name: '블랙 후드티',
-		category: '상의',
-		imageUrl:
-			'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&auto=format&fit=crop&q=60',
-		brand: '나이키',
-	},
-	{
-		id: '2',
-		name: '청바지',
-		category: '하의',
-		imageUrl:
-			'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500&auto=format&fit=crop&q=60',
-		brand: '리바이스',
-	},
-	{
-		id: '3',
-		name: '화이트 스니커즈',
-		category: '신발',
-		imageUrl:
-			'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&auto=format&fit=crop&q=60',
-		brand: '아디다스',
-	},
-	{
-		id: '4',
-		name: '베이지 코트',
-		category: '아우터',
-		imageUrl:
-			'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&auto=format&fit=crop&q=60',
-		brand: 'ZARA',
-	},
-	{
-		id: '5',
-		name: '그레이 맨투맨',
-		category: '상의',
-		imageUrl:
-			'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&auto=format&fit=crop&q=60',
-		brand: '유니클로',
-	},
-	{
-		id: '6',
-		name: '검정 슬랙스',
-		category: '하의',
-		imageUrl:
-			'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=500&auto=format&fit=crop&q=60',
-		brand: 'H&M',
-	},
-];
+import { categoryMapping } from '@/constants/categoryConfig';
+import {
+	LibraryApis,
+	LibraryClothes,
+	LibraryResponse,
+} from '@/features/regist/api/registApis';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 
 const LibraryContainer = () => {
 	const [selectedCategory, setSelectedCategory] = useState<
 		(typeof categoryConfig)[number]
 	>(categoryConfig[0]);
 	const [value, setValue] = useState('');
-	const [items] = useState<ClothItem[]>(dummyItems);
+	const [debouncedValue, setDebouncedValue] = useState(value);
+	const deferredValue = useDeferredValue(debouncedValue); // 검색어 랜더링 최적화
+
+	// 디바운스 처리 - 검색어 입력후 200ms 뒤에 api 호출
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedValue(value);
+		}, 200);
+
+		return () => clearTimeout(timer);
+	}, [value]);
+
+	const {
+		data,
+		isFetchingNextPage,
+		hasNextPage,
+		fetchNextPage,
+		isFetching,
+		isLoading,
+	} = useInfiniteQuery<LibraryResponse>({
+		queryKey: ['clothes', selectedCategory, deferredValue.trim()],
+		queryFn: async ({ pageParam }) => {
+			const request = {
+				size: 12,
+				keyword: deferredValue || undefined,
+				categoryId:
+					selectedCategory === '전체'
+						? undefined
+						: categoryMapping[selectedCategory],
+			};
+			const response = await LibraryApis.getClothes({
+				...request,
+				cursor: pageParam as number | undefined,
+			});
+
+			return response;
+		},
+		getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
+		initialPageParam: undefined,
+		staleTime: 1000 * 5,
+		placeholderData: () => ({
+			pages: [],
+			pageParams: [],
+		}),
+	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValue(e.target.value);
@@ -78,6 +79,32 @@ const LibraryContainer = () => {
 		console.log('선택된 아이템:', item);
 	};
 
+	const sentinel = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		if (!sentinel.current) return;
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ root: null, threshold: 0.1 },
+		);
+		io.observe(sentinel.current);
+		return () => io.disconnect();
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+	const allItems =
+		data?.pages.flatMap((page: LibraryResponse) =>
+			page.content.map((item: LibraryClothes) => ({
+				id: item.id,
+				name: item.name,
+				imageUrl: item.image,
+				brand: item.brandName,
+			})),
+		) || [];
+
 	return (
 		<div className='flex flex-col gap-2 w-full items-center'>
 			<SearchBar
@@ -86,15 +113,26 @@ const LibraryContainer = () => {
 				onChange={handleChange}
 				onSubmit={handleSubmit}
 			/>
-			<ClothListContainer
-				isForRegist={true}
-				categories={categoryConfig}
-				items={items}
-				selectedCategory={selectedCategory}
-				onCategoryChange={handleCategoryChange}
-				onItemClick={handleItemClick}
-				className='flex flex-col w-full gap-4'
-			/>
+			<div className='w-full px-2 py-2.5 sticky top-[48px] z-10 bg-white'>
+				<ItemCategoryBar
+					categories={categoryConfig}
+					selectedCategory={selectedCategory}
+					onCategoryChange={handleCategoryChange}
+				/>
+			</div>
+			<div className='w-full '>
+				<ClothListContainer
+					isForRegist={true}
+					items={allItems as ClothItem[]}
+					onItemClick={handleItemClick}
+					className='flex flex-col w-full gap-4'
+					scrollRef={sentinel}
+					isLoading={isLoading}
+					isFetching={isFetching}
+					isFetchingNextPage={isFetchingNextPage}
+					columns={2}
+				/>
+			</div>
 		</div>
 	);
 };

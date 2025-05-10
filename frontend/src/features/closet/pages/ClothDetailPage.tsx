@@ -1,47 +1,100 @@
-import { ClothItem } from '@/components/cards/cloth-card';
-import Header from '@/components/layouts/Header';
-import { CodiEditor } from '@/containers/CodiEditor';
 import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
-import NavBar from '@/components/layouts/NavBar';
-import { useNavigate } from 'react-router-dom';
-
-const SampleClothItem: ClothItem = {
-	id: '1',
-	category: '아우터',
-	name: '빈티지 워싱 카라 투웨이 크롭 데님자켓',
-	imageUrl: 'https://picsum.photos/200',
-};
+import { useNavigate, useParams } from 'react-router-dom';
+import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
+import { useState } from 'react';
+import { BottomSheet } from '@/components/modals/bottom-sheet';
+import { useDeleteCloth } from '@/features/closet/hooks/useDeleteCloth';
+import { ImageDetailView } from '@/containers/ImageDetailView';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
+	const { id } = useParams();
+	const clothId = Number(id);
 
-	const handleBackClick = () => {
-		if (window.history.length > 1) {
-			navigate(-1);
-		} else {
-			navigate('/');
-		}
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+	const { data: cloth, isLoading, isError } = useClothDetail(clothId);
+	const { mutate: deleteCloth } = useDeleteCloth();
+
+	const handleMenuClick = () => {
+		setIsMenuOpen(true);
 	};
 
-	return (
-		<div className='flex flex-col h-screen bg-white max-w-md mx-auto'>
-			<Header showBack={true} onBackClick={handleBackClick} />
+	const handleMenuClose = () => {
+		setIsMenuOpen(false);
+	};
 
+	const handleEdit = () => {
+		navigate(`/cloth/${clothId}/edit`);
+	};
+
+	const handleDelete = () => {
+		if (!window.confirm('정말 삭제하시겠습니까?')) return;
+
+		deleteCloth(clothId, {
+			onSuccess: () => {
+				alert('삭제되었습니다.');
+				navigate('/mypage');
+			},
+			onError: () => {
+				alert('삭제에 실패했습니다. 다시 시도해주세요.');
+			},
+		});
+	};
+
+	if (isLoading) return <div className='p-4'>불러오는 중...</div>;
+	if (isError || !cloth)
+		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
+
+	return (
+		<div className='flex flex-col bg-white w-full'>
 			<div className='flex-1 overflow-auto pb-20'>
-				<CodiEditor item={SampleClothItem}>
-					<div className='px-4'>
-						<ClothDetailItem label='상품명' value={SampleClothItem.name} />
+				<ImageDetailView
+					item={{
+						// id: cloth.id, id 안받도록 처리
+						name: cloth.name,
+						imageUrl: cloth.image,
+						category: cloth.category.name,
+					}}
+					showMoreButton={true}
+					onMoreButtonClick={handleMenuClick}
+				>
+					<div className='px-4 flex flex-col gap-6'>
+						<ClothDetailItem label='상품명' value={cloth.name} />
+						<ClothDetailItem label='카테고리' value={cloth.category.name} />
+						<ClothDetailItem label='브랜드' value={cloth.brandName} />
 						<ClothDetailItem
-							label='카테고리'
-							value={SampleClothItem.category}
+							label='색깔'
+							value={cloth.color.name}
+							hexCode={cloth.color.hexCode}
 						/>
-						<ClothDetailItem label='브랜드' value='앤드모어' />
-						<ClothDetailItem label='색깔' value='데님' />
 					</div>
-				</CodiEditor>
+				</ImageDetailView>
 			</div>
 
-			<NavBar />
+			{/* 수정 삭제 바텀 시트 */}
+			<BottomSheet
+				isOpen={isMenuOpen}
+				onClose={handleMenuClose}
+				snapPoints={[1]}
+				initialSnap={0}
+			>
+				<div className='p-4 space-y-4'>
+					<button
+						className='w-full py-3 text-blue-500 font-medium text-center'
+						onClick={handleEdit}
+					>
+						수정하기
+					</button>
+					<div className='border-t border-gray-200'></div>
+					<button
+						className='w-full py-3 text-red-500 font-medium text-center'
+						onClick={handleDelete}
+					>
+						삭제하기
+					</button>
+				</div>
+			</BottomSheet>
 		</div>
 	);
 };

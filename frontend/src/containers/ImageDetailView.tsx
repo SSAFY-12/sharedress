@@ -1,18 +1,20 @@
-import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ClothMainDisplay } from '@/components/cards/cloth-main-display/ClothMainDisplay';
+import { Recommender } from '@/components/cards/cloth-main-display/ClothMainDisplay.types';
+import { ImageDetailItem } from '@/constants/ImageDetailInterface';
 import React from 'react';
 
-interface CodiEditorProps {
-	item: ClothItem;
+interface ImageDetailViewProps {
+	item: ImageDetailItem;
 	editable?: boolean;
 	onImageClick?: () => void;
 	children: React.ReactNode;
 	className?: string;
 	showMoreButton?: boolean;
 	onMoreButtonClick?: () => void;
+	recommender?: Recommender | null;
 }
 
-export const CodiEditor = ({
+export const ImageDetailView = ({
 	item,
 	editable = false,
 	onImageClick,
@@ -20,7 +22,8 @@ export const CodiEditor = ({
 	className = '',
 	showMoreButton = false,
 	onMoreButtonClick,
-}: CodiEditorProps) => (
+	recommender = null,
+}: ImageDetailViewProps) => (
 	<div className={`w-full max-w-3xl mx-auto ${className}`}>
 		<div className='mb-6'>
 			<ClothMainDisplay
@@ -29,6 +32,7 @@ export const CodiEditor = ({
 				onClick={onImageClick}
 				showMoreButton={showMoreButton}
 				onMoreButtonClick={onMoreButtonClick}
+				recommender={recommender}
 			/>
 		</div>
 		<div className='space-y-4'>{children}</div>

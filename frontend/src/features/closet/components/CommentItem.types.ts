@@ -1,5 +1,5 @@
 export interface CommentAuthor {
-	id: string;
+	id: number;
 	name: string;
 	imageUrl: string;
 }
@@ -14,4 +14,5 @@ export interface Comment {
 export interface CommentItemProps {
 	comment: Comment;
 	onMoreClick?: (comment: Comment) => void;
+	isMine: boolean;
 }

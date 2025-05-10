@@ -17,7 +17,7 @@ export const SearchBar = ({
 				value={value}
 				onChange={onChange}
 				onKeyDown={onKeyDown}
-				className='bg-background text-default text-regular placeholder:text-default placeholder:text-description outline-none'
+				className='bg-background text-default text-regular placeholder:text-default placeholder:text-descriptionColor outline-none'
 			/>
 		</div>
 	</form>

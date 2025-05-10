@@ -16,72 +16,80 @@ const CodiEditPage = () => {
 		{ id: 'etc', label: '기타' },
 	];
 
-	const products = [
+	interface Product {
+		id: number;
+		imageUrl: string;
+		name: string;
+		brand: string;
+		category: string;
+	}
+
+	const products: Product[] = [
 		{
-			id: '1',
+			id: 1,
 			imageUrl: 'https://picsum.photos/200',
 			name: '체크 셔츠',
 			brand: 'INTHERAW',
 			category: 'top',
 		},
 		{
-			id: '2',
+			id: 2,
 			imageUrl: 'https://picsum.photos/200',
 			name: '화이트 티셔츠',
 			brand: 'INTHERAW',
 			category: 'top',
 		},
 		{
-			id: '3',
+			id: 3,
 			imageUrl: 'https://picsum.photos/200',
 			name: '네이비 팬츠',
 			brand: 'INTHERAW',
 			category: 'bottom',
 		},
 		{
-			id: '4',
+			id: 4,
 			imageUrl: 'https://picsum.photos/200',
 			name: '브라운 가죽 벨트',
 			brand: 'INTHERAW',
 			category: 'etc',
 		},
 		{
-			id: '5',
+			id: 5,
 			imageUrl: 'https://picsum.photos/200',
 			name: '블랙 드레스 슈즈',
 			brand: 'Dr.Martens',
 			category: 'shoes',
 		},
 		{
-			id: '6',
+			id: 6,
 			imageUrl: 'https://picsum.photos/200',
 			name: '베이지 재킷',
 			brand: '도날드덕 잠옷',
 			category: 'outer',
 		},
 		{
-			id: '7',
+			id: 7,
 			imageUrl: 'https://picsum.photos/200',
 			name: '옷',
 			brand: '브랜드',
 			category: 'shoes',
 		},
 		{
-			id: '8',
+			id: 8,
 			imageUrl: 'https://picsum.photos/200',
 			name: '옷',
 			brand: '브랜드',
 			category: 'bottom',
 		},
 		{
-			id: '9',
+			id: 9,
 			imageUrl: 'https://picsum.photos/200',
 			name: '옷',
 			brand: '브랜드',
 			category: 'outer',
 		},
 		{
-			id: '10',
+			id: 10,
 			imageUrl: 'https://picsum.photos/200',
 			name: '옷',
 			brand: '브랜드',

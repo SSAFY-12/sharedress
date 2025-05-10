@@ -1,2 +1,5 @@
 export { CodiPreviewCard } from './CodiPreviewCard';
-export type { CodiPreviewCardProps, ClothItem } from './CodiPreviewCard.types';
+export type {
+	CodiPreviewCardProps,
+	CodiClothItem,
+} from './CodiPreviewCard.types';
