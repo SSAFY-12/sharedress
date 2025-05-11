@@ -90,7 +90,7 @@ const LibraryContainer = () => {
 					fetchNextPage();
 				}
 			},
-			{ root: null, threshold: 0.1 }
+			{ root: null, threshold: 0.1 },
 		);
 		io.observe(sentinel.current);
 		return () => io.disconnect();
@@ -103,14 +103,14 @@ const LibraryContainer = () => {
 				name: item.name,
 				imageUrl: item.image,
 				brand: item.brandName,
-			}))
+			})),
 		) || [];
 
 	return (
-		<div className="flex flex-col gap-5 w-full items-center">
-			<div className="w-full flex flex-col py-2 gap-2 sticky top-0 z-10 bg-white">
+		<div className='flex flex-col gap-5 w-full items-center'>
+			<div className='w-full flex flex-col py-2 gap-2 sticky top-[0px] z-10 bg-white '>
 				<SearchBar
-					placeholder="검색"
+					placeholder='검색'
 					value={value}
 					onChange={handleChange}
 					onSubmit={handleSubmit}
@@ -119,15 +119,15 @@ const LibraryContainer = () => {
 					categories={categoryConfig}
 					selectedCategory={selectedCategory}
 					onCategoryChange={handleCategoryChange}
-					className="px-2 py-2.5"
+					className='px-2 py-2.5'
 				/>
 			</div>
-			<div className="w-full">
+			<div className='w-full '>
 				<ClothListContainer
 					isForRegist={true}
 					items={allItems as ClothItem[]}
 					onItemClick={handleItemClick}
-					className="flex flex-col w-full gap-4"
+					className='flex flex-col w-full gap-4'
 					scrollRef={sentinel}
 					isLoading={isLoading}
 					isFetching={isFetching}
