@@ -23,7 +23,7 @@ export const ClothCardRegist = ({
 			<RegisteredBedge libraryId={item.id} />
 		</div>
 
-		<div className='flex flex-col items-start gap-0.5 px-1'>
+		<div className='flex flex-col w-full items-start gap-0.5 px-1'>
 			<span className='w-full text-left text-smallDescription text-low'>
 				{item.brand}
 			</span>
