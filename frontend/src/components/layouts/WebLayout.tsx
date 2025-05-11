@@ -35,7 +35,7 @@ export const WebLayout = () => {
 	};
 
 	return (
-		<div className='relative h-full flex flex-col'>
+		<div className='relative min-h-screen flex flex-col'>
 			<header className='absolute top-0 left-0 right-0 bg-white z-10'>
 				{isMyPage ||
 				isClothEdit ||

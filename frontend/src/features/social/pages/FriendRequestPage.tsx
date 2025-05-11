@@ -29,11 +29,11 @@ export const FriendRequestsPage = () => {
 		});
 		setActionModalOpen(true);
 	};
-
+	console.log('friendRequests', friendRequests);
 	return (
-		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
+		<div className='w-full bg-white flex flex-col items-stretch'>
 			{/* 친구 요청 목록 */}
-			<div className='flex-1 p-4'>
+			<div className='p-4'>
 				{friendRequests?.map((request) => (
 					<div
 						key={request.id}
@@ -57,17 +57,17 @@ export const FriendRequestsPage = () => {
 							<div className='flex gap-2'>
 								<PrimaryBtn
 									size='compact'
-									name='수락'
+									name='친구 수락'
 									color='black'
 									onClick={() => handleActionClick('accept', request)}
-									className='whitespace-nowrap min-w-[70px] text-sm font-medium'
+									className='mt-3 w-[82px] h-[40px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
 								/>
 								<PrimaryBtn
 									size='compact'
-									name='거절'
+									name='친구 거절'
 									color='black'
 									onClick={() => handleActionClick('reject', request)}
-									className='whitespace-nowrap min-w-[70px] text-sm font-medium'
+									className='mt-3 w-[82px] h-[40px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
 								/>
 							</div>
 						</div>

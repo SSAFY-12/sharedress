@@ -41,7 +41,7 @@ export const FriendRequestMsgModal = ({
 						className='mb-3'
 					/>
 					<h2 className='font-bold mb-1'>{friend.nickname}</h2>
-					<label className='mt-4 mb-2 text-sm'>
+					<label className='mt-4 mb-2 text-sm text-left'>
 						친구 요청 메시지(10자 제한)
 					</label>
 					<input
@@ -58,7 +58,7 @@ export const FriendRequestMsgModal = ({
 						size='compact'
 						name='친구 요청'
 						color='black'
-						className='w-full'
+						className='w-full bg-[#3A3636] text-white mt-2'
 						onClick={onConfirm}
 					/>
 				</div>
