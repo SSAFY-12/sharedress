@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
 	CoordinationScope,
 	getCoordinationList,
-} from '@/features/closet/api/myClosetApi';
+} from '@/features/closet/api/closetApi';
 
 export const useCoordinationList = (
 	memberId: number,

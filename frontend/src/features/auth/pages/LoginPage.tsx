@@ -12,9 +12,7 @@ export const LoginPage = () => {
 				<h1 className='text-4xl font-bold mb-2 font-logo text-white'>
 					쉐어드레스
 				</h1>
-				<p className='text-md text-white'>
-					옷장 공유와 스타일 조언을 한번에
-				</p>
+				<p className='text-md text-white'>옷장 공유와 스타일 조언을 한번에</p>
 			</div>
 
 			{/* 로그인 버튼 */}

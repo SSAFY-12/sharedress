@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import CommentList from '@/features/closet/components/CommentList';
@@ -16,7 +16,9 @@ import { ImageDetailView } from '@/containers/ImageDetailView';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const { id } = useParams();
+	const isMe = location.state?.isMe ?? false;
 
 	const coordinationId = Number(id);
 
@@ -97,6 +99,9 @@ const CodiDetailPage = () => {
 				onSuccess: () => {
 					setCommentText('');
 					setIsCommentFocused(false);
+				},
+				onError: () => {
+					alert('댓글 작성에 실패했습니다. 다시 시도해주세요.');
 				},
 			});
 		}
@@ -194,7 +199,7 @@ const CodiDetailPage = () => {
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
 				<ImageDetailView
 					item={item}
-					showMoreButton={true}
+					showMoreButton={isMe}
 					onMoreButtonClick={handleMenuClick}
 					recommender={recommender}
 				>
@@ -234,7 +239,7 @@ const CodiDetailPage = () => {
 						{isCommentFocused && (
 							<button
 								className='ml-2 p-2 text-white rounded-full flex items-center justify-center'
-								onClick={handleCommentSubmit}
+								onMouseDown={handleCommentSubmit}
 							>
 								<img src='/icons/submit.svg' alt='전송' className='w-5 h-5' />
 							</button>

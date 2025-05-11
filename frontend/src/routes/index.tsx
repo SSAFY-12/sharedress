@@ -14,6 +14,7 @@ import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import FriendPage from '@/pages/social/FriendPage';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import ClothEditPage from '@/features/closet/pages/ClothEditPage';
+import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 
 export const router = createBrowserRouter([
 	{
@@ -68,15 +69,19 @@ export const router = createBrowserRouter([
 				element: <MyClosetPage />,
 			},
 			{
-				path: '/cloth/:id',
+				path: 'friend/:id',
+				element: <FriendClosetPage />,
+			},
+			{
+				path: 'cloth/:id',
 				element: <ClothDetailPage />,
 			},
 			{
-				path: '/codi/:id',
+				path: 'codi/:id',
 				element: <CodiDetailPage />,
 			},
 			{
-				path: '/cloth/:id/edit',
+				path: 'cloth/:id/edit',
 				element: <ClothEditPage />,
 			},
 		],

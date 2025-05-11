@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchClothDetail } from '@/features/closet/api/myClosetApi';
+import { fetchClothDetail } from '@/features/closet/api/closetApi';
 
 export const useClothDetail = (clothId: number) =>
 	useQuery({

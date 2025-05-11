@@ -6,11 +6,12 @@ import { useCloset } from '@/features/closet/hooks/useCloset';
 interface ClosetTabProps {
 	memberId: number;
 	selectedCategory: string;
+	isMe: boolean;
 }
 
 const CATEGORIES = ['전체', '아우터', '상의', '하의', '신발', '기타'];
 
-const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
+const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const navigate = useNavigate();
 
 	const categoryId =
@@ -20,8 +21,14 @@ const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
 
 	const { data: closetItems } = useCloset(memberId, categoryId);
 
+	const visibleItems = (closetItems ?? []).filter(
+		(item) => isMe || item.isPublic,
+	);
+
 	const handleItemClick = (item: ClothItem) => {
-		navigate(`/cloth/${item.id}`);
+		navigate(`/cloth/${item.id}`, {
+			state: { isMe },
+		});
 	};
 
 	return (
@@ -29,7 +36,7 @@ const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
 			<div className='flex-1 px-4'>
 				<ClothListContainer
 					items={
-						closetItems?.map((item) => ({
+						visibleItems.map((item) => ({
 							id: item.id,
 							category: selectedCategory,
 							imageUrl: item.image,

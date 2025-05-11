@@ -22,7 +22,9 @@ const CodiTab = ({ memberId, activeSubTab }: CodiTabProps) => {
 	}));
 
 	const handleItemClick = (item: ClothItem) => {
-		navigate(`/codi/${item.id}`);
+		navigate(`/codi/${item.id}`, {
+			state: { isMe: true },
+		});
 	};
 
 	return (
