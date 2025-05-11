@@ -1,9 +1,10 @@
-import cv2
-import numpy as np
-from PIL import Image
-import logging
+import logging, colorsys
 from io import BytesIO
-import colorsys
+from typing import Tuple
+
+import cv2, numpy as np
+from PIL import Image
+from sklearn.cluster import KMeans     # pip install scikit-learn
 
 logger = logging.getLogger(__name__)
 
@@ -54,140 +55,70 @@ class ColorExtractor:
             20: ("그레이 쿨", [(210, 270), (5, 20), (40, 80)])
         }
 
-    def _normalize_hsv(self, h, s, v):
-        """Normalize HSV values to standard ranges (H: 0-360, S: 0-100, V: 0-100)"""
-        return h, s * 100, v * 100
+    # ───────────────────────────────────────────
+    @staticmethod
+    def _rgba_pixels(img: Image.Image) -> np.ndarray:
+        """알파 > 10 인 전경 픽셀만 반환"""
+        if img.mode == "RGBA":
+            a = np.array(img.split()[-1])
+            rgb = np.array(img.convert("RGB"))
+            mask = a > 10
+            px = rgb[mask]
+            if len(px) < 500:                # 전경픽셀 적으면 전체 사용
+                px = rgb.reshape(-1, 3)
+        else:
+            px = np.array(img).reshape(-1, 3)
+        return px.astype(np.float32)
 
-    def extract_dominant_color(self, image_bytes):
-        """Extract dominant color from image using K-means clustering"""
-        try:
-            # Open image from bytes
-            image = Image.open(image_bytes).convert("RGBA")
+    # ───────────────────────────────────────────
+    def _dominant_hsv(self, pil_img: Image.Image, k: int = 3) -> Tuple[float, float, float]:
+        pixels = self._rgba_pixels(pil_img)
+        km = KMeans(n_clusters=k, n_init="auto", random_state=42).fit(pixels)
+        counts = np.bincount(km.labels_)
+        bgr = km.cluster_centers_[np.argmax(counts)]
+        hsv = cv2.cvtColor(np.uint8([[bgr]]), cv2.COLOR_BGR2HSV)[0][0].astype(float)
+        h = hsv[0] * 2.0          # 0-360
+        s = hsv[1] / 255.0 * 100  # 0-100
+        v = hsv[2] / 255.0 * 100
+        return h, s, v
 
-            # Create background image for alpha blending
-            bg = Image.new("RGB", image.size, (255, 255, 255))
-            bg.paste(image, mask=image.split()[3])  # 3 is the alpha channel
+    # ───────────────────────────────────────────
+    def _to_hex(self, h, s, v):
+        r, g, b = colorsys.hsv_to_rgb(h / 360, s / 100, v / 100)
+        return f"#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}"
+    # ───────────────────────────────────────────
+    def _classify(self, h: float, s: float, v: float):
+        # 특별 케이스(black/white/gray) 먼저
+        if v <= 15:
+            return (1 if 25 <= h <= 45 else 2), self._to_hex(h, s, v)
+        if v >= 90 and s <= 10:
+            return (3 if 30 <= h <= 60 else 4), self._to_hex(h, s, v)
+        if s <= 20 and 40 <= v <= 80:
+            return (19 if 30 <= h <= 60 else 20), self._to_hex(h, s, v)
 
-            # Convert to OpenCV format
-            img_cv = np.array(bg)
-            img_cv = cv2.cvtColor(img_cv, cv2.COLOR_RGB2BGR)
-
-            # Resize for faster processing
-            height, width = img_cv.shape[:2]
-            if height * width > 500000:  # If larger than ~700x700
-                scale = np.sqrt(500000 / (height * width))
-                img_cv = cv2.resize(img_cv, (0, 0), fx=scale, fy=scale)
-
-            # Reshape for K-means
-            pixels = img_cv.reshape(-1, 3).astype(np.float32)
-
-            # Apply K-means clustering (k=5)
-            criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 200, 0.1)
-            _, labels, centers = cv2.kmeans(pixels, 5, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
-
-            # Get the count of pixels in each cluster
-            counts = np.bincount(labels.flatten())
-
-            # Sort clusters by size (descending)
-            sorted_indices = np.argsort(counts)[::-1]
-
-            # Get the 2 largest clusters
-            largest_clusters = [centers[idx] for idx in sorted_indices[:2]]
-
-            # Convert to HLS color space
-            dominant_colors_hls = []
-            for bgr_color in largest_clusters:
-                # BGR to HSV conversion
-                bgr_color_uint8 = np.uint8([[bgr_color]])
-                hsv_color = cv2.cvtColor(bgr_color_uint8, cv2.COLOR_BGR2HSV)[0][0]
-
-                # Normalize HSV values
-                h, s, v = self._normalize_hsv(hsv_color[0] * 2, hsv_color[1] / 255, hsv_color[2] / 255)
-                dominant_colors_hls.append((h, s, v))
-
-            # The first color is the most dominant
-            return dominant_colors_hls[0]
-
-        except Exception as e:
-            logger.error(f"Error extracting dominant color: {e}")
-            # Default to mid-gray
-            return (0, 0, 50)
-
-    def hsv_to_hex(self, h, s, v):
-        """Convert HSV color to hex color code"""
-        # Convert HSV (0-360, 0-100, 0-100) to RGB (0-1, 0-1, 0-1)
-        r, g, b = colorsys.hsv_to_rgb(h/360, s/100, v/100)
-
-        # Convert to hex
-        return "#{:02x}{:02x}{:02x}".format(int(r*255), int(g*255), int(b*255))
-
-    def classify_color(self, hsv):
-        """Classify HSV color to predefined color categories"""
-        h, s, v = hsv
-
-        # Handle special case - check if it's black, white, or gray first based on S and V
-        if v <= 15:  # Very dark (black)
-            if 25 <= h <= 45:
-                return 1, "블랙 웜", self.hsv_to_hex(h, s, v)
-            return 2, "블랙 쿨", self.hsv_to_hex(h, s, v)
-
-        if v >= 90 and s <= 10:  # Very light and low saturation (white)
-            if 30 <= h <= 60:
-                return 3, "화이트 웜", self.hsv_to_hex(h, s, v)
-            return 4, "화이트 쿨", self.hsv_to_hex(h, s, v)
-
-        if s <= 20 and 40 <= v <= 80:  # Low saturation, mid value (gray)
-            if 30 <= h <= 60:
-                return 19, "그레이 웜", self.hsv_to_hex(h, s, v)
-            return 20, "그레이 쿨", self.hsv_to_hex(h, s, v)
-
-        # For colors with higher saturation, match against our defined ranges
-        best_match = None
-        best_score = float('inf')
-
-        for color_id, (color_name, ranges) in self.color_ranges.items():
-            h_range, s_range, v_range = ranges
-
-            # Skip black, white, gray which we already checked
-            if color_id in [1, 2, 3, 4, 19, 20]:
+        # 범위 기반 매칭
+        best, score = None, 1e9
+        for cid, (name, rng) in self.color_ranges.items():
+            h1, h2, s1, s2, v1, v2 = rng
+            if cid in (1, 2, 3, 4, 19, 20):     # 이미 처리
                 continue
-
-            # Calculate score - lower is better
-            h_min, h_max = h_range
-            s_min, s_max = s_range
-            v_min, v_max = v_range
-
-            # Special handling for hue wrapping (for colors like red that cross 0/360 boundary)
-            if h_min > h_max:  # Wrapping case
-                h_dist = min(abs(h - h_min), abs(h - (h_max + 360))) if h < h_min else min(abs(h - h_min), abs(h - h_max))
+            # Hue wrapping
+            if h1 > h2:
+                hd = 0 if h >= h1 or h <= h2 else min(abs(h - h1), abs(h - h2))
             else:
-                h_dist = 0 if h_min <= h <= h_max else min(abs(h - h_min), abs(h - h_max))
+                hd = 0 if h1 <= h <= h2 else min(abs(h - h1), abs(h - h2))
+            sd = 0 if s1 <= s <= s2 else min(abs(s - s1), abs(s - s2))
+            vd = 0 if v1 <= v <= v2 else min(abs(v - v1), abs(v - v2))
+            sc = hd * 1.0 + sd * 0.3 + vd * 0.2
+            if sc < score:
+                score, best = sc, cid
+        hex_code = self._to_hex(h, s, v)
+        return best or 5, hex_code   # fallback: 5(레드 웜)
 
-            s_dist = 0 if s_min <= s <= s_max else min(abs(s - s_min), abs(s - s_max))
-            v_dist = 0 if v_min <= v <= v_max else min(abs(v - v_min), abs(v - v_max))
-
-            # Weight the distances (hue is most important)
-            score = (h_dist * 1.0) + (s_dist * 0.3) + (v_dist * 0.2)
-
-            if score < best_score:
-                best_score = score
-                best_match = (color_id, color_name)
-
-        if best_match:
-            color_id, color_name = best_match
-            return color_id, color_name, self.hsv_to_hex(h, s, v)
-
-        # Default fallback - just return warm red
-        return 5, "레드 웜", self.hsv_to_hex(h, s, v)
-
-    def process_image(self, image_bytes):
-        """Extract and classify the dominant color from an image"""
-        dominant_hsv = self.extract_dominant_color(image_bytes)
-        color_id, color_name, color_hex = self.classify_color(dominant_hsv)
-
-        return {
-            "color_id": color_id,
-            "color_name": color_name,
-            "color_hex": color_hex,
-            "hsv": dominant_hsv
-        }
+    # ───────────────────────────────────────────
+    def process_image(self, pil_img: Image.Image, k: int = 3):
+        h, s, v = self._dominant_hsv(pil_img, k)
+        cid, hex_code = self._classify(h, s, v)
+        cname = self.color_ranges[cid][0]
+        return {"color_id": cid, "color_name": cname,
+                "color_hex": hex_code, "hsv": (h, s, v)}

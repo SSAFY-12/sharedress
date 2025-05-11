@@ -11,26 +11,25 @@ class DBService:
     def __init__(self):
         self.db: Session = next(get_db())
 
-    # -----------------------------------------------------------
-    # Clothes CREATE
-    # -----------------------------------------------------------
-    def create_clothes_record(self, image_uri: str, category_id: int, color_id: int) -> int | None:
+    # ────────── INSERT ──────────
+    def create_clothes_record(
+            self, image_url: str, category_id: int, color_id: int
+    ) -> int | None:
         try:
-            new_item = Clothes(
-                image_uri=image_uri,
+            row = Clothes(
+                imageUrl=image_url,        # ← imageUrl 속성 사용
                 category_id=category_id,
                 color_id=color_id,
             )
-            self.db.add(new_item)
+            self.db.add(row)
             self.db.commit()
-            self.db.refresh(new_item)
+            self.db.refresh(row)
 
-            logger.info(f"Clothes row inserted (id={new_item.id})")
-            return new_item.id
-
+            logger.info("Clothes inserted (id=%s)", row.id)
+            return row.id
         except Exception as e:
             self.db.rollback()
-            logger.error(f"Clothes insert failed: {e}")
+            logger.error("Clothes insert failed: %s", e)
             return None
 
     # -----------------------------------------------------------
