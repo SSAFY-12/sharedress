@@ -72,7 +72,7 @@ export const SubBtnModal = ({
 									onClick={() => {
 										console.log('코디 만들기');
 										onClose();
-										navigate('/regist');
+										navigate('/codi/edit');
 									}}
 								>
 									<img src='/icons/create_codi_add.svg' alt='plus' />
