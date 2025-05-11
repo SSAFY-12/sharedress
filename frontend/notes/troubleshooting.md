@@ -860,13 +860,6 @@ https://lh3.googleusercontent.com/a/ACg8ocKA2rKTYFTRCmV6mmsWcupxFlKVWkQm9cOmYu2u
 
    - API 요청이 완료되기 전에 모달이 닫혀서 사용자에게 피드백이 없음
    - 사용자는 요청이 성공했는지 실패했는지 알 수 없음
-   - UI가 업데이트되기 전에 모달이 닫혀서 변경사항을 볼 수 없음
-
-   **개선 후 효과:**
-
-   - API 요청이 완료될 때까지 기다려 안정적인 처리 보장
-   - 성공했을 때만 모달이 닫혀서 사용자에게 명확한 피드백 제공
-   - 실패했을 경우 에러 처리로 사용자에게 알림 가능
    - UI가 업데이트된 후에 모달이 닫히므로 사용자가 변경사항을 확인할 수 있음
 
 ### 해결방법
@@ -965,3 +958,105 @@ const handleAction = async () => {
 
 이러한 변경으로 친구 요청 취소 시 UI가 즉시 반영되어 더 나은 사용자 경험을 제공
 할 수 있게 되었습니다.
+
+## [트러블슈팅] FriendRequestActionModal 불필요한 API 호출 문제(2025/05/11)
+
+### 문제상황
+
+FriendRequestActionModal 컴포넌트에서 useRequest 훅이 모달의 열림/닫힘 상태와 관
+계없이 항상 API를 호출하는 문제가 발생했습니다. 이는 모달이 닫혀있을 때도 불필요
+한 API 호출이 발생한다는 것을 의미합니다.
+
+### 원인 분석
+
+1. **React 컴포넌트의 마운트/언마운트 원리**
+
+   - React에서 컴포넌트가 렌더링될 때마다 해당 컴포넌트의 모든 코드가 실행됨
+   - `FriendRequestActionModal`이 부모 컴포넌트에 포함되어 있다면, 부모가 렌더링
+     될 때마다 모달 컴포넌트의 코드도 실행됨
+   - 이는 모달이 실제로 보이지 않더라도(`isOpen={false}`) 마찬가지
+
+2. **부모-자식 컴포넌트 관계의 문제**
+
+   - 부모 컴포넌트(예: FriendRequestPage)에서 모달 컴포넌트가 항상 마운트되어 있
+     음
+   - 모달의 `isOpen` prop이 `false`여도 컴포넌트 자체는 존재하고 실행됨
+   - 결과적으로 모든 친구 요청에 대한 API 호출이 동시에 발생
+
+3. **useRequest 훅의 동작 방식**
+
+   - 컴포넌트가 렌더링될 때마다 useRequest 훅이 호출됨
+   - memberId가 항상 존재하여 API 호출이 발생
+   - 모달의 isOpen 상태와 관계없이 API 호출이 이루어짐
+
+4. **실제 사용 예시**
+   ```typescript
+   // 부모 컴포넌트 (FriendRequestPage)
+   const FriendRequestPage = () => {
+   	return (
+   		<div>
+   			{/* 다른 컨텐츠 */}
+   			{friendRequests.map((request) => (
+   				<FriendRequestActionModal
+   					key={request.id}
+   					isOpen={false} // 모달이 닫혀있음
+   					memberId={request.memberId}
+   					// ... 다른 props
+   				/>
+   			))}
+   		</div>
+   	);
+   };
+   ```
+   - 이 경우 모든 친구 요청에 대해 모달 컴포넌트가 생성됨
+   - 각 모달 컴포넌트는 자신의 memberId로 API 호출을 시도
+   - 결과적으로 모든 친구 요청에 대한 API가 동시에 호출됨
+
+### 해결방법
+
+useRequest 훅에 전달되는 memberId를 조건부로 전달하도록 수정:
+
+```typescript
+const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
+	useRequest(isOpen ? memberId : undefined);
+```
+
+### 예시
+
+#### 수정 전
+
+```typescript
+const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
+	useRequest(memberId); // 항상 API 호출 발생
+```
+
+#### 수정 후
+
+```typescript
+const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
+	useRequest(isOpen ? memberId : undefined); // 모달이 열려있을 때만 API 호출
+```
+
+### 결론 및 정리
+
+1. **React 컴포넌트 동작 원리 이해**
+
+   - 컴포넌트가 마운트되면 모든 코드가 실행됨
+   - 조건부 렌더링이 필요할 때는 적절한 조건 체크 필요
+
+2. **성능 최적화**
+
+   - 불필요한 API 호출 감소
+   - 서버 부하 감소
+   - 네트워크 트래픽 감소
+   - 사용자 경험 개선
+
+3. **React 훅 사용 시 주의사항**
+
+   - 훅의 호출 시점과 조건을 잘 고려해야 함
+   - 불필요한 API 호출을 방지하기 위해 조건부 실행을 적절히 활용
+   - 타입 안정성을 위해 undefined를 사용하여 타입 에러 방지
+
+4. **모달 컴포넌트 설계 시 고려사항**
+   - 모달의 열림/닫힘 상태에 따라 API 호출을 제어하는 것이 성능상 이점이 있음
+   - 불필요한 리소스 사용을 방지하기 위한 조건부 로직 구현 필요

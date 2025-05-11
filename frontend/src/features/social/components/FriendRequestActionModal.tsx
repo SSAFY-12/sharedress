@@ -24,7 +24,7 @@ export const FriendRequestActionModal = ({
 	friend,
 }: FriendRequestActionModalProps) => {
 	const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
-		useRequest(memberId); // 특정 요청 조회
+		useRequest(isOpen ? memberId : undefined); // 모달이 열려있을 때만 요청 조회
 
 	const handleAction = async () => {
 		if (!friendRequest) return;
