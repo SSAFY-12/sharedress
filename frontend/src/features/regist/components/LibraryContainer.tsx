@@ -1,3 +1,4 @@
+// frontend/src/features/regist/components/LibraryContainer.tsx
 import React, { useDeferredValue, useEffect, useRef, useState } from 'react';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ClothListContainer } from '@/containers/ClothListContainer';

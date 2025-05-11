@@ -193,7 +193,7 @@ const CodiEditPage = () => {
 	};
 
 	return (
-		<div className='max-w-md mx-auto h-screen flex flex-col bg-white overflow-hidden'>
+		<div className='w-full h-screen flex flex-col bg-white overflow-hidden'>
 			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-hidden'>
 				<div className='flex-shrink-0'>

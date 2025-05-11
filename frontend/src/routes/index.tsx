@@ -84,6 +84,14 @@ export const router = createBrowserRouter([
 				path: 'cloth/:id/edit',
 				element: <ClothEditPage />,
 			},
+			{
+				path: '/codi/edit',
+				element: <CodiEditPage />,
+			},
+			{
+				path: '/codi/save',
+				element: <CodiSavePage />,
+			},
 		],
 	},
 	{
@@ -93,13 +101,5 @@ export const router = createBrowserRouter([
 	{
 		path: '/oauth/google/callback',
 		element: <GoogleCallbackHandler />,
-	},
-	{
-		path: '/codi/edit',
-		element: <CodiEditPage />,
-	},
-	{
-		path: '/codi/save',
-		element: <CodiSavePage />,
 	},
 ]);

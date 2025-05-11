@@ -1,3 +1,4 @@
+// frontend/src/features/regist/pages/RegistSearchPage.tsx
 import LibraryContainer from '@/features/regist/components/LibraryContainer';
 
 const RegistSearchPage = () => (

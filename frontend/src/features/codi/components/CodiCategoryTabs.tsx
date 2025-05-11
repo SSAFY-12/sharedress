@@ -18,10 +18,10 @@ export default function CodiCategoryTabs({
 				<button
 					key={category.id}
 					onClick={() => onCategoryChange(category.id)}
-					className={`px-4 py-3 text-sm font-medium whitespace-nowrap relative rounded-none ${
+					className={`px-4 py-3.5 text-topHeader whitespace-nowrap relative rounded-none ${
 						activeCategory === category.id
-							? 'text-black border-b-2 border-b-black'
-							: 'text-gray-500 hover:text-gray-700'
+							? 'text-regular border-b-2 border-b-regular'
+							: 'text-descriptionColor hover:text-low'
 					}`}
 				>
 					{category.label}
