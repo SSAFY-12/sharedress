@@ -350,6 +350,7 @@ const CodiCanvas = ({
 							}}
 							draggable={false}
 							onLoad={isEditable ? (e) => handleImageLoad(e, item) : undefined}
+							crossOrigin='anonymous'
 						/>
 					</div>
 
