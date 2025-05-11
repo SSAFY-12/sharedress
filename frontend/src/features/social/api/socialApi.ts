@@ -76,3 +76,17 @@ export const socialApi = {
 		return response.data;
 	},
 };
+
+export const publicApi = {
+	// 공개링크 발급
+	createPublicLink: async () => {
+		const response = await client.post('/api/open-link');
+		return response.data.content.openLink;
+	},
+
+	// 공개링크 디코딩
+	decodePublicLink: async (openLink: string) => {
+		const response = await client.get(`/api/open-link/${openLink}`);
+		return response.data;
+	},
+};
