@@ -5,6 +5,8 @@ import SocialHeader from './SocialHeader';
 import { NavConfig } from '@/constants/navConfig';
 import getHeaderProps from '@/utils/getHeaderProps';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { SubBtnModal } from '@/components/modals/sub-btn-modal/SubBtnModal';
 
 export const MobileLayout = () => {
 	const location = useLocation();
@@ -18,6 +20,9 @@ export const MobileLayout = () => {
 	const firstDepth = '/' + location.pathname.split('/')[1];
 	const showNav = NavConfig[firstDepth] === true;
 
+	/* 모달 표시 여부 결정	*/
+	const [isModalOpen, setIsModalOpen] = useState(false);
+
 	// 뒤로가기 함수
 	const onBackClick = () => {
 		if (window.history.length > 1) {
@@ -27,27 +32,39 @@ export const MobileLayout = () => {
 		}
 	};
 
+	useEffect(() => {
+		console.log(isModalOpen);
+	}, [isModalOpen]);
+
 	return (
-		<div className='min-h-screen flex flex-col'>
-			<header className='fixed top-0 left-0 right-0 bg-white z-10'>
-				{isMyPage || isClothEdit ? null : isSocial ? (
-					<SocialHeader />
-				) : (
-					<Header {...headerProps} onBackClick={onBackClick} />
+		<>
+			<div className='min-h-screen flex flex-col'>
+				<header className='fixed top-0 left-0 right-0 bg-white z-10'>
+					{isMyPage || isClothEdit ? null : isSocial ? (
+						<SocialHeader />
+					) : (
+						<Header {...headerProps} onBackClick={onBackClick} />
+					)}
+				</header>
+				<main
+					className={`flex-1 ${isMyPage || isClothEdit ? '' : 'mt-16'} ${
+						showNav ? 'mb-16' : 'mb-0'
+					} h-full flex flex-col overflow-y-auto `}
+				>
+					<Outlet />
+				</main>
+				{showNav && (
+					<footer className='fixed bottom-0 left-0 right-0 bg-white z-20'>
+						<NavBar openModal={() => setIsModalOpen(true)} />
+					</footer>
 				)}
-			</header>
-			<main
-				className={`flex-1 ${isMyPage || isClothEdit ? '' : 'mt-16'} ${
-					showNav ? 'mb-16' : 'mb-0'
-				} h-full flex flex-col overflow-y-auto `}
-			>
-				<Outlet />
-			</main>
-			{showNav && (
-				<footer className='fixed bottom-0 left-0 right-0 bg-white z-10'>
-					<NavBar />
-				</footer>
-			)}
-		</div>
+				{isModalOpen && (
+					<SubBtnModal
+						isOpen={isModalOpen}
+						onClose={() => setIsModalOpen(false)}
+					/>
+				)}
+			</div>
+		</>
 	);
 };

@@ -1,13 +1,16 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const NavBar = () => {
+interface NavBarProps {
+	openModal: () => void;
+}
+
+const NavBar = ({ openModal }: NavBarProps) => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const currentPath = location.pathname;
 	const isFriendTabActive =
 		currentPath === '/social' || currentPath.startsWith('/friend/');
 	const isClosetTabActive = currentPath === '/mypage';
-	console.log(isFriendTabActive, isClosetTabActive);
 
 	return (
 		<div
@@ -39,8 +42,11 @@ const NavBar = () => {
 				</button>
 			</div>
 			<div className='flex justify-center items-center'>
-				<button className='flex items-center justify-center p-4 bg-regular rounded-full border-8 border-background'>
-					<img src='/icons/plus.svg' alt='nav-friends' />
+				<button
+					className='flex items-center justify-center p-4 bg-regular rounded-full border-8 border-background'
+					onClick={openModal}
+				>
+					<img src='/icons/plus.svg' alt='plus' />
 				</button>
 			</div>
 			<div className='flex-1 flex justify-center items-center'>
