@@ -156,4 +156,23 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 	public void deleteById(Long id) {
 		coordinationJpaRepository.deleteById(id);
 	}
+
+	@Override
+	public List<Coordination> findFriendCoordinationRecommendedByMe(Long myId, Long friendId) {
+		QCoordination cd = QCoordination.coordination;
+		QMember owner = new QMember("owner");
+		QMember creator = new QMember("creator");
+
+		return queryFactory
+			.selectFrom(cd)
+			.leftJoin(cd.owner, owner).fetchJoin()
+			.leftJoin(cd.creator, creator).fetchJoin()
+			.where(
+				cd.owner.id.eq(friendId)
+					.and(cd.creator.id.eq(myId))
+			)
+			.orderBy(cd.id.desc())
+			.distinct()
+			.fetch();
+	}
 }

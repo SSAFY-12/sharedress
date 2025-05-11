@@ -141,4 +141,13 @@ public class CoordinationController {
 		coordinationUseCase.removeCoordination(member.getId(), coordinationId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
+
+	@GetMapping("/coordinations/friends/{friendId}")
+	public ResponseEntity<ResponseWrapper<List<CoordinationResponse>>> getFriendCoordinations(
+		@CurrentMember Member member,
+		@PathVariable("friendId") Long friendId
+	) {
+		List<CoordinationResponse> response = coordinationQueryUseCase.getFriendCoordinations(member.getId(), friendId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, response);
+	}
 }

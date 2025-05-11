@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.application.coordination.dto.CoordinationDetailResponse;
+import com.ssafy.sharedress.application.coordination.dto.CoordinationResponse;
 import com.ssafy.sharedress.application.coordination.dto.CoordinationWithItemResponse;
 import com.ssafy.sharedress.application.coordination.dto.Scope;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationQueryUseCase;
@@ -49,6 +50,14 @@ public class CoordinationQueryService implements CoordinationQueryUseCase {
 		return coordinationRepository.findByIdWithOwnerAndOriginCreator(coordinationId)
 			.map(CoordinationDetailResponse::fromEntity)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
+	}
+
+	@Override
+	public List<CoordinationResponse> getFriendCoordinations(Long myId, Long friendId) {
+		return coordinationRepository.findFriendCoordinationRecommendedByMe(myId, friendId)
+			.stream()
+			.map(CoordinationResponse::fromEntity)
+			.toList();
 	}
 
 	// -- 게스트 -- //

@@ -21,4 +21,6 @@ public interface CoordinationRepository {
 	Optional<Coordination> findById(Long id);
 
 	void deleteById(Long id);
+
+	List<Coordination> findFriendCoordinationRecommendedByMe(Long myId, Long friendId);
 }
