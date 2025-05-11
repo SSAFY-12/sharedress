@@ -119,7 +119,7 @@ export const FriendSearchResultPage = () => {
 							{user.relationStatus === 0 || user.relationStatus === 3 ? (
 								<PrimaryBtn
 									size='compact'
-									name='친구 요청'
+									name='친구 신청'
 									color='black'
 									onClick={() => {
 										setModalOpen(true);
@@ -130,12 +130,12 @@ export const FriendSearchResultPage = () => {
 											memberId: user.memberId,
 										});
 									}}
-									className='mt-3'
+									className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
 								/>
 							) : user.relationStatus === 1 ? (
 								<PrimaryBtn
 									size='compact'
-									name='요청 취소'
+									name='친구 취소'
 									color='gray'
 									onClick={() => {
 										setSelectedFriend({
@@ -147,12 +147,12 @@ export const FriendSearchResultPage = () => {
 										setActionType('cancel');
 										setActionModalOpen(true);
 									}}
-									className='mt-3'
+									className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
 								/>
 							) : user.relationStatus === 2 ? (
 								<PrimaryBtn
 									size='compact'
-									name='요청 수락'
+									name='친구 수락'
 									color='primary'
 									onClick={() => {
 										setSelectedFriend({
@@ -164,7 +164,7 @@ export const FriendSearchResultPage = () => {
 										setActionType('accept');
 										setActionModalOpen(true);
 									}}
-									className='mt-3'
+									className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
 								/>
 							) : null}
 						</div>
