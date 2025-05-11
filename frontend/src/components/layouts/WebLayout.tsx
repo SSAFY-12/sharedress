@@ -5,6 +5,8 @@ import SocialHeader from './SocialHeader';
 import { NavConfig } from '@/constants/navConfig';
 import getHeaderProps from '@/utils/getHeaderProps';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { SubBtnModal } from '@/components/modals/sub-btn-modal/SubBtnModal';
 
 export const WebLayout = () => {
 	const location = useLocation();
@@ -15,6 +17,9 @@ export const WebLayout = () => {
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 	const navigate = useNavigate();
+
+	/* 모달 표시 여부 결정	*/
+	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	/* 네비게이션 바 표시 여부 결정	*/
 	const firstDepth = '/' + location.pathname.split('/')[1];
@@ -45,14 +50,20 @@ export const WebLayout = () => {
 			<main
 				className={`flex-1 ${
 					isMyPage || isClothEdit || isCodiEdit || isCodiSave ? '' : 'mt-16'
-				} ${showNav ? 'mb-16' : 'mb-0'} h-full flex flex-col overflow-y-auto`}
+				} ${showNav ? '' : 'mb-0'} h-full flex flex-col overflow-y-auto`}
 			>
 				<Outlet />
 			</main>
 			{showNav && (
 				<footer className='sticky bottom-0 bg-white z-10'>
-					<NavBar />
+					<NavBar openModal={() => setIsModalOpen(true)} />
 				</footer>
+			)}
+			{isModalOpen && (
+				<SubBtnModal
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
 			)}
 		</div>
 	);
