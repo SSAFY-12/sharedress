@@ -2,10 +2,10 @@ pipeline {
   agent any
 
   environment {
-    // Git 브랜치에 따라 태그만 구분 (예: 12‑fe)
+    // Git 브랜치에 따라 태그만 구분 (예: 12-fe)
     BUILD_TAG = "${BUILD_NUMBER}-fe"
     BLUE_IP   = '172.31.35.103'      // LB EC2 프라이빗(또는 퍼블릭) IP
-    DIST_DIR  = 'frontend/dist'  // 🔄 dev‑dist 로 변경
+    DIST_DIR  = 'frontend/dist'      // 🔄 dev-dist 로 변경 가능
     SSH_USER  = 'ec2-user'
   }
 
@@ -19,6 +19,22 @@ pipeline {
       steps { checkout scm }
     }
 
+    /* ────────────────────────────────
+       ★ 추가 ❶ : .env.production 주입
+       ──────────────────────────────── */
+    stage('Inject env') {            // (Managed files → fe-env-production)
+      steps {
+        configFileProvider([
+          configFile(
+            fileId: 'fe-env-production',        // Jenkins Managed File ID
+            targetLocation: 'frontend/.env.production'
+          )
+        ]) {
+          echo '✅  .env.production 주입 완료'
+        }
+      }
+    }
+
     stage('Install & Build') {       // **frontend 폴더로 들어가서 빌드**
       steps {
         dir('frontend') {
@@ -27,7 +43,8 @@ pipeline {
             npm ci --legacy-peer-deps
 
             echo "📦  Building…"
-            npm run build
+            # Vite 는 .env.production 을 자동으로 읽어 인라인
+            npm run build -- --mode production      # ★ 추가 ❷
           '''
         }
       }
