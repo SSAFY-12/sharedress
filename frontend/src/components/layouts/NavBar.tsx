@@ -1,51 +1,74 @@
-const NavBar = () => (
-	<div
-		className='flex items-center justify-center h-16
-     px-8 bg-white border-t border-gray-200 gap-x-16'
-	>
-		<button className='w-16 h-16 flex items-center justify-center bg-white'>
-			<svg
-				width='32'
-				height='32'
-				fill='none'
-				stroke='gray'
-				strokeWidth='2'
-				viewBox='0 0 24 24'
-			>
-				<path d='M3 12L12 5l9 7' strokeLinecap='round' strokeLinejoin='round' />
-				<path d='M9 21V12h6v9' strokeLinecap='round' strokeLinejoin='round' />
-			</svg>
-		</button>
+import { useLocation, useNavigate } from 'react-router-dom';
 
-		<button className='w-12 h-12 flex items-center justify-center rounded-full bg-gray-800 shadow-lg'>
-			<svg
-				width='44'
-				height='44'
-				fill='none'
-				stroke='#fff'
-				strokeWidth='4'
-				viewBox='0 0 24 24'
-			>
-				<g transform='scale(1.8) translate(-5 -5)'>
-					<path d='M12 6v12M6 12h12' strokeLinecap='round' />
-				</g>
-			</svg>
-		</button>
+const NavBar = () => {
+	const location = useLocation();
+	const navigate = useNavigate();
+	const currentPath = location.pathname;
+	const isFriendTabActive =
+		currentPath === '/social' || currentPath.startsWith('/friend/');
+	const isClosetTabActive = currentPath === '/mypage';
+	console.log(isFriendTabActive, isClosetTabActive);
 
-		<button className='w-16 h-16 flex items-center justify-center bg-white border-none'>
-			<svg
-				width='32'
-				height='32'
-				fill='none'
-				stroke='gray'
-				strokeWidth='2'
-				viewBox='0 0 24 24'
-			>
-				<circle cx='12' cy='8' r='4' />
-				<path d='M4 20c0-4 8-4 8-4s8 0 8 4' strokeLinecap='round' />
-			</svg>
-		</button>
-	</div>
-);
+	return (
+		<div
+			className='flex items-end justify-between
+     px-1.5 pb-2 h-[70px] bg-background z-99'
+		>
+			<div className='flex-1 flex justify-center items-center'>
+				<button
+					className='flex flex-col items-center justify-center gap-1.5 py-1'
+					onClick={() => navigate('/social')}
+				>
+					<img
+						src={
+							isFriendTabActive
+								? '/icons/nav_friend_selected.svg'
+								: '/icons/nav_friend_default.svg'
+						}
+						alt='nav-friends'
+					/>
+					<span
+						className={
+							isFriendTabActive
+								? 'text-navUnselected text-regualr'
+								: 'text-navUnselected text-low'
+						}
+					>
+						FRIENDS
+					</span>
+				</button>
+			</div>
+			<div className='flex justify-center items-center'>
+				<button className='flex items-center justify-center p-4 bg-regular rounded-full border-8 border-background'>
+					<img src='/icons/plus.svg' alt='nav-friends' />
+				</button>
+			</div>
+			<div className='flex-1 flex justify-center items-center'>
+				<button
+					className='flex flex-col items-center justify-center gap-1.5 py-1'
+					onClick={() => navigate('/mypage')}
+				>
+					<img
+						src={
+							isClosetTabActive
+								? '/icons/nav_closet_selected.svg'
+								: '/icons/nav_closet_default.svg'
+						}
+						alt='nav-friends'
+					/>
+					<span
+						className={
+							isClosetTabActive
+								? 'text-navUnselected text-regualr'
+								: 'text-navUnselected text-low'
+						}
+					>
+						CLOSET
+					</span>
+				</button>
+			</div>
+		</div>
+	);
+};
 
 export default NavBar;
