@@ -1,28 +1,28 @@
 import { useState } from 'react';
 import ProfileHeader from '@/features/closet/components/ProfileHeader';
 import ClosetTab from '@/features/closet/components/ClosetTab';
-import CodiTab from '@/features/closet/components/CodiTab';
-import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import SelectMenu from '@/components/menu/two-selection-menu/SelectMenu';
 import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 import { categoryConfig } from '@/constants/categoryConfig';
 
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
+import FriendCodiTab from '@/features/closet/components/FriendCodiTab';
+import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [
 	{
-		id: 'my' as const,
-		label: '나의 코디',
+		id: 'friends' as const,
+		label: '친구의 코디',
 	},
 	{
-		id: 'friends' as const,
-		label: '친구의 추천',
+		id: 'recommended' as const,
+		label: '내가 추천한 코디',
 	},
 ];
 
-const MyClosetPage = () => {
+const FriendClosetPage = () => {
 	const location = useLocation();
 	const initialTab =
 		(location.state?.initialTab as (typeof closetTab)[number]) ?? '옷장';
@@ -32,9 +32,14 @@ const MyClosetPage = () => {
 		(typeof closetTab)[number]
 	>(initialTab ?? '옷장');
 	const [selectedCategory, setSelectedCategory] = useState(categoryConfig[0]);
-	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friends'>('my');
+	const [activeSubTab, setActiveSubTab] = useState<'friends' | 'recommended'>(
+		'friends',
+	);
 
-	const { data: profile } = useMyProfile();
+	const { id } = useParams();
+	const memberId = Number(id);
+
+	const { data: profile } = useFriendProfile(memberId);
 
 	return (
 		<div className='flex flex-col h-screen overflow-y-auto bg-white w-full scrollbar-hide'>
@@ -44,7 +49,7 @@ const MyClosetPage = () => {
 					nickname={profile?.nickname}
 					code={profile?.code}
 					statusMessage={profile?.oneLiner}
-					isMe={true}
+					isMe={false}
 				/>
 				{/* 자연스러운 그라데이션 효과 */}
 				<div
@@ -87,32 +92,20 @@ const MyClosetPage = () => {
 			<div className='pb-4'>
 				{activeMainTab === '옷장' ? (
 					<ClosetTab
-						memberId={profile?.id ?? 0}
+						memberId={memberId}
 						selectedCategory={selectedCategory}
-						isMe={true}
+						isMe={false}
 					/>
 				) : (
-					<CodiTab
-						memberId={profile?.id ?? 0}
+					<FriendCodiTab
+						memberId={memberId}
 						activeSubTab={activeSubTab}
 						setActiveSubTab={setActiveSubTab}
 					/>
 				)}
 			</div>
-
-			{/* 하단 컴포넌트 */}
-			{/* <div className='flex-1 overflow-y-auto scrollbar-hide'>
-				{activeMainTab === '옷장' ? (
-					<ClosetTab
-						memberId={profile?.id ?? 0}
-						selectedCategory={selectedCategory}
-					/>
-				) : (
-					<CodiTab memberId={profile?.id ?? 0} />
-				)}
-			</div> */}
 		</div>
 	);
 };
 
-export default MyClosetPage;
+export default FriendClosetPage;

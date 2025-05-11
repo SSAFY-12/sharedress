@@ -296,7 +296,7 @@ const CodiCanvas = ({
 			onTouchEnd={isEditable ? handleCanvasClick : undefined}
 		>
 			{items.length === 0 && (
-				<div className='absolute inset-0 flex items-center justify-center text-gray-400'>
+				<div className='absolute inset-0 flex items-center justify-center text-low'>
 					{isEditable
 						? '아이템을 선택하여 코디를 만들어보세요'
 						: '선택된 아이템이 없습니다'}
@@ -363,7 +363,7 @@ const CodiCanvas = ({
 								onMouseDown={(e) => handleTransformStart(e, item)}
 								onTouchStart={(e) => handleTransformStart(e, item)}
 							>
-								<Move size={12} className='text-gray-400' />
+								<Move size={12} className='text-descriptionColor' />
 							</div>
 
 							{/* 삭제 버튼 */}

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { postCoordinationComment } from '@/features/closet/api/myClosetApi';
+import { postCoordinationComment } from '@/features/closet/api/closetApi';
 
 export const usePostCoordinationComment = (coordinationId: number) => {
 	const queryClient = useQueryClient();

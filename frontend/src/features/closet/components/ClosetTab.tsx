@@ -6,6 +6,7 @@ import { useCloset } from '@/features/closet/hooks/useCloset';
 interface ClosetTabProps {
 	memberId: number;
 	selectedCategory: string;
+	isMe: boolean;
 }
 
 // 카테고리 ID 매핑 (API 호출용)
@@ -17,7 +18,7 @@ const CATEGORY_ID_MAP: { [key: string]: number } = {
 	기타: 5,
 };
 
-const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
+const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const navigate = useNavigate();
 
 	const categoryId =
@@ -25,8 +26,14 @@ const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
 
 	const { data: closetItems } = useCloset(memberId, categoryId);
 
+	const visibleItems = (closetItems ?? []).filter(
+		(item) => isMe || item.isPublic,
+	);
+
 	const handleItemClick = (item: ClothItem) => {
-		navigate(`/cloth/${item.id}`);
+		navigate(`/cloth/${item.id}`, {
+			state: { isMe },
+		});
 	};
 
 	return (
@@ -34,7 +41,7 @@ const ClosetTab = ({ memberId, selectedCategory }: ClosetTabProps) => {
 			<div className='flex-1 px-4'>
 				<ClothListContainer
 					items={
-						closetItems?.map((item) => ({
+						visibleItems.map((item) => ({
 							id: item.id,
 							category: selectedCategory,
 							imageUrl: item.image,

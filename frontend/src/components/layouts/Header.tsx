@@ -1,4 +1,3 @@
-import { ChevronLeft } from 'lucide-react';
 import { Badge } from '@/components/etc/badge/Badge';
 
 export interface HeaderProps {
@@ -36,11 +35,11 @@ const Header = ({
 			{showBack && (
 				<div className='flex items-center gap-1 min-w-0'>
 					<button
-						className='text-gray-600 flex items-center p-0 m-0 bg-white hover:bg-gray-50 rounded-full p-1 transition-colors'
+						className='text-gray-600 flex items-center m-0 bg-white hover:bg-gray-50 rounded-full p-1 transition-colors'
 						onClick={onBackClick}
 						aria-label='뒤로가기'
 					>
-						<ChevronLeft size={22} />
+						<img src='/icons/arrow_left_black.svg' alt='뒤로가기' />
 					</button>
 					{subtitle && (
 						<h1 className='text-[15px] text-gray-900 font-medium truncate'>

@@ -24,23 +24,28 @@ export const FriendRequestActionModal = ({
 	friend,
 }: FriendRequestActionModalProps) => {
 	const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
-		useRequest(memberId); // 특정 요청 조회
+		useRequest(isOpen ? memberId : undefined); // 모달이 열려있을 때만 요청 조회
 
-	const handleAction = () => {
+	const handleAction = async () => {
 		if (!friendRequest) return;
 
-		switch (actionType) {
-			case 'accept':
-				acceptRequest(friendRequest.id); // 친구 요청 수락
-				break;
-			case 'reject':
-				rejectRequest(friendRequest.id); // 친구 요청 거절
-				break;
-			case 'cancel':
-				cancelRequest(friendRequest.id); // 친구 요청 취소
-				break;
+		try {
+			switch (actionType) {
+				case 'accept':
+					acceptRequest(friendRequest.id); // 친구 요청 수락
+					break;
+				case 'reject':
+					rejectRequest(friendRequest.id); // 친구 요청 거절
+					break;
+				case 'cancel':
+					cancelRequest(friendRequest.id); // 친구 요청 취소
+					break;
+			}
+			onClose();
+		} catch (error) {
+			console.error('Failed to process friend request:', error);
+			// 에러 처리 로직 추가 가능
 		}
-		onClose();
 	};
 
 	const getActionButtonText = () => {
@@ -64,21 +69,21 @@ export const FriendRequestActionModal = ({
 		>
 			<MainModal.Header>
 				<MainModal.Body>
-					<div className='flex flex-col items-center'>
+					<div className='flex flex-col items-center gap-2 py-4'>
 						<UserMiniAvatar
 							src={getOptimizedImageUrl(friend.profileImage)}
 							size='lg'
-							className='mb-3'
+							className='mb-2'
 						/>
 						<h2 className='font-bold mb-1'>{friend.nickname}</h2>
-						<div className='mt-4 mb-2 text-sm text-gray-600'>
+						<div className='mb-2 text-sm text-gray-600 w-full text-left'>
 							{friendRequest.message}
 						</div>
 						<PrimaryBtn
 							size='compact'
 							name={getActionButtonText()}
 							color='black'
-							className='w-full'
+							className='w-full bg-[#3A3636] text-white mt-1'
 							onClick={handleAction}
 						/>
 					</div>

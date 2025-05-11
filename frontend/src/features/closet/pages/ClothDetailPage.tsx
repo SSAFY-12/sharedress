@@ -1,5 +1,5 @@
 import ClothDetailItem from '@/features/closet/components/ClothDetailItem';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 import { useState } from 'react';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
@@ -8,8 +8,10 @@ import { ImageDetailView } from '@/containers/ImageDetailView';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const { id } = useParams();
 	const clothId = Number(id);
+	const isMe = location.state?.isMe ?? false;
 
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -56,7 +58,7 @@ const ClothDetailPage = () => {
 						imageUrl: cloth.image,
 						category: cloth.category.name,
 					}}
-					showMoreButton={true}
+					showMoreButton={isMe}
 					onMoreButtonClick={handleMenuClick}
 				>
 					<div className='px-4 flex flex-col gap-6'>

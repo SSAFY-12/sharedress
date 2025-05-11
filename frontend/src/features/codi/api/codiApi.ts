@@ -23,6 +23,7 @@ interface SaveCodiRequest {
 
 export const myCodiSaveApi = async (data: SaveCodiRequest) => {
 	const response = await client.post('api/coordinations/my', data);
+	console.log(response.data);
 	return response.data;
 };
 
