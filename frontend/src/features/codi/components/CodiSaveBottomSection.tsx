@@ -10,6 +10,7 @@ interface CodiSaveBottomSectionProps {
 		e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => void;
 	onPublicToggle: () => void;
+	mode: 'my' | 'recommended';
 }
 
 const CodiSaveBottomSection = ({
@@ -18,6 +19,7 @@ const CodiSaveBottomSection = ({
 	isLoading,
 	onDescriptionChange,
 	onPublicToggle,
+	mode,
 }: CodiSaveBottomSectionProps) => (
 	<div className='p-4 flex-1'>
 		{isLoading ? (
@@ -40,10 +42,14 @@ const CodiSaveBottomSection = ({
 						onChange={onDescriptionChange}
 					/>
 				</div>
-				<div className='flex items-center justify-between'>
-					<span className='text-default text-regular'>다른 사람에게 공개</span>
-					<SwitchToggle checked={isPublic} onToggle={onPublicToggle} />
-				</div>
+				{mode === 'my' && (
+					<div className='flex items-center justify-between'>
+						<span className='text-default text-regular'>
+							다른 사람에게 공개
+						</span>
+						<SwitchToggle checked={isPublic} onToggle={onPublicToggle} />
+					</div>
+				)}
 			</>
 		)}
 	</div>

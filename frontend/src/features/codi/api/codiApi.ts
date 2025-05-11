@@ -13,10 +13,10 @@ interface CodiItem {
 	rotation: number;
 }
 
-interface SaveCodiRequest {
+export interface SaveCodiRequest {
 	title: string;
 	description: string;
-	isPublic: boolean;
+	isPublic?: boolean;
 	isTemplate: boolean;
 	items: CodiItem[];
 }
@@ -27,22 +27,14 @@ export const myCodiSaveApi = async (data: SaveCodiRequest) => {
 	return response.data;
 };
 
-export const uploadCodiImage = async (
-	coordinationsId: number,
-	file: File,
-): Promise<string> => {
-	const formData = new FormData();
-	formData.append('file', file);
-
-	const response = await client.patch(
-		`api/coordinations/${coordinationsId}/thumbnail`,
-		formData,
-		{
-			headers: {
-				'Content-Type': 'multipart/form-data',
-			},
-		},
+export const recommendedCodiSaveApi = async (
+	friendId: string,
+	data: Omit<SaveCodiRequest, 'isPublic'>,
+) => {
+	const response = await client.post(
+		`api/coordinations/friends/${friendId}`,
+		data,
 	);
-
-	return response.data.content.thumbnail;
+	console.log(response.data.content);
+	return response.data.content;
 };

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Header from '@/components/layouts/Header';
 import CodiCanvas from '@/features/codi/components/CodiCanvas';
@@ -17,8 +17,14 @@ const CATEGORIES = [
 
 const CodiEditPage = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const mode = location.state?.mode ?? 'my';
+	const targetMemberId = location.state?.targetMemberId ?? 0;
 
-	const memberId = useProfileStore((state) => state.getMyId()) ?? 0;
+	const isRecommendedMode = mode === 'recommended';
+	const memberId = isRecommendedMode
+		? targetMemberId
+		: useProfileStore((state) => state.getMyId()) ?? 0;
 
 	// 카테고리 상태
 	const [activeCategory, setActiveCategory] = useState('all');
@@ -106,7 +112,20 @@ const CodiEditPage = () => {
 
 	const handleNextClick = () => {
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
-		navigate('/codi/save');
+		if (isRecommendedMode) {
+			navigate('/codi/save', {
+				state: {
+					mode: 'recommended',
+					targetMemberId: memberId,
+				},
+			});
+		} else {
+			navigate('/codi/save', {
+				state: {
+					mode: 'my',
+				},
+			});
+		}
 	};
 
 	const headerProps = {

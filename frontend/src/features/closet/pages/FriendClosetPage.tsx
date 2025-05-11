@@ -50,6 +50,7 @@ const FriendClosetPage = () => {
 					code={profile?.code}
 					statusMessage={profile?.oneLiner}
 					isMe={false}
+					memberId={memberId}
 				/>
 				{/* 자연스러운 그라데이션 효과 */}
 				<div

@@ -1,6 +1,7 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileHeaderProps {
 	profileImage?: string;
@@ -8,6 +9,7 @@ interface ProfileHeaderProps {
 	code?: string;
 	statusMessage?: string;
 	isMe?: boolean;
+	memberId?: number;
 }
 
 const backgroundImages = [
@@ -23,11 +25,25 @@ const ProfileHeader = ({
 	code,
 	statusMessage,
 	isMe,
+	memberId,
 }: ProfileHeaderProps) => {
 	const selectedBackgroundImage = useMemo(() => {
 		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
 		return backgroundImages[randomIndex];
 	}, []);
+
+	const navigate = useNavigate();
+
+	const handleRecommendClick = () => {
+		if (!memberId) return;
+
+		navigate('/codi/edit', {
+			state: {
+				mode: 'recommended',
+				targetMemberId: memberId.toString(),
+			},
+		});
+	};
 
 	return (
 		<div className='relative w-full min-h-[37.5vh]'>
@@ -85,7 +101,7 @@ const ProfileHeader = ({
 								<PrimaryBtn
 									size='full'
 									name='코디 추천하기'
-									onClick={() => console.log('코디 추천하기 클릭')}
+									onClick={handleRecommendClick}
 									color='white'
 								/>
 							)}
