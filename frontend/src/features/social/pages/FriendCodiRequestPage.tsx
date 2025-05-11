@@ -1,9 +1,17 @@
 import { SearchBar } from '@/components/inputs/search-bar';
 import { UserRowItem } from '@/containers/UserRowItem';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getOptimizedImageUrl } from '@/utils/imageUtils'; // 이미지 최적화
 import useFriendList from '@/features/social/hooks/useFriendList';
 import useSearchFriend from '@/features/social/hooks/useSearchFriend';
+import { CodiRequestMsgModal } from '@/features/social/components/CodiRequestMsgModal';
+import { useCodiRequest } from '@/features/social/hooks/useCodiRequest';
+
+export interface Friend {
+	nickname: string;
+	profileImage: string;
+	receiverId: number;
+}
 
 // 메인 컴포넌트
 export const FriendCodiRequestPage = () => {
@@ -29,17 +37,43 @@ export const FriendCodiRequestPage = () => {
 		}
 	};
 
+	// 선택된 친구
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+	const handleRequestClick = (request: Friend) => {
+		setSelectedFriend({
+			receiverId: request.receiverId,
+			nickname: request.nickname,
+			profileImage: request.profileImage,
+		});
+		setIsModalOpen(true);
+	};
+
+	const handleConfirm = () => {
+		onSubmit();
+		setIsModalOpen(false);
+	};
+
+	const { register, watch, onSubmit, setValue } = useCodiRequest(
+		selectedFriend?.receiverId ?? 0,
+	);
+
 	// 친구 검색 이름 제한 20글자이내
 	return (
-		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
+		<div className='flex flex-col w-full h-full mx-auto bg-white gap-3.5 px-4 pt-2'>
 			{/* 검색 영역 */}
-			<div className='py-3 px-3'>
-				<SearchBar
-					placeholder='친구 검색 (최대 20자)'
-					value={searchValue}
-					onChange={handleSearchChange}
-					onKeyDown={handleSearch}
-				/>
+			<SearchBar
+				placeholder='친구 검색'
+				value={searchValue}
+				onChange={handleSearchChange}
+				onKeyDown={handleSearch}
+			/>
+
+			<div className='flex w-full py-4 my-2.5 border border-dashed border-gray-300 rounded-2xl'>
+				<span className='w-full text-button text-low'>
+					{' '}
+					외부에 코디 추천 요청{' '}
+				</span>
 			</div>
 
 			{/* 친구 목록 영역 */}
@@ -49,12 +83,15 @@ export const FriendCodiRequestPage = () => {
 						//id, nickname, profileImage, oneLiner
 						<UserRowItem
 							key={friend.id}
+							userId={friend.id}
 							userName={friend.nickname}
 							userAvatar={getOptimizedImageUrl(friend.profileImage)}
 							userStatus={friend.oneLiner}
-							actionType='arrow'
-							onClick={() => console.log('Navigate to user profile')}
-							// user 클릭시 프로필 이동
+							actionType='button'
+							actionButtonText='코디 요청'
+							codiRequestClick={(request: Friend) =>
+								handleRequestClick(request)
+							}
 						/>
 					))}
 				</div>
@@ -65,18 +102,31 @@ export const FriendCodiRequestPage = () => {
 						searchMyFriend.map((friend) => (
 							<UserRowItem
 								key={friend.id}
+								userId={friend.id}
 								userName={friend.nickname}
 								userAvatar={getOptimizedImageUrl(friend.profileImage)}
 								userStatus={friend.oneLiner}
-								actionType='arrow'
-								onClick={() => console.log('Navigate to user profile')}
-								//user 클릭시 프로필 이동
+								actionType='button'
+								actionButtonText='코디 요청'
+								codiRequestClick={(request: Friend) =>
+									handleRequestClick(request)
+								}
 							/>
 						))
 					) : (
 						<p>검색 결과가 없습니다.</p>
 					)}
 				</div>
+			)}
+			{isModalOpen && selectedFriend && (
+				<CodiRequestMsgModal
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+					friend={selectedFriend}
+					message={watch('message')}
+					onMessageChange={(value) => setValue('message', value)}
+					onConfirm={handleConfirm}
+				/>
 			)}
 		</div>
 	);
