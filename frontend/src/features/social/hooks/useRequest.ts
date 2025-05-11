@@ -53,6 +53,7 @@ const useRequest = (memberId?: number) => {
 		mutationFn: (requestId: number) => socialApi.cancelFriendRequest(requestId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['searchUser'] }); // 친구 요청 취소 성공 시 친구 검색 목록 갱신
+			queryClient.invalidateQueries({ queryKey: ['friendRequests'] }); // 친구 요청 목록 갱신
 		},
 	});
 
