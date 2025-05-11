@@ -2,7 +2,7 @@ import { ClothItem } from '@/components/cards/cloth-card';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useNavigate } from 'react-router-dom';
 import { useCoordinationList } from '@/features/closet/hooks/useCoordinationList';
-import { useRecommendedToFriend } from '../hooks/useRecommendedToFriend';
+import { useRecommendedToFriend } from '@/features/closet/hooks/useRecommendedToFriend';
 
 interface FriendCodiTabProps {
 	memberId: number;

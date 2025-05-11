@@ -7,8 +7,8 @@ import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 import { categoryConfig } from '@/constants/categoryConfig';
 
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
-import FriendCodiTab from '../components/FriendCodiTab';
-import { useFriendProfile } from '../hooks/useFriendProfile';
+import FriendCodiTab from '@/features/closet/components/FriendCodiTab';
+import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [
