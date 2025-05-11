@@ -52,6 +52,8 @@ const CodiSavePage = () => {
 				items: formattedItems,
 			};
 
+			console.log(payload);
+
 			await myCodiSaveApi(payload);
 			alert('코디가 저장되었습니다!');
 			navigate('/');
@@ -79,7 +81,7 @@ const CodiSavePage = () => {
 	};
 
 	return (
-		<div className='max-w-md mx-auto h-screen flex flex-col bg-white'>
+		<div className='w-full h-screen flex flex-col bg-white'>
 			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-auto'>
 				{isLoading ? (
