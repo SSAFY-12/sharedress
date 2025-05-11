@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getMyProfile } from '@/features/closet/api/myClosetApi';
+import { getMyProfile } from '@/features/closet/api/closetApi';
 import { useProfileStore } from '@/store/useProfileStore';
 
 export const useMyProfile = () => {

@@ -1,12 +1,15 @@
 import client from '@/api/client';
 
-export interface MemberProfile {
+export interface Profile {
 	id: number;
 	email: string;
 	nickname: string;
 	code: string;
 	profileImage: string;
 	oneLiner: string;
+}
+
+export interface MemberProfile extends Profile {
 	isPublic: boolean;
 	notificationStatus: boolean;
 }
@@ -207,4 +210,16 @@ export const deleteCoordinationComment = async ({
 		`/api/coordinations/${coordinationId}/comments/${commentId}`,
 	);
 	return response.data;
+};
+
+export const fetchFriendProfile = async (
+	memberId: number,
+): Promise<Profile> => {
+	const response = await client.get(`api/members/${memberId}/profile`);
+	return response.data.content;
+};
+
+export const fetchRecommendedToFriend = async (memberId: number) => {
+	const response = await client.get(`/api/coordinations/friends/${memberId}`);
+	return response.data.content as CoordinationItem[];
 };

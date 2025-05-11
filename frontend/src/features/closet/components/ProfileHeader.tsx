@@ -7,6 +7,7 @@ interface ProfileHeaderProps {
 	nickname?: string;
 	code?: string;
 	statusMessage?: string;
+	isMe?: boolean;
 }
 
 const backgroundImages = [
@@ -21,6 +22,7 @@ const ProfileHeader = ({
 	nickname,
 	code,
 	statusMessage,
+	isMe,
 }: ProfileHeaderProps) => {
 	const selectedBackgroundImage = useMemo(() => {
 		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
@@ -72,12 +74,21 @@ const ProfileHeader = ({
 							{statusMessage}
 						</p>
 						<div className='w-full px-4'>
-							<PrimaryBtn
-								size='full'
-								name='프로필 수정하기'
-								onClick={() => console.log('프로필 수정 클릭')}
-								color='white'
-							/>
+							{isMe ? (
+								<PrimaryBtn
+									size='full'
+									name='프로필 수정하기'
+									onClick={() => console.log('프로필 수정 클릭')}
+									color='white'
+								/>
+							) : (
+								<PrimaryBtn
+									size='full'
+									name='코디 추천하기'
+									onClick={() => console.log('코디 추천하기 클릭')}
+									color='white'
+								/>
+							)}
 						</div>
 					</div>
 				</div>
