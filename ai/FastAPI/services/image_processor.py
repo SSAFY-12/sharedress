@@ -1,19 +1,13 @@
-# services/image_processor.py
-import base64
-import logging
+import base64, logging, requests, cv2, numpy as np, torch
 from io import BytesIO
 from typing import List, Tuple
 
-import aiohttp
-import cv2
-import numpy as np
-import requests
-import torch
 import torch.serialization as ts
 from PIL import Image
 from openai import OpenAI
 from rembg import remove
 from ultralytics import YOLO
+import open_clip
 
 from config import OPENAI_API_KEY
 
@@ -21,161 +15,146 @@ logger = logging.getLogger(__name__)
 
 
 class ImageProcessor:
-    """이미지 다운로드 → 모델 컷 필터링 → 배경 제거 → 필요 시 DALL·E 생성"""
+    """URL 리스트 → '사람 없는' 상품컷 선별 → rembg →(없으면) DALL·E 3 생성"""
 
-    # ------------------------------------------------------------------ #
-    # 초기화
-    # ------------------------------------------------------------------ #
     def __init__(self) -> None:
-        self._init_models()
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    def _init_models(self) -> None:
-        # ----------------------------------
-        # 1) YOLOv8 - person detection
-        # ----------------------------------
+        # YOLO ‒ person
         try:
             logger.info("Initializing YOLOv8 …")
-
-            # PyTorch ≥2.6 : weights_only=True 가 기본 → 전체 로드 강제
             ts.add_safe_globals(
-                [("ultralytics.nn.tasks.DetectionModel", "ultralytics.nn.tasks.DetectionModel")]
+                [("ultralytics.nn.tasks.DetectionModel",
+                  "ultralytics.nn.tasks.DetectionModel")]
             )
-            self.yolo_model = YOLO("yolov8n.pt", weights_only=False).to(
-                "cuda" if torch.cuda.is_available() else "cpu"
-            )
-
+            self.yolo = YOLO("yolov8n.pt")
+            self.yolo.model.to(self.device)
         except Exception as e:
-            logger.error(f"Failed to initialize YOLOv8: {e}")
-            self.yolo_model = None
+            logger.error("YOLO init failed: %s", e)
+            self.yolo = None
 
-        # ----------------------------------
-        # 2) OpenAI 이미지 생성
-        # ----------------------------------
-        self.openai_client = OpenAI(api_key=OPENAI_API_KEY)
+        # OpenAI (DALL·E3)
+        self.openai = OpenAI(api_key=OPENAI_API_KEY)
 
-    # ------------------------------------------------------------------ #
-    # 내부 유틸
-    # ------------------------------------------------------------------ #
+        # Fashion-CLIP
+        try:
+            m = "hf-hub:Marqo/marqo-fashionCLIP"
+            self.clip, _, self.clip_pp = open_clip.create_model_and_transforms(m)
+            self.clip = self.clip.to(self.device).eval()
+            tok = open_clip.get_tokenizer(m)
+            with torch.no_grad():
+                t = tok(["studio product photo of clothing", "model wearing clothing"])
+                t = t.to(self.device)  # 텍스트 토큰을 디바이스로 이동
+                vec = self.clip.encode_text(t)
+                vec = vec / vec.norm(dim=-1, keepdim=True)
+                self.txt_prod = vec[0].to(self.device)
+                self.txt_wear = vec[1].to(self.device)
+            logger.info("CLIP ready")
+        except Exception as e:
+            logger.error("CLIP init failed: %s", e)
+            # GPU 문제 시 CPU로 전환
+            self.device = "cpu"
+            # CPU 모드로 다시 초기화
+            m = "hf-hub:Marqo/marqo-fashionCLIP"
+            self.clip, _, self.clip_pp = open_clip.create_model_and_transforms(m)
+            self.clip = self.clip.to(self.device).eval()
+            tok = open_clip.get_tokenizer(m)
+            with torch.no_grad():
+                t = tok(["studio product photo of clothing", "model wearing clothing"])
+                t = t.to(self.device)
+                vec = self.clip.encode_text(t)
+                vec = vec / vec.norm(dim=-1, keepdim=True)
+                self.txt_prod = vec[0].to(self.device)
+                self.txt_wear = vec[1].to(self.device)
+            logger.info("CLIP ready (CPU mode)")
+
     @staticmethod
-    def _download_image(image_url: str) -> Tuple[BytesIO, Image.Image]:
-        resp = requests.get(image_url, timeout=10)
-        resp.raise_for_status()
-        buf = BytesIO(resp.content)
+    def _download(url: str) -> Tuple[BytesIO, Image.Image]:
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        buf = BytesIO(r.content)
         return buf, Image.open(buf).convert("RGB")
 
-    # ---------------------------------- #
-    # YOLO person detection
-    # ---------------------------------- #
-    def has_person(self, pil_img: Image.Image) -> bool:
-        if self.yolo_model is None:
-            logger.warning("YOLOv8 model not initialized.")
+    def _has_person(self, img: Image.Image) -> bool:
+        if not self.yolo:
             return False
+        out = self.yolo.predict(img,
+                                device=0 if self.device == "cuda" else "cpu",
+                                verbose=False)
+        return any(int(b.cls) == 0 and float(b.conf) > .45
+                   for r in out for b in r.boxes)
 
-        try:
-            results = self.yolo_model.predict(
-                pil_img,
-                device=0 if torch.cuda.is_available() else "cpu",
-                verbose=False,
-            )
-            for res in results:
-                for box in res.boxes:
-                    cls = int(box.cls.item())
-                    conf = float(box.conf.item())
-                    if cls == 0 and conf > 0.5:  # 0 == person
-                        return True
-            return False
-        except Exception as e:
-            logger.error(f"YOLO person detection error: {e}")
-            return False
+    def _product_score(self, img: Image.Image) -> float:
+        with torch.no_grad():
+            tensor_img = self.clip_pp(img).unsqueeze(0).to(self.device)
+            v = self.clip.encode_image(tensor_img)
+            v = v / v.norm(dim=-1, keepdim=True)
+        # 모든 텐서가 같은 디바이스에 있는지 확인
+        prod_score = (v @ self.txt_prod.T).item()
+        wear_score = (v @ self.txt_wear.T).item()
+        return prod_score - wear_score
 
-    # ---------------------------------- #
-    # 배경 균일도 체크
-    # ---------------------------------- #
-    @staticmethod
-    def has_uniform_background(pil_img: Image.Image) -> bool:
-        try:
-            img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
-            blr = cv2.GaussianBlur(img, (21, 21), 0)
-
-            b, g, r = cv2.split(blr)
-            h, w = img.shape[:2]
-            border = max(h, w) // 10
-            mask = np.zeros((h, w), np.uint8)
-            mask[:border, :] = 255
-            mask[-border:, :] = 255
-            mask[:, :border] = 255
-            mask[:, -border:] = 255
-
-            std = np.mean([np.std(c[mask > 0]) for c in (r, g, b)])
-            return std < 30
-        except Exception as e:
-            logger.error(f"Uniform-background check failed: {e}")
-            return False
-
-    # ---------------------------------- #
-    # rembg 배경제거
-    # ---------------------------------- #
     @staticmethod
     def remove_background(buf: BytesIO) -> BytesIO:
         try:
-            output = remove(buf.getvalue())
-            return BytesIO(output)
+            return BytesIO(remove(buf.getvalue()))
         except Exception as e:
-            logger.error(f"rembg background removal failed: {e}")
+            logger.error("rembg error: %s", e)
             return buf
 
-    # ---------------------------------- #
-    # DALL·E 3 이미지 생성
-    # ---------------------------------- #
-    def generate_product_image(self, image_url: str, category_name: str) -> BytesIO | None:
+    def _generate(self, category: str) -> BytesIO | None:
         try:
-            prompt = (
-                f"{category_name} 의류만 깔끔하게 잘린 PNG, 투명 배경, "
-                "studio product shot, no model, high-res"
-            )
-            resp = self.openai_client.images.generate(
-                model="GPT-image-1",
+            prompt = (f"{category} clothing isolated on transparent background, "
+                      "studio product photo, no human, high-res")
+            r = self.openai.images.generate(
+                model="gpt-image-1",
                 prompt=prompt,
                 n=1,
-                size="1024x1024",
-                response_format="b64_json",
+                size="1024x1024"
             )
-            img_bytes = base64.b64decode(resp.data[0].b64_json)
-            return BytesIO(img_bytes)
+
+            # URL에서 이미지 다운로드 (최신 API는 base64 대신 URL 반환)
+            img_url = r.data[0].url
+            response = requests.get(img_url)
+            response.raise_for_status()
+            return BytesIO(response.content)
         except Exception as e:
-            logger.error(f"DALL·E image generation failed: {e}")
+            logger.error("OpenAI gen error: %s", e)
+            return None
+    # product_processor.py에서 호출하는 메서드
+    def generate_product_image(self, _, category: str) -> BytesIO | None:
+        return self._generate(category)
+
+    def process_image(self, urls: List[str], category: str) -> BytesIO | None:
+        """사람 없는 컷을 **무조건** 우선 사용"""
+        if not urls:
             return None
 
-    # ------------------------------------------------------------------ #
-    # 공개 메서드: 이미지 리스트 처리
-    # ------------------------------------------------------------------ #
-    def process_image(self, image_urls: List[str], category_name: str) -> BytesIO | None:
-        if not image_urls:
-            logger.warning("No image URLs supplied.")
-            return None
-
-        # 1-A. 제품 단독 컷 찾기
-        for url in image_urls:
+        # ① 후보 수집: '사람 없는' 이미지 전부
+        no_person: list[Tuple[BytesIO, Image.Image, float]] = []
+        for u in urls:
             try:
-                buf, pil_img = self._download_image(url)
-                if not self.has_person(pil_img) and self.has_uniform_background(pil_img):
-                    logger.info(f"Product-only image found: {url}")
-                    return self.remove_background(buf)
+                buf, img = self._download(u)
+                if not self._has_person(img):
+                    score = self._product_score(img)
+                    no_person.append((buf, img, score))
             except Exception as e:
-                logger.warning(f"Image check failed ({url}): {e}")
+                logger.warning("DL fail %s: %s", u, e)
 
-        # 1-B. 모델 착용 컷 → DALL·E 생성
-        for url in image_urls:
-            gen = self.generate_product_image(url, category_name)
-            if gen:
-                logger.info(f"DALL·E succeeded for {url}")
-                return gen
+        # ② 가장 product-like 높은 점수 선택
+        if no_person:
+            buf, _, _ = max(no_person, key=lambda x: x[2])
+            return self.remove_background(buf)
 
-        # 1-C. 최후: 첫 번째 이미지를 강제 배경제거
+        # ③ 없으면 DALL·E3
+        gen = self._generate(category)
+        if gen:
+            return gen
+
+        # ④ 최후: 첫 번째 이미지 rembg
         try:
-            buf, _ = self._download_image(image_urls[0])
-            logger.warning("Fallback to first image + background removal.")
+            buf, _ = self._download(urls[0])
             return self.remove_background(buf)
         except Exception as e:
-            logger.error(f"Ultimate fallback failed: {e}")
+            logger.error("Ultimate fallback error: %s", e)
             return None

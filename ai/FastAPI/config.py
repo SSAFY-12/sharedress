@@ -29,3 +29,6 @@ WORKER_CONCURRENCY = int(os.getenv("WORKER_CONCURRENCY", "2"))
 
 # Database connection string
 DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
+API_DOMAIN   = os.getenv("API_DOMAIN", "https://www.sharedress.co.kr")
+AI_COMPLETE  = f"{API_DOMAIN}/api/clothes/ai-complete"

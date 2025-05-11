@@ -152,13 +152,18 @@ class HTMLExtractor:
                         logger.info(f"메타 키워드 '{keyword}'를 '{main_category}'로 매핑")
                         return main_category
 
-            # 3. 기본값 반환
-            logger.warning("카테고리를 찾을 수 없어 기본값 '상의' 반환")
-            return "상의"
 
         except Exception as e:
-            logger.error(f"카테고리 추출 중 오류: {e}")
-            return "상의"  # 기본 카테고리
+            crumbs = [a.get("data-category-name") or a.text.strip()
+                      for a in soup.select('a[data-category-name]')][:2]
+            valid = {"상의","아우터","하의","신발","악세사리"}
+            for c in crumbs:
+                if c in valid:
+                    logger.info("breadcrumb 선택: %s", c)
+                    return c
+
+        logger.warning("카테고리를 찾지 못해 기본값 '상의' 사용")
+        return "상의"
 
     def _extract_image_urls(self, url: str, soup: BeautifulSoup, desired_color: Optional[str] = None) -> List[str]:
         """상품 이미지 URL 추출"""

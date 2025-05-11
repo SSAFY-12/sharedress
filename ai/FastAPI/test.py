@@ -1,4 +1,27 @@
-import torch, torchvision, torchaudio, onnxruntime as ort
-print(torch.__version__, torchvision.__version__, torchaudio.__version__)
-print("CUDA 사용 가능?", torch.cuda.is_available())
-print("ONNX Runtime 디바이스:", ort.get_device())
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# 각 모듈을 하나씩 가져와보기
+try:
+    print("Importing HTMLExtractor...")
+    from services.html_extractor import HTMLExtractor
+    print("Success!")
+except Exception as e:
+    print(f"Error importing HTMLExtractor: {e}")
+
+try:
+    print("Importing ImageProcessor...")
+    from services.image_processor import ImageProcessor
+    print("Success!")
+except Exception as e:
+    print(f"Error importing ImageProcessor: {e}")
+
+try:
+    print("Creating instances...")
+    html_extractor = HTMLExtractor()
+    image_processor = ImageProcessor()
+    print("Success!")
+except Exception as e:
+    print(f"Error creating instances: {e}")
+
+print("Test completed")

@@ -7,7 +7,6 @@ from pyngrok import ngrok
 import os
 
 from config import WORKER_CONCURRENCY
-from models.db_models import init_db
 from services.sqs_service import SQSService
 from services.product_processor import ProductProcessor
 from services.purchase_processor import PurchaseProcessor
@@ -31,7 +30,6 @@ message_queue = asyncio.Queue()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize database
-    init_db()
 
     # 외부 ngrok URL 로그 표시
     ngrok_url = os.environ.get("NGROK_URL", "https://sharedress-ai.ngrok.io")
