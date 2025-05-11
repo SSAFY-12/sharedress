@@ -37,7 +37,11 @@ export const router = createBrowserRouter([
 				element: <CodiPage />,
 			},
 			{
+<<<<<<< HEAD
 				path: 'social/*',
+=======
+				path: 'social',
+>>>>>>> a6a3bd883ee94951ebed0baa5b6dc4587db55094
 				element: <FriendPage />,
 			},
 			{
