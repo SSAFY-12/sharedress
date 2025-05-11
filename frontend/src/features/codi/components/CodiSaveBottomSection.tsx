@@ -26,10 +26,10 @@ const CodiSaveBottomSection = ({
 			</div>
 		) : (
 			<>
-				<div className='mb-6'>
+				<div className='mb-9'>
 					<label
 						htmlFor='description'
-						className='block text-sm font-medium text-gray-700 mb-2 text-left'
+						className='block text-description text-low mb-2 text-left'
 					>
 						코디 설명
 					</label>
@@ -41,9 +41,7 @@ const CodiSaveBottomSection = ({
 					/>
 				</div>
 				<div className='flex items-center justify-between'>
-					<span className='text-sm font-medium text-gray-700'>
-						다른 사람에게 공개
-					</span>
+					<span className='text-default text-regular'>다른 사람에게 공개</span>
 					<SwitchToggle checked={isPublic} onToggle={onPublicToggle} />
 				</div>
 			</>
