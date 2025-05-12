@@ -13,6 +13,7 @@ import { useCopyCoordination } from '@/features/closet/hooks/useCopyCoordination
 import { useDeleteCoordination } from '@/features/closet/hooks/useDeleteCoordinations';
 import { useDeleteCoordinationComment } from '@/features/closet/hooks/useDeleteCoordinationComment';
 import { ImageDetailView } from '@/containers/ImageDetailView';
+import Header from '@/components/layouts/Header';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
@@ -63,7 +64,7 @@ const CodiDetailPage = () => {
 	};
 
 	const handleEdit = () => {
-		console.log('수정하기 클릭');
+		navigate(`/codi/${coordinationId}/edit`);
 		setIsMenuOpen(false);
 	};
 
@@ -124,6 +125,14 @@ const CodiDetailPage = () => {
 			},
 			onError: () => {
 				alert('코디 추가에 실패했습니다.');
+			},
+		});
+	};
+
+	const handleBackClick = () => {
+		navigate('/mypage', {
+			state: {
+				initialTab: '코디',
 			},
 		});
 	};
@@ -195,6 +204,7 @@ const CodiDetailPage = () => {
 
 	return (
 		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
+			<Header showBack={true} onBackClick={handleBackClick} />
 			{/* 메인 콘텐츠 */}
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
 				<ImageDetailView

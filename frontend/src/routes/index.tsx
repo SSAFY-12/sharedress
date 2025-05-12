@@ -6,17 +6,13 @@ import AuthPage from '@/pages/AuthPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MyClosetPage from '@/features/closet/pages/MyClosetPage';
-import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
-import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
 import RegistPage from '@/pages/RegistPage';
-import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import NotificationPage from '@/pages/NotificationPage';
-import CodiEditPage from '@/features/codi/pages/CodiEditPage';
-import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
+import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
 
 // 인증된 사용자만 접근 가능한 라우트
@@ -103,6 +99,14 @@ export const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<CodiPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/codi/:id/edit',
+				element: (
+					<ProtectedRoute>
+						<CodiPublicEditPage />
 					</ProtectedRoute>
 				),
 			},
