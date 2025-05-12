@@ -35,6 +35,13 @@ const InitialRoute = () => {
 };
 
 export const router = createBrowserRouter([
+	// 공개 라우트
+	{ path: '/auth', element: <AuthPage /> },
+	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
+	{ path: '/link/:code', element: <ExternalUserPage /> },
+	{ path: '/friend/:id', element: <FriendClosetPage /> }, // <-- App 없이 바로!
+
+	// 인증 필요 라우트
 	{
 		path: '/',
 		element: <App />,
@@ -75,14 +82,14 @@ export const router = createBrowserRouter([
 					</ProtectedRoute>
 				),
 			},
-			{
-				path: 'friend/:id',
-				element: (
-					<ProtectedRoute>
-						<FriendClosetPage />
-					</ProtectedRoute>
-				),
-			},
+			// {
+			// 	path: 'friend/:id',
+			// 	element: (
+			// 		<PublicRoute>
+			// 			<FriendClosetPage />
+			// 		</PublicRoute>
+			// 	),
+			// },
 			{
 				path: 'cloth/*',
 				element: (
@@ -104,17 +111,5 @@ export const router = createBrowserRouter([
 				element: <Navigate to='/' replace />,
 			},
 		],
-	},
-	{
-		path: '/auth',
-		element: <AuthPage />,
-	},
-	{
-		path: '/oauth/google/callback',
-		element: <GoogleCallbackHandler />,
-	},
-	{
-		path: '/link/:code',
-		element: <ExternalUserPage />,
 	},
 ]);
