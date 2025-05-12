@@ -6,17 +6,13 @@ import AuthPage from '@/pages/AuthPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MyClosetPage from '@/features/closet/pages/MyClosetPage';
-import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
-import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
 import RegistPage from '@/pages/RegistPage';
-import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import NotificationPage from '@/pages/NotificationPage';
-import CodiEditPage from '@/features/codi/pages/CodiEditPage';
-import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
+import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
 import MyPage from '@/pages/MyPage';
 
@@ -36,6 +32,13 @@ const InitialRoute = () => {
 };
 
 export const router = createBrowserRouter([
+	// 공개 라우트
+	{ path: '/auth', element: <AuthPage /> },
+	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
+	{ path: '/link/:code', element: <ExternalUserPage /> },
+	{ path: '/friend/:id', element: <FriendClosetPage /> }, // <-- App 없이 바로!
+
+	// 인증 필요 라우트
 	{
 		path: '/',
 		element: <App />,
@@ -76,14 +79,14 @@ export const router = createBrowserRouter([
 					</ProtectedRoute>
 				),
 			},
-			{
-				path: 'friend/:id',
-				element: (
-					<ProtectedRoute>
-						<FriendClosetPage />
-					</ProtectedRoute>
-				),
-			},
+			// {
+			// 	path: 'friend/:id',
+			// 	element: (
+			// 		<PublicRoute>
+			// 			<FriendClosetPage />
+			// 		</PublicRoute>
+			// 	),
+			// },
 			{
 				path: 'cloth/*',
 				element: (
@@ -101,21 +104,17 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
+				path: '/codi/:id/edit',
+				element: (
+					<ProtectedRoute>
+						<CodiPublicEditPage />
+					</ProtectedRoute>
+				),
+			},
+			{
 				path: '*',
 				element: <Navigate to='/' replace />,
 			},
 		],
-	},
-	{
-		path: '/auth',
-		element: <AuthPage />,
-	},
-	{
-		path: '/oauth/google/callback',
-		element: <GoogleCallbackHandler />,
-	},
-	{
-		path: '/link/:code',
-		element: <ExternalUserPage />,
 	},
 ]);

@@ -4,7 +4,6 @@ import {
 	myCodiSaveApi,
 	recommendedCodiSaveApi,
 	SaveCodiRequest,
-	captureCanvasImage,
 	uploadCodiThumbnail,
 } from '@/features/codi/api/codiApi';
 import Header from '@/components/layouts/Header';
@@ -12,6 +11,7 @@ import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
 import { base64ToFile } from '@/features/codi/utils/base64ToFile';
 import LoadingOverlay from '@/features/codi/components/LoadingOverlay';
+import { captureCanvasImageWithRetry } from '@/features/codi/utils/captureCanvasImageWithRetry';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
@@ -80,7 +80,7 @@ const CodiSavePage = () => {
 			const container = document.getElementById('codi-canvas');
 			if (!container) throw new Error('코디 캔버스를 찾을 수 없습니다.');
 
-			const base64 = await captureCanvasImage(container);
+			const base64 = await captureCanvasImageWithRetry(container, 2);
 			console.log('base64:', base64);
 
 			const file = base64ToFile(base64, 'codi.png', 'image/png');

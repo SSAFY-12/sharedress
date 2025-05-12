@@ -53,7 +53,9 @@ export const captureCanvasImage = async (
 	);
 	await waitAllImagesLoaded(element);
 	await replaceImageWithBase64(element);
-	await new Promise((r) => requestAnimationFrame(r));
+	await new Promise((r) =>
+		requestAnimationFrame(() => requestAnimationFrame(r)),
+	);
 
 	const canvas = await html2canvas(element, {
 		useCORS: true,

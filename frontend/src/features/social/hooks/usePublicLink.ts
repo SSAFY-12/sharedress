@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { publicApi } from '@/features/social/api/socialApi';
-import { useEffect } from 'react';
 
 interface PublicLinkResponse {
 	content: string;

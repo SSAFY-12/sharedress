@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { profileModifyApi, Profile } from '../api/socialApi';
+import { profileModifyApi, Profile } from '@/features/social/api/socialApi';
 import { useProfileStore } from '@/store/useProfileStore';
 
 export const useModifyProfile = () => {
