@@ -18,6 +18,6 @@ class PurchaseProcessingResult(BaseModel):
     color_id: int
     color_name: str
     color_hex: str
-    image_uri: str
+    image_url: str
     processing_status: str
     message_id: Optional[str] = None

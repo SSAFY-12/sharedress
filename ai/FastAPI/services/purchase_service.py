@@ -36,7 +36,7 @@ class PurchaseProcessor:
                     color_id=product_result.color_id,
                     color_name=product_result.color_name,
                     color_hex=product_result.color_hex,
-                    image_uri=product_result.image_uri,
+                    image_url=product_result.image_url,
                     processing_status=product_result.processing_status,
                     message_id=message_id
                 )
@@ -55,7 +55,7 @@ class PurchaseProcessor:
                     color_id=1,  # Default to black warm
                     color_name="블랙 웜",
                     color_hex="#000000",
-                    image_uri="",
+                    image_url="",
                     processing_status="ERROR",
                     message_id=message_id
                 )

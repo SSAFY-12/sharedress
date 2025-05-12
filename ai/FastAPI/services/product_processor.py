@@ -47,13 +47,21 @@ class ProductProcessor:
             if "error" in html:
                 return self._err(url, message_id, html["error"])
 
+            # 카테고리 확인 - 지원되는 카테고리인지 검사
+            cat_txt = html.get("category_text", "상의")
+            valid_categories = ["상의", "하의", "아우터", "신발", "악세사리", "악세서리"]
+
+            if cat_txt not in valid_categories:
+                logger.warning(f"카테고리 '{cat_txt}' 지원하지 않음. 처리 중단: {url}")
+                return self._err(url, message_id, f"지원되지 않는 카테고리: {cat_txt}")
+
             # 1) 이미지 확보 → ImageProcessor 로 배경 제거 or 생성
             img_urls: List[str] = html.get("image_urls", [])
             buf = None
             if img_urls:
-                buf = self.image_processor.process_image(img_urls, html.get("category_text", "상의"))
+                buf = self.image_processor.process_image(img_urls, cat_txt)
             if not buf:
-                buf = self.image_processor.generate_product_image(None, html.get("category_text", "상의"))
+                buf = self.image_processor.generate_product_image(None, cat_txt)
 
             if not buf:
                 return self._err(url, message_id, "이미지 처리 실패")
@@ -67,7 +75,6 @@ class ProductProcessor:
 
             # 3) 카테고리 → ID
             cat_map = {"상의":1,"아우터":2,"하의":3,"신발":4,"악세사리":5}
-            cat_txt = html.get("category_text", "상의")
             cat_id  = cat_map.get(cat_txt, 1)
 
             # 4) S3 업로드
@@ -89,7 +96,7 @@ class ProductProcessor:
                 color_id=cid,
                 color_name=cname,
                 color_hex=chex,
-                image_uri=uri,
+                image_url=uri,
                 processing_status="SUCCESS",
                 message_id=message_id
             )
@@ -106,6 +113,6 @@ class ProductProcessor:
             url=url, product_name="Error",
             category_id=1, category_name="상의",
             color_id=1,  color_name="블랙 웜", color_hex="#000000",
-            image_uri="", processing_status="ERROR",
+            image_url="", processing_status="ERROR",
             message_id=msg_id
         )

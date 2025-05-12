@@ -27,11 +27,11 @@ class NotificationService:
                 results_dict = result.model_dump()
 
             # Send notification
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     self.completion_api_url,
                     json=results_dict,
-                    timeout=10.0
+                    timeout=30.0
                 )
 
                 # Check response
@@ -44,5 +44,7 @@ class NotificationService:
                     return False
 
         except Exception as e:
-            logger.error(f"Exception sending completion notification: {e}")
+            import traceback
+            error_traceback = traceback.format_exc()
+            logger.error(f"Exception sending completion notification: {e}\n{error_traceback}")
             return False

@@ -99,7 +99,7 @@ class ColorExtractor:
         # 범위 기반 매칭
         best, score = None, 1e9
         for cid, (name, rng) in self.color_ranges.items():
-            h1, h2, s1, s2, v1, v2 = rng
+            (h1, h2), (s1, s2), (v1, v2) = rng
             if cid in (1, 2, 3, 4, 19, 20):     # 이미 처리
                 continue
             # Hue wrapping

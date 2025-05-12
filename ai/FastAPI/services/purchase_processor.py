@@ -40,7 +40,7 @@ class PurchaseProcessor:
                         color_id      = prod.color_id,
                         color_name    = prod.color_name,
                         color_hex     = prod.color_hex,
-                        image_uri     = prod.image_uri,
+                        image_url     =prod.image_url,
                         processing_status = prod.processing_status,
                         message_id    = message_id,
                     )
@@ -54,7 +54,7 @@ class PurchaseProcessor:
                         memberId=member_id, clothesId=item.clothesId,
                         category_id=1, category_name="상의",
                         color_id=1, color_name="블랙 웜", color_hex="#000000",
-                        image_uri="", processing_status="ERROR",
+                        image_url="", processing_status="ERROR",
                         message_id=message_id
                     )
                 )

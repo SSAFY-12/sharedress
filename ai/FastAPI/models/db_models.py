@@ -29,8 +29,8 @@ class Clothes(Base):
     __tablename__ = "clothes"
 
     id        = Column(Integer, primary_key=True, autoincrement=True)
-    # ✅ 컬럼명·속성명 모두 imageUrl 로 통일
-    imageUrl  = Column("imageUrl", String(1024), nullable=False)
+
+    image_url = Column("image_url", String(1024), nullable=False)
 
     category_id = Column(Integer, ForeignKey("category.id"), nullable=False)
     color_id    = Column(Integer, ForeignKey("color.id"),    nullable=False)

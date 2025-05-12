@@ -17,7 +17,7 @@ class DBService:
     ) -> int | None:
         try:
             row = Clothes(
-                imageUrl=image_url,        # ← imageUrl 속성 사용
+                image_url=image_url,     # ← imageUrl 속성 사용
                 category_id=category_id,
                 color_id=color_id,
             )

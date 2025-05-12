@@ -36,10 +36,10 @@ class S3Service:
             )
 
             # Generate the URI
-            image_uri = f"https://{self.bucket_name}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
-            logger.info(f"Uploaded image to S3: {image_uri}")
+            image_url = f"https://{self.bucket_name}.s3.{AWS_REGION}.amazonaws.com/{file_name}"
+            logger.info(f"Uploaded image to S3: {image_url}")
 
-            return image_uri
+            return image_url
 
         except Exception as e:
             logger.error(f"Failed to upload image to S3: {e}")

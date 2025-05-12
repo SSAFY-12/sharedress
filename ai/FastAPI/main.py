@@ -56,8 +56,6 @@ async def lifespan(app: FastAPI):
     # Cancel SQS poller
     sqs_poller_task.cancel()
 
-    # 여기에 ngrok 관련 코드가 있었으나 이미 삭제되었습니다.
-    # 완전히 삭제되었는지 코드 검토 필요
 
 app = FastAPI(lifespan=lifespan)
 
@@ -145,12 +143,15 @@ async def message_worker(worker_id):
                 # Send completion notification
                 notification_success = await notification_service.send_completion_notification(result)
 
-            if notification_success:
-                # Delete message from SQS only if notification was successful
+            # 항상 SQS에서 메시지를 삭제하려고 시도
+            try:
                 sqs_service.delete_message(receipt_handle)
-                logger.info(f"Worker {worker_id} completed message: {message_data['message_id']}")
-            else:
-                logger.warning(f"Worker {worker_id} could not send notification for message: {message_data['message_id']}")
+                if notification_success:
+                    logger.info(f"Worker {worker_id} completed message: {message_data['message_id']}")
+                else:
+                    logger.warning(f"Worker {worker_id} could not send notification for message: {message_data['message_id']}, but message has been deleted from queue")
+            except Exception as e:
+                logger.error(f"Failed to delete message {message_data['message_id']}: {str(e)}")
 
             # Mark task as done
             message_queue.task_done()
