@@ -1,4 +1,4 @@
-import { captureCanvasImage } from '../api/codiApi';
+import { captureCanvasImage } from '@/features/codi/api/codiApi';
 
 export const captureCanvasImageWithRetry = async (
 	element: HTMLElement,

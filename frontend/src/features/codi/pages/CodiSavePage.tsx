@@ -11,7 +11,7 @@ import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
 import { base64ToFile } from '@/features/codi/utils/base64ToFile';
 import LoadingOverlay from '@/features/codi/components/LoadingOverlay';
-import { captureCanvasImageWithRetry } from '../utils/captureCanvasImageWithRetry';
+import { captureCanvasImageWithRetry } from '@/features/codi/utils/captureCanvasImageWithRetry';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
