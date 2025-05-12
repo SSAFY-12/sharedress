@@ -12,6 +12,7 @@ interface FriendCodiTabProps {
 
 const FriendCodiTab = ({ memberId, activeSubTab }: FriendCodiTabProps) => {
 	const navigate = useNavigate();
+	const isMe = false;
 	const { data: friendsCoordis = [] } = useCoordinationList(
 		memberId,
 		'CREATED',
@@ -21,11 +22,14 @@ const FriendCodiTab = ({ memberId, activeSubTab }: FriendCodiTabProps) => {
 	const coordis =
 		activeSubTab === 'friends' ? friendsCoordis : recommendedCoordis;
 
-	const items: ClothItem[] = coordis.map((coordi) => ({
+	const visibleCoordis = coordis.filter((c) => isMe || c.isPublic);
+
+	const items: ClothItem[] = visibleCoordis.map((coordi) => ({
 		id: coordi.id,
 		name: coordi.description,
 		category: activeSubTab === 'friends' ? '친구의 코디' : '내가 추천한 코디',
 		imageUrl: coordi.thumbnail || 'https://picsum.photos/200',
+		isPublic: coordi.isPublic,
 	}));
 
 	const handleItemClick = (item: ClothItem) => {

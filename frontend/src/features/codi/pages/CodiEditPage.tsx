@@ -163,6 +163,7 @@ const CodiEditPage = () => {
 								? '전체'
 								: CATEGORIES.find((cat) => cat.id === activeCategory)?.label ||
 								  '전체',
+						isPublic: item.isPublic,
 					}))}
 					onCategoryChange={setActiveCategory}
 					onItemClick={addItemToCanvas}

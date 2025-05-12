@@ -41,7 +41,10 @@ export interface ClothDetail {
 	id: number;
 	image: string;
 	name: string;
-	brandName: string;
+	brand: {
+		id: number;
+		name: string;
+	};
 	shopName: string;
 	color: {
 		id: number;
@@ -115,6 +118,14 @@ export interface CopeidCoordination {
 interface PostCommentParams {
 	coordinationId: number;
 	content: string;
+}
+
+interface UpdateClothRequest {
+	name: string;
+	brandId: number;
+	categoryId: number;
+	colorId: number;
+	isPublic: boolean;
 }
 
 export const getMyProfile = async (): Promise<MemberProfile> => {
@@ -222,4 +233,40 @@ export const fetchFriendProfile = async (
 export const fetchRecommendedToFriend = async (memberId: number) => {
 	const response = await client.get(`/api/coordinations/friends/${memberId}`);
 	return response.data.content as CoordinationItem[];
+};
+
+export const updateCloth = async (
+	closetClothesId: number,
+	data: UpdateClothRequest,
+) => {
+	const response = await client.put(
+		`api/closet/clothes/${closetClothesId}`,
+		data,
+	);
+	console.log(response.data.content);
+	return response.data.content;
+};
+
+export const fetchBrandsByKeyword = async (keyword: string) => {
+	const response = await client.get('/api/clothes/brands', {
+		params: { keyword },
+	});
+	return response.data.content;
+};
+
+export const fetchColors = async () => {
+	const response = await client.get('/api/clothes/colors');
+	return response.data.content as {
+		id: number;
+		name: string;
+		hexCode: string;
+	}[];
+};
+
+export const fetchCategories = async () => {
+	const response = await client.get('/api/clothes/categories');
+	return response.data.content as {
+		id: number;
+		name: string;
+	}[];
 };

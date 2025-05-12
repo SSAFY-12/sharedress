@@ -4,6 +4,7 @@ export interface ClothItem {
 	brand?: string;
 	category: string;
 	imageUrl: string;
+	isPublic?: boolean;
 }
 
 export interface ClothCardProps {

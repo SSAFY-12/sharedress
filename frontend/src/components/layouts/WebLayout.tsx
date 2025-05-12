@@ -13,6 +13,7 @@ export const WebLayout = () => {
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
 	const isClothEdit = matchPath('/cloth/:id/edit', location.pathname) !== null;
+	const isClothDetail = matchPath('/cloth/:id', location.pathname) !== null;
 	const isFriendPage = matchPath('/friend/:id', location.pathname) !== null;
 	const isCodiEdit = matchPath('/codi/edit', location.pathname) !== null;
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
@@ -42,7 +43,8 @@ export const WebLayout = () => {
 				isClothEdit ||
 				isCodiEdit ||
 				isCodiSave ||
-				isFriendPage ? null : isSocial ? (
+				isFriendPage ||
+				isClothDetail ? null : isSocial ? (
 					<SocialHeader />
 				) : (
 					<Header {...headerProps} onBackClick={onBackClick} />
@@ -51,7 +53,12 @@ export const WebLayout = () => {
 
 			<main
 				className={`flex-1 ${
-					isMyPage || isClothEdit || isCodiEdit || isCodiSave || isFriendPage
+					isMyPage ||
+					isClothEdit ||
+					isCodiEdit ||
+					isCodiSave ||
+					isFriendPage ||
+					isClothDetail
 						? ''
 						: 'mt-16'
 				} ${showNav ? '' : 'mb-0'} h-full flex flex-col overflow-y-auto`}

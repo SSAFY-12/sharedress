@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
 import { useDeleteCloth } from '@/features/closet/hooks/useDeleteCloth';
 import { ImageDetailView } from '@/containers/ImageDetailView';
+import Header from '@/components/layouts/Header';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
@@ -16,6 +17,7 @@ const ClothDetailPage = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const { data: cloth, isLoading, isError } = useClothDetail(clothId);
+	console.log(cloth);
 	const { mutate: deleteCloth } = useDeleteCloth();
 
 	const handleMenuClick = () => {
@@ -24,6 +26,10 @@ const ClothDetailPage = () => {
 
 	const handleMenuClose = () => {
 		setIsMenuOpen(false);
+	};
+
+	const handleBackClick = () => {
+		navigate('/mypage');
 	};
 
 	const handleEdit = () => {
@@ -50,6 +56,7 @@ const ClothDetailPage = () => {
 
 	return (
 		<div className='flex flex-col bg-white w-full'>
+			<Header showBack={true} onBackClick={handleBackClick} />
 			<div className='flex-1 overflow-auto pb-20'>
 				<ImageDetailView
 					item={{
@@ -64,12 +71,18 @@ const ClothDetailPage = () => {
 					<div className='px-4 flex flex-col gap-6'>
 						<ClothDetailItem label='상품명' value={cloth.name} />
 						<ClothDetailItem label='카테고리' value={cloth.category.name} />
-						<ClothDetailItem label='브랜드' value={cloth.brandName} />
+						<ClothDetailItem label='브랜드' value={cloth.brand.name} />
 						<ClothDetailItem
 							label='색깔'
 							value={cloth.color.name}
 							hexCode={cloth.color.hexCode}
 						/>
+						{isMe && (
+							<ClothDetailItem
+								label='공개 여부'
+								value={cloth.isPublic ? '공개' : '비공개'}
+							/>
+						)}
 					</div>
 				</ImageDetailView>
 			</div>

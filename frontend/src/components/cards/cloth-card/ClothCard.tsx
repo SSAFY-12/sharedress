@@ -1,3 +1,4 @@
+import { Lock } from 'lucide-react';
 import { ClothCardProps } from './ClothCard.types';
 
 // 선택 여부에 따라 테두리 색상 변경, 크기 동적 적용
@@ -32,6 +33,11 @@ export const ClothCard = ({
 					alt={item.name}
 					className='object-cover w-full h-full'
 				/>
+				{!item.isPublic && (
+					<div className='absolute top-1.5 right-1.5 bg-black/60 rounded-full p-2 flex items-center justify-center'>
+						<Lock className='w-4 h-4 text-white' />
+					</div>
+				)}
 				{selected && (
 					<div className='absolute top-1 right-1 bg-rose-500 rounded-full w-4 h-4 flex items-center justify-center'>
 						<span className='text-white text-xs'>✓</span>

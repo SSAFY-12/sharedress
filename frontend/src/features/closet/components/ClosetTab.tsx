@@ -47,6 +47,7 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 							imageUrl: item.image,
 							name: item.name,
 							brand: item.brandName,
+							isPublic: item.isPublic,
 						})) ?? []
 					}
 					onItemClick={handleItemClick}

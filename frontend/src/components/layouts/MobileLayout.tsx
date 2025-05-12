@@ -17,6 +17,7 @@ export const MobileLayout = () => {
 	const isFriendPage = matchPath('/friend/:id', location.pathname) !== null;
 	const isCodiEdit = matchPath('/codi/edit', location.pathname) !== null;
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
+	const isClothDetail = matchPath('/cloth/:id', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 
 	/* 네비게이션 바 표시 여부 결정	*/
@@ -47,7 +48,8 @@ export const MobileLayout = () => {
 					isClothEdit ||
 					isCodiEdit ||
 					isCodiSave ||
-					isFriendPage ? null : isSocial ? (
+					isFriendPage ||
+					isClothDetail ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
@@ -55,7 +57,12 @@ export const MobileLayout = () => {
 				</header>
 				<main
 					className={`flex-1 ${
-						isMyPage || isClothEdit || isCodiEdit || isCodiSave || isFriendPage
+						isMyPage ||
+						isClothEdit ||
+						isCodiEdit ||
+						isCodiSave ||
+						isFriendPage ||
+						isClothDetail
 							? ''
 							: 'mt-16'
 					} ${
