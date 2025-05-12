@@ -98,9 +98,9 @@ export const router = createBrowserRouter([
 			{
 				path: 'friend/:id',
 				element: (
-					<ProtectedRoute>
+					<PublicRoute>
 						<FriendClosetPage />
-					</ProtectedRoute>
+					</PublicRoute>
 				),
 			},
 			{
