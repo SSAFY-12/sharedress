@@ -45,6 +45,10 @@ const ProfileHeader = ({
 		});
 	};
 
+	const handleProfileEditClick = () => {
+		navigate('/mypage/edit');
+	};
+
 	return (
 		<div className='relative w-full min-h-[37.5vh]'>
 			<div className='absolute inset-0 overflow-hidden'>
@@ -94,7 +98,7 @@ const ProfileHeader = ({
 								<PrimaryBtn
 									size='full'
 									name='프로필 수정하기'
-									onClick={() => console.log('프로필 수정 클릭')}
+									onClick={() => handleProfileEditClick()}
 									color='white'
 								/>
 							) : (
