@@ -20,7 +20,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 // 초기 라우트 컴포넌트
 const InitialRoute = () => {
 	const { accessToken } = useAuthStore.getState();
-	return <Navigate to={accessToken ? '/mypage' : '/wardrobe'} replace />;
+	return <Navigate to={accessToken ? '/mypage' : '/auth'} replace />;
 };
 
 export const router = createBrowserRouter([
