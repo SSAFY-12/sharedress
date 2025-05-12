@@ -47,7 +47,7 @@ export const UserRowItem = ({
 		{actionType === 'button' && actionButtonText && (
 			<button
 				type='button'
-				className='py-2 px-3.5 rounded-xl hover:bg-gray-100 transition bg-brownButton text-white text-description'
+				className='py-2 px-3.5 rounded-xl hover:bg-low transition bg-brownButton text-white text-description'
 				onClick={(e) => {
 					e.stopPropagation();
 					if (codiRequestClick && userId)

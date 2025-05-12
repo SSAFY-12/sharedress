@@ -1,31 +1,34 @@
-// src/auth/GoogleCallbackHandler.tsx
-// import { useAuthStore } from '@/store/useAuthStore';
-import { useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
 
 const GoogleCallbackHandler = () => {
 	const { mutation } = useAuth();
+	const calledRef = useRef(false);
 
 	useEffect(() => {
 		const handleToken = async () => {
+			if (calledRef.current) return;
+			calledRef.current = true;
+
 			try {
 				const urlHash = new URLSearchParams(window.location.hash.substring(1));
 				const accessToken = urlHash.get('access_token');
-
-				if (!accessToken) {
-					console.error('토큰을 찾을 수 없습니다.');
-					return;
-				}
-
+				console.log('콜백 accessToken:', accessToken); // 디버깅용
+				if (!accessToken) return;
 				await mutation.mutateAsync(accessToken);
 			} catch (error) {
 				console.error('토큰 검증 실패:', error);
 			}
 		};
-
 		handleToken();
 	}, [mutation]);
 
+	if (mutation.isPending) {
+		return <div>구글 로그인 중입니다... (잠시만 기다려주세요)</div>;
+	}
+	if (mutation.isError) {
+		return <div>로그인 실패! 다시 시도해주세요.</div>;
+	}
 	return <div>구글 로그인 중입니다...</div>;
 };
 

@@ -1060,3 +1060,137 @@ const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
 4. **모달 컴포넌트 설계 시 고려사항**
    - 모달의 열림/닫힘 상태에 따라 API 호출을 제어하는 것이 성능상 이점이 있음
    - 불필요한 리소스 사용을 방지하기 위한 조건부 로직 구현 필요
+
+## [트러블슈팅] 비로그인 auth 인증 권한 문제(2025/05/12)
+
+### 1. 문제 상황
+
+- **비로그인(게스트) 유저가 `/link/:code`로 접근**  
+  → 공개된 링크를 통해 친구 옷장(`/friend/:id`)을 보려고 했음
+- 하지만  
+  **"인증이 필요합니다"라는 메시지**가 뜨거나  
+  **401 에러(Unauthorized)**가 발생해서  
+  비로그인 유저가 정상적으로 접근하지 못하는 문제가 발생
+
+---
+
+### 2. 원인 분석
+
+#### (1) 라우팅 구조의 문제
+
+- 처음에는 `/friend/:id` 라우트가  
+  **App 컴포넌트 하위**에 위치해 있었음
+- App 컴포넌트에서는  
+  **로그인(토큰)이 없으면 useTokenValidation을 통해 인증을 강제**했음
+- 그래서  
+  **비로그인 유저가 `/friend/:id`로 접근해도  
+  App이 감싸고 있어서 무조건 인증을 요구**하게 됨
+
+#### (2) 인증/토큰 처리 방식의 문제
+
+- 인증이 필요한 라우트에서는  
+  **accessToken이 없으면 ProtectedRoute에서 `/auth`로 리다이렉트**
+- App 컴포넌트에서  
+  **isPublicRoute(공개 라우트) 목록에 `/friend/:id`가 빠져 있었음**
+- 그래서  
+  **비로그인 유저가 `/friend/:id`로 접근해도  
+  인증이 필요하다는 메시지가 뜸**
+
+#### (3) API 요청 및 리프레시 처리의 문제
+
+- 게스트(비로그인) 유저가 접근했을 때  
+  **accessToken이 없는데도 불구하고,  
+  API 클라이언트(client.ts)에서 리프레시 토큰 요청을 시도**
+- 리프레시 토큰도 없으니  
+  **401 에러가 발생**  
+  (이때도 인증이 필요하다는 메시지가 뜰 수 있음)
+
+---
+
+## 3. 해결 방법
+
+### (1) 라우터 구조 개선
+
+- **공개 라우트(비로그인 허용)**는  
+  App 컴포넌트 밖에서 바로 렌더링되도록 구조를 변경
+- `/friend/:id`를 App 하위가 아니라  
+  **최상위 공개 라우트**로 분리
+
+```tsx
+export const router = createBrowserRouter([
+	{ path: '/auth', element: <AuthPage /> },
+	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
+	{ path: '/link/:code', element: <ExternalUserPage /> },
+	{ path: '/friend/:id', element: <FriendClosetPage /> }, // <-- App 없이 바로!
+	// 인증 필요 라우트
+	{
+		path: '/',
+		element: <App />,
+		children: [
+			// ...생략
+		],
+	},
+]);
+```
+
+### (2) App 컴포넌트의 공개 라우트 조건 강화
+
+- App에서 useTokenValidation을  
+  **공개 라우트가 아닐 때만 실행**하도록 조건을 강화
+
+```tsx
+const isPublicRoute =
+	location.pathname === '/auth' ||
+	location.pathname === '/auth/google/callback' ||
+	location.pathname === '/oauth/google/callback' ||
+	location.pathname.startsWith('/link/') ||
+	location.pathname.startsWith('/friend/');
+
+useEffect(() => {
+	if (!isPublicRoute) {
+		useTokenValidation();
+	}
+}, [location.pathname]);
+```
+
+### (3) 게스트 접근 시 API/리프레시 요청 분기 처리
+
+- **accessToken이 없으면**  
+  인증이 필요한 API 요청, 리프레시 요청을  
+  **아예 시도하지 않도록 분기 처리**
+- 게스트라면 게스트용 데이터만 요청하거나,  
+  인증이 필요 없는 API만 호출
+
+---
+
+## 4. 예시
+
+- `/link/:code`로 접근  
+  → 공개된 링크라면 `/friend/:id`로 이동  
+  → **App이 감싸지 않으므로 인증 강제 X**
+- `/friend/:id`에서  
+  **accessToken이 없으면 게스트로 동작**  
+  (API 요청도 게스트용으로 분기)
+
+---
+
+## 5. 결론 및 정리
+
+- **근본 원인:**
+
+  1. 라우터 구조상 App이 모든 라우트를 감싸고 있어서  
+     비로그인 유저도 인증을 강제당함
+  2. App 컴포넌트의 공개 라우트 조건이 부족해서  
+     비로그인 허용 라우트도 인증을 요구함
+  3. 게스트 접근 시에도 인증/리프레시 요청을 시도해서 401 에러가 발생함
+
+- **해결 방법:**
+
+  1. 공개 라우트는 App 밖에서 바로 렌더링
+  2. App에서 공개 라우트 조건을 명확히
+  3. 게스트 접근 시 인증/리프레시 요청 분기
+
+- **결과:**  
+  이제 비로그인 유저도  
+  `/link/:code` → `/friend/:id`로  
+  **인증 없이 정상적으로 접근**할 수 있게 됨

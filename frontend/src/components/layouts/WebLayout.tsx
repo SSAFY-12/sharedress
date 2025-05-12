@@ -7,8 +7,10 @@ import getHeaderProps from '@/utils/getHeaderProps';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { SubBtnModal } from '@/components/modals/sub-btn-modal/SubBtnModal';
+import { useTokenValidation } from '@/features/auth/hooks/useTokenValidation';
 
 export const WebLayout = () => {
+	useTokenValidation();
 	const location = useLocation();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
