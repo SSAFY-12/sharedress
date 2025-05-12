@@ -6,12 +6,15 @@ import useFriendList from '@/features/social/hooks/useFriendList';
 import useSearchFriend from '@/features/social/hooks/useSearchFriend';
 import { CodiRequestMsgModal } from '@/features/social/components/CodiRequestMsgModal';
 import { useCodiRequest } from '@/features/social/hooks/useCodiRequest';
+import { ExternalShareModal } from '@/features/social/components/ExternalShareModal';
 
 export interface Friend {
 	nickname: string;
 	profileImage: string;
 	receiverId: number;
 }
+
+type ModalState = 'friend' | 'external' | null;
 
 // 메인 컴포넌트
 export const FriendCodiRequestPage = () => {
@@ -37,8 +40,16 @@ export const FriendCodiRequestPage = () => {
 		}
 	};
 
-	// 선택된 친구
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	// 모달 state 관리
+	const [isRequestModalOpen, setIsRequestModalOpen] =
+		useState<ModalState>(null);
+
+	// 외부 코디 요청 모달
+	const handleExternalRequestClick = () => {
+		setIsRequestModalOpen('external');
+	};
+
+	// 친구 코디 요청 모달
 	const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
 	const handleRequestClick = (request: Friend) => {
 		setSelectedFriend({
@@ -46,12 +57,12 @@ export const FriendCodiRequestPage = () => {
 			nickname: request.nickname,
 			profileImage: request.profileImage,
 		});
-		setIsModalOpen(true);
+		setIsRequestModalOpen('friend');
 	};
 
 	const handleConfirm = () => {
 		onSubmit();
-		setIsModalOpen(false);
+		setIsRequestModalOpen(null);
 	};
 
 	const { watch, onSubmit, setValue } = useCodiRequest(
@@ -69,12 +80,14 @@ export const FriendCodiRequestPage = () => {
 				onKeyDown={handleSearch}
 			/>
 
-			<div className='flex w-full py-4 my-2.5 border border-dashed border-gray-300 rounded-2xl'>
+			<button
+				className='flex w-full py-4 my-2.5 border border-dashed border-description hover:bg-background transition hover:border-low transition rounded-2xl'
+				onClick={handleExternalRequestClick}
+			>
 				<span className='w-full text-button text-low'>
-					{' '}
-					외부에 코디 추천 요청{' '}
+					외부에 코디 추천 요청
 				</span>
-			</div>
+			</button>
 
 			{/* 친구 목록 영역 */}
 			{!keyword ? (
@@ -118,14 +131,21 @@ export const FriendCodiRequestPage = () => {
 					)}
 				</div>
 			)}
-			{isModalOpen && selectedFriend && (
+			{isRequestModalOpen === 'friend' && selectedFriend && (
 				<CodiRequestMsgModal
-					isOpen={isModalOpen}
-					onClose={() => setIsModalOpen(false)}
+					isOpen={isRequestModalOpen === 'friend'}
+					onClose={() => setIsRequestModalOpen(null)}
 					friend={selectedFriend}
 					message={watch('message')}
 					onMessageChange={(value) => setValue('message', value)}
 					onConfirm={handleConfirm}
+				/>
+			)}
+
+			{isRequestModalOpen === 'external' && (
+				<ExternalShareModal
+					isOpen={isRequestModalOpen === 'external'}
+					onClose={() => setIsRequestModalOpen(null)}
 				/>
 			)}
 		</div>

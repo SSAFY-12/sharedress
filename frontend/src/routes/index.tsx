@@ -16,6 +16,7 @@ import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
+import ExternalUserPage from '@/pages/ExternalUserPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -150,5 +151,9 @@ export const router = createBrowserRouter([
 	{
 		path: '/oauth/google/callback',
 		element: <GoogleCallbackHandler />,
+	},
+	{
+		path: '/link/:code',
+		element: <ExternalUserPage />,
 	},
 ]);
