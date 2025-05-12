@@ -96,30 +96,70 @@ class ImageProcessor:
 
     @staticmethod
     def remove_background(buf: BytesIO) -> BytesIO:
-        try:
-            return BytesIO(remove(buf.getvalue()))
-        except Exception as e:
+         try:
+             return BytesIO(remove(buf.getvalue()))
+         except Exception as e:
             logger.error("rembg error: %s", e)
             return buf
+
 
     def _generate(self, category: str) -> BytesIO | None:
         try:
             prompt = (f"{category} clothing isolated on transparent background, "
                       "studio product photo, no human, high-res")
-            r = self.openai.images.generate(
+
+            # gpt-image-1 모델 사용 - output_format 매개변수 사용
+            response = self.openai.images.generate(
                 model="gpt-image-1",
                 prompt=prompt,
                 n=1,
-                size="1024x1024"
+                size="1024x1024",
+                quality="high",  # high, medium, low, auto 중 하나
+                output_format="png"  # 출력 형식 지정
             )
 
-            # URL에서 이미지 다운로드 (최신 API는 base64 대신 URL 반환)
-            img_url = r.data[0].url
-            response = requests.get(img_url)
-            response.raise_for_status()
-            return BytesIO(response.content)
+            # 응답 구조 확인 (로그)
+            logger.info(f"Response data: {response.data}")
+
+            # b64_json 필드가 있다면 사용
+            if hasattr(response.data[0], 'b64_json') and response.data[0].b64_json:
+                logger.info("Using b64_json field")
+                image_bytes = base64.b64decode(response.data[0].b64_json)
+                return BytesIO(image_bytes)
+
+            # url 필드가 있다면 사용
+            elif hasattr(response.data[0], 'url') and response.data[0].url:
+                logger.info(f"Using URL field: {response.data[0].url}")
+                image_response = requests.get(response.data[0].url)
+                image_response.raise_for_status()
+                return BytesIO(image_response.content)
+
+            # 로그에서 본 것처럼 b64_json이 직접 속성이 아니라 값으로 있을 경우
+            else:
+                # 응답 구조를 문자열로 변환하여 로깅
+                logger.info(f"Response structure: {str(response.data[0])}")
+                # 데이터가 문자열 형태인지 확인
+                data_str = str(response.data[0])
+                if 'b64_json' in data_str:
+                    logger.info("Found b64_json in string representation")
+                    # 문자열에서 b64_json 추출 시도
+                    try:
+                        import re
+                        pattern = r"b64_json='([^']+)'"
+                        match = re.search(pattern, data_str)
+                        if match:
+                            b64_data = match.group(1)
+                            image_bytes = base64.b64decode(b64_data)
+                            return BytesIO(image_bytes)
+                    except Exception as e:
+                        logger.error(f"Error extracting b64_json: {e}")
+
+            # 모든 방법이 실패한 경우, 대체 방법
+            logger.warning("Could not extract image data, using fallback method")
+            return None
+
         except Exception as e:
-            logger.error("OpenAI gen error: %s", e)
+            logger.error(f"OpenAI gen error: {e}")
             return None
     # product_processor.py에서 호출하는 메서드
     def generate_product_image(self, _, category: str) -> BytesIO | None:
