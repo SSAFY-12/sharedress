@@ -270,3 +270,13 @@ export const fetchCategories = async () => {
 		name: string;
 	}[];
 };
+
+export const updateCodiPublicStatus = async (
+	coordinationId: number,
+	isPublic: boolean,
+) => {
+	const response = await client.patch(`/api/coordinations/${coordinationId}`, {
+		isPublic,
+	});
+	return response.data;
+};

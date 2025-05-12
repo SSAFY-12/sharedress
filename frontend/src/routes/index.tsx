@@ -16,6 +16,7 @@ import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
+import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -134,6 +135,14 @@ export const router = createBrowserRouter([
 				element: (
 					<ProtectedRoute>
 						<CodiSavePage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/codi/:id/edit',
+				element: (
+					<ProtectedRoute>
+						<CodiPublicEditPage />
 					</ProtectedRoute>
 				),
 			},

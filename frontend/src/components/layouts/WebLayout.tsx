@@ -17,6 +17,9 @@ export const WebLayout = () => {
 	const isFriendPage = matchPath('/friend/:id', location.pathname) !== null;
 	const isCodiEdit = matchPath('/codi/edit', location.pathname) !== null;
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
+	const isCodiPublicEdit =
+		matchPath('/codi/:id/edit', location.pathname) !== null;
+	const isCodiDetail = matchPath('/codi/:id', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 	const navigate = useNavigate();
 
@@ -44,7 +47,9 @@ export const WebLayout = () => {
 				isCodiEdit ||
 				isCodiSave ||
 				isFriendPage ||
-				isClothDetail ? null : isSocial ? (
+				isClothDetail ||
+				isCodiPublicEdit ||
+				isCodiDetail ? null : isSocial ? (
 					<SocialHeader />
 				) : (
 					<Header {...headerProps} onBackClick={onBackClick} />
@@ -58,7 +63,9 @@ export const WebLayout = () => {
 					isCodiEdit ||
 					isCodiSave ||
 					isFriendPage ||
-					isClothDetail
+					isClothDetail ||
+					isCodiPublicEdit ||
+					isCodiDetail
 						? ''
 						: 'mt-16'
 				} ${showNav ? '' : 'mb-0'} h-full flex flex-col overflow-y-auto`}
