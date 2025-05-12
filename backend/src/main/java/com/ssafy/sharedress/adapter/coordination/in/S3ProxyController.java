@@ -34,8 +34,6 @@ public class S3ProxyController {
 			URL decodedUrl = new URL(URLDecoder.decode(url, StandardCharsets.UTF_8));
 			HttpURLConnection connection = (HttpURLConnection)decodedUrl.openConnection();
 			connection.setRequestMethod("GET");
-			connection.setConnectTimeout(5000);
-			connection.setReadTimeout(10000);
 
 			int responseCode = connection.getResponseCode();
 			if (responseCode != 200) {
