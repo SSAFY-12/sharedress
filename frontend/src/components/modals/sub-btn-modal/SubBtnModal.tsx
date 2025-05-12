@@ -83,7 +83,7 @@ export const SubBtnModal = ({
 									onClick={() => {
 										console.log('옷 등록');
 										onClose();
-										navigate('/regist');
+										navigate('/social/codi-request');
 									}}
 								>
 									<img src='/icons/create_codi_request.svg' alt='plus' />
