@@ -5,192 +5,162 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import useRefresh from './useRefresh';
 
 const TOKEN_EXPIRATION_BUFFER = 3 * 60 * 1000; // 3분 버퍼
+const INITIAL_CHECK_DELAY = 3000; // 초기 체크 지연 시간 (3초)
 
 export const useTokenValidation = () => {
-	// 토큰 상태 확인
-	const { accessToken, isInitialized } = useAuthStore(); // 토큰 상태
-	// 1. 사용자 정보 로드  / 2. 설정 로드 / 3. 기타 초기화 작업(초기화가 완료되기 전까지 로딩)
-	// 필요한 데이터가 모두 로드된 이후에만 앱을 랜더링 (더 나은 사용자 경험 제공)
-
-	const { mutateAsync: refreshAsync } = useRefresh(); // 토큰 갱신
-	const navigate = useNavigate(); // 네비게이션
+	const { accessToken, isInitialized } = useAuthStore();
+	const { mutateAsync: refreshAsync } = useRefresh();
+	const navigate = useNavigate();
 	const location = useLocation();
 
 	useEffect(() => {
 		// 1. 초기화 체크
-		// 앱이 완전히 초기화되지 않았다면 토큰 검증을 하지 않음 : 앱의 기본 설정이 완료된 후에 토큰 검증
-		// (다른 초기 설정들이 완료되지 않은 상태에서 토큰 검증을 하면 안됨)
 		if (!isInitialized) {
 			return;
 		}
 
-		// 현재 경로가 /auth 또는 /auth/google/callback인 경우 토큰 검증을 건너뜁니다
+		// 2. 인증 관련 페이지 체크
 		if (
 			location.pathname === '/auth' ||
-			location.pathname === '/auth/google/callback'
+			location.pathname === '/auth/google/callback' ||
+			location.pathname === '/oauth/google/callback'
 		) {
 			return;
 		}
 
-		// 2. 토큰 없음 체크
-		// 액세스 토큰이 없는 경우 (로그인하지 않은 상태)
-		if (!accessToken) {
-			// 리프레시 토큰으로 새 액세스 토큰 발급 시도
-			refreshAsync()
-				.then((response) => {
-					console.log('✅ 토큰 갱신 성공:', {
-						새토큰: !!response.content.accessToken,
-						시간: new Date().toLocaleString('ko-KR'),
-					});
-					// 토큰 갱신 성공 시 /mypage로 이동
-					navigate('/mypage', { replace: true });
-				})
-				.catch((error) => {
-					console.error('❌ 토큰 갱신 실패:', {
-						에러: error,
-						시간: new Date().toLocaleString('ko-KR'),
-					});
-					// 리프레시 토큰도 없는 경우 (쿠키에 없음) 로그인 페이지로 이동
-					if (!document.cookie.includes('refreshToken')) {
-						navigate('/auth', { replace: true });
-					}
-				});
-			return;
-		}
+		// 3. 초기 체크 지연
+		const initialCheckTimeout = setTimeout(() => {
+			// 4. 리프레시 토큰 존재 여부 확인
+			const hasRefreshToken = document.cookie.includes('refreshToken');
 
-		// 3. 토큰 만료 시간 체크
-		// JWT 토큰에서 만료 시간을 추출
-		const expirationTime = getTokenExpiration(accessToken);
-		if (!expirationTime) {
-			// 만료 시간을 파싱할 수 없는 경우 새 토큰 발급 시도
-			refreshAsync()
-				.then((response) => {
-					console.log('✅ 토큰 갱신 성공:', {
-						새토큰: !!response.content.accessToken,
-						시간: new Date().toLocaleString('ko-KR'),
-					});
-					navigate('/mypage', { replace: true });
-				})
-				.catch((error) => {
-					console.error('❌ 토큰 갱신 실패:', {
-						에러: error,
-						시간: new Date().toLocaleString('ko-KR'),
-					});
-					// 리프레시 토큰도 없는 경우 (쿠키에 없음) 로그인 페이지로 이동
-					if (!document.cookie.includes('refreshToken')) {
-						navigate('/auth', { replace: true });
-					}
-				});
-			return;
-		}
+			// 5. 액세스 토큰이 없는 경우
+			if (!accessToken) {
+				// 리프레시 토큰이 있는 경우에만 갱신 시도
+				if (hasRefreshToken) {
+					refreshAsync()
+						.then((response) => {
+							console.log('✅ 토큰 갱신 성공:', {
+								새토큰: !!response.content.accessToken,
+								시간: new Date().toLocaleString('ko-KR'),
+							});
+						})
+						.catch((error) => {
+							console.error('❌ 토큰 갱신 실패:', error);
+							navigate('/auth', { replace: true });
+						});
+				} else {
+					// 리프레시 토큰도 없는 경우 로그인 페이지로 이동
+					navigate('/auth', { replace: true });
+				}
+				return;
+			}
 
-		// 4. 토큰 만료 시간 계산
-		const currentTime = Date.now() / 1000; // 현재 시간 (초 단위)
-		const timeUntilExpiration = (expirationTime - currentTime) * 1000; // 만료까지 남은 시간 (밀리초 단위)
+			// 6. 토큰 만료 시간 체크
+			const expirationTime = getTokenExpiration(accessToken);
+			if (!expirationTime) {
+				if (hasRefreshToken) {
+					refreshAsync()
+						.then((response) => {
+							console.log('✅ 토큰 갱신 성공:', {
+								새토큰: !!response.content.accessToken,
+								시간: new Date().toLocaleString('ko-KR'),
+							});
+						})
+						.catch((error) => {
+							console.error('❌ 토큰 갱신 실패:', error);
+							navigate('/auth', { replace: true });
+						});
+				} else {
+					navigate('/auth', { replace: true });
+				}
+				return;
+			}
 
-		// 5. 토큰 갱신 필요 여부 체크
-		if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER) {
-			// 남은 시간이 버퍼 시간보다 작으면 토큰 갱신
-			refreshAsync()
-				.then((response) => {
-					console.log('✅ 토큰 갱신 성공:', {
-						새토큰: !!response.content.accessToken,
-						시간: new Date().toLocaleString('ko-KR'),
-					});
-					navigate('/mypage', { replace: true });
-				})
-				.catch((error) => {
-					console.error('❌ 토큰 갱신 실패:', {
-						에러: error,
-						시간: new Date().toLocaleString('ko-KR'),
-					});
-					if (!document.cookie.includes('refreshToken')) {
-						navigate('/auth', { replace: true });
-					}
-				});
-		}
+			// 7. 토큰 만료 시간 계산
+			const currentTime = Date.now() / 1000;
+			const timeUntilExpiration = (expirationTime - currentTime) * 1000;
 
-		// 6. 주기적 토큰 상태 확인 (30초마다)
-		const intervalId = setInterval(() => {
-			// 현재 토큰 상태 확인
-			const currentToken = useAuthStore.getState().accessToken;
-
-			// 토큰이 없어진 경우
-			if (!currentToken) {
+			// 8. 토큰 갱신 필요 여부 체크 (만료 3분 전에만 갱신)
+			if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER && hasRefreshToken) {
 				refreshAsync()
 					.then((response) => {
-						console.log('✅ 주기적 토큰 갱신 성공:', {
+						console.log('✅ 토큰 갱신 성공:', {
 							새토큰: !!response.content.accessToken,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
-						navigate('/mypage', { replace: true });
 					})
 					.catch((error) => {
-						console.error('❌ 주기적 토큰 갱신 실패:', {
-							에러: error,
-							시간: new Date().toLocaleString('ko-KR'),
-						});
-						if (!document.cookie.includes('refreshToken')) {
-							navigate('/auth', { replace: true });
-						}
+						console.error('❌ 토큰 갱신 실패:', error);
+						navigate('/auth', { replace: true });
 					});
+			}
+		}, INITIAL_CHECK_DELAY);
+
+		// 9. 주기적 토큰 상태 확인 (30초마다)
+		const intervalId = setInterval(() => {
+			const currentToken = useAuthStore.getState().accessToken;
+			const hasRefreshToken = document.cookie.includes('refreshToken');
+
+			if (!currentToken) {
+				if (hasRefreshToken) {
+					refreshAsync()
+						.then((response) => {
+							console.log('✅ 주기적 토큰 갱신 성공:', {
+								새토큰: !!response.content.accessToken,
+								시간: new Date().toLocaleString('ko-KR'),
+							});
+						})
+						.catch((error) => {
+							console.error('❌ 주기적 토큰 갱신 실패:', error);
+							navigate('/auth', { replace: true });
+						});
+				} else {
+					navigate('/auth', { replace: true });
+				}
 				return;
 			}
 
 			const currentExpirationTime = getTokenExpiration(currentToken);
-			// 현재 토큰의 만료 시간
 			if (!currentExpirationTime) {
-				refreshAsync()
-					.then((response) => {
-						console.log('✅ 주기적 토큰 갱신 성공:', {
-							새토큰: !!response.content.accessToken,
-							시간: new Date().toLocaleString('ko-KR'),
-						});
-						navigate('/mypage', { replace: true });
-					})
-					.catch((error) => {
-						console.error('❌ 주기적 토큰 갱신 실패:', {
-							에러: error,
-							시간: new Date().toLocaleString('ko-KR'),
-						});
-						if (!document.cookie.includes('refreshToken')) {
+				if (hasRefreshToken) {
+					refreshAsync()
+						.then((response) => {
+							console.log('✅ 주기적 토큰 갱신 성공:', {
+								새토큰: !!response.content.accessToken,
+								시간: new Date().toLocaleString('ko-KR'),
+							});
+						})
+						.catch((error) => {
+							console.error('❌ 주기적 토큰 갱신 실패:', error);
 							navigate('/auth', { replace: true });
-						}
-					});
+						});
+				} else {
+					navigate('/auth', { replace: true });
+				}
 				return;
 			}
 
-			// 주기적으로 만료 시간 체크
 			const currentTime = Date.now() / 1000;
 			const timeUntilExpiration = (currentExpirationTime - currentTime) * 1000;
 
-			// 만료가 임박한 경우 갱신
-			if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER) {
+			if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER && hasRefreshToken) {
 				refreshAsync()
 					.then((response) => {
 						console.log('✅ 주기적 토큰 갱신 성공:', {
 							새토큰: !!response.content.accessToken,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
-						navigate('/mypage', { replace: true });
 					})
 					.catch((error) => {
-						console.error('❌ 주기적 토큰 갱신 실패:', {
-							에러: error,
-							시간: new Date().toLocaleString('ko-KR'),
-						});
-						// 리프레시 토큰도 없는 경우 (쿠키에 없음) 로그인 페이지로 이동
-						if (!document.cookie.includes('refreshToken')) {
-							navigate('/auth', { replace: true });
-						}
+						console.error('❌ 주기적 토큰 갱신 실패:', error);
+						navigate('/auth', { replace: true });
 					});
 			}
-		}, 30000); // 30초마다 체크 === 안정적 토큰 갱신
+		}, 30000);
 
-		// 7. 클린업 함수
-		// 컴포넌트가 언마운트되거나 의존성이 변경될 때 인터벌 정리
 		return () => {
-			clearInterval(intervalId); // 인터벌 정리
+			clearTimeout(initialCheckTimeout);
+			clearInterval(intervalId);
 		};
 	}, [accessToken, refreshAsync, isInitialized, navigate, location.pathname]);
 };
