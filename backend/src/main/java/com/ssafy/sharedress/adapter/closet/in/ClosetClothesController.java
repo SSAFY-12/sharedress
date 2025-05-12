@@ -19,7 +19,6 @@ import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AddLibraryClothesToClosetRequest;
-import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.application.guest.annotation.CurrentGuest;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
 import com.ssafy.sharedress.domain.common.context.UserContext;
@@ -102,12 +101,12 @@ public class ClosetClothesController {
 		);
 	}
 
-	@PostMapping("/closet/clothes/purchase-history")
-	public ResponseEntity<ResponseWrapper<Void>> registerClothesFromPurchase(
-		@RequestBody PurchaseHistoryRequest request,
-		@CurrentMember Member member
-	) {
-		closetClothesUseCase.registerClothesFromPurchase(request, member.getId());
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
-	}
+	// @PostMapping("/closet/clothes/purchase-history")
+	// public ResponseEntity<ResponseWrapper<Void>> registerClothesFromPurchase(
+	// 	@RequestBody PurchaseHistoryRequest request,
+	// 	@CurrentMember Member member
+	// ) {
+	// 	closetClothesUseCase.registerClothesFromPurchase(request, member.getId());
+	// 	return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
+	// }
 }
