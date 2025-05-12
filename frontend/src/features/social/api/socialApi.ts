@@ -66,4 +66,13 @@ export const socialApi = {
 		);
 		return response.data;
 	},
+
+	// 친구코디 요청
+	requestFriendCodi: async (receiverId: number, message: string) => {
+		const response = await client.post(`/api/coordinations/request`, {
+			receiverId,
+			message,
+		});
+		return response.data;
+	},
 };
