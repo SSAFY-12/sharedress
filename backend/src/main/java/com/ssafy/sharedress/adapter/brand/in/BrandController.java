@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.brand.dto.BrandSearchResponse;
 import com.ssafy.sharedress.application.brand.usecase.BrandUseCase;
+import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
@@ -23,8 +24,11 @@ public class BrandController {
 
 	@GetMapping("/clothes/brands")
 	public ResponseEntity<ResponseWrapper<List<BrandSearchResponse>>> searchBrands(
-		@RequestParam(required = false) String keyword) {
-		List<BrandSearchResponse> results = brandUseCase.searchBrands(keyword);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, results);
+		@RequestParam(required = false) String keyword,
+		@RequestParam(required = false) Long cursor,
+		@RequestParam(defaultValue = "12") int size
+	) {
+		CursorPageResult<BrandSearchResponse> result = brandUseCase.searchBrands(keyword, cursor, size);
+		return ResponseWrapperFactory.toPageResponseEntity(HttpStatus.OK, result);
 	}
 }

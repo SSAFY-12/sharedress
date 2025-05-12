@@ -1,10 +1,13 @@
 package com.ssafy.sharedress.application.brand.usecase;
 
-import java.util.List;
-
 import com.ssafy.sharedress.application.brand.dto.BrandSearchResponse;
+import com.ssafy.sharedress.global.dto.CursorPageResult;
 
 public interface BrandUseCase {
 	// 브랜드 검색
-	List<BrandSearchResponse> searchBrands(String keyword);
+	CursorPageResult<BrandSearchResponse> searchBrands(
+		String keyword,
+		Long cursor,
+		int size
+	);
 }
