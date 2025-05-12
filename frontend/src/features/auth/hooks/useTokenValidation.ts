@@ -23,7 +23,8 @@ export const useTokenValidation = () => {
 		if (
 			location.pathname === '/auth' ||
 			location.pathname === '/auth/google/callback' ||
-			location.pathname === '/oauth/google/callback'
+			location.pathname === '/oauth/google/callback' ||
+			location.pathname.startsWith('/link/') // 공개 링크 접근 허용
 		) {
 			return;
 		}

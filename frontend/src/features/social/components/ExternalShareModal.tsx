@@ -1,7 +1,6 @@
 import { MainModal } from '@/components/modals/main-modal/MainModal';
 
 import { SwitchToggle } from '@/components/buttons/switch-toggle/SwitchToggle';
-import { useEffect, useState, useMemo } from 'react';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useModifyProfile } from '../hooks/useModifyProfile';
 import { usePublicLink } from '../hooks/usePublicLink';

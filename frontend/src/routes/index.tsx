@@ -27,6 +27,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 	return <>{children}</>;
 };
 
+// 공개 라우트 (인증이 필요하지 않은 라우트)
+const PublicRoute = ({ children }: { children: React.ReactNode }) => (
+	<>{children}</>
+);
+
 // 초기 라우트 컴포넌트
 const InitialRoute = () => {
 	const { accessToken } = useAuthStore();
@@ -154,6 +159,10 @@ export const router = createBrowserRouter([
 	},
 	{
 		path: '/link/:code',
-		element: <ExternalUserPage />,
+		element: (
+			<PublicRoute>
+				<ExternalUserPage />
+			</PublicRoute>
+		),
 	},
 ]);
