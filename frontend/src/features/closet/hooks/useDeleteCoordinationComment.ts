@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { deleteCoordinationComment } from '@/features/closet/api/myClosetApi';
+import { deleteCoordinationComment } from '@/features/closet/api/closetApi';
 
 export const useDeleteCoordinationComment = (coordinationId: number) => {
 	const queryClient = useQueryClient();

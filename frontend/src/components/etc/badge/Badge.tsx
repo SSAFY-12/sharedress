@@ -44,7 +44,7 @@ export const Badge = ({ icon, onClick, text, className = '' }: BadgeProps) => {
 	// text만 있을 때와 아이콘이 있을 때의 스타일을 분리
 	const buttonStyle = icon
 		? `inline-flex items-center gap-1 p-1.5 bg-gray-200 hover:bg-gray-300 rounded-full text-xs transition-colors ${className}`
-		: `inline-flex items-center gap-1 text-xs ${className}`;
+		: `inline-flex items-center gap-1 text-topHeader p-1.5 text-regular ${className}`;
 
 	return (
 		<button onClick={onClick} className={buttonStyle}>

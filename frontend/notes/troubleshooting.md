@@ -334,7 +334,7 @@ key={user.memberId}
 
 2. 토큰 갱신 로직의 구조적 문제
    - `useMutation`을 사용한 토큰 갱신 로직이 컴포넌트 외부에서 실행될 수 없음
-   - 인터셉터에서 훅을 사용하려 했던 접근 방식이 잘못됨
+   - 인터셉터에서 훅을 사용하려는 접근 방식이 잘못됨
 
 ### 해결방법
 
@@ -539,7 +539,7 @@ client.interceptors.response.use(
 - request 인터셉터에서 예외처리를 통해 불필요한 헤더 추가를 막아야 한다.
 - response 인터셉터에서 refresh 요청에 대한 401은 재시도하지 않고 바로 로그아웃
   처리해야 한다.
-- 이렇게 하면 401 무한루프와 서버 과부하를 막을 수 있다.
+- 이러한 구조로 변경함으로써 401 무한루프와 서버 과부하를 막을 수 있다.
 
 ---
 
@@ -779,3 +779,284 @@ https://lh3.googleusercontent.com/a/ACg8ocKA2rKTYFTRCmV6mmsWcupxFlKVWkQm9cOmYu2u
 
 이러한 변경으로 Google 프로필 이미지 로딩 관련 문제가 해결되어, 더 나은 사용자경
 험을 제공할 수 있게 되었습니다.
+
+## [트러블슈팅] FriendRequestPage 레이아웃 문제 트러블슈팅(2025/05/08-안주민)
+
+### 문제상황
+
+- FriendRequestPage가 웹 레이아웃에서 컨텐츠가 보이지 않는 문제 발생
+- 모바일 레이아웃에서는 정상 작동하나 웹 레이아웃에서만 문제 발생
+- 헤더와 컨텐츠가 겹치는 현상 발생
+
+### 원인 분석
+
+1. 레이아웃 구조의 차이
+
+   - WebLayout: header가 `absolute` 포지션 사용
+   - MobileLayout: header가 `fixed` 포지션 사용
+   - MobileLayout은 `mt-16`으로 헤더 높이만큼 마진을 주고 있었으나, WebLayout은
+     이 마진이 없었음
+
+2. 컴포넌트 구조의 문제
+   - FriendRequestListPage에서 불필요한 div 래퍼로 인한 스타일 중첩
+   - FriendRequestPage에서 직접 레이아웃 관련 스타일을 처리하려 시도
+
+### 해결방법
+
+1. FriendRequestListPage 수정
+
+   - 불필요한 div 래퍼 제거
+   - 컴포넌트 구조 단순화
+
+2. FriendRequestPage 수정
+
+   - 레이아웃 관련 스타일 제거
+   - 컨텐츠에만 집중하도록 수정
+
+3. WebLayout 수정
+   - main 태그에 `mt-16` 추가하여 헤더 높이만큼 마진 부여
+   - MobileLayout과 동일한 방식으로 컨텐츠 영역 조정
+
+### 예시
+
+```tsx
+// WebLayout.tsx 수정 전
+<main className='flex-1 h-full flex flex-col overflow-y-auto'>
+
+// WebLayout.tsx 수정 후
+<main className='flex-1 h-full flex flex-col overflow-y-auto mt-16'>
+```
+
+### 결론 및 정리
+
+1. 레이아웃 관련 스타일은 레이아웃 컴포넌트에서 일관되게 처리해야 함
+2. 웹/모바일 레이아웃 간의 차이점을 명확히 이해하고 일관된 스타일 적용 필요
+3. 불필요한 컴포넌트 래핑은 스타일 중첩 문제를 일으킬 수 있으므로 주의 필요
+4. 레이아웃과 컨텐츠의 책임을 명확히 분리하여 관리하는 것이 중요
+
+## [트러블슈팅] 친구 요청 취소 시 UI 즉시 반영 문제 (2025/05/11-안주민)
+
+### 문제상황
+
+- 친구 요청 취소 시 UI가 즉시 반영되지 않는 문제 발생
+- 취소 버튼 클릭 후 모달은 닫히지만, 목록에서 해당 요청이 사라지지 않음
+- 새로고침해야만 취소된 요청이 목록에서 제거됨
+
+### 원인 분석
+
+1. **캐시 무효화(Invalidation) 문제**
+
+   - `cancelRequest` mutation의 `onSuccess` 콜백에서 `friendRequests` 쿼리키 무
+     효화 누락
+   - `acceptRequest`와 `rejectRequest`에서는 `friendRequests` 쿼리키를 무효화하
+     고 있었으나, `cancelRequest`에서는 누락
+
+2. **비동기 처리 순서 문제**
+
+   - `handleAction` 함수에서 mutation 완료를 기다리지 않고 바로 `onClose()` 호출
+   - UI 업데이트 전에 모달이 닫혀서 사용자에게 변경사항이 보이지 않음
+
+   **개선 전 문제점:**
+
+   - API 요청이 완료되기 전에 모달이 닫혀서 사용자에게 피드백이 없음
+   - 사용자는 요청이 성공했는지 실패했는지 알 수 없음
+   - UI가 업데이트된 후에 모달이 닫히므로 사용자가 변경사항을 확인할 수 있음
+
+### 해결방법
+
+1. **캐시 무효화 추가**
+
+   ```typescript
+   const cancelRequest = useMutation({
+   	mutationFn: (requestId: number) =>
+   		socialApi.cancelFriendRequest(requestId),
+   	onSuccess: () => {
+   		queryClient.invalidateQueries({ queryKey: ['searchUser'] });
+   		queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+   	},
+   });
+   ```
+
+2. **비동기 처리 개선**
+
+   ```typescript
+   const handleAction = async () => {
+   	if (!friendRequest) return;
+
+   	try {
+   		switch (actionType) {
+   			case 'cancel':
+   				await cancelRequest(friendRequest.id);
+   				break;
+   		}
+   		onClose();
+   	} catch (error) {
+   		console.error('Failed to process friend request:', error);
+   	}
+   };
+   ```
+
+### 예시
+
+**문제가 있는 코드**
+
+```typescript
+// 캐시 무효화 누락
+const cancelRequest = useMutation({
+	mutationFn: (requestId: number) => socialApi.cancelFriendRequest(requestId),
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['searchUser'] });
+	},
+});
+
+// 비동기 처리 미흡
+const handleAction = () => {
+	cancelRequest(friendRequest.id);
+	onClose(); // mutation 완료 전에 호출
+};
+```
+
+**개선된 코드**
+
+```typescript
+// 캐시 무효화 추가
+const cancelRequest = useMutation({
+	mutationFn: (requestId: number) => socialApi.cancelFriendRequest(requestId),
+	onSuccess: () => {
+		queryClient.invalidateQueries({ queryKey: ['searchUser'] });
+		queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
+	},
+});
+
+// 비동기 처리 개선
+const handleAction = async () => {
+	try {
+		await cancelRequest(friendRequest.id);
+		onClose(); // mutation 완료 후 호출
+	} catch (error) {
+		console.error('Failed to process friend request:', error);
+	}
+};
+```
+
+### 결론 및 정리
+
+1. **React Query 캐시 관리**
+
+   - mutation 성공 시 관련된 모든 쿼리키를 무효화하여 UI 동기화
+   - `friendRequests`와 `searchUser` 쿼리키 모두 무효화 필요
+
+2. **비동기 처리**
+
+   - mutation 완료를 기다린 후 UI 업데이트
+   - 에러 처리 추가로 안정성 향상
+
+3. **디버깅 포인트**
+   - Network 탭에서 API 호출 확인
+   - React Query DevTools로 캐시 상태 모니터링
+   - 서버 응답 상태 확인
+
+이러한 변경으로 친구 요청 취소 시 UI가 즉시 반영되어 더 나은 사용자 경험을 제공
+할 수 있게 되었습니다.
+
+## [트러블슈팅] FriendRequestActionModal 불필요한 API 호출 문제(2025/05/11)
+
+### 문제상황
+
+FriendRequestActionModal 컴포넌트에서 useRequest 훅이 모달의 열림/닫힘 상태와 관
+계없이 항상 API를 호출하는 문제가 발생했습니다. 이는 모달이 닫혀있을 때도 불필요
+한 API 호출이 발생한다는 것을 의미합니다.
+
+### 원인 분석
+
+1. **React 컴포넌트의 마운트/언마운트 원리**
+
+   - React에서 컴포넌트가 렌더링될 때마다 해당 컴포넌트의 모든 코드가 실행됨
+   - `FriendRequestActionModal`이 부모 컴포넌트에 포함되어 있다면, 부모가 렌더링
+     될 때마다 모달 컴포넌트의 코드도 실행됨
+   - 이는 모달이 실제로 보이지 않더라도(`isOpen={false}`) 마찬가지
+
+2. **부모-자식 컴포넌트 관계의 문제**
+
+   - 부모 컴포넌트(예: FriendRequestPage)에서 모달 컴포넌트가 항상 마운트되어 있
+     음
+   - 모달의 `isOpen` prop이 `false`여도 컴포넌트 자체는 존재하고 실행됨
+   - 결과적으로 모든 친구 요청에 대한 API 호출이 동시에 발생
+
+3. **useRequest 훅의 동작 방식**
+
+   - 컴포넌트가 렌더링될 때마다 useRequest 훅이 호출됨
+   - memberId가 항상 존재하여 API 호출이 발생
+   - 모달의 isOpen 상태와 관계없이 API 호출이 이루어짐
+
+4. **실제 사용 예시**
+   ```typescript
+   // 부모 컴포넌트 (FriendRequestPage)
+   const FriendRequestPage = () => {
+   	return (
+   		<div>
+   			{/* 다른 컨텐츠 */}
+   			{friendRequests.map((request) => (
+   				<FriendRequestActionModal
+   					key={request.id}
+   					isOpen={false} // 모달이 닫혀있음
+   					memberId={request.memberId}
+   					// ... 다른 props
+   				/>
+   			))}
+   		</div>
+   	);
+   };
+   ```
+   - 이 경우 모든 친구 요청에 대해 모달 컴포넌트가 생성됨
+   - 각 모달 컴포넌트는 자신의 memberId로 API 호출을 시도
+   - 결과적으로 모든 친구 요청에 대한 API가 동시에 호출됨
+
+### 해결방법
+
+useRequest 훅에 전달되는 memberId를 조건부로 전달하도록 수정:
+
+```typescript
+const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
+	useRequest(isOpen ? memberId : undefined);
+```
+
+### 예시
+
+#### 수정 전
+
+```typescript
+const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
+	useRequest(memberId); // 항상 API 호출 발생
+```
+
+#### 수정 후
+
+```typescript
+const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
+	useRequest(isOpen ? memberId : undefined); // 모달이 열려있을 때만 API 호출
+```
+
+### 결론 및 정리
+
+1. **React 컴포넌트 동작 원리 이해**
+
+   - 컴포넌트가 마운트되면 모든 코드가 실행됨
+   - 조건부 렌더링이 필요할 때는 적절한 조건 체크 필요
+
+2. **성능 최적화**
+
+   - 불필요한 API 호출 감소
+   - 서버 부하 감소
+   - 네트워크 트래픽 감소
+   - 사용자 경험 개선
+
+3. **React 훅 사용 시 주의사항**
+
+   - 훅의 호출 시점과 조건을 잘 고려해야 함
+   - 불필요한 API 호출을 방지하기 위해 조건부 실행을 적절히 활용
+   - 타입 안정성을 위해 undefined를 사용하여 타입 에러 방지
+
+4. **모달 컴포넌트 설계 시 고려사항**
+   - 모달의 열림/닫힘 상태에 따라 API 호출을 제어하는 것이 성능상 이점이 있음
+   - 불필요한 리소스 사용을 방지하기 위한 조건부 로직 구현 필요

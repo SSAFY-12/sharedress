@@ -24,7 +24,7 @@ export const headerConfig: HeaderConfig = {
 	'/social/add': {
 		showBack: true,
 		subtitle: '친구 ID로 추가',
-		badgeText: '확인',
+		// badgeText: '확인',
 	},
 	'/social/request': {
 		showBack: true,

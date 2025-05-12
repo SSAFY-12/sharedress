@@ -25,7 +25,7 @@ const TestMobileLayout = () => (
 			</div>
 		</div>
 		{/* Bottom Navigation Bar */}
-		<NavBar />
+		<NavBar openModal={() => console.log('Modal opened')} />
 	</div>
 );
 export default TestMobileLayout;
