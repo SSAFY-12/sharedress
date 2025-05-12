@@ -3,34 +3,31 @@ import 'react-toastify/dist/ReactToastify.css';
 import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
 import { ToastContainer } from 'react-toastify';
-import { useTokenValidation } from './features/auth/hooks/useTokenValidation';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 import useFcmStore from '@/store/useFcmStore';
-import { useLocation } from 'react-router-dom';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
-	// const isInitialized = useAuthStore((state) => state.isInitialized);
+	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
-	const location = useLocation();
-
+	// useTokenValidation();
 	// 공개 라우트 목록
-	const isPublicRoute =
-		location.pathname === '/auth' ||
-		location.pathname === '/auth/google/callback' ||
-		location.pathname === '/oauth/google/callback' ||
-		location.pathname.startsWith('/link/') ||
-		location.pathname.startsWith('/friend/');
+	// const isPublicRoute =
+	// 	location.pathname === '/auth' ||
+	// 	location.pathname === '/auth/google/callback' ||
+	// 	location.pathname === '/oauth/google/callback' ||
+	// 	location.pathname.startsWith('/link/') ||
+	// 	location.pathname.startsWith('/friend/');
 
-	// 공개 라우트가 아니면 토큰 검사
-	useEffect(() => {
-		if (!isPublicRoute) {
-			useTokenValidation();
-		}
-	}, [location.pathname, isPublicRoute]);
+	// // 공개 라우트가 아니면 토큰 검사
+	// useEffect(() => {
+	// 	if (!isPublicRoute) {
+	// 		useTokenValidation();
+	// 	}
+	// }, [isPublicRoute]);
 
 	useEffect(() => {
 		console.log('FCM Token:', useFcmStore.getState().token);
@@ -61,8 +58,8 @@ export const App = () => {
 	// 	}
 	// };
 
-	if (isLoading) {
-		return <div>Loading...</div>; // 또는 로딩 스피너 컴포넌트
+	if (isLoading || !isInitialized) {
+		return <div>Loading...</div>;
 	}
 
 	return (
