@@ -44,6 +44,7 @@ const MyClosetPage = () => {
 					nickname={profile?.nickname}
 					code={profile?.code}
 					statusMessage={profile?.oneLiner}
+					isMe={true}
 				/>
 				{/* 자연스러운 그라데이션 효과 */}
 				<div
@@ -88,6 +89,7 @@ const MyClosetPage = () => {
 					<ClosetTab
 						memberId={profile?.id ?? 0}
 						selectedCategory={selectedCategory}
+						isMe={true}
 					/>
 				) : (
 					<CodiTab

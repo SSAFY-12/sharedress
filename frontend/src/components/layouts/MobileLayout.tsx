@@ -10,13 +10,14 @@ import { SubBtnModal } from '@/components/modals/sub-btn-modal/SubBtnModal';
 
 export const MobileLayout = () => {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
 	const isClothEdit = matchPath('/cloth/:id/edit', location.pathname) !== null;
+	const isFriendPage = matchPath('/friend/:id', location.pathname) !== null;
 	const isCodiEdit = matchPath('/codi/edit', location.pathname) !== null;
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
-	const navigate = useNavigate();
 
 	/* 네비게이션 바 표시 여부 결정	*/
 	const firstDepth = '/' + location.pathname.split('/')[1];
@@ -45,7 +46,8 @@ export const MobileLayout = () => {
 					{isMyPage ||
 					isClothEdit ||
 					isCodiEdit ||
-					isCodiSave ? null : isSocial ? (
+					isCodiSave ||
+					isFriendPage ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
@@ -53,7 +55,9 @@ export const MobileLayout = () => {
 				</header>
 				<main
 					className={`flex-1 ${
-						isMyPage || isClothEdit || isCodiEdit || isCodiSave ? '' : 'mt-16'
+						isMyPage || isClothEdit || isCodiEdit || isCodiSave || isFriendPage
+							? ''
+							: 'mt-16'
 					} ${
 						showNav ? 'mb-16' : 'mb-0'
 					} h-full flex flex-col overflow-y-auto `}

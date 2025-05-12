@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { Shirt, CoinsIcon as Coat, MessageSquare } from 'lucide-react';
 import { SubBtnModalProps } from './SubBtnModal.types';
 import { useNavigate } from 'react-router-dom';
 

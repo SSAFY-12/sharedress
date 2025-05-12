@@ -1,6 +1,10 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import { myCodiSaveApi } from '@/features/codi/api/codiApi';
+import {
+	myCodiSaveApi,
+	recommendedCodiSaveApi,
+	SaveCodiRequest,
+} from '@/features/codi/api/codiApi';
 import Header from '@/components/layouts/Header';
 import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
@@ -10,6 +14,21 @@ const EMPTY_FN = () => {};
 
 const CodiSavePage = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
+
+	const mode = location.state?.mode ?? 'my';
+	const targetMemberId = location.state?.targetMemberId ?? 0;
+
+	const saveCodi = async (
+		payload: Omit<SaveCodiRequest, 'isPublic'> & { isPublic?: boolean },
+	) => {
+		if (mode === 'my') {
+			return await myCodiSaveApi(payload as SaveCodiRequest);
+		}
+		if (!targetMemberId) throw new Error('targetMemberId is required');
+		return await recommendedCodiSaveApi(targetMemberId.toString(), payload);
+	};
+
 	const [codiItems, setCodiItems] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [description, setDescription] = useState('');
@@ -47,14 +66,14 @@ const CodiSavePage = () => {
 			const payload = {
 				title: '임시 제목',
 				description,
-				isPublic,
 				isTemplate: false,
 				items: formattedItems,
+				...(mode === 'my' ? { isPublic } : {}),
 			};
 
 			console.log(payload);
 
-			await myCodiSaveApi(payload);
+			await saveCodi(payload);
 			alert('코디가 저장되었습니다!');
 			navigate('/');
 		} catch (error) {
@@ -106,6 +125,7 @@ const CodiSavePage = () => {
 							isLoading={isLoading}
 							onDescriptionChange={handleDescriptionChange}
 							onPublicToggle={handlePublicToggle}
+							mode={mode}
 						/>
 					</>
 				)}

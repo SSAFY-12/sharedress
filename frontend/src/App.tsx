@@ -6,15 +6,22 @@ import { ToastContainer } from 'react-toastify';
 import { useTokenValidation } from './features/auth/hooks/useTokenValidation';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
+import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
+import useFcmStore from '@/store/useFcmStore';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	// const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
-
+	useEffect(() => {
+		console.log('FCM Token:', useFcmStore.getState().token);
+	}, []);
 	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 	useTokenValidation();
+
+	// FCM 초기화
+	useFcmInitialization();
 
 	// 앱 시작 시 토큰 초기화
 	useEffect(() => {
@@ -83,14 +90,14 @@ export const App = () => {
 			<ToastContainer
 				position='top-right'
 				autoClose={3000}
-				hideProgressBar={true} // 새로운 토스트가 위에 표시
+				hideProgressBar={true}
 				newestOnTop={false}
 				closeOnClick
-				rtl={false} // 오른쪽에서 왼쪽으로 표시
-				pauseOnFocusLoss // 포커스 손실 시 일시정지
-				draggable={false} // 드래그 가능 여부
-				pauseOnHover // 마우스 오버 시 일시정지
-				theme='light' // 테마 설정
+				rtl={false}
+				pauseOnFocusLoss
+				draggable={false}
+				pauseOnHover
+				theme='light'
 			/>
 		</>
 	);

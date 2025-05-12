@@ -1,31 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Vite + React + TS</title>
+		<title>쉐어드레스</title>
 	</head>
 	<body>
 		<div id="root"></div>
 		<script type="module" src="/src/main.tsx"></script>
 		<script>
 			if ('serviceWorker' in navigator) {
-				window.addEventListener('load', () => {
-					navigator.serviceWorker
-						.register('/sw.js', {
-							scope: '/',
-							type: 'module',
-						})
-						.then((registration) => {
-							console.log(
-								'Service Worker registered successfully:',
-								registration,
-							);
-						})
-						.catch((error) => {
-							console.error('Service Worker registration failed:', error);
-						});
+				window.addEventListener('load', async () => {
+					try {
+						// PWA 서비스 워커 등록
+						const pwaRegistration = await navigator.serviceWorker.register(
+							'/sw.js',
+							{
+								scope: '/',
+							},
+						);
+						console.log('PWA Service Worker registered:', pwaRegistration);
+
+						// FCM 서비스 워커 등록
+						const fcmRegistration = await navigator.serviceWorker.register(
+							'/firebase-messaging-sw.js',
+							{
+								scope: '/',
+							},
+						);
+						console.log('FCM Service Worker registered:', fcmRegistration);
+					} catch (error) {
+						console.error('Service Worker registration failed:', error);
+					}
 				});
 			}
 		</script>
