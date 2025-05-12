@@ -7,16 +7,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.ssafy.sharedress.config.MusinsaFeignConfig;
 
 @FeignClient(
-	name = "loginMusinsaFeignClient",
+	name = "loginMusinsaClient",
 	url = "http://localhost:3000",
 	configuration = MusinsaFeignConfig.class
 )
-public interface LoginMusinsaFeignClient {
+public interface LoginMusinsaClient {
 
 	@PostMapping("/login")
 	MusinsaResponse login(@RequestBody LoginRequest request);
 
 	record LoginRequest(
+		Long shopId,
 		String id,
 		String password
 	) {

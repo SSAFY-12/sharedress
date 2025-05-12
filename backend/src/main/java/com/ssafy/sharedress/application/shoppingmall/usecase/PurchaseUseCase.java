@@ -1,9 +1,17 @@
 package com.ssafy.sharedress.application.shoppingmall.usecase;
 
-import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaFeignClient;
+import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaClient;
 
 public interface PurchaseUseCase {
-	LoginMusinsaFeignClient.MusinsaResponse loginMusinsa(
-		LoginMusinsaFeignClient.LoginRequest request
+	LoginMusinsaClient.MusinsaResponse loginMusinsa(
+		LoginMusinsaClient.LoginRequest request
+	);
+
+	void getMusinsaPurchaseHistory(
+		Long memberId,
+		Long shopId,
+		String appAtk,
+		String appRtk,
+		String rootOrderNo
 	);
 }

@@ -18,6 +18,8 @@ public interface NotificationUseCase {
 
 	void sendCommentNotification(Long senderId, Long coordinationId, Long parentId, String message);
 
+	void sendAiCompleteNotification(Long memberId, String fcmToken);
+
 	List<NotificationResponse> getNotifications(Long memberId);
 
 	NotificationReadResponse readNotification(Long notificationId, Long memberId);

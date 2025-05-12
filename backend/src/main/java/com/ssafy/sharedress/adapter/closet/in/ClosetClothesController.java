@@ -100,13 +100,4 @@ public class ClosetClothesController {
 			closetClothesUseCase.addLibraryClothesToCloset(request.itemId(), member.getId())
 		);
 	}
-
-	// @PostMapping("/closet/clothes/purchase-history")
-	// public ResponseEntity<ResponseWrapper<Void>> registerClothesFromPurchase(
-	// 	@RequestBody PurchaseHistoryRequest request,
-	// 	@CurrentMember Member member
-	// ) {
-	// 	closetClothesUseCase.registerClothesFromPurchase(request, member.getId());
-	// 	return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
-	// }
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaFeignClient;
+import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaClient;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
 import com.ssafy.sharedress.application.shoppingmall.dto.ShoppingMallResponse;
 import com.ssafy.sharedress.application.shoppingmall.usecase.PurchaseUseCase;
@@ -37,11 +37,12 @@ public class ShoppingMallController {
 	@PostMapping("closet/clothes/purchase-history")
 	public ResponseEntity<ResponseWrapper<Void>> purchaseClothes(
 		@CurrentMember Member member,
-		@RequestBody LoginMusinsaFeignClient.LoginRequest request
+		@RequestBody LoginMusinsaClient.LoginRequest request
 	) {
-		log.info("token= {}", purchaseUseCase.loginMusinsa(request).tokens());
+		LoginMusinsaClient.Tokens tokens = purchaseUseCase.loginMusinsa(request).tokens();
+		purchaseUseCase.getMusinsaPurchaseHistory(member.getId(), request.shopId(), tokens.app_atk(), tokens.app_rtk(),
+			null);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
-
 }
