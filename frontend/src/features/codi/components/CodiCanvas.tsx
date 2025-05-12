@@ -291,6 +291,7 @@ const CodiCanvas = ({
 	return (
 		<div
 			ref={canvasRef}
+			id='codi-canvas'
 			className='relative w-full aspect-square bg-gray-50 overflow-hidden touch-pan-x'
 			onClick={isEditable ? handleCanvasClick : undefined}
 			onTouchEnd={isEditable ? handleCanvasClick : undefined}

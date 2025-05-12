@@ -4,10 +4,14 @@ import {
 	myCodiSaveApi,
 	recommendedCodiSaveApi,
 	SaveCodiRequest,
+	captureCanvasImage,
+	uploadCodiThumbnail,
 } from '@/features/codi/api/codiApi';
 import Header from '@/components/layouts/Header';
 import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
+import { base64ToFile } from '@/features/codi/utils/base64ToFile';
+import LoadingOverlay from '@/features/codi/components/LoadingOverlay';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
@@ -33,6 +37,7 @@ const CodiSavePage = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [description, setDescription] = useState('');
 	const [isPublic, setIsPublic] = useState(true);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	useEffect(() => {
 		const savedItems = localStorage.getItem('codiItems');
@@ -51,6 +56,7 @@ const CodiSavePage = () => {
 	};
 
 	const handleComplete = async () => {
+		setIsSubmitting(true);
 		try {
 			const formattedItems = codiItems.map((item) => ({
 				id: Number(item.id),
@@ -71,14 +77,38 @@ const CodiSavePage = () => {
 				...(mode === 'my' ? { isPublic } : {}),
 			};
 
-			console.log(payload);
+			const container = document.getElementById('codi-canvas');
+			if (!container) throw new Error('코디 캔버스를 찾을 수 없습니다.');
 
-			await saveCodi(payload);
+			const base64 = await captureCanvasImage(container);
+			console.log('base64:', base64);
+
+			const file = base64ToFile(base64, 'codi.png', 'image/png');
+			console.log('[DEBUG] 변환된 File:', file);
+			console.log('[DEBUG] 파일 크기:', file.size);
+
+			const saved = await saveCodi(payload);
+			const coordinationId = saved.content.id;
+			console.log('[DEBUG] 저장된 coordinationId:', coordinationId);
+
+			const result = await uploadCodiThumbnail(coordinationId, file);
+			console.log('[DEBUG] 썸네일 업로드 응답:', result);
+
 			alert('코디가 저장되었습니다!');
-			navigate('/');
+			if (mode === 'my') {
+				navigate('/mypage', {
+					state: { initialTab: '코디' },
+				});
+			} else {
+				navigate(`/friend/${targetMemberId}`, {
+					state: { initialTab: '코디', initialSubTab: 'recommended' },
+				});
+			}
 		} catch (error) {
 			console.error('코디 저장 실패:', error);
 			alert('코디 저장 실패');
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -101,6 +131,7 @@ const CodiSavePage = () => {
 
 	return (
 		<div className='w-full h-screen flex flex-col bg-white'>
+			{isSubmitting && <LoadingOverlay />}
 			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-auto'>
 				{isLoading ? (

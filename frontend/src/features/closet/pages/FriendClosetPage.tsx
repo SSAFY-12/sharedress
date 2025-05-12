@@ -26,6 +26,8 @@ const FriendClosetPage = () => {
 	const location = useLocation();
 	const initialTab =
 		(location.state?.initialTab as (typeof closetTab)[number]) ?? '옷장';
+	const initialSubTab =
+		(location.state?.initialSubTab as 'friends' | 'recommended') ?? 'friends';
 
 	// 상태 관리
 	const [activeMainTab, setActiveMainTab] = useState<
@@ -33,7 +35,7 @@ const FriendClosetPage = () => {
 	>(initialTab ?? '옷장');
 	const [selectedCategory, setSelectedCategory] = useState(categoryConfig[0]);
 	const [activeSubTab, setActiveSubTab] = useState<'friends' | 'recommended'>(
-		'friends',
+		initialSubTab ?? 'friends',
 	);
 
 	const { id } = useParams();
