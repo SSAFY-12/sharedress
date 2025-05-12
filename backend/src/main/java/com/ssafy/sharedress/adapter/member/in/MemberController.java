@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ssafy.sharedress.application.guest.annotation.CurrentGuest;
 import com.ssafy.sharedress.application.guest.usecase.GuestUseCase;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.application.member.dto.DecodingOpenLinkResponse;
 import com.ssafy.sharedress.application.member.dto.FcmTokenRequest;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MemberSearchResponse;
@@ -114,7 +115,7 @@ public class MemberController {
 	}
 
 	@GetMapping("/open-link/{hash}")
-	public ResponseEntity<ResponseWrapper<Long>> decodeHash(
+	public ResponseEntity<ResponseWrapper<DecodingOpenLinkResponse>> decodeHash(
 		HttpServletResponse response,
 		@CurrentMember(required = false) Member member,
 		@CurrentGuest(required = false) Guest guest,
@@ -129,8 +130,7 @@ public class MemberController {
 			response.addCookie(cookie);
 		}
 
-		Long memberId = new Hashids("sharedress", 10).decode(hash)[0];
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, memberId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, memberQueryUseCase.decodeOpenLink(hash));
 	}
 
 	@PatchMapping("/members/profile/notification")
