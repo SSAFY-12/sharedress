@@ -20,12 +20,12 @@ const GoogleCallbackHandler = () => {
 				mutation.mutate(accessToken, {
 					onError: (error) => {
 						console.error('토큰 검증 실패:', error);
-						navigate('/login');
+						navigate('/auth');
 					},
 				});
 			} else {
 				console.error('토큰을 찾을 수 없습니다.');
-				navigate('/login');
+				navigate('/auth');
 			}
 		};
 

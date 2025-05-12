@@ -31,10 +31,6 @@ export const router = createBrowserRouter([
 				index: true,
 				element: <InitialRoute />,
 			},
-			// {
-			// 	path: 'auth',
-			// 	element: <AuthPage />,
-			// },
 			{
 				path: 'wardrobe',
 				element: <WardrobePage />,
@@ -51,20 +47,10 @@ export const router = createBrowserRouter([
 				path: 'regist/*',
 				element: <RegistPage />,
 			},
-
 			{
 				path: 'notification',
 				element: <NotificationPage />,
 			},
-
-			{
-				path: '*',
-				element: <Navigate to='/wardrobe' replace />,
-			},
-			// {
-			// 	path: '*',
-			// 	element: <Navigate to='/wardrobe' replace />,
-			// },
 			{
 				path: 'mypage',
 				element: <MyClosetPage />,
@@ -92,6 +78,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/codi/save',
 				element: <CodiSavePage />,
+			},
+			{
+				path: '*',
+				element: <Navigate to='/' replace />,
 			},
 		],
 	},
