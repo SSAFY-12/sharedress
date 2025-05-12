@@ -81,10 +81,8 @@ client.interceptors.response.use(
 				const { clearAuth } = useAuthStore.getState();
 				clearAuth();
 
-				// 현재 경로가 /auth가 아닌 경우에만 리다이렉트
-				if (!window.location.pathname.includes('/auth')) {
-					window.location.href = '/auth';
-				}
+				// 로그아웃 후 /auth로 이동 (항상 이동)
+				window.location.href = '/auth';
 				return Promise.reject(refreshError);
 			}
 		}

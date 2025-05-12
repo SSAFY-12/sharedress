@@ -26,10 +26,8 @@ export const useAuthStore = create<AuthState>()(
 			logout: () => {
 				// 로그아웃 처리
 				toast.info('로그아웃되었습니다.');
-				set({
-					accessToken: null, // 액세스 토큰 초기화
-					isAuthenticated: false, // 인증 여부 초기화
-				});
+				useAuthStore.getState().clearAuth();
+				window.location.href = '/auth';
 			},
 			clearAuth: () => {
 				// 인증 정보 초기화
