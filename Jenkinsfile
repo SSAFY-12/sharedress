@@ -92,6 +92,14 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+  # 2) 새로 추가할 Musinsa 서비스 (Docker Hub)
+  musinsa:
+    image: leejh7/sharedress-musinsa:latest
+    container_name: musinsa_app
+    restart: always
+    ports:
+      - "3000:3000" 
 EOL"
 
             # ECR 로그인 추가 및 Blue EC2에서 컨테이너 재시작
