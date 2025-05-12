@@ -14,6 +14,13 @@ import NotificationPage from '@/pages/NotificationPage';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
+import { useAuthStore } from '@/store/useAuthStore';
+
+// 초기 라우트 컴포넌트
+const InitialRoute = () => {
+	const { accessToken } = useAuthStore.getState();
+	return <Navigate to={accessToken ? '/mypage' : '/auth'} replace />;
+};
 
 export const router = createBrowserRouter([
 	{
@@ -22,9 +29,7 @@ export const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
-				// element: <Navigate to='/wardrobe' />,
-				element: <Navigate to='/wardrobe' />,
-				// 초기 세팅값 wardrobe
+				element: <InitialRoute />,
 			},
 			// {
 			// 	path: 'auth',
@@ -46,6 +51,7 @@ export const router = createBrowserRouter([
 				path: 'regist/*',
 				element: <RegistPage />,
 			},
+
 			{
 				path: 'notification',
 				element: <NotificationPage />,
