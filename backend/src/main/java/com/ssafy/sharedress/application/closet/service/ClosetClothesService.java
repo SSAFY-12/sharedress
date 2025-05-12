@@ -137,16 +137,24 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 		request.items().forEach(item -> {
 
+			// 상품명 필수 체크
+			if (item.name() == null || item.name().isBlank()) {
+				log.warn("상품명이 비어있어 등록에서 제외됨: item={}", item);
+				return;
+			}
+
 			// 브랜드 조회 또는 저장
 			Brand brand = brandRepository.findByExactNameEnOrKr(item.brandNameEng(), item.brandNameKor())
 				.orElseGet(() -> brandRepository.save(new Brand(item.brandNameEng(), item.brandNameKor())));
 
+			String normalizedName = normalizeProductName(item.name());
+
 			// 라이브러리 조회 (상품명 + 브랜드 ID 기준)
-			Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(item.name(), brand.getId());
+			Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(normalizedName, brand.getId());
 
 			// Clothes 객체 (있으면 재사용, 없으면 생성 및 저장)
 			Clothes clothes = existing.orElseGet(() ->
-				clothesRepository.save(new Clothes(item.name(), brand, shoppingMall, item.linkUrl()))
+				clothesRepository.save(new Clothes(normalizedName, brand, shoppingMall, item.linkUrl()))
 			);
 
 			// 내 옷장에 이미 있는 옷인지 확인
@@ -185,5 +193,17 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				throw new RuntimeException("메시지 전송 실패", e);
 			}
 		}
+	}
+
+	private String normalizeProductName(String name) {
+		if (name == null) {
+			return null;
+		}
+		// [] 패턴 제거
+		name = name.replaceAll("^\\s*\\[[^\\]]*\\]\\s*", "");
+		// () 패턴 제거
+		name = name.replaceAll("^\\s*\\([^)]*\\)\\s*", "");
+		// 양쪽 공백 제거
+		return name.trim();
 	}
 }

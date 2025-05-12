@@ -2,6 +2,7 @@ package com.ssafy.sharedress.application.closet.dto;
 
 import java.time.LocalDateTime;
 
+import com.ssafy.sharedress.application.brand.dto.BrandDetailResponse;
 import com.ssafy.sharedress.application.category.dto.CategoryResponse;
 import com.ssafy.sharedress.application.color.dto.ColorResponse;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
@@ -11,7 +12,7 @@ public record ClosetClothesDetailResponse(
 	Long id,
 	String image,
 	String name,
-	String brandName,
+	BrandDetailResponse brand,
 	String shopName,
 	ColorResponse color,
 	CategoryResponse category,
@@ -26,10 +27,16 @@ public record ClosetClothesDetailResponse(
 			entity.getId(),
 			entity.getImageUrl(),
 			entity.getCustomName() != null ? entity.getCustomName() : clothes.getName(),
-			entity.getCustomBrand() != null ? entity.getCustomBrand().getNameKr() : clothes.getBrand().getNameKr(),
+			entity.getCustomBrand() != null
+				? BrandDetailResponse.from(entity.getCustomBrand())
+				: BrandDetailResponse.from(clothes.getBrand()),
 			clothes.getShoppingMall() != null ? clothes.getShoppingMall().getName() : null,
-			ColorResponse.from(clothes.getColor()),
-			CategoryResponse.from(clothes.getCategory()),
+			entity.getCustomColor() != null
+				? ColorResponse.from(entity.getCustomColor())
+				: ColorResponse.from(clothes.getColor()),
+			entity.getCustomCategory() != null
+				? CategoryResponse.from(entity.getCustomCategory())
+				: CategoryResponse.from(clothes.getCategory()),
 			Boolean.TRUE.equals(entity.getIsPublic()),
 			entity.getCreatedAt()
 		);
