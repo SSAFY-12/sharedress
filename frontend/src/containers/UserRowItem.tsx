@@ -1,6 +1,5 @@
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
 import { Friend } from '@/features/social/pages/FriendCodiRequestPage';
-import { useEffect } from 'react';
 
 interface UserRowItemProps {
 	userId?: number;
@@ -23,7 +22,6 @@ export const UserRowItem = ({
 	userAvatar,
 	userStatus,
 	actionButtonText,
-	onActionClick,
 	codiRequestClick,
 	onClick,
 	className = '',

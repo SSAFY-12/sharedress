@@ -1,112 +1,42 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Header from '@/components/layouts/Header';
 import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSection';
+import { useProfileStore } from '@/store/useProfileStore';
+import { useCloset } from '@/features/closet/hooks/useCloset';
+
+const CATEGORIES = [
+	{ id: 'all', label: '전체' },
+	{ id: '2', label: '아우터' },
+	{ id: '1', label: '상의' },
+	{ id: '3', label: '하의' },
+	{ id: '4', label: '신발' },
+	{ id: '5', label: '기타' },
+];
 
 const CodiEditPage = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const mode = location.state?.mode ?? 'my';
+	const targetMemberId = location.state?.targetMemberId ?? 0;
 
-	const categories = [
-		{ id: 'all', label: '전체' },
-		{ id: 'top', label: '상의' },
-		{ id: 'bottom', label: '하의' },
-		{ id: 'outer', label: '아우터' },
-		{ id: 'shoes', label: '신발' },
-		{ id: 'etc', label: '기타' },
-	];
+	const isRecommendedMode = mode === 'recommended';
+	const memberId = isRecommendedMode
+		? targetMemberId
+		: useProfileStore((state) => state.getMyId()) ?? 0;
 
-	interface Product {
-		id: number;
-		imageUrl: string;
-		name: string;
-		brand: string;
-		category: string;
-	}
-
-	const products: Product[] = [
-		{
-			id: 1,
-			imageUrl: 'https://picsum.photos/200',
-			name: '체크 셔츠',
-			brand: 'INTHERAW',
-			category: 'top',
-		},
-		{
-			id: 2,
-			imageUrl: 'https://picsum.photos/200',
-			name: '화이트 티셔츠',
-			brand: 'INTHERAW',
-			category: 'top',
-		},
-		{
-			id: 3,
-			imageUrl: 'https://picsum.photos/200',
-			name: '네이비 팬츠',
-			brand: 'INTHERAW',
-			category: 'bottom',
-		},
-		{
-			id: 4,
-			imageUrl: 'https://picsum.photos/200',
-			name: '브라운 가죽 벨트',
-			brand: 'INTHERAW',
-			category: 'etc',
-		},
-		{
-			id: 5,
-			imageUrl: 'https://picsum.photos/200',
-			name: '블랙 드레스 슈즈',
-			brand: 'Dr.Martens',
-			category: 'shoes',
-		},
-		{
-			id: 6,
-			imageUrl: 'https://picsum.photos/200',
-			name: '베이지 재킷',
-			brand: '도날드덕 잠옷',
-			category: 'outer',
-		},
-		{
-			id: 7,
-			imageUrl: 'https://picsum.photos/200',
-			name: '옷',
-			brand: '브랜드',
-			category: 'shoes',
-		},
-		{
-			id: 8,
-			imageUrl: 'https://picsum.photos/200',
-			name: '옷',
-			brand: '브랜드',
-			category: 'bottom',
-		},
-		{
-			id: 9,
-			imageUrl: 'https://picsum.photos/200',
-			name: '옷',
-			brand: '브랜드',
-			category: 'outer',
-		},
-		{
-			id: 10,
-			imageUrl: 'https://picsum.photos/200',
-			name: '옷',
-			brand: '브랜드',
-			category: 'etc',
-		},
-	];
-
-	// 상태 관리
+	// 카테고리 상태
 	const [activeCategory, setActiveCategory] = useState('all');
+	const categoryId =
+		activeCategory === 'all' ? undefined : Number(activeCategory);
+
+	// 옷장 데이터 조회
+	const { data: products } = useCloset(memberId, categoryId);
+
+	// 캔버스 아이템 상태
 	const [canvasItems, setCanvasItems] = useState<any[]>([]);
 	const [maxZIndex, setMaxZIndex] = useState(0);
-
-	// 카테고리 필터링
-	const filteredProducts =
-		activeCategory === 'all'
-			? products
-			: products.filter((product) => product.category === activeCategory);
 
 	// 아이템을 캔버스에 추가하는 함수
 	const addItemToCanvas = (item: any) => {
@@ -182,7 +112,20 @@ const CodiEditPage = () => {
 
 	const handleNextClick = () => {
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
-		navigate('/codi/save');
+		if (isRecommendedMode) {
+			navigate('/codi/save', {
+				state: {
+					mode: 'recommended',
+					targetMemberId: memberId,
+				},
+			});
+		} else {
+			navigate('/codi/save', {
+				state: {
+					mode: 'my',
+				},
+			});
+		}
 	};
 
 	const headerProps = {
@@ -207,9 +150,20 @@ const CodiEditPage = () => {
 					/>
 				</div>
 				<CodiEditBottomSection
-					categories={categories}
+					categories={CATEGORIES}
 					activeCategory={activeCategory}
-					filteredProducts={filteredProducts}
+					filteredProducts={(products || []).map((item) => ({
+						id: item.id,
+						imageUrl: item.image,
+						name: item.name,
+						image: item.image,
+						brand: item.brandName,
+						category:
+							activeCategory === 'all'
+								? '전체'
+								: CATEGORIES.find((cat) => cat.id === activeCategory)?.label ||
+								  '전체',
+					}))}
 					onCategoryChange={setActiveCategory}
 					onItemClick={addItemToCanvas}
 				/>

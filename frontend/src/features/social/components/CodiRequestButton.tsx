@@ -18,3 +18,5 @@ const CodiRequestButton = ({
 		{actionButtonText}
 	</button>
 );
+
+export default CodiRequestButton;

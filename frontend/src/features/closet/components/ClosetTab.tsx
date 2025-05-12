@@ -9,15 +9,20 @@ interface ClosetTabProps {
 	isMe: boolean;
 }
 
-const CATEGORIES = ['전체', '아우터', '상의', '하의', '신발', '기타'];
+// 카테고리 ID 매핑 (API 호출용)
+const CATEGORY_ID_MAP: { [key: string]: number } = {
+	아우터: 2,
+	상의: 1,
+	하의: 3,
+	신발: 4,
+	기타: 5,
+};
 
 const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const navigate = useNavigate();
 
 	const categoryId =
-		selectedCategory === '전체'
-			? undefined
-			: CATEGORIES.indexOf(selectedCategory);
+		selectedCategory === '전체' ? undefined : CATEGORY_ID_MAP[selectedCategory];
 
 	const { data: closetItems } = useCloset(memberId, categoryId);
 

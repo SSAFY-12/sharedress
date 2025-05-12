@@ -1,6 +1,6 @@
 import { SearchBar } from '@/components/inputs/search-bar';
 import { UserRowItem } from '@/containers/UserRowItem';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { getOptimizedImageUrl } from '@/utils/imageUtils'; // 이미지 최적화
 import useFriendList from '@/features/social/hooks/useFriendList';
 import useSearchFriend from '@/features/social/hooks/useSearchFriend';
@@ -54,7 +54,7 @@ export const FriendCodiRequestPage = () => {
 		setIsModalOpen(false);
 	};
 
-	const { register, watch, onSubmit, setValue } = useCodiRequest(
+	const { watch, onSubmit, setValue } = useCodiRequest(
 		selectedFriend?.receiverId ?? 0,
 	);
 

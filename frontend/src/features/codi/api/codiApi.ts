@@ -13,10 +13,10 @@ interface CodiItem {
 	rotation: number;
 }
 
-interface SaveCodiRequest {
+export interface SaveCodiRequest {
 	title: string;
 	description: string;
-	isPublic: boolean;
+	isPublic?: boolean;
 	isTemplate: boolean;
 	items: CodiItem[];
 }
@@ -25,4 +25,16 @@ export const myCodiSaveApi = async (data: SaveCodiRequest) => {
 	const response = await client.post('api/coordinations/my', data);
 	console.log(response.data);
 	return response.data;
+};
+
+export const recommendedCodiSaveApi = async (
+	friendId: string,
+	data: Omit<SaveCodiRequest, 'isPublic'>,
+) => {
+	const response = await client.post(
+		`api/coordinations/friends/${friendId}`,
+		data,
+	);
+	console.log(response.data.content);
+	return response.data.content;
 };

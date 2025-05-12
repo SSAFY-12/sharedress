@@ -9,12 +9,12 @@ import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
 import RegistPage from '@/pages/RegistPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
-import FriendPage from '@/pages/social/FriendPage';
 import NotificationPage from '@/pages/NotificationPage';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 import { useAuthStore } from '@/store/useAuthStore';
+import FriendPage from '@/pages/FriendPage';
 
 // 초기 라우트 컴포넌트
 const InitialRoute = () => {
