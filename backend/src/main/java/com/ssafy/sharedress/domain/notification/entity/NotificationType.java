@@ -14,7 +14,8 @@ public enum NotificationType {
 	COORDINATION_REQUEST(3),    // 코디 요청
 	COORDINATION_RECOMMEND(4),    // 코디 추천
 	COORDINATION_COPY(5),    // 코디 복사
-	COMMENT(6);     // 코디 댓글
+	COMMENT(6),    // 코디 댓글
+	AI_COMPLETE(7);    // AI 처리 완료
 
 	public final Integer code;
 

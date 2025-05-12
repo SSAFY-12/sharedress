@@ -66,6 +66,11 @@ public class NotificationAspect {
 				Long memberId = (Long)args[2];
 				notificationUseCase.sendCommentNotification(memberId, coordinationId, dto.parentId(), dto.content());
 			}
+			case AI_COMPLETE -> {
+				Long memberId = (Long)args[0];
+				String fcmToken = (String)args[1];
+				notificationUseCase.sendAiCompleteNotification(memberId, fcmToken);
+			}
 			// TODO: 알림이 필요한 부분 추가
 		}
 	}

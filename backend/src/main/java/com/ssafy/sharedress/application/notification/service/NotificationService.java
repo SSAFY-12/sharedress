@@ -183,6 +183,15 @@ public class NotificationService implements NotificationUseCase {
 	}
 
 	@Override
+	public void sendAiCompleteNotification(Long memberId, String fcmToken) {
+		sendFcmNotification(
+			fcmToken,
+			"AI 처리 완료",
+			"AI 처리가 완료되었습니다."
+		);
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public List<NotificationResponse> getNotifications(Long memberId) {
 		return notificationRepository.findByReceiverId(memberId)
