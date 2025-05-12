@@ -152,19 +152,24 @@ const CodiEditPage = () => {
 				<CodiEditBottomSection
 					categories={CATEGORIES}
 					activeCategory={activeCategory}
-					filteredProducts={(products || []).map((item) => ({
-						id: item.id,
-						imageUrl: item.image,
-						name: item.name,
-						image: item.image,
-						brand: item.brandName,
-						category:
-							activeCategory === 'all'
-								? '전체'
-								: CATEGORIES.find((cat) => cat.id === activeCategory)?.label ||
-								  '전체',
-						isPublic: item.isPublic,
-					}))}
+					filteredProducts={(products || [])
+						.filter((item) => {
+							if (isRecommendedMode) return item.isPublic;
+							return true;
+						})
+						.map((item) => ({
+							id: item.id,
+							imageUrl: item.image,
+							name: item.name,
+							image: item.image,
+							brand: item.brandName,
+							category:
+								activeCategory === 'all'
+									? '전체'
+									: CATEGORIES.find((cat) => cat.id === activeCategory)
+											?.label || '전체',
+							isPublic: item.isPublic,
+						}))}
 					onCategoryChange={setActiveCategory}
 					onItemClick={addItemToCanvas}
 				/>
