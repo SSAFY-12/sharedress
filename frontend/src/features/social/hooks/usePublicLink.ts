@@ -17,7 +17,7 @@ const usePublicLink = () => {
 	});
 
 	return {
-		publicLink: data?.content.openLink,
+		publicLink: data?.openLink,
 		isLoading,
 		error,
 	};

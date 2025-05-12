@@ -4,6 +4,8 @@ import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { SwitchToggle } from '@/components/buttons/switch-toggle/SwitchToggle';
 import { useEffect, useState } from 'react';
+import { useProfileStore } from '@/store/useProfileStore';
+import { useModifyProfile } from '../hooks/useModifyProfile';
 
 interface ExternalShareModalProps {
 	// 외부 코디 요청 모달 컴포넌트의 타입 정의
@@ -16,11 +18,17 @@ export const ExternalShareModal = ({
 	isOpen,
 	onClose,
 }: ExternalShareModalProps) => {
-	/*
-	현재 공개링크 발긍 상태 여부 확인하는 api 필요 
-	*/
-	const [isChecked, setIsChecked] = useState(false);
-	useEffect(() => {}, [isChecked]);
+	const getIsPublic = useProfileStore((state) => state.getIsPublic);
+	const [isChecked, setIsChecked] = useState(getIsPublic() ?? true);
+	const { mutate: modifyProfile } = useModifyProfile();
+
+	useEffect(() => {
+		modifyProfile({
+			nickname: '',
+			oneLiner: '',
+			isPublic: isChecked,
+		});
+	}, [isChecked, modifyProfile]);
 
 	return (
 		<MainModal
@@ -39,6 +47,9 @@ export const ExternalShareModal = ({
 								variant='primary'
 							/>
 						</div>
+					</div>
+					<div className='text-regular text-default border border-red-500'>
+						{isChecked}
 					</div>
 				</MainModal.Body>
 			</MainModal.Header>

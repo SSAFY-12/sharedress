@@ -90,3 +90,17 @@ export const publicApi = {
 		return response.data;
 	},
 };
+
+export interface Profile {
+	nickname?: string;
+	oneLiner?: string;
+	isPublic?: boolean;
+}
+
+export const profileModifyApi = {
+	// 프로필 수정
+	modifyProfile: async (profile: Profile) => {
+		const response = await client.put('/api/members/profile', profile);
+		return response.data;
+	},
+};

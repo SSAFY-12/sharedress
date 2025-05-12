@@ -45,6 +45,9 @@ export const FriendCodiRequestPage = () => {
 		useState<ModalState>(null);
 
 	// 외부 코디 요청 모달
+	const handleExternalRequestClick = () => {
+		setIsRequestModalOpen('external');
+	};
 
 	// 친구 코디 요청 모달
 	const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
@@ -77,15 +80,14 @@ export const FriendCodiRequestPage = () => {
 				onKeyDown={handleSearch}
 			/>
 
-			<div
-				className='flex w-full py-4 my-2.5 border border-dashed border-gray-300 rounded-2xl'
-				onClick={() => setIsRequestModalOpen('external')}
+			<button
+				className='flex w-full py-4 my-2.5 border border-dashed border-description hover:bg-background transition hover:border-low transition rounded-2xl'
+				onClick={handleExternalRequestClick}
 			>
 				<span className='w-full text-button text-low'>
-					{' '}
-					외부에 코디 추천 요청{' '}
+					외부에 코디 추천 요청
 				</span>
-			</div>
+			</button>
 
 			{/* 친구 목록 영역 */}
 			{!keyword ? (
