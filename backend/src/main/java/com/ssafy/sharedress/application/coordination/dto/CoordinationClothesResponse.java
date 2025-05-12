@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.application.coordination.dto;
 
+import com.ssafy.sharedress.application.category.dto.CategoryResponse;
+import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
 import com.ssafy.sharedress.domain.coordination.entity.CoordinationClothes;
 
 public record CoordinationClothesResponse(
@@ -7,19 +9,22 @@ public record CoordinationClothesResponse(
 	String image,
 	PositionDto position,
 	Float scale,
-	Float rotation
+	Float rotation,
+	CategoryResponse category
 ) {
 	public static CoordinationClothesResponse fromEntity(CoordinationClothes coordinationClothes) {
+		ClosetClothes closetClothes = coordinationClothes.getClosetClothes();
 		return new CoordinationClothesResponse(
 			coordinationClothes.getId(),
-			coordinationClothes.getClosetClothes().getImageUrl(),
+			closetClothes.getImageUrl(),
 			new PositionDto(
 				coordinationClothes.getPosition().getPosX(),
 				coordinationClothes.getPosition().getPosY(),
 				coordinationClothes.getPosition().getZIndex()
 			),
 			coordinationClothes.getScale(),
-			coordinationClothes.getRotation()
+			coordinationClothes.getRotation(),
+			CategoryResponse.from(closetClothes.getClothes().getCategory())
 		);
 	}
 }

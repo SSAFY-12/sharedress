@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ssafy.sharedress.domain.category.entity.QCategory;
 import com.ssafy.sharedress.domain.closet.entity.QClosetClothes;
 import com.ssafy.sharedress.domain.clothes.entity.QClothes;
 import com.ssafy.sharedress.domain.coordination.entity.Coordination;
@@ -132,6 +133,7 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 		QCoordinationClothes cc = QCoordinationClothes.coordinationClothes;
 		QClosetClothes clc = QClosetClothes.closetClothes;
 		QClothes cl = QClothes.clothes;
+		QCategory category = QCategory.category;
 
 		return Optional.ofNullable(
 			queryFactory
@@ -142,6 +144,7 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 				.leftJoin(cd.coordinationClothes, cc).fetchJoin()
 				.leftJoin(cc.closetClothes, clc).fetchJoin()
 				.leftJoin(clc.clothes, cl).fetchJoin()
+				.leftJoin(cl.category, category).fetchJoin()
 				.where(cd.id.eq(id))
 				.fetchOne()
 		);
