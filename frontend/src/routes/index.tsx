@@ -1,8 +1,6 @@
 import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
-import FriendAddPage from '@/pages/social/FriendAddPage';
-import FriendRequestListPage from '@/pages/social/FriendRequestListPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MyClosetPage from '@/features/closet/pages/MyClosetPage';
@@ -41,13 +39,8 @@ export const router = createBrowserRouter([
 				element: <CodiPage />,
 			},
 			{
-				path: 'social',
-				// element: <SocialPage />,
+				path: 'social/*',
 				element: <FriendPage />,
-			},
-			{
-				path: 'social/add',
-				element: <FriendAddPage />,
 			},
 			{
 				path: 'regist/*',
@@ -61,10 +54,6 @@ export const router = createBrowserRouter([
 			{
 				path: '*',
 				element: <Navigate to='/wardrobe' replace />,
-			},
-			{
-				path: 'social/request',
-				element: <FriendRequestListPage />,
 			},
 			// {
 			// 	path: '*',
