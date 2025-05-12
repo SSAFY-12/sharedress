@@ -1,6 +1,7 @@
 import React from 'react';
 // import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
+import ClothPage from '@/pages/ClothPage';
 import AuthPage from '@/pages/AuthPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
@@ -41,22 +42,6 @@ export const router = createBrowserRouter([
 			{
 				index: true,
 				element: <InitialRoute />,
-			},
-			// {
-			// 	path: 'wardrobe',
-			// 	element: (
-			// 		<ProtectedRoute>
-			// 			<WardrobePage />
-			// 		</ProtectedRoute>
-			// 	),
-			// },
-			{
-				path: 'codi',
-				element: (
-					<ProtectedRoute>
-						<CodiPage />
-					</ProtectedRoute>
-				),
 			},
 			{
 				path: 'social/*',
@@ -99,42 +84,18 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: 'cloth/:id',
+				path: 'cloth/*',
 				element: (
 					<ProtectedRoute>
-						<ClothDetailPage />
+						<ClothPage />
 					</ProtectedRoute>
 				),
 			},
 			{
-				path: 'codi/:id',
+				path: 'codi/*',
 				element: (
 					<ProtectedRoute>
-						<CodiDetailPage />
-					</ProtectedRoute>
-				),
-			},
-			{
-				path: 'cloth/:id/edit',
-				element: (
-					<ProtectedRoute>
-						<ClothEditPage />
-					</ProtectedRoute>
-				),
-			},
-			{
-				path: '/codi/edit',
-				element: (
-					<ProtectedRoute>
-						<CodiEditPage />
-					</ProtectedRoute>
-				),
-			},
-			{
-				path: '/codi/save',
-				element: (
-					<ProtectedRoute>
-						<CodiSavePage />
+						<CodiPage />
 					</ProtectedRoute>
 				),
 			},
