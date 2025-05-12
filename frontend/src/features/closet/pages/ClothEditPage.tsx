@@ -3,7 +3,7 @@ import { SearchBar } from '@/components/inputs/search-bar';
 import Header from '@/components/layouts/Header';
 import { BottomSheet } from '@/components/modals/bottom-sheet';
 import { ImageDetailView } from '@/containers/ImageDetailView';
-import React, { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 import { updateCloth } from '@/features/closet/api/closetApi';
@@ -26,24 +26,28 @@ const ClothEditPage = () => {
 	const [isPublic, setIsPublic] = useState(true);
 
 	const [inputQuery, setInputQuery] = useState('');
-	const [searchQuery, setSearchQuery] = useState('');
 	const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
 	const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
 		null,
 	);
 	const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+	const [debouncedQuery, setDebouncedQuery] = useState('');
+	const deferredQuery = useDeferredValue(debouncedQuery);
 
-	const handleSearchSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		setSearchQuery(inputQuery);
-	};
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedQuery(inputQuery);
+		}, 200);
+
+		return () => clearTimeout(timer);
+	}, [inputQuery]);
 
 	const [isCategorySheetOpen, setIsCategorySheetOpen] = useState(false);
 	const [isBrandSheetOpen, setIsBrandSheetOpen] = useState(false);
 	const [isColorSheetOpen, setIsColorSheetOpen] = useState(false);
 
 	const { data: brandResults = [], isLoading: isBrandLoading } =
-		useBrandSearch(searchQuery);
+		useBrandSearch(deferredQuery);
 	const { data: colorList = [], isLoading: isColorLoading } = useColorList();
 	const { data: categoryList = [], isLoading: isCategoryLoading } =
 		useCategoryList();
@@ -211,14 +215,13 @@ const ClothEditPage = () => {
 						placeholder='검색'
 						value={inputQuery}
 						onChange={(e) => setInputQuery(e.target.value)}
-						onSubmit={handleSearchSubmit}
 					/>
 					<div className='mt-4 flex flex-wrap justify-start gap-2'>
 						{isBrandLoading ? (
 							<p className='text-default text-center text-descriptionColor w-full mt-6 mb-6'>
 								검색 중...
 							</p>
-						) : searchQuery === '' ? (
+						) : deferredQuery.trim() === '' ? (
 							<p className='text-default text-center text-descriptionColor w-full mt-6 mb-6'>
 								브랜드 명을 입력하세요.
 							</p>
