@@ -17,6 +17,7 @@ import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
+import MyPage from '@/pages/MyPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -83,10 +84,10 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: 'mypage',
+				path: 'mypage/*',
 				element: (
 					<ProtectedRoute>
-						<MyClosetPage />
+						<MyPage />
 					</ProtectedRoute>
 				),
 			},
