@@ -1,4 +1,5 @@
-import WardrobePage from '@/pages/WardrobePage';
+import React from 'react';
+// import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
 import { App } from '@/App';
@@ -17,9 +18,18 @@ import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
 
+// 인증된 사용자만 접근 가능한 라우트
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+	const { accessToken } = useAuthStore();
+	if (!accessToken) {
+		return <Navigate to='/auth' replace />;
+	}
+	return <>{children}</>;
+};
+
 // 초기 라우트 컴포넌트
 const InitialRoute = () => {
-	const { accessToken } = useAuthStore.getState();
+	const { accessToken } = useAuthStore();
 	return <Navigate to={accessToken ? '/mypage' : '/auth'} replace />;
 };
 
@@ -33,66 +43,104 @@ export const router = createBrowserRouter([
 				element: <InitialRoute />,
 			},
 			// {
-			// 	path: 'auth',
-			// 	element: <AuthPage />,
+			// 	path: 'wardrobe',
+			// 	element: (
+			// 		<ProtectedRoute>
+			// 			<WardrobePage />
+			// 		</ProtectedRoute>
+			// 	),
 			// },
 			{
-				path: 'wardrobe',
-				element: <WardrobePage />,
-			},
-			{
 				path: 'codi',
-				element: <CodiPage />,
+				element: (
+					<ProtectedRoute>
+						<CodiPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: 'social/*',
-				element: <FriendPage />,
+				element: (
+					<ProtectedRoute>
+						<FriendPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: 'regist/*',
-				element: <RegistPage />,
+				element: (
+					<ProtectedRoute>
+						<RegistPage />
+					</ProtectedRoute>
+				),
 			},
-
 			{
 				path: 'notification',
-				element: <NotificationPage />,
+				element: (
+					<ProtectedRoute>
+						<NotificationPage />
+					</ProtectedRoute>
+				),
 			},
-
-			{
-				path: '*',
-				element: <Navigate to='/wardrobe' replace />,
-			},
-			// {
-			// 	path: '*',
-			// 	element: <Navigate to='/wardrobe' replace />,
-			// },
 			{
 				path: 'mypage',
-				element: <MyClosetPage />,
+				element: (
+					<ProtectedRoute>
+						<MyClosetPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: 'friend/:id',
-				element: <FriendClosetPage />,
+				element: (
+					<ProtectedRoute>
+						<FriendClosetPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: 'cloth/:id',
-				element: <ClothDetailPage />,
+				element: (
+					<ProtectedRoute>
+						<ClothDetailPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: 'codi/:id',
-				element: <CodiDetailPage />,
+				element: (
+					<ProtectedRoute>
+						<CodiDetailPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: 'cloth/:id/edit',
-				element: <ClothEditPage />,
+				element: (
+					<ProtectedRoute>
+						<ClothEditPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: '/codi/edit',
-				element: <CodiEditPage />,
+				element: (
+					<ProtectedRoute>
+						<CodiEditPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: '/codi/save',
-				element: <CodiSavePage />,
+				element: (
+					<ProtectedRoute>
+						<CodiSavePage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '*',
+				element: <Navigate to='/' replace />,
 			},
 		],
 	},

@@ -56,42 +56,46 @@ client.interceptors.request.use(
 client.interceptors.response.use(
 	(response) => response,
 	async (error) => {
-		const originalRequest = error.config; // 원래 요청 정보 저장(실패한 요청의 정보)
-		// config 속성은 원래 요청했던 API 설정 정보를 가지고 있음(어떤 메서드, 데이터)
+		const originalRequest = error.config;
 
-		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도(아직 재시도하지 않은 경우)
-		if (error.response?.status === 401 && !originalRequest._retry) {
-			// originalRequest._retry 초기화를 통해서 무한 루프 방지(직접 만든 플래그 === 재시도 여부 판단)
-			// retry flag true로 설정 -> 재시도 여부 판단
+		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도
+		if (
+			error.response?.status === 401 &&
+			!originalRequest._retry &&
+			!originalRequest.url?.includes('/auth/refresh')
+		) {
 			originalRequest._retry = true;
 
 			try {
 				// 리프레시 토큰으로 새로운 액세스 토큰 요청
-				const { content } = await authApi.refresh(); // 리프레시 토큰 요청 => TokenResponse
-				const { accessToken } = content; // 새로운 액세스 토큰 저장
+				const { content } = await authApi.refresh();
+				const { accessToken } = content;
 
-				useAuthStore.getState().setAccessToken(accessToken); // 새로운 액세스 토큰 저장
+				useAuthStore.getState().setAccessToken(accessToken);
 
 				// 원래 요청 재시도
 				originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-				return client(originalRequest); // 재시도 => 새로운 액세스 토큰 요청
+				return client(originalRequest);
 			} catch (refreshError) {
 				// 리프레시 토큰 갱신 실패 시 로그아웃 처리
-				const { clearAuth } = useAuthStore.getState(); // 로그아웃 처리
+				const { clearAuth } = useAuthStore.getState();
 				clearAuth();
-				// 로그인 페이지로 리다이렉트
-				window.location.href = '/auth';
+
+				// 현재 경로가 /auth가 아닌 경우에만 리다이렉트
+				if (!window.location.pathname.includes('/auth')) {
+					window.location.href = '/auth';
+				}
+				return Promise.reject(refreshError);
 			}
 		}
 
 		// 전역 에러 처리
 		if (error.response) {
-			const { status } = error.response; // 에러 상태 코드
-			const serverMessage = error.response.data?.message; // 서버 에러 메시지
-			handleGlobalError(status, serverMessage); // 전역 에러 처리
+			const { status } = error.response;
+			const serverMessage = error.response.data?.message;
+			handleGlobalError(status, serverMessage);
 		} else {
-			// 네트워크 에러 등 response가 없는 경우
-			handleGlobalError(0, '서버와의 통신에 실패했습니다.'); // 전역 에러 처리
+			handleGlobalError(0, '서버와의 통신에 실패했습니다.');
 		}
 
 		return Promise.reject(error);
