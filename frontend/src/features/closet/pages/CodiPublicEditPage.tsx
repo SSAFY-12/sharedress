@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import { useCoordinationDetail } from '../hooks/useCoordinationDetail';
+import { useCoordinationDetail } from '@/features/closet/hooks/useCoordinationDetail';
 import { useEffect, useState } from 'react';
 import Header from '@/components/layouts/Header';
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
-import { updateCodiPublicStatus } from '../api/closetApi';
+import { updateCodiPublicStatus } from '@/features/closet/api/closetApi';
 
 const CodiPublicEditPage = () => {
 	const navigate = useNavigate();
