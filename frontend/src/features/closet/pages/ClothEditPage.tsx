@@ -5,12 +5,12 @@ import { BottomSheet } from '@/components/modals/bottom-sheet';
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useClothDetail } from '../hooks/useClothDetail';
-import { updateCloth } from '../api/closetApi';
+import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
+import { updateCloth } from '@/features/closet/api/closetApi';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
-import { useBrandSearch } from '../hooks/useBrandSearch';
-import { useColorList } from '../hooks/useColorList';
-import { useCategoryList } from '../hooks/useCategoryList';
+import { useBrandSearch } from '@/features/closet/hooks/useBrandSearch';
+import { useColorList } from '@/features/closet/hooks/useColorList';
+import { useCategoryList } from '@/features/closet/hooks/useCategoryList';
 
 const ClothEditPage = () => {
 	const navigate = useNavigate();

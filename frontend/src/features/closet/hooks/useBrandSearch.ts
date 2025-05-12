@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchBrandsByKeyword } from '../api/closetApi';
+import { fetchBrandsByKeyword } from '@/features/closet/api/closetApi';
 
 export const useBrandSearch = (keyword: string) =>
 	useQuery({

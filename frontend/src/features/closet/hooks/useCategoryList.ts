@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchCategories } from '../api/closetApi';
+import { fetchCategories } from '@/features/closet/api/closetApi';
 
 export const useCategoryList = () =>
 	useQuery({

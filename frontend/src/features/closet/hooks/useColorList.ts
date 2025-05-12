@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchColors } from '../api/closetApi';
+import { fetchColors } from '@/features/closet/api/closetApi';
 
 export const useColorList = () =>
 	useQuery({
