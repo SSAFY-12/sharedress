@@ -43,6 +43,6 @@ public class ShoppingMallController {
 		purchaseUseCase.getMusinsaPurchaseHistory(member.getId(), request.shopId(), tokens.app_atk(), tokens.app_rtk(),
 			null);
 
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
 	}
 }
