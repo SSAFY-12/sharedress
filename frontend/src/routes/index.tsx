@@ -15,6 +15,7 @@ import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
+import ExternalUserPage from '@/pages/ExternalUserPage';
 
 // 초기 라우트 컴포넌트
 const InitialRoute = () => {
@@ -102,5 +103,9 @@ export const router = createBrowserRouter([
 	{
 		path: '/oauth/google/callback',
 		element: <GoogleCallbackHandler />,
+	},
+	{
+		path: '/link/:code',
+		element: <ExternalUserPage />,
 	},
 ]);

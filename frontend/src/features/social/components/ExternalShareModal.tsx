@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useModifyProfile } from '../hooks/useModifyProfile';
 import { usePublicLink } from '../hooks/usePublicLink';
-import { shareOrCopy } from '@/utils/share';
+import { shareLink } from '@/utils/share';
 import { toast } from 'react-toastify';
 
 interface ExternalShareModalProps {
@@ -29,17 +29,20 @@ export const ExternalShareModal = ({
 		});
 	};
 
+	const linkTitle = 'Sharedress - 내 옷장을 공유해요';
 	const linkUrl = `https://sharedress.co.kr/link/${publicLink}`;
-	const linkText = '나의 스타일 프로필을 보고 코디를 추천해줘!';
+	const linkText = '나의 옷장을 보고 코디를 만들어 줘!';
 
 	const handleCopyShare = async () => {
 		if (!isPublic) return; // 비공개일 땐 막기
-		const result = await shareOrCopy(linkUrl, linkText);
+		const result = await shareLink({
+			title: linkTitle,
+			url: linkUrl,
+			text: linkText,
+		});
 
-		if (result === 'shared') {
-			toast.success('공유 완료 ✨');
-		} else {
-			toast.info('주소가 복사됐어요 📋');
+		if (result === 'copied') {
+			toast.info('내 옷장 주소가 복사됐어요');
 		}
 	};
 
@@ -91,7 +94,7 @@ export const ExternalShareModal = ({
 									</>
 								) : (
 									<span className='text-description text-default text-center w-full'>
-										외부에 공유하려면 프로필을 공개해야 해
+										공유하려면 프로필을 공개해야 합니다
 									</span>
 								)}
 							</div>
