@@ -1194,3 +1194,131 @@ useEffect(() => {
   이제 비로그인 유저도  
   `/link/:code` → `/friend/:id`로  
   **인증 없이 정상적으로 접근**할 수 있게 됨
+
+## [트러블 슈팅] \*\*비로그인(인증 만료) 상태에서 FCM 토큰 저장, refresh 요청 등 불필요한 API 요청(2025/05/13-안주민)
+
+- refresh 토큰이 만료/없을 때도 `/api/auth/refresh`가 반복적으로 호출됨
+- FCM 토큰 저장 요청이 인증 없이(401) 두 번씩 발생
+- 로그아웃 시 라우팅이 `/login`이 아니라 `/auth`로 가야 함
+- 인증 상태 관리가 일관되지 않아, 여러 곳에서 인증 체크가 누락됨
+
+---
+
+### 2. **근본 원인**
+
+- **FCM 토큰 저장 API 호출 전에 로그인(인증) 상태를 체크하지 않음**
+- refresh 401(Unauthorized) 발생 시, 즉시 로그아웃 및 라우팅 처리가 미흡
+- 로그아웃 시 인증정보 초기화와 라우팅이 일관되지 않음
+- 인증 상태 변수(`isLoggedIn`, `isAuthenticated` 등) 사용이 일관되지 않음
+
+---
+
+### 3. **어떻게 바뀌었나? (수정 내역)**
+
+#### 1) **FCM 토큰 저장: 로그인 상태에서만 저장**
+
+- **Before:**  
+  FCM 토큰 저장 API가 로그인 여부와 상관없이 호출됨 → 401 에러, 중복 요청
+- **After:**  
+  `useFcmInitialization.ts`에서 `useAuthStore`의 `isAuthenticated`를 체크,  
+  **로그인 상태일 때만** FCM 토큰 저장 API 호출  
+  → 불필요한 401 에러, 중복 저장 방지
+
+---
+
+#### 2) **refresh 401 처리: 즉시 로그아웃 및 `/auth`로 이동**
+
+- **Before:**  
+  refresh 401 발생 시, clearAuth만 하고 라우팅이 불명확하거나 중복 체크
+- **After:**  
+  `client.ts` axios 인터셉터에서 refresh 401 발생 시  
+  **항상** `clearAuth()` 후 `window.location.href = '/auth'`로 이동  
+  → 무한 401 루프, 인증 만료 후 API 요청 방지
+
+---
+
+#### 3) **로그아웃 시 항상 인증정보 초기화 및 `/auth`로 이동**
+
+- **Before:**  
+  로그아웃 시 인증정보 초기화와 라우팅이 일관되지 않음
+- **After:**  
+  `useAuthStore.ts`의 `logout()`에서  
+  `clearAuth()` 호출 후 **항상** `/auth`로 이동  
+  → 로그아웃 후 인증정보 남거나 잘못된 라우팅 방지
+
+---
+
+#### 4) **코드 내 인증 상태 체크 변수명 통일**
+
+- **Before:**  
+  `isLoggedIn`, `isAuthenticated` 등 혼용
+- **After:**  
+  `isAuthenticated`로 통일  
+  → 인증 체크 일관성 확보
+
+---
+
+## 4. **문제의 근본적 해결책**
+
+- **모든 인증 필요한 API 요청 전, 인증 상태(`isAuthenticated`)를 반드시 체크**
+- **refresh 401 발생 시 즉시 인증정보 초기화 및 `/auth`로 이동**
+- **로그아웃 시 인증정보 초기화 및 `/auth`로 이동**
+- **인증 상태 변수명 통일로 코드 일관성 유지**
+- **FCM 토큰 저장 등 인증 필요한 로직은 반드시 로그인 상태에서만 실행**
+
+---
+
+## 5. **예시 코드 (핵심 부분)**
+
+### FCM 토큰 저장 (useFcmInitialization.ts)
+
+```ts
+const { isAuthenticated } = useAuthStore.getState();
+if (isAuthenticated && !isSavingFcmToken) {
+	isSavingFcmToken = true;
+	try {
+		await fcmApi.saveFcmToken(token);
+	} catch (error) {
+		console.error('FCM 토큰 저장 실패:', error);
+	}
+	isSavingFcmToken = false;
+}
+```
+
+#### refresh 401 처리 (client.ts)
+
+```ts
+catch (refreshError) {
+  const { clearAuth } = useAuthStore.getState();
+  clearAuth();
+  window.location.href = '/auth';
+  return Promise.reject(refreshError);
+}
+```
+
+#### 로그아웃 (useAuthStore.ts)
+
+```ts
+logout: () => {
+  toast.info('로그아웃되었습니다.');
+  useAuthStore.getState().clearAuth();
+  window.location.href = '/auth';
+},
+```
+
+---
+
+### 6. **결론 및 정리**
+
+- **문제:**  
+  인증 만료/비로그인 상태에서 불필요한 API 요청, 무한 401 루프, 잘못된 라우팅,
+  인증 상태 불일치
+- **원인:**  
+  인증 체크 누락, 401 처리 미흡, 인증 상태 변수 혼용
+- **해결:**  
+  인증 체크 강화, 401 처리 일원화, 로그아웃/라우팅 일관화, 변수명 통일
+- **결과:**  
+  인증 만료 시 즉시 `/auth`로 이동,  
+  비로그인 상태에서 불필요한 요청 방지,  
+  인증 상태 관리 일관성 확보,  
+  사용자 경험 및 보안 모두 개선
