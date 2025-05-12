@@ -80,11 +80,11 @@ export const socialApi = {
 export const publicApi = {
 	// 공개링크 발급
 	createPublicLink: async () => {
-		const response = await client.post('/api/open-link');
-		return response.data.content.openLink;
+		const response = await client.get('/api/open-link');
+		return response.data;
 	},
 
-	// 공개링크 디코딩
+	// 공개링크 디코딩 - api 수정사항 맞춰서 반영 필요
 	decodePublicLink: async (openLink: string) => {
 		const response = await client.get(`/api/open-link/${openLink}`);
 		return response.data;
@@ -100,7 +100,7 @@ export interface Profile {
 export const profileModifyApi = {
 	// 프로필 수정
 	modifyProfile: async (profile: Profile) => {
-		const response = await client.put('/api/members/profile', profile);
+		const response = await client.patch('/api/members/profile', profile);
 		return response.data;
 	},
 };

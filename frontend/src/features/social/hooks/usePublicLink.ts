@@ -1,23 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { publicApi } from '@/features/social/api/socialApi';
+import { useEffect } from 'react';
 
 interface PublicLinkResponse {
-	openLink: string;
+	content: string;
 }
 
 interface DecodePublicLinkResponse {
-	// API 응답 타입에 맞게 정의
 	content: any;
 }
 
 const usePublicLink = () => {
-	const { data, isLoading, error } = useQuery<PublicLinkResponse>({
+	const { data, isLoading, error } = useQuery<PublicLinkResponse, Error>({
 		queryKey: ['publicLink'],
 		queryFn: () => publicApi.createPublicLink(),
 	});
 
 	return {
-		publicLink: data?.openLink,
+		publicLink: data?.content,
 		isLoading,
 		error,
 	};
