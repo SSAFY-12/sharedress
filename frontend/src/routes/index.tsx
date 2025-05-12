@@ -1,8 +1,6 @@
 import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
 import AuthPage from '@/pages/AuthPage';
-import FriendAddPage from '@/pages/social/FriendAddPage';
-import FriendRequestListPage from '@/pages/social/FriendRequestListPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import MyClosetPage from '@/features/closet/pages/MyClosetPage';
@@ -11,10 +9,18 @@ import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 import CodiDetailPage from '@/features/closet/pages/CodiDetailPage';
 import RegistPage from '@/pages/RegistPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
-import FriendPage from '@/pages/social/FriendPage';
+import NotificationPage from '@/pages/NotificationPage';
 import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import ClothEditPage from '@/features/closet/pages/ClothEditPage';
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
+import { useAuthStore } from '@/store/useAuthStore';
+import FriendPage from '@/pages/FriendPage';
+
+// 초기 라우트 컴포넌트
+const InitialRoute = () => {
+	const { accessToken } = useAuthStore.getState();
+	return <Navigate to={accessToken ? '/mypage' : '/auth'} replace />;
+};
 
 export const router = createBrowserRouter([
 	{
@@ -23,9 +29,7 @@ export const router = createBrowserRouter([
 		children: [
 			{
 				index: true,
-				// element: <Navigate to='/wardrobe' />,
-				element: <Navigate to='/wardrobe' />,
-				// 초기 세팅값 wardrobe
+				element: <InitialRoute />,
 			},
 			// {
 			// 	path: 'auth',
@@ -40,25 +44,22 @@ export const router = createBrowserRouter([
 				element: <CodiPage />,
 			},
 			{
-				path: 'social',
-				// element: <SocialPage />,
+				path: 'social/*',
 				element: <FriendPage />,
-			},
-			{
-				path: 'social/add',
-				element: <FriendAddPage />,
 			},
 			{
 				path: 'regist/*',
 				element: <RegistPage />,
 			},
+
+			{
+				path: 'notification',
+				element: <NotificationPage />,
+			},
+
 			{
 				path: '*',
 				element: <Navigate to='/wardrobe' replace />,
-			},
-			{
-				path: 'social/request',
-				element: <FriendRequestListPage />,
 			},
 			// {
 			// 	path: '*',

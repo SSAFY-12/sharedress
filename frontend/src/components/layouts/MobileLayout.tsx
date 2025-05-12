@@ -10,6 +10,7 @@ import { SubBtnModal } from '@/components/modals/sub-btn-modal/SubBtnModal';
 
 export const MobileLayout = () => {
 	const location = useLocation();
+	const navigate = useNavigate();
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
 	const isClothEdit = matchPath('/cloth/:id/edit', location.pathname) !== null;
@@ -17,7 +18,6 @@ export const MobileLayout = () => {
 	const isCodiEdit = matchPath('/codi/edit', location.pathname) !== null;
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
-	const navigate = useNavigate();
 
 	/* 네비게이션 바 표시 여부 결정	*/
 	const firstDepth = '/' + location.pathname.split('/')[1];
