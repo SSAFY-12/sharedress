@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getTokenExpiration } from '@/features/auth/utils/tokenUtils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useRefresh from './useRefresh';
 
 const TOKEN_EXPIRATION_BUFFER = 3 * 60 * 1000; // 3분 버퍼
@@ -14,12 +14,21 @@ export const useTokenValidation = () => {
 
 	const { mutateAsync: refreshAsync } = useRefresh(); // 토큰 갱신
 	const navigate = useNavigate(); // 네비게이션
+	const location = useLocation();
 
 	useEffect(() => {
 		// 1. 초기화 체크
 		// 앱이 완전히 초기화되지 않았다면 토큰 검증을 하지 않음 : 앱의 기본 설정이 완료된 후에 토큰 검증
 		// (다른 초기 설정들이 완료되지 않은 상태에서 토큰 검증을 하면 안됨)
 		if (!isInitialized) {
+			return;
+		}
+
+		// 현재 경로가 /auth 또는 /auth/google/callback인 경우 토큰 검증을 건너뜁니다
+		if (
+			location.pathname === '/auth' ||
+			location.pathname === '/auth/google/callback'
+		) {
 			return;
 		}
 
@@ -33,6 +42,8 @@ export const useTokenValidation = () => {
 						새토큰: !!response.content.accessToken,
 						시간: new Date().toLocaleString('ko-KR'),
 					});
+					// 토큰 갱신 성공 시 /mypage로 이동
+					navigate('/mypage', { replace: true });
 				})
 				.catch((error) => {
 					console.error('❌ 토큰 갱신 실패:', {
@@ -41,7 +52,7 @@ export const useTokenValidation = () => {
 					});
 					// 리프레시 토큰도 없는 경우 (쿠키에 없음) 로그인 페이지로 이동
 					if (!document.cookie.includes('refreshToken')) {
-						navigate('/auth');
+						navigate('/auth', { replace: true });
 					}
 				});
 			return;
@@ -58,6 +69,7 @@ export const useTokenValidation = () => {
 						새토큰: !!response.content.accessToken,
 						시간: new Date().toLocaleString('ko-KR'),
 					});
+					navigate('/mypage', { replace: true });
 				})
 				.catch((error) => {
 					console.error('❌ 토큰 갱신 실패:', {
@@ -66,7 +78,7 @@ export const useTokenValidation = () => {
 					});
 					// 리프레시 토큰도 없는 경우 (쿠키에 없음) 로그인 페이지로 이동
 					if (!document.cookie.includes('refreshToken')) {
-						navigate('/auth');
+						navigate('/auth', { replace: true });
 					}
 				});
 			return;
@@ -85,6 +97,7 @@ export const useTokenValidation = () => {
 						새토큰: !!response.content.accessToken,
 						시간: new Date().toLocaleString('ko-KR'),
 					});
+					navigate('/mypage', { replace: true });
 				})
 				.catch((error) => {
 					console.error('❌ 토큰 갱신 실패:', {
@@ -92,7 +105,7 @@ export const useTokenValidation = () => {
 						시간: new Date().toLocaleString('ko-KR'),
 					});
 					if (!document.cookie.includes('refreshToken')) {
-						navigate('/auth');
+						navigate('/auth', { replace: true });
 					}
 				});
 		}
@@ -110,6 +123,7 @@ export const useTokenValidation = () => {
 							새토큰: !!response.content.accessToken,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
+						navigate('/mypage', { replace: true });
 					})
 					.catch((error) => {
 						console.error('❌ 주기적 토큰 갱신 실패:', {
@@ -117,7 +131,7 @@ export const useTokenValidation = () => {
 							시간: new Date().toLocaleString('ko-KR'),
 						});
 						if (!document.cookie.includes('refreshToken')) {
-							navigate('/auth');
+							navigate('/auth', { replace: true });
 						}
 					});
 				return;
@@ -132,6 +146,7 @@ export const useTokenValidation = () => {
 							새토큰: !!response.content.accessToken,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
+						navigate('/mypage', { replace: true });
 					})
 					.catch((error) => {
 						console.error('❌ 주기적 토큰 갱신 실패:', {
@@ -139,7 +154,7 @@ export const useTokenValidation = () => {
 							시간: new Date().toLocaleString('ko-KR'),
 						});
 						if (!document.cookie.includes('refreshToken')) {
-							navigate('/auth');
+							navigate('/auth', { replace: true });
 						}
 					});
 				return;
@@ -157,6 +172,7 @@ export const useTokenValidation = () => {
 							새토큰: !!response.content.accessToken,
 							시간: new Date().toLocaleString('ko-KR'),
 						});
+						navigate('/mypage', { replace: true });
 					})
 					.catch((error) => {
 						console.error('❌ 주기적 토큰 갱신 실패:', {
@@ -165,7 +181,7 @@ export const useTokenValidation = () => {
 						});
 						// 리프레시 토큰도 없는 경우 (쿠키에 없음) 로그인 페이지로 이동
 						if (!document.cookie.includes('refreshToken')) {
-							navigate('/auth');
+							navigate('/auth', { replace: true });
 						}
 					});
 			}
@@ -176,5 +192,5 @@ export const useTokenValidation = () => {
 		return () => {
 			clearInterval(intervalId); // 인터벌 정리
 		};
-	}, [accessToken, refreshAsync, isInitialized, navigate]);
+	}, [accessToken, refreshAsync, isInitialized, navigate, location.pathname]);
 };
