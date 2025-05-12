@@ -92,7 +92,7 @@ export default defineConfig(({ mode }) => {
 			mkcert(),
 			VitePWA({
 				registerType: 'autoUpdate',
-				injectRegister: 'auto',
+				injectRegister: false,
 				devOptions: { enabled: true, type: 'module' },
 				includeAssets: [
 					'favicon.ico',

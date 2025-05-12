@@ -1288,12 +1288,10 @@ if (isAuthenticated && !isSavingFcmToken) {
 #### refresh 401 처리 (client.ts)
 
 ```ts
-catch (refreshError) {
-  const { clearAuth } = useAuthStore.getState();
-  clearAuth();
-  window.location.href = '/auth';
-  return Promise.reject(refreshError);
-}
+refresh: async () => {
+    const response = await client.post(`/api/auth/refresh`);
+    return response.data;
+},
 ```
 
 #### 로그아웃 (useAuthStore.ts)
@@ -1322,3 +1320,99 @@ logout: () => {
   비로그인 상태에서 불필요한 요청 방지,  
   인증 상태 관리 일관성 확보,  
   사용자 경험 및 보안 모두 개선
+
+## [트러블슈팅] Vite PWA에서 registerSW.js가 필요 없는 이유와 injectRegister 옵션의 역할 (2025/05/13-안주민)
+
+### 문제상황
+
+- Vite PWA 플러그인을 사용할 때,  
+  `registerSW.js` 파일이 자동으로 생성되고  
+  브라우저가 이 파일을 불러오면서  
+  **"Cannot use import statement outside a module"** 에러가 발생함.
+- 실제로는 서비스워커 등록 코드를 직접 작성해서  
+  `registerSW.js`가 필요 없는 상황임에도  
+  자동으로 삽입되어 문제가 발생함.
+
+---
+
+### 원인 분석
+
+- Vite PWA 플러그인의 기본 설정(`injectRegister: 'auto'` 또는 `true`)은  
+  빌드 시 자동으로 `registerSW.js` 파일을 만들고  
+  이를 index.html에 `<script src="/registerSW.js"></script>`로 삽입함.
+- 이 파일이 import 문을 포함하거나,  
+  브라우저가 모듈로 인식하지 않으면  
+  **import 문 에러**가 발생함.
+- 하지만, 이미 index.html에서  
+  직접 서비스워커 등록 코드를 `<script>`로 작성하고 있다면  
+  **registerSW.js는 중복**이 되고, 필요가 없음.
+
+---
+
+### 해결방법
+
+- Vite PWA 플러그인 설정에서  
+  `injectRegister: false`로 변경하면  
+  registerSW.js 파일이 **생성/삽입되지 않음**.
+- 따라서 브라우저가 이 파일을 불러오지 않고,  
+  import 문 에러도 발생하지 않음.
+- 서비스워커 등록은 index.html의 `<script>`에서 직접 처리하면 됨.
+
+---
+
+### 예시
+
+**vite.config.ts**
+
+```js
+VitePWA({
+	// ...기존 옵션...
+	injectRegister: false, // registerSW.js 자동 생성/삽입 비활성화
+});
+```
+
+**index.html**
+
+```html
+<script>
+	if ('serviceWorker' in navigator) {
+		window.addEventListener('load', async () => {
+			// 직접 서비스워커 등록 코드
+			await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+			await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+				scope: '/',
+			});
+		});
+	}
+</script>
+```
+
+→ 별도의 registerSW.js 파일이 필요 없음!
+
+---
+
+### 결론 및 정리
+
+- **registerSW.js는 Vite PWA 플러그인이 자동으로 서비스워커 등록을 위해 생성하는
+  파일**이지만,
+- 이미 index.html에서 직접 서비스워커 등록 코드를 작성했다면  
+  **registerSW.js는 필요 없다**.
+- `injectRegister: false`로 설정하면  
+  registerSW.js가 생성/삽입되지 않아  
+  import 문 에러 등 불필요한 문제가 발생하지 않는다.
+- \*\*즉, 직접 서비스워커 등록 코드를 작성한 경우  
+  registerSW.js를 생성하지 않도록(injectRegister: false) 설정하는 것이 더 안전하
+  고 명확한 방법입니다.
+
++index.html에 직접 서비스워커 등록 코드가 있다면, Vite PWA 플러그인이 자동으로생
+성하는 registerSW.js 파일은 필요하지 않습니다. 서비스워커 등록의 본질은 브라우저
+가 sw.js, firebase-messaging-sw.js 등 서비스워커 파일을 등록하는 것이며, 이 작업
+을 직접 자바스크립트 코드로 처리하면 registerSW.js가 없어도 PWA, FCM 등 모든서비
+스워커 관련 기능이 정상적으로 동작합니다.
+
+- +오히려 registerSW.js가 남아 있으면 중복 등록, 충돌, import 문 에러 등 불필요
+  한 문제가 발생할 수 있으므로, 직접 등록 코드를 작성한 경우에는 registerSW.js를
+  생성하지 않도록(injectRegister: false) 설정하는 것이 더 안전하고 명확한 방법입
+  니다.
+- +즉, index.html에 직접 서비스워커 등록 코드가 있다면 registerSW.js가 없어도 아
+  무 문제 없으며, 실제로 없는 것이 더 바람직합니다.
