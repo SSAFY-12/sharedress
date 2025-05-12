@@ -37,7 +37,7 @@ export const FriendRequestsPage = () => {
 				{friendRequests?.map((request) => (
 					<div
 						key={request.id}
-						className='relative mb-4 pb-4 border-b border-gray-100'
+						className='relative mb-4 pb-4 border-b border-gray-100 px-2 sm:px-4'
 					>
 						<div className='flex items-center justify-between'>
 							<div className='flex items-center text-left'>
@@ -60,14 +60,24 @@ export const FriendRequestsPage = () => {
 									name='친구 수락'
 									color='black'
 									onClick={() => handleActionClick('accept', request)}
-									className='mt-3 w-[82px] h-[40px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									className='
+									mt-3
+									w-[72px] h-[36px] text-[13px] rounded-[8px]
+									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
+									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
+								  '
 								/>
 								<PrimaryBtn
 									size='compact'
 									name='친구 거절'
 									color='black'
 									onClick={() => handleActionClick('reject', request)}
-									className='mt-3 w-[82px] h-[40px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									className='
+									mt-3
+									w-[72px] h-[36px] text-[13px] rounded-[8px]
+									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
+									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
+								  '
 								/>
 							</div>
 						</div>
