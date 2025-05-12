@@ -27,11 +27,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 	return <>{children}</>;
 };
 
-// 공개 라우트 (인증이 필요하지 않은 라우트)
-const PublicRoute = ({ children }: { children: React.ReactNode }) => (
-	<>{children}</>
-);
-
 // 초기 라우트 컴포넌트
 const InitialRoute = () => {
 	const { accessToken } = useAuthStore();
@@ -39,6 +34,13 @@ const InitialRoute = () => {
 };
 
 export const router = createBrowserRouter([
+	// 공개 라우트
+	{ path: '/auth', element: <AuthPage /> },
+	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
+	{ path: '/link/:code', element: <ExternalUserPage /> },
+	{ path: '/friend/:id', element: <FriendClosetPage /> }, // <-- App 없이 바로!
+
+	// 인증 필요 라우트
 	{
 		path: '/',
 		element: <App />,
@@ -95,14 +97,14 @@ export const router = createBrowserRouter([
 					</ProtectedRoute>
 				),
 			},
-			{
-				path: 'friend/:id',
-				element: (
-					<PublicRoute>
-						<FriendClosetPage />
-					</PublicRoute>
-				),
-			},
+			// {
+			// 	path: 'friend/:id',
+			// 	element: (
+			// 		<PublicRoute>
+			// 			<FriendClosetPage />
+			// 		</PublicRoute>
+			// 	),
+			// },
 			{
 				path: 'cloth/:id',
 				element: (
@@ -148,21 +150,5 @@ export const router = createBrowserRouter([
 				element: <Navigate to='/' replace />,
 			},
 		],
-	},
-	{
-		path: '/auth',
-		element: <AuthPage />,
-	},
-	{
-		path: '/oauth/google/callback',
-		element: <GoogleCallbackHandler />,
-	},
-	{
-		path: '/link/:code',
-		element: (
-			<PublicRoute>
-				<ExternalUserPage />
-			</PublicRoute>
-		),
 	},
 ]);

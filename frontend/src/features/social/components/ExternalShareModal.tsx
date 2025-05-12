@@ -2,8 +2,8 @@ import { MainModal } from '@/components/modals/main-modal/MainModal';
 
 import { SwitchToggle } from '@/components/buttons/switch-toggle/SwitchToggle';
 import { useProfileStore } from '@/store/useProfileStore';
-import { useModifyProfile } from '../hooks/useModifyProfile';
-import { usePublicLink } from '../hooks/usePublicLink';
+import { useModifyProfile } from '@/features/social/hooks/useModifyProfile';
+import { usePublicLink } from '@/features/social/hooks/usePublicLink';
 import { shareLink } from '@/utils/share';
 import { toast } from 'react-toastify';
 
