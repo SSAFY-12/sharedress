@@ -2,7 +2,7 @@ import { useLocation, Outlet, matchPath } from 'react-router-dom';
 import Header from './Header';
 import NavBar from './NavBar';
 import SocialHeader from './SocialHeader';
-import { NavConfig } from '@/constants/navConfig';
+import { shouldShowNav } from '@/constants/navConfig';
 import getHeaderProps from '@/utils/getHeaderProps';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -20,8 +20,7 @@ export const MobileLayout = () => {
 	const headerProps = getHeaderProps(location.pathname);
 
 	/* 네비게이션 바 표시 여부 결정	*/
-	const firstDepth = '/' + location.pathname.split('/')[1];
-	const showNav = NavConfig[firstDepth] === true;
+	const showNav = shouldShowNav(location.pathname);
 
 	/* 모달 표시 여부 결정	*/
 	const [isModalOpen, setIsModalOpen] = useState(false);
