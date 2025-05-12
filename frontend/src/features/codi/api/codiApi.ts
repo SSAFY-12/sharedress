@@ -1,7 +1,7 @@
 import client from '@/api/client';
-import { replaceImageWithBase64 } from '../utils/replaceImageWithBase64';
+import { replaceImageWithBase64 } from '@/features/codi/utils/replaceImageWithBase64';
 import html2canvas from 'html2canvas';
-import { waitAllImagesLoaded } from '../utils/watiForAllImages';
+import { waitAllImagesLoaded } from '@/features/codi/utils/watiForAllImages';
 
 interface Position {
 	x: number;

@@ -10,8 +10,8 @@ import {
 import Header from '@/components/layouts/Header';
 import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
-import { base64ToFile } from '../utils/base64ToFile';
-import LoadingOverlay from '../components/LoadingOverlay';
+import { base64ToFile } from '@/features/codi/utils/base64ToFile';
+import LoadingOverlay from '@/features/codi/components/LoadingOverlay';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
