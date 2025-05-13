@@ -166,6 +166,10 @@ public class NotificationService implements NotificationUseCase {
 					return;
 				}
 
+				if (receiver.getId().equals(senderId)) {
+					return;
+				}
+
 				sendFcmNotification(
 					receiver.getFcmToken(),
 					"코디 댓글",
