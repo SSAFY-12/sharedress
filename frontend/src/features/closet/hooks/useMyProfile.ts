@@ -5,6 +5,7 @@ import { useProfileStore } from '@/store/useProfileStore';
 export const useMyProfile = () => {
 	const setMyId = useProfileStore((state) => state.setMyId);
 	const setIsPublic = useProfileStore((state) => state.setIsPublic);
+	const setIsGuest = useProfileStore((state) => state.setIsGuest);
 
 	return useQuery({
 		queryKey: ['myProfile'],
@@ -12,6 +13,7 @@ export const useMyProfile = () => {
 			const data = await getMyProfile();
 			setMyId(data.id);
 			setIsPublic(data.isPublic);
+			setIsGuest(false);
 			return data;
 		},
 		staleTime: Infinity,

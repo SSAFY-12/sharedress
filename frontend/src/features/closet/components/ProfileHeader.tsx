@@ -102,17 +102,19 @@ const ProfileHeader = ({
 							/>
 						</div>
 					</header>
-				) : isGuest ? (					
-						<Header
-							logo='쉐어드레스'
-							signUp={true}
-							onSignUpClick={handleSignUpClick}
-						/>):(
-						<Header showBack={true}								
-							badgeIcon='bell'
-							onBackClick={() => navigate(-1)}
-							onBadgeClick={handleNotificationClick}
-						/>
+				) : isGuest ? (
+					<Header
+						logo='쉐어드레스'
+						signUp={true}
+						onSignUpClick={handleSignUpClick}
+					/>
+				) : (
+					<Header
+						showBack={true}
+						badgeIcon='bell'
+						onBackClick={() => navigate(-1)}
+						onBadgeClick={handleNotificationClick}
+					/>
 				)}
 			</div>
 
