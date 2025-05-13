@@ -1194,3 +1194,225 @@ useEffect(() => {
   이제 비로그인 유저도  
   `/link/:code` → `/friend/:id`로  
   **인증 없이 정상적으로 접근**할 수 있게 됨
+
+## [트러블 슈팅] \*\*비로그인(인증 만료) 상태에서 FCM 토큰 저장, refresh 요청 등 불필요한 API 요청(2025/05/13-안주민)
+
+- refresh 토큰이 만료/없을 때도 `/api/auth/refresh`가 반복적으로 호출됨
+- FCM 토큰 저장 요청이 인증 없이(401) 두 번씩 발생
+- 로그아웃 시 라우팅이 `/login`이 아니라 `/auth`로 가야 함
+- 인증 상태 관리가 일관되지 않아, 여러 곳에서 인증 체크가 누락됨
+
+---
+
+### 2. **근본 원인**
+
+- **FCM 토큰 저장 API 호출 전에 로그인(인증) 상태를 체크하지 않음**
+- refresh 401(Unauthorized) 발생 시, 즉시 로그아웃 및 라우팅 처리가 미흡
+- 로그아웃 시 인증정보 초기화와 라우팅이 일관되지 않음
+- 인증 상태 변수(`isLoggedIn`, `isAuthenticated` 등) 사용이 일관되지 않음
+
+---
+
+### 3. **어떻게 바뀌었나? (수정 내역)**
+
+#### 1) **FCM 토큰 저장: 로그인 상태에서만 저장**
+
+- **Before:**  
+  FCM 토큰 저장 API가 로그인 여부와 상관없이 호출됨 → 401 에러, 중복 요청
+- **After:**  
+  `useFcmInitialization.ts`에서 `useAuthStore`의 `isAuthenticated`를 체크,  
+  **로그인 상태일 때만** FCM 토큰 저장 API 호출  
+  → 불필요한 401 에러, 중복 저장 방지
+
+---
+
+#### 2) **refresh 401 처리: 즉시 로그아웃 및 `/auth`로 이동**
+
+- **Before:**  
+  refresh 401 발생 시, clearAuth만 하고 라우팅이 불명확하거나 중복 체크
+- **After:**  
+  `client.ts` axios 인터셉터에서 refresh 401 발생 시  
+  **항상** `clearAuth()` 후 `window.location.href = '/auth'`로 이동  
+  → 무한 401 루프, 인증 만료 후 API 요청 방지
+
+---
+
+#### 3) **로그아웃 시 항상 인증정보 초기화 및 `/auth`로 이동**
+
+- **Before:**  
+  로그아웃 시 인증정보 초기화와 라우팅이 일관되지 않음
+- **After:**  
+  `useAuthStore.ts`의 `logout()`에서  
+  `clearAuth()` 호출 후 **항상** `/auth`로 이동  
+  → 로그아웃 후 인증정보 남거나 잘못된 라우팅 방지
+
+---
+
+#### 4) **코드 내 인증 상태 체크 변수명 통일**
+
+- **Before:**  
+  `isLoggedIn`, `isAuthenticated` 등 혼용
+- **After:**  
+  `isAuthenticated`로 통일  
+  → 인증 체크 일관성 확보
+
+---
+
+## 4. **문제의 근본적 해결책**
+
+- **모든 인증 필요한 API 요청 전, 인증 상태(`isAuthenticated`)를 반드시 체크**
+- **refresh 401 발생 시 즉시 인증정보 초기화 및 `/auth`로 이동**
+- **로그아웃 시 인증정보 초기화 및 `/auth`로 이동**
+- **인증 상태 변수명 통일로 코드 일관성 유지**
+- **FCM 토큰 저장 등 인증 필요한 로직은 반드시 로그인 상태에서만 실행**
+
+---
+
+## 5. **예시 코드 (핵심 부분)**
+
+### FCM 토큰 저장 (useFcmInitialization.ts)
+
+```ts
+const { isAuthenticated } = useAuthStore.getState();
+if (isAuthenticated && !isSavingFcmToken) {
+	isSavingFcmToken = true;
+	try {
+		await fcmApi.saveFcmToken(token);
+	} catch (error) {
+		console.error('FCM 토큰 저장 실패:', error);
+	}
+	isSavingFcmToken = false;
+}
+```
+
+#### refresh 401 처리 (client.ts)
+
+```ts
+refresh: async () => {
+    const response = await client.post(`/api/auth/refresh`);
+    return response.data;
+},
+```
+
+#### 로그아웃 (useAuthStore.ts)
+
+```ts
+logout: () => {
+  toast.info('로그아웃되었습니다.');
+  useAuthStore.getState().clearAuth();
+  window.location.href = '/auth';
+},
+```
+
+---
+
+### 6. **결론 및 정리**
+
+- **문제:**  
+  인증 만료/비로그인 상태에서 불필요한 API 요청, 무한 401 루프, 잘못된 라우팅,
+  인증 상태 불일치
+- **원인:**  
+  인증 체크 누락, 401 처리 미흡, 인증 상태 변수 혼용
+- **해결:**  
+  인증 체크 강화, 401 처리 일원화, 로그아웃/라우팅 일관화, 변수명 통일
+- **결과:**  
+  인증 만료 시 즉시 `/auth`로 이동,  
+  비로그인 상태에서 불필요한 요청 방지,  
+  인증 상태 관리 일관성 확보,  
+  사용자 경험 및 보안 모두 개선
+
+## [트러블슈팅] Vite PWA에서 registerSW.js가 필요 없는 이유와 injectRegister 옵션의 역할 (2025/05/13-안주민)
+
+### 문제상황
+
+- Vite PWA 플러그인을 사용할 때,  
+  `registerSW.js` 파일이 자동으로 생성되고  
+  브라우저가 이 파일을 불러오면서  
+  **"Cannot use import statement outside a module"** 에러가 발생함.
+- 실제로는 서비스워커 등록 코드를 직접 작성해서  
+  `registerSW.js`가 필요 없는 상황임에도  
+  자동으로 삽입되어 문제가 발생함.
+
+---
+
+### 원인 분석
+
+- Vite PWA 플러그인의 기본 설정(`injectRegister: 'auto'` 또는 `true`)은  
+  빌드 시 자동으로 `registerSW.js` 파일을 만들고  
+  이를 index.html에 `<script src="/registerSW.js"></script>`로 삽입함.
+- 이 파일이 import 문을 포함하거나,  
+  브라우저가 모듈로 인식하지 않으면  
+  **import 문 에러**가 발생함.
+- 하지만, 이미 index.html에서  
+  직접 서비스워커 등록 코드를 `<script>`로 작성하고 있다면  
+  **registerSW.js는 중복**이 되고, 필요가 없음.
+
+---
+
+### 해결방법
+
+- Vite PWA 플러그인 설정에서  
+  `injectRegister: false`로 변경하면  
+  registerSW.js 파일이 **생성/삽입되지 않음**.
+- 따라서 브라우저가 이 파일을 불러오지 않고,  
+  import 문 에러도 발생하지 않음.
+- 서비스워커 등록은 index.html의 `<script>`에서 직접 처리하면 됨.
+
+---
+
+### 예시
+
+**vite.config.ts**
+
+```js
+VitePWA({
+	// ...기존 옵션...
+	injectRegister: false, // registerSW.js 자동 생성/삽입 비활성화
+});
+```
+
+**index.html**
+
+```html
+<script>
+	if ('serviceWorker' in navigator) {
+		window.addEventListener('load', async () => {
+			// 직접 서비스워커 등록 코드
+			await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+			await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+				scope: '/',
+			});
+		});
+	}
+</script>
+```
+
+→ 별도의 registerSW.js 파일이 필요 없음!
+
+---
+
+### 결론 및 정리
+
+- **registerSW.js는 Vite PWA 플러그인이 자동으로 서비스워커 등록을 위해 생성하는
+  파일**이지만,
+- 이미 index.html에서 직접 서비스워커 등록 코드를 작성했다면  
+  **registerSW.js는 필요 없다**.
+- `injectRegister: false`로 설정하면  
+  registerSW.js가 생성/삽입되지 않아  
+  import 문 에러 등 불필요한 문제가 발생하지 않는다.
+- \*\*즉, 직접 서비스워커 등록 코드를 작성한 경우  
+  registerSW.js를 생성하지 않도록(injectRegister: false) 설정하는 것이 더 안전하
+  고 명확한 방법입니다.
+
++index.html에 직접 서비스워커 등록 코드가 있다면, Vite PWA 플러그인이 자동으로생
+성하는 registerSW.js 파일은 필요하지 않습니다. 서비스워커 등록의 본질은 브라우저
+가 sw.js, firebase-messaging-sw.js 등 서비스워커 파일을 등록하는 것이며, 이 작업
+을 직접 자바스크립트 코드로 처리하면 registerSW.js가 없어도 PWA, FCM 등 모든서비
+스워커 관련 기능이 정상적으로 동작합니다.
+
+- +오히려 registerSW.js가 남아 있으면 중복 등록, 충돌, import 문 에러 등 불필요
+  한 문제가 발생할 수 있으므로, 직접 등록 코드를 작성한 경우에는 registerSW.js를
+  생성하지 않도록(injectRegister: false) 설정하는 것이 더 안전하고 명확한 방법입
+  니다.
+- +즉, index.html에 직접 서비스워커 등록 코드가 있다면 registerSW.js가 없어도 아
+  무 문제 없으며, 실제로 없는 것이 더 바람직합니다.

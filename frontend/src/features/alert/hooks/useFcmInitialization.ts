@@ -6,6 +6,7 @@ import {
 } from '@/utils/firebase';
 import useFcmStore from '@/store/useFcmStore';
 import fcmApi from '@/features/alert/api/fcmapi';
+import { useAuthStore } from '@/store/useAuthStore';
 
 /**
  * FCM(Firebase Cloud Messaging) 초기화를 위한 커스텀 훅
@@ -17,6 +18,8 @@ const useFcmInitialization = () => {
 			try {
 				// 현재 알림 권한 상태 확인
 				const permission = await Notification.permission;
+				const { isAuthenticated } = useAuthStore.getState();
+				let isSavingFcmToken = false;
 
 				if (permission === 'default') {
 					// 권한이 아직 요청되지 않은 경우
@@ -26,12 +29,14 @@ const useFcmInitialization = () => {
 							if (token) {
 								toast.success('알림 권한이 허용되었습니다!');
 								useFcmStore.setState({ token });
-
-								// FCM 토큰을 서버에 저장
-								try {
-									await fcmApi.saveFcmToken(token);
-								} catch (error) {
-									console.error('FCM 토큰 저장 실패:', error);
+								if (isAuthenticated && !isSavingFcmToken) {
+									isSavingFcmToken = true;
+									try {
+										await fcmApi.saveFcmToken(token);
+									} catch (error) {
+										console.error('FCM 토큰 저장 실패:', error);
+									}
+									isSavingFcmToken = false;
 								}
 
 								// 포그라운드 메시지 리스너 설정
@@ -50,12 +55,14 @@ const useFcmInitialization = () => {
 					const token = await requestNotificationPermission();
 					if (token) {
 						useFcmStore.setState({ token });
-
-						// FCM 토큰을 서버에 저장
-						try {
-							await fcmApi.saveFcmToken(token);
-						} catch (error) {
-							console.error('FCM 토큰 저장 실패:', error);
+						if (isAuthenticated && !isSavingFcmToken) {
+							isSavingFcmToken = true;
+							try {
+								await fcmApi.saveFcmToken(token);
+							} catch (error) {
+								console.error('FCM 토큰 저장 실패:', error);
+							}
+							isSavingFcmToken = false;
 						}
 
 						// 포그라운드 메시지 리스너 설정
