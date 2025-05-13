@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getMyLoginInfo } from '../api/socialApi';
+import { getMyLoginInfo } from '@/features/social/api/socialApi';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useEffect } from 'react';
 
