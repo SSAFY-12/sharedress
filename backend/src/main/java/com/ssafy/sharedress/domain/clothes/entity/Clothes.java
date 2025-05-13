@@ -6,6 +6,7 @@ import com.ssafy.sharedress.domain.color.entity.Color;
 import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 import com.ssafy.sharedress.domain.shoppingmall.entity.ShoppingMall;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,10 +30,12 @@ public class Clothes extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false)
 	private String name;
 
 	private String imageUrl;
 
+	@Column(nullable = false)
 	@Convert(converter = ClothesSourceTypeConverter.class)
 	private ClothesSourceType type;
 
