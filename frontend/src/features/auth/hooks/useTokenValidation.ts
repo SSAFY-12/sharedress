@@ -77,9 +77,19 @@ export const useTokenValidation = () => {
 			버퍼시간: Math.floor(TOKEN_EXPIRATION_BUFFER / 1000 / 60) + '분',
 		});
 
-		if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER && hasRefreshToken) {
-			console.log('🔄 토큰 갱신 필요');
-			return await handleTokenRefresh();
+		if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER) {
+			console.debug(
+				'[토큰검증] 🔄 토큰 갱신 시도 (만료까지 남은 시간:',
+				Math.floor(timeUntilExpiration / 1000),
+				'초)',
+			);
+			const refreshResult = await handleTokenRefresh();
+			if (refreshResult) {
+				console.debug('[토큰검증] ✅ 토큰 재갱신 성공');
+			} else {
+				console.debug('[토큰검증] ❌ 토큰 재갱신 실패');
+			}
+			return refreshResult;
 		}
 
 		console.log('✅ 토큰 유효');
