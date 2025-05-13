@@ -2,6 +2,8 @@ import { useMutation } from '@tanstack/react-query';
 import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
+import useFcmStore from '@/store/useFcmStore';
+import fcmApi from '@/features/alert/api/fcmapi';
 
 const useRefresh = () => {
 	const navigate = useNavigate();
@@ -16,6 +18,16 @@ const useRefresh = () => {
 				if (response.content.accessToken) {
 					// 토큰 저장
 					setAccessToken(response.content.accessToken);
+
+					// FCM 토큰이 있으면 서버에 저장
+					const fcmToken = useFcmStore.getState().token;
+					if (fcmToken) {
+						try {
+							await fcmApi.saveFcmToken(fcmToken);
+						} catch (e) {
+							console.error('FCM 토큰 저장 실패:', e);
+						}
+					}
 				} else {
 					console.error('❌ 토큰 갱신 실패: 새 토큰이 없습니다');
 					throw new Error('토큰 갱신 실패: 새 토큰이 없습니다');

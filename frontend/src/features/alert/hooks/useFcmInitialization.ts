@@ -55,14 +55,12 @@ const useFcmInitialization = () => {
 					const token = await requestNotificationPermission();
 					if (token) {
 						useFcmStore.setState({ token });
-						if (isAuthenticated && !isSavingFcmToken) {
-							isSavingFcmToken = true;
+						if (isAuthenticated) {
 							try {
 								await fcmApi.saveFcmToken(token);
 							} catch (error) {
 								console.error('FCM 토큰 저장 실패:', error);
 							}
-							isSavingFcmToken = false;
 						}
 
 						// 포그라운드 메시지 리스너 설정
