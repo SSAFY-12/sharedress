@@ -8,4 +8,6 @@ public interface TokenUseCase {
 	TokenWithRefresh issueToken(Long memberId);
 
 	TokenResponse refreshToken(HttpServletRequest request);
+
+	void logout(HttpServletRequest request);
 }

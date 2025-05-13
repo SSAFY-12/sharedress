@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.application.jwt;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.application.auth.dto.TokenWithRefresh;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
@@ -60,5 +61,28 @@ public class TokenService implements TokenUseCase {
 		String newAccessToken = tokenProvider.createAccessToken(memberId);
 
 		return new TokenResponse(newAccessToken);
+	}
+
+	@Override
+	@Transactional
+	public void logout(HttpServletRequest request) {
+		String refreshToken = tokenResolver.resolveRefreshToken(request);
+		if (refreshToken == null) {
+			ExceptionUtil.throwException(TokenErrorCode.TOKEN_NOT_FOUND);
+		}
+
+		if (!tokenProvider.validateToken(refreshToken)) {
+			ExceptionUtil.throwException(TokenErrorCode.TOKEN_INVALID);
+		}
+
+		Long memberId = Long.valueOf(tokenProvider.getMemberId(refreshToken));
+
+		RefreshToken saved = refreshTokenRepository.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(TokenErrorCode.TOKEN_NOT_FOUND));
+
+		if (!saved.getToken().equals(refreshToken)) {
+			ExceptionUtil.throwException(TokenErrorCode.TOKEN_INVALID);
+		}
+		refreshTokenRepository.deleteByMemberId(memberId);
 	}
 }
