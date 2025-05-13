@@ -1416,3 +1416,255 @@ VitePWA({
   니다.
 - +즉, index.html에 직접 서비스워커 등록 코드가 있다면 registerSW.js가 없어도 아
   무 문제 없으며, 실제로 없는 것이 더 바람직합니다.
+
+# FCM 토큰 관리 시스템
+
+## 목차
+
+- [개요](#개요)
+- [시스템 구조](#시스템-구조)
+- [주요 기능](#주요-기능)
+- [토큰 갱신 시점](#토큰-갱신-시점)
+- [구현 상세](#구현-상세)
+- [에러 처리](#에러-처리)
+- [주의사항](#주의사항)
+
+## [트러블 슈팅] FCM(Firebase Cloud Messaging) 토큰을 효율적으로 관리(2025/05/13-안주민)
+
+## 주요 기능
+
+### 1. 토큰 저장 로직 중앙화
+
+- `useFcmToken` 훅에서 모든 토큰 저장 로직 관리
+- 중복 코드 제거 및 일관된 토큰 저장 처리
+- 인증 상태에 따른 조건부 토큰 저장
+- `useRef`를 사용한 함수 의존성 관리로 무한 재귀 방지
+
+### 2. 토큰 갱신 시점 관리
+
+- 인증 상태 변경 시 자동 갱신
+- FCM 토큰 발급/갱신 시 자동 처리
+- 앱 초기화 완료 시 자동 처리
+- 토큰 저장 상태 관리로 중복 저장 방지
+
+### 3. 초기화 순서 최적화
+
+- 인증 초기화 완료 후 FCM 초기화 실행
+- 불필요한 토큰 저장 시도 방지
+- 상태 동기화 보장
+- 명확한 책임 분리로 코드 유지보수성 향상
+
+## 토큰 갱신 시점
+
+### 1. 초기 로그인 시
+
+```typescript
+// useAuth.ts
+onSuccess: (data: TokenResponse) => {
+	setAccessToken(data.content.accessToken);
+	saveFcmToken(); // FCM 토큰 저장
+	navigate('/mypage');
+};
+```
+
+### 2. 리프레시 토큰 갱신 시
+
+```typescript
+// useTokenValidation.ts
+const handleTokenRefresh = async () => {
+	try {
+		const response = await refreshAsync();
+		saveFcmTokenRef.current(); // ref를 통한 안전한 호출
+	} catch (error) {
+		navigate('/auth', { replace: true });
+	}
+};
+```
+
+### 3. 새로고침 시
+
+```typescript
+// App.tsx
+useEffect(() => {
+	if (!isLoading && isInitialized) {
+		useFcmInitialization();
+	}
+}, [isLoading, isInitialized]);
+```
+
+### 4. FCM 토큰 자체 갱신 시
+
+```typescript
+// useFcmInitialization.ts
+useEffect(() => {
+	if (isAuthenticated && fcmToken) {
+		saveFcmTokenRef.current(); // FCM 토큰 변경 시 저장
+	}
+}, [isAuthenticated, fcmToken]);
+```
+
+## 구현 상세
+
+### 1. 토큰 저장 조건
+
+- 인증된 사용자인 경우에만 토큰 저장
+- 유효한 FCM 토큰이 있는 경우에만 저장
+- 중복 저장 방지
+- 저장 상태 관리로 동시 저장 방지
+
+### 2. 상태 관리
+
+- Zustand를 사용한 토큰 상태 관리
+- 인증 상태와 FCM 토큰 상태 동기화
+- 전역 상태 관리로 일관성 유지
+- `useRef`를 통한 함수 참조 안정화
+
+### 3. 초기화 프로세스
+
+1. 앱 시작
+2. 인증 상태 초기화
+3. FCM 초기화
+4. 토큰 저장 (필요한 경우)
+5. 상태 변경 감지 및 자동 저장
+
+## 에러 처리
+
+### 1. 토큰 저장 실패
+
+- 에러 로깅
+- 사용자 피드백 제공
+- 재시도 메커니즘
+- 저장 상태 관리로 중복 시도 방지
+
+### 2. 권한 거부
+
+- 사용자에게 권한 요청 안내
+- 브라우저 설정 페이지 링크 제공
+- 대체 동작 제공
+- 권한 상태 변경 감지
+
+## 주의사항
+
+### 1. 성능 고려사항
+
+- 불필요한 토큰 저장 방지
+- 적절한 갱신 주기 설정
+- 메모리 누수 방지
+- 함수 의존성 최적화
+
+### 2. 보안 고려사항
+
+- 토큰 안전한 저장
+- 인증 상태 검증
+- 민감 정보 보호
+- 토큰 갱신 시점 관리
+
+### 3. 사용자 경험
+
+- 적절한 피드백 제공
+- 권한 요청 시점 최적화
+- 오류 상황 대응
+- 상태 변경 시 즉각적인 반영
+
+## 개선된 코드 구조
+
+### 1. useFcmToken.ts
+
+```typescript
+const useFcmToken = () => {
+	const [isSaving, setIsSaving] = useState(false);
+	const { token: fcmToken } = useFcmStore();
+
+	const { mutate: saveToken } = useMutation({
+		mutationFn: (token: FcmTokenReq) => fcmApi.saveFcmToken(token.fcmToken),
+	});
+
+	const saveFcmToken = async () => {
+		if (isSaving || !fcmToken) return;
+
+		setIsSaving(true);
+		try {
+			await saveToken({ fcmToken });
+		} catch (error) {
+			console.error('FCM 토큰 저장 실패:', error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	return { saveFcmToken, isSaving };
+};
+```
+
+### 2. useTokenValidation.ts
+
+```typescript
+export const useTokenValidation = () => {
+	const { saveFcmToken } = useFcmToken();
+	const saveFcmTokenRef = useRef(saveFcmToken);
+
+	useEffect(() => {
+		saveFcmTokenRef.current = saveFcmToken;
+	}, [saveFcmToken]);
+
+	const handleTokenRefresh = async () => {
+		try {
+			const response = await refreshAsync();
+			saveFcmTokenRef.current();
+		} catch (error) {
+			navigate('/auth', { replace: true });
+		}
+	};
+};
+```
+
+### 3. useFcmInitialization.ts
+
+```typescript
+export const useFcmInitialization = () => {
+	const { isAuthenticated } = useAuthStore();
+	const { token: fcmToken } = useFcmStore();
+	const { saveFcmToken } = useFcmToken();
+	const saveFcmTokenRef = useRef(saveFcmToken);
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			initializeFCM();
+		}
+	}, [isAuthenticated]);
+
+	useEffect(() => {
+		if (isAuthenticated && fcmToken) {
+			saveFcmTokenRef.current();
+		}
+	}, [isAuthenticated, fcmToken]);
+};
+```
+
+## 검증 방법
+
+### 1. 콘솔 로그 확인
+
+```typescript
+console.log('FCM 토큰 저장 시도:', {
+	시점: '로그인/갱신/초기화',
+	시간: new Date().toLocaleString('ko-KR'),
+});
+```
+
+### 2. 네트워크 요청 확인
+
+- 개발자 도구의 Network 탭에서 FCM 토큰 저장 요청 확인
+- 요청 시점과 응답 확인
+
+### 3. 상태 변화 확인
+
+```typescript
+useEffect(() => {
+	console.log('FCM 토큰 상태 변경:', {
+		토큰존재: !!fcmToken,
+		저장중: isSaving,
+		에러: error,
+	});
+}, [fcmToken, isSaving, error]);
+```

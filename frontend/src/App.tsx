@@ -5,8 +5,8 @@ import { MobileLayout } from '@/components/layouts/MobileLayout';
 import { ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
-import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 import useFcmStore from '@/store/useFcmStore';
+import { useFcmInitialization } from './features/alert/hooks/useFcmInitialization';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
@@ -34,9 +34,6 @@ export const App = () => {
 	}, []);
 	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 
-	// FCM 초기화
-	useFcmInitialization();
-
 	// 앱 시작 시 토큰 초기화
 	useEffect(() => {
 		const init = async () => {
@@ -45,6 +42,13 @@ export const App = () => {
 		};
 		init();
 	}, [initializeAuth]);
+
+	// FCM 초기화는 인증 초기화 이후에 실행
+	useEffect(() => {
+		if (!isLoading && isInitialized) {
+			useFcmInitialization();
+		}
+	}, [isLoading, isInitialized]);
 
 	// const handleManualError = () => {
 	// 	try {
