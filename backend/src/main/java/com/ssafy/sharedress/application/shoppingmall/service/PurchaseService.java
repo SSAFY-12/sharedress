@@ -40,6 +40,7 @@ public class PurchaseService implements PurchaseUseCase {
 				throw new RuntimeException("무신사 로그인 서버 오류 발생");
 			}
 		} catch (Exception e) {
+			log.error("Openfeign error: {}", e.getMessage());
 			throw new RuntimeException("무신사 로그인 서버 오류 발생");
 		}
 		return null;
