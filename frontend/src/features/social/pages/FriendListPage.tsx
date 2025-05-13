@@ -37,30 +37,27 @@ export const FriendsListPage = () => {
 
 	// 친구 검색 이름 제한 20글자이내
 	return (
-		<div className='flex flex-col h-full w-full bg-white px-4 sm:px-6'>
+		<div className='flex flex-col w-full h-full mx-auto bg-white gap-3.5 px-4 pt-2'>
 			{/* 검색 영역 */}
-			<div className='py-3 px-3'>
 				<SearchBar
 					placeholder='친구 검색 (최대 20자)'
 					value={searchValue}
 					onChange={handleSearchChange}
 					onKeyDown={handleSearch}
 				/>
-			</div>
 
 			{/* 친구 목록 영역 */}
 			{!keyword ? (
 				<div>
 					{friends?.map((friend) => (
-						<div key={friend.id} className='px-2 sm:px-4'>
-							<UserRowItem
+						<UserRowItem
+								key={friend.id}
 								userName={friend.nickname}
 								userAvatar={getOptimizedImageUrl(friend.profileImage)}
 								userStatus={friend.oneLiner}
 								actionType='arrow'
 								onClick={() => handleFriendArrowClick(friend.id)}
-							/>
-						</div>
+						/>
 					))}
 				</div>
 			) : (
@@ -68,15 +65,14 @@ export const FriendsListPage = () => {
 				<div>
 					{Array.isArray(searchMyFriend) && searchMyFriend.length > 0 ? (
 						searchMyFriend.map((friend) => (
-							<div key={friend.id} className='px-2 sm:px-4'>
 								<UserRowItem
+									key={friend.id}
 									userName={friend.nickname}
 									userAvatar={getOptimizedImageUrl(friend.profileImage)}
 									userStatus={friend.oneLiner}
 									actionType='arrow'
 									onClick={() => handleFriendArrowClick(friend.id)}
 								/>
-							</div>
 						))
 					) : (
 						<p>검색 결과가 없습니다.</p>
