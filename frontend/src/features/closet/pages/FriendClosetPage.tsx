@@ -9,6 +9,7 @@ import { categoryConfig } from '@/constants/categoryConfig';
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 import FriendCodiTab from '@/features/closet/components/FriendCodiTab';
 import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
+import { useLoginInfo } from '@/features/closet/hooks/useLoginInfo';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [
@@ -28,6 +29,8 @@ const FriendClosetPage = () => {
 		(location.state?.initialTab as (typeof closetTab)[number]) ?? '옷장';
 	const initialSubTab =
 		(location.state?.initialSubTab as 'friends' | 'recommended') ?? 'friends';
+
+	const { data: loginInfo } = useLoginInfo();
 
 	// 상태 관리
 	const [activeMainTab, setActiveMainTab] = useState<
