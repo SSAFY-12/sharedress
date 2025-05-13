@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { formatDistanceToNow, parseISO } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import { ko } from 'date-fns/locale';
 import CommentList from '@/features/closet/components/CommentList';
 import { Comment } from '@/features/closet/components/CommentItem.types';
@@ -129,14 +130,6 @@ const CodiDetailPage = () => {
 		});
 	};
 
-	const handleBackClick = () => {
-		navigate('/mypage', {
-			state: {
-				initialTab: '코디',
-			},
-		});
-	};
-
 	const handleCommentDelete = () => {
 		if (!selectedComment) return;
 		const confirmed = window.confirm('댓글을 삭제하시겠습니까?');
@@ -166,12 +159,15 @@ const CodiDetailPage = () => {
 	const toRelativeTime = (dateString: string) => {
 		try {
 			if (!dateString) return '';
+			console.log(dateString);
 			const sanitized = sanitizeISOString(dateString);
-			const date = parseISO(sanitized);
+			const utcDate = parseISO(sanitized);
+			const kstDate = toZonedTime(utcDate, 'Asia/Seoul');
+			console.log(kstDate);
 
-			if (isNaN(date.getTime())) return '';
+			if (isNaN(kstDate.getTime())) return '';
 
-			return formatDistanceToNow(date, {
+			return formatDistanceToNow(kstDate, {
 				addSuffix: true,
 				locale: customKo,
 			});
@@ -187,6 +183,18 @@ const CodiDetailPage = () => {
 
 	const isMyCodi = coordination.creator.id === coordination.owner.id;
 
+	const handleBackClick = () => {
+		if (isMyCodi) {
+			navigate('/mypage', {
+				state: {
+					initialTab: '코디',
+				},
+			});
+		} else {
+			navigate(`/friend/${coordination.owner.id}`);
+		}
+	};
+
 	const item = {
 		id: coordination.id,
 		name: coordination.description,
@@ -201,6 +209,8 @@ const CodiDetailPage = () => {
 				imageUrl: coordination.creator.profileImage,
 		  }
 		: null;
+
+	console.log(item.imageUrl);
 
 	return (
 		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>

@@ -111,6 +111,10 @@ const CodiEditPage = () => {
 	};
 
 	const handleNextClick = () => {
+		if (canvasItems.length === 0) {
+			alert('최소 하나 이상의 옷을 코디에 담아야 합니다.');
+			return;
+		}
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
 		if (isRecommendedMode) {
 			navigate('/codi/save', {

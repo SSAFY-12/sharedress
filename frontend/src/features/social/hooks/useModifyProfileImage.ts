@@ -15,7 +15,7 @@ export const useModifyProfileImage = () => {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['myProfile'] });
 		},
-		onError: (error, newImage, context) => {
+		onError: (error, _, context) => {
 			if (context?.previousImage) {
 				queryClient.setQueryData(['myProfile'], context.previousImage);
 				queryClient.invalidateQueries({ queryKey: ['myProfile'] });

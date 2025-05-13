@@ -18,7 +18,6 @@ export const headerConfig: HeaderConfig = {
 	'/notification': {
 		showBack: true,
 		subtitle: '알림',
-		badgeIcon: 'bell',
 	},
 
 	'/social/add': {

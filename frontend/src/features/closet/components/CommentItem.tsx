@@ -1,3 +1,4 @@
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { CommentItemProps } from './CommentItem.types';
 import { formatDistanceToNow, parse } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -40,7 +41,10 @@ const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 		<div className='flex items-start justify-between'>
 			<div className='flex items-center'>
 				<img
-					src={comment.author.imageUrl || 'https://picsum.photos/200'}
+					src={
+						getOptimizedImageUrl(comment.author.imageUrl) ||
+						'https://picsum.photos/200'
+					}
 					alt={comment.author.name}
 					className='w-11 h-11 rounded-full mr-4'
 				/>
