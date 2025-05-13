@@ -8,7 +8,7 @@ import com.ssafy.sharedress.config.MusinsaFeignConfig;
 
 @FeignClient(
 	name = "loginMusinsaClient",
-	url = "http://localhost:3000",
+	url = "http://musinsa:3000",
 	configuration = MusinsaFeignConfig.class
 )
 public interface LoginMusinsaClient {
