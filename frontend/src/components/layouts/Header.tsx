@@ -35,7 +35,7 @@ const Header = ({
 			{showBack && (
 				<div className='flex items-center gap-1 min-w-0'>
 					<button
-						className='text-gray-600 flex items-center m-0 bg-white hover:bg-gray-50 rounded-full p-1 transition-colors'
+						className='text-gray-600 flex items-center m-0 bg-transparent rounded-full p-1 transition-colors'
 						onClick={onBackClick}
 						aria-label='뒤로가기'
 					>

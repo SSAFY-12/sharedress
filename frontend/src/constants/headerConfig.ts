@@ -18,7 +18,6 @@ export const headerConfig: HeaderConfig = {
 	'/notification': {
 		showBack: true,
 		subtitle: '알림',
-		badgeIcon: 'bell',
 	},
 
 	'/social/add': {
@@ -56,5 +55,9 @@ export const headerConfig: HeaderConfig = {
 	},
 	'/codi/:id': {
 		showBack: true,
+	},
+	'/social/codi-request': {
+		showBack: true,
+		subtitle: '친구에게 조언 받기',
 	},
 } as const;

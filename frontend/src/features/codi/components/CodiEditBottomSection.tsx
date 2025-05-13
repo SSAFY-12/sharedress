@@ -32,11 +32,19 @@ const CodiEditBottomSection = ({
 		</div>
 		<div className='flex-1 overflow-y-auto scrollbar-hide'>
 			<div className='p-4'>
-				<ClothListContainer
-					items={filteredProducts}
-					onItemClick={onItemClick}
-					type='cloth'
-				/>
+				{filteredProducts.length > 0 ? (
+					<ClothListContainer
+						items={filteredProducts}
+						onItemClick={onItemClick}
+						type='cloth'
+					/>
+				) : (
+					<div className='flex flex-col items-center justify-center h-full'>
+						<p className='text-center my-auto text-description text-descriptionColor'>
+							옷이 없습니다!
+						</p>
+					</div>
+				)}
 			</div>
 		</div>
 	</div>

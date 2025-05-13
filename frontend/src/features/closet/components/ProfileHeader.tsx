@@ -1,5 +1,6 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -45,6 +46,10 @@ const ProfileHeader = ({
 		});
 	};
 
+	const handleBadgeClick = () => {
+		navigate('/notification');
+	};
+
 	return (
 		<div className='relative w-full min-h-[37.5vh]'>
 			<div className='absolute inset-0 overflow-hidden'>
@@ -64,7 +69,15 @@ const ProfileHeader = ({
 
 			{/* 헤더 */}
 			<div className='relative z-10'>
-				<Header logo='쉐어드레스' badgeIcon='bell' />
+				{isMe ? (
+					<Header
+						logo='쉐어드레스'
+						badgeIcon='bell'
+						onBadgeClick={handleBadgeClick}
+					/>
+				) : (
+					<Header showBack={true} onBackClick={() => navigate(-1)} />
+				)}
 			</div>
 
 			{/* 프로필 카드 컨테이너 */}
@@ -73,7 +86,10 @@ const ProfileHeader = ({
 				<div className='absolute left-1/2 transform -translate-x-1/2 -translate-y-1/3 z-20'>
 					<div className='w-20 h-20 rounded-full overflow-hidden'>
 						<img
-							src={profileImage || 'https://picsum.photos/200'}
+							src={
+								getOptimizedImageUrl(profileImage) ||
+								'https://picsum.photos/200'
+							}
 							alt={`${nickname}#${code}의 프로필 이미지`}
 							className='w-full h-full object-cover'
 						/>
