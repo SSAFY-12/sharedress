@@ -24,6 +24,7 @@ import com.ssafy.sharedress.domain.closet.error.ClosetErrorCode;
 import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
 import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
+import com.ssafy.sharedress.domain.clothes.error.ClothesErrorCode;
 import com.ssafy.sharedress.domain.clothes.repository.ClothesRepository;
 import com.ssafy.sharedress.domain.color.entity.Color;
 import com.ssafy.sharedress.domain.color.repository.ColorRepository;
@@ -107,8 +108,9 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		Closet closet = closetRepository.findByMemberId(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
+		log.info("clothesId={}", clothesId);
 		Clothes clothes = clothesRepository.findById(clothesId)
-			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ClothesErrorCode.CLOTHES_NOT_FOUND));
 
 		if (closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(), clothes.getId())) {
 			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOSET_CLOTHES_ALREADY_EXISTS);

@@ -6,7 +6,8 @@ import com.ssafy.sharedress.global.response.ResponseCode;
 
 public enum ClothesErrorCode implements ResponseCode {
 
-	CLOTHES_SOURCE_TYPE_NOT_FOUND("500", "데이터베이스 정합성 문제 / Clothes 테이블의 Type 확인", HttpStatus.INTERNAL_SERVER_ERROR);
+	CLOTHES_SOURCE_TYPE_NOT_FOUND("500", "데이터베이스 정합성 문제 / Clothes 테이블의 Type 확인", HttpStatus.INTERNAL_SERVER_ERROR),
+	CLOTHES_NOT_FOUND("404", "옷을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
 	private final String code;
 	private final String message;
