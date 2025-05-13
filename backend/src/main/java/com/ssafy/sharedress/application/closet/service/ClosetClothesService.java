@@ -3,6 +3,7 @@ package com.ssafy.sharedress.application.closet.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +55,8 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final ClothesRepository clothesRepository;
 	private final ShoppingMallRepository shoppingMallRepository;
 	private final SqsMessageSender sqsMessageSender;
+
+	private static final int MAX_ITEMS_PER_MESSAGE = 30;
 
 	@Transactional
 	@Override
@@ -184,16 +187,30 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		});
 
 		if (!itemsToProcess.isEmpty()) {
-			AiProcessMessageRequest message = new AiProcessMessageRequest(memberId, member.getFcmToken(),
-				itemsToProcess);
+			String taskId = UUID.randomUUID().toString();
+			List<List<AiProcessMessageRequest.ItemInfo>> batches = batchList(itemsToProcess, MAX_ITEMS_PER_MESSAGE);
 
-			try {
-				sqsMessageSender.send(message);
-				log.debug("SQS 전송 성공");
-			} catch (Exception e) {
-				log.error("SQS 전송 중 예외 발생: {}", e.getMessage(), e);
-				throw new RuntimeException("메시지 전송 실패", e);
+			for (int i = 0; i < batches.size(); i++) {
+				List<AiProcessMessageRequest.ItemInfo> batch = batches.get(i);
+				boolean isLast = (i == batches.size() - 1);
+
+				AiProcessMessageRequest message = new AiProcessMessageRequest(
+					taskId,
+					isLast,
+					memberId,
+					member.getFcmToken(),
+					batch
+				);
+
+				try {
+					sqsMessageSender.send(message);
+					log.debug("SQS 전송 성공: taskId={}, isLast={}, batchSize={}", taskId, isLast, batch.size());
+				} catch (Exception e) {
+					log.error("SQS 전송 중 예외 발생: {}", e.getMessage(), e);
+					throw new RuntimeException("메시지 전송 실패", e);
+				}
 			}
+			log.info("SQS 메시지 전송 완료: taskId={}, 총 배치 수={}, 총 아이템 수={}", taskId, batches.size(), itemsToProcess.size());
 		}
 	}
 
@@ -208,4 +225,15 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		// 양쪽 공백 제거
 		return name.trim();
 	}
+
+	// 클래스 내부 어디든 위치 가능
+	private static <T> List<List<T>> batchList(List<T> list, int batchSize) {
+		List<List<T>> batches = new ArrayList<>();
+		for (int i = 0; i < list.size(); i += batchSize) {
+			int endIndex = Math.min(i + batchSize, list.size());
+			batches.add(list.subList(i, endIndex));
+		}
+		return batches;
+	}
+
 }
