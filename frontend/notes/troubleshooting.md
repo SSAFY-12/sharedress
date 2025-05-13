@@ -1520,7 +1520,7 @@ VitePWA({
 
 ---
 
-## [트러블슈팅] 토큰 리프레시 및 인증 상태 관리 문제 요약(2025/05/13-앉민)
+## [트러블슈팅] 토큰 리프레시 및 인증 상태 관리 문제 요약(2025/05/13-안주주민)
 
 ### 1. 문제상황
 
@@ -1600,3 +1600,68 @@ VitePWA({
 
 > 토큰 만료와 갱신 로직을 명확히 분리하고, 주기적으로 검증 및 갱신이 이루어지도
 > 록 개선하여 인증 상태 문제를 해결했다.
+
+## [트러블슈팅] FCM 토큰 저장/갱신 타이밍 문제 및 개선 (2025/05/13-안주민)
+
+### 문제상황
+
+- FCM(Firebase Cloud Messaging) 토큰이 서버에 저장되는 타이밍이 불명확함
+- 로그인, 토큰 리프레시, 앱 최초 진입(새로고침) 등 다양한 상황에서 FCM 토큰이 서
+  버에 저장되지 않거나, 누락되는 현상 발생
+- 이로 인해 푸시 알림이 정상적으로 동작하지 않거나, 특정 상황에서 알림이 오지 않
+  는 문제가 발생
+
+### 원인 분석
+
+- 기존 로직은 앱 최초 진입/새로고침 시에만 FCM 토큰을 서버에 저장
+- 로그인 성공, accessToken 리프레시(갱신) 시점에는 FCM 토큰 저장 로직이 없음
+- FCM 토큰이 이미 발급되어 있음에도 서버에 저장되지 않는 타이밍이 존재
+- 권한 허용 후에는 저장되지만, 이후 인증 상태 변화(로그인/리프레시)에는 반영되지
+  않음
+
+### 해결방법
+
+1. **로그인 성공 시 (useAuth.ts)**
+   - accessToken 저장 후, FCM 토큰이 있으면 서버에 저장하도록 로직 추가
+2. **토큰 갱신 성공 시 (useRefresh.ts)**
+   - accessToken 갱신 후, FCM 토큰이 있으면 서버에 저장하도록 로직 추가
+3. **앱 최초 진입/새로고침 (useFcmInitialization.ts)**
+   - 권한이 이미 허용된 경우, FCM 토큰이 있고 로그인 상태일 때만 서버에 저장하도
+     록 명확히 개선
+
+### 예시
+
+```typescript
+// useAuth.ts (로그인 성공 시)
+setAccessToken(data.content.accessToken);
+const fcmToken = useFcmStore.getState().token;
+if (fcmToken) {
+	await fcmApi.saveFcmToken(fcmToken);
+}
+
+// useRefresh.ts (토큰 갱신 성공 시)
+setAccessToken(response.content.accessToken);
+const fcmToken = useFcmStore.getState().token;
+if (fcmToken) {
+	await fcmApi.saveFcmToken(fcmToken);
+}
+
+// useFcmInitialization.ts (앱 최초 진입/새로고침)
+if (permission === 'granted') {
+	const token = await requestNotificationPermission();
+	if (token) {
+		useFcmStore.setState({ token });
+		if (isAuthenticated) {
+			await fcmApi.saveFcmToken(token);
+		}
+	}
+}
+```
+
+### 결론 및 정리
+
+- 이제 로그인, 토큰 리프레시, 앱 최초 진입(새로고침) 등 모든 주요 타이밍에서 FCM
+  토큰이 서버에 자동 저장/갱신됨
+- 푸시 알림이 누락되는 문제, 인증 상태 변화 시 FCM 토큰 미반영 문제를 해결
+- FCM 토큰 저장 타이밍을 명확히 하여, 안정적인 알림 서비스 제공이 가능해짐
+- 인증 상태 변화와 FCM 토큰 관리의 연동이 중요함을 확인한 사례
