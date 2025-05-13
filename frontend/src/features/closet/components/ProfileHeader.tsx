@@ -1,5 +1,6 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
+import { authApi } from '@/features/auth/api/authApi';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -46,7 +47,12 @@ const ProfileHeader = ({
 		});
 	};
 
-	const handleBadgeClick = () => {
+	const handleLogoutClick = () => {
+		authApi.logout();
+		navigate('/');
+	};
+
+	const handleNotificationClick = () => {
 		navigate('/notification');
 	};
 
@@ -74,11 +80,23 @@ const ProfileHeader = ({
 			{/* 헤더 */}
 			<div className='relative z-10'>
 				{isMe ? (
-					<Header
-						logo='쉐어드레스'
-						badgeIcon='bell'
-						onBadgeClick={handleBadgeClick}
-					/>
+					<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
+						<img src='/icons/logo_black.svg' alt='쉐어드레스' />
+						<div className='flex gap-4'>
+							<img
+								src='/icons/logout_black.svg'
+								alt='로그아웃'
+								onClick={handleLogoutClick}
+								className='cursor-pointer'
+							/>
+							<img
+								src='/icons/notification_black.svg'
+								alt='알림'
+								onClick={handleNotificationClick}
+								className='cursor-pointer'
+							/>
+						</div>
+					</header>
 				) : (
 					<Header showBack={true} onBackClick={() => navigate(-1)} />
 				)}
