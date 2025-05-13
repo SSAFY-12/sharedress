@@ -26,6 +26,7 @@ import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileImageResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
+import com.ssafy.sharedress.application.member.dto.UserProfileResponse;
 import com.ssafy.sharedress.application.member.usecase.MemberQueryUseCase;
 import com.ssafy.sharedress.application.member.usecase.MemberUseCase;
 import com.ssafy.sharedress.domain.common.context.UserContext;
@@ -50,16 +51,16 @@ public class MemberController {
 	private final MemberUseCase memberUseCase;
 
 	@GetMapping("/me")
-	public ResponseEntity<ResponseWrapper<MemberProfileResponse>> getMe(
+	public ResponseEntity<ResponseWrapper<UserProfileResponse>> getMe(
 		@CurrentMember(required = false) Member member,
 		@CurrentGuest(required = false) Guest guest
 	) {
 		UserContext userContext = new UserContext(member, guest);
-		MemberProfileResponse response = null;
+		UserProfileResponse response = null;
 		if (userContext.isMember()) {
-			response = MemberProfileResponse.from(member);
+			response = UserProfileResponse.from(member);
 		} else if (userContext.isGuest()) {
-			response = MemberProfileResponse.from(guest);
+			response = UserProfileResponse.from(guest);
 		} else {
 			ExceptionUtil.throwException(UserContextErrorCode.USER_UNAUTHORIZED);
 		}
