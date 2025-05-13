@@ -110,9 +110,9 @@ const ProfileEditPage = () => {
 	});
 
 	return (
-		<form onSubmit={onSubmit} className='flex flex-col h-full'>
-			<div className='flex-1 h-full flex flex-col overflow-y-auto px-4'>
-				<div className='flex flex-col w-full justify-center items-center gap-1 pt-10 pb-1'>
+		<form onSubmit={onSubmit} className='flex flex-col flex-1'>
+			<div className='flex-1 flex flex-col px-4 pt-10 '>
+				<div className='flex flex-col w-full justify-center items-center gap-1 pb-1'>
 					<div className='w-20 h-20 rounded-full overflow-hidden'>
 						<img
 							src={previewUrl ?? profile?.profileImage}
@@ -178,7 +178,7 @@ const ProfileEditPage = () => {
 					</div>
 				</div>
 			</div>
-			<footer className='p-[18px] sticky w-full bottom-0 bg-white z-10'>
+			<footer className='p-[18px] w-full bg-white z-10'>
 				<PrimaryBtn onClick={onSubmit} size='full' name='저장하기' />
 			</footer>
 		</form>
