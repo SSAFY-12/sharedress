@@ -53,24 +53,22 @@ const ProfileEditPage = () => {
 	/* -------- 갤러리에서 가져온 사진 상태 -------- */
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-	
+
 	/* 선택된 파일이 바뀌면 미리보기 URL 생성 */
 	useEffect(() => {
-		if (selectedFile) {
-		  const newUrl = URL.createObjectURL(selectedFile);
-		  setPreviewUrl(newUrl);
-		  
-		  // Clean up function
-		  return () => {
-			if (newUrl) URL.revokeObjectURL(newUrl);
-		  };
-		}
-	  }, [selectedFile]);
-	
+		if (!selectedFile) return;
+
+		const reader = new FileReader();
+		reader.onload = () => setPreviewUrl(reader.result as string);
+		reader.readAsDataURL(selectedFile);
+
+		return () => setPreviewUrl(null);
+	}, [selectedFile]);
+
 	/* -------- 파일 input 제어 -------- */
 	const fileRef = useRef<HTMLInputElement>(null);
 	const openPicker = () => fileRef.current?.click();
-	
+
 	const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) setSelectedFile(file);
@@ -88,21 +86,21 @@ const ProfileEditPage = () => {
 				onSuccess: () => {
 					if (selectedFile) {
 						modifyProfileImage(selectedFile, {
-						  onSuccess: () => {
-							setTimeout(() => {
-							  navigate('/mypage');
-							}, 100);
-						  },
-						  onError: (error) => {
-							console.error('프로필 이미지 수정 실패:', error);
-						  }
+							onSuccess: () => {
+								setTimeout(() => {
+									navigate('/mypage');
+								}, 100);
+							},
+							onError: (error) => {
+								console.error('프로필 이미지 수정 실패:', error);
+							},
 						});
-					  } else {
+					} else {
 						// 이미지 변경이 없으면 바로 페이지 이동
 						setTimeout(() => {
-						  navigate('/mypage');
+							navigate('/mypage');
 						}, 100);
-					  }
+					}
 				},
 				onError: (error) => {
 					console.error('프로필 수정 실패:', error);
@@ -111,15 +109,14 @@ const ProfileEditPage = () => {
 		);
 	});
 
-
 	return (
 		<form onSubmit={onSubmit} className='flex flex-col h-full'>
 			<div className='flex-1 h-full flex flex-col overflow-y-auto px-4'>
 				<div className='flex flex-col w-full justify-center items-center gap-1 pt-10 pb-1'>
 					<div className='w-20 h-20 rounded-full overflow-hidden'>
 						<img
-  							src={previewUrl || profile?.profileImage || '/placeholder.svg'}
-  							alt={`프로필 이미지`}
+							src={previewUrl ?? profile?.profileImage}
+							alt={`프로필 이미지`}
 							className='w-full h-full object-cover'
 						/>
 					</div>

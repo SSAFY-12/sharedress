@@ -20,7 +20,7 @@ const cspHeader = [
 	"style-src 'self' 'unsafe-inline' https: http:", // FCM 푸시 알림 스타일 설정
 
 	// 이미지 설정
-	"img-src 'self' data: https: http:", // FCM 푸시 알림 이미지 설정
+	"img-src 'self' data: blob: https: http:", // FCM 푸시 알림 이미지 설정
 
 	// 폰트 설정
 	"font-src 'self' data: https: http:", // FCM 푸시 알림 폰트 설정
