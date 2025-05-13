@@ -41,7 +41,7 @@ public class ClothesController {
 
 	@PostMapping("/clothes/ai-complete")
 	public ResponseEntity<ResponseWrapper<Void>> completeClothesPreprocessing(@RequestBody AiCompleteRequest request) {
-		clothesUseCase.markClothesAsAiCompleted(request.memberId(), request.fcmToken());
+		clothesUseCase.markClothesAsAiCompleted(request.memberId(), request.successClothes(), request.failClothes());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 }
