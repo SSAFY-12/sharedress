@@ -18,7 +18,6 @@ export const headerConfig: HeaderConfig = {
 	'/notification': {
 		showBack: true,
 		subtitle: '알림',
-		badgeIcon: 'bell',
 	},
 
 	'/social/add': {
@@ -56,5 +55,13 @@ export const headerConfig: HeaderConfig = {
 	},
 	'/codi/:id': {
 		showBack: true,
+	},
+	'/mypage/edit': {
+		showBack: true,
+		subtitle: '프로필 수정',
+	},
+	'/social/codi-request': {
+		showBack: true,
+		subtitle: '친구에게 코디 요청',
 	},
 } as const;

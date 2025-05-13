@@ -34,55 +34,63 @@ export const FriendRequestsPage = () => {
 		<div className='w-full bg-white flex flex-col items-stretch'>
 			{/* 친구 요청 목록 */}
 			<div className='p-4'>
-				{friendRequests?.map((request) => (
-					<div
-						key={request.id}
-						className='relative mb-4 pb-4 border-b border-gray-100 px-2 sm:px-4'
-					>
-						<div className='flex items-center justify-between'>
-							<div className='flex items-center text-left'>
-								<UserMiniAvatar
-									src={getOptimizedImageUrl(request.requester.profileImage)}
-									size='md'
-								/>
-								<div className='ml-3 flex-1'>
-									<h3 className='font-medium text-button'>
-										{request.requester.nickname}
-									</h3>
-									<p className='text-sm text-gray-500 text-description'>
-										{request.message}
-									</p>
+				{friendRequests && friendRequests.length > 0 ? (
+					friendRequests.map((request) => (
+						<div
+							key={request.id}
+							className='relative mb-4 pb-4 border-b border-gray-100 px-2 sm:px-4'
+						>
+							<div className='flex items-center justify-between'>
+								<div className='flex items-center text-left'>
+									<UserMiniAvatar
+										src={getOptimizedImageUrl(request.requester.profileImage)}
+										size='md'
+									/>
+									<div className='ml-3 flex-1'>
+										<h3 className='font-medium text-button'>
+											{request.requester.nickname}
+										</h3>
+										<p className='text-sm text-gray-500 text-description'>
+											{request.message}
+										</p>
+									</div>
+								</div>
+								<div className='flex gap-2'>
+									<PrimaryBtn
+										size='compact'
+										name='친구 수락'
+										color='black'
+										onClick={() => handleActionClick('accept', request)}
+										className='
+									mt-3
+									w-[72px] h-[36px] text-[13px] rounded-[8px]
+									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
+									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
+								  '
+									/>
+									<PrimaryBtn
+										size='compact'
+										name='친구 거절'
+										color='black'
+										onClick={() => handleActionClick('reject', request)}
+										className='
+									mt-3
+									w-[72px] h-[36px] text-[13px] rounded-[8px]
+									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
+									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
+								  '
+									/>
 								</div>
 							</div>
-							<div className='flex gap-2'>
-								<PrimaryBtn
-									size='compact'
-									name='친구 수락'
-									color='black'
-									onClick={() => handleActionClick('accept', request)}
-									className='
-									mt-3
-									w-[72px] h-[36px] text-[13px] rounded-[8px]
-									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
-									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
-								  '
-								/>
-								<PrimaryBtn
-									size='compact'
-									name='친구 거절'
-									color='black'
-									onClick={() => handleActionClick('reject', request)}
-									className='
-									mt-3
-									w-[72px] h-[36px] text-[13px] rounded-[8px]
-									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
-									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
-								  '
-								/>
-							</div>
 						</div>
+					))
+				) : (
+					<div className='flex items-center justify-center h-full'>
+						<p className='text-description text-descriptionColor'>
+							현재 들어온 친구 요청이 없습니다.
+						</p>
 					</div>
-				))}
+				)}
 			</div>
 
 			{/* 친구 요청 수락/거절 모달 */}

@@ -1,5 +1,7 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
+import { authApi } from '@/features/auth/api/authApi';
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,7 +33,6 @@ const ProfileHeader = ({
 		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
 		return backgroundImages[randomIndex];
 	}, []);
-
 	const navigate = useNavigate();
 
 	const handleRecommendClick = () => {
@@ -43,6 +44,23 @@ const ProfileHeader = ({
 				targetMemberId: memberId.toString(),
 			},
 		});
+	};
+
+	const handleLogoutClick = () => {
+		authApi.logout();
+		navigate('/');
+	};
+
+	const handleNotificationClick = () => {
+		navigate('/notification');
+	};
+
+	const handleProfileEditClick = () => {
+		navigate('/mypage/edit');
+	};
+
+	const handleSignUpClick = () => {
+		navigate('/auth');
 	};
 
 	return (
@@ -64,7 +82,40 @@ const ProfileHeader = ({
 
 			{/* 헤더 */}
 			<div className='relative z-10'>
-				<Header logo='쉐어드레스' badgeIcon='bell' />
+				{isMe ? (
+					<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
+						<img src='/icons/logo_black.svg' alt='쉐어드레스' />
+						<div className='flex gap-4'>
+							<img
+								src='/icons/logout_black.svg'
+								alt='로그아웃'
+								onClick={handleLogoutClick}
+								className='cursor-pointer'
+							/>
+							<img
+								src='/icons/notification_black.svg'
+								alt='알림'
+								onClick={handleNotificationClick}
+								className='cursor-pointer'
+							/>
+						</div>
+					</header>
+				) : (
+					<Header
+						logo='쉐어드레스'
+						badgeIcon='bell'
+						onBadgeClick={handleNotificationClick}
+					/>
+				)}
+				: !isGuest ? (
+				<Header showBack={true} onBackClick={() => navigate(-1)} />
+				) : (
+				<Header
+					logo='쉐어드레스'
+					signUp={true}
+					onSignUpClick={handleSignUpClick}
+				/>
+				)
 			</div>
 
 			{/* 프로필 카드 컨테이너 */}
@@ -73,7 +124,10 @@ const ProfileHeader = ({
 				<div className='absolute left-1/2 transform -translate-x-1/2 -translate-y-1/3 z-20'>
 					<div className='w-20 h-20 rounded-full overflow-hidden'>
 						<img
-							src={profileImage || 'https://picsum.photos/200'}
+							src={
+								getOptimizedImageUrl(profileImage) ||
+								'https://picsum.photos/200'
+							}
 							alt={`${nickname}#${code}의 프로필 이미지`}
 							className='w-full h-full object-cover'
 						/>
@@ -94,7 +148,7 @@ const ProfileHeader = ({
 								<PrimaryBtn
 									size='full'
 									name='프로필 수정하기'
-									onClick={() => console.log('프로필 수정 클릭')}
+									onClick={() => handleProfileEditClick()}
 									color='white'
 								/>
 							) : (

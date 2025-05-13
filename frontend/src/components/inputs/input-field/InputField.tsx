@@ -13,7 +13,9 @@ export const InputField = ({
 	hexCode,
 }: InputFieldProps) => {
 	const baseClass =
-		'border border-gray-300 bg-background h-12 rounded-md px-3 py-2 w-full text-default text-regular focus:outline-none focus:ring-2 focus:ring-light disabled:bg-gray-100';
+		'flex justify-between items-center px-4 py-2.5 bg-background h-12 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-light disabled:bg-background';
+	const textClass =
+		'text-default text-regular placeholder:text-descriptionColor text-left';
 
 	if (type === 'text') {
 		return (
@@ -23,7 +25,7 @@ export const InputField = ({
 				onChange={onChange}
 				placeholder={placeholder}
 				disabled={disabled}
-				className={`${baseClass} ${className}`}
+				className={`${baseClass} ${textClass} ${className} `}
 				onFocus={onFocus}
 				onBlur={onBlur}
 			/>
@@ -38,13 +40,16 @@ export const InputField = ({
 				onClick={onClick}
 				disabled={disabled}
 			>
-				{hexCode && (
-					<div
-						className='w-4 h-4 rounded-full'
-						style={{ backgroundColor: hexCode }}
-					/>
-				)}
-				<span className='text-left'>{value}</span>
+				<div className='flex items-center gap-2.5'>
+					{hexCode && (
+						<div
+							className='w-4 h-4 rounded-full'
+							style={{ backgroundColor: hexCode }}
+						/>
+					)}
+					<span className={`${textClass}`}>{value}</span>
+				</div>
+				<img src='/icons/arrow_down.svg' alt='arrow-down' />
 			</button>
 		);
 	}
@@ -56,7 +61,8 @@ export const InputField = ({
 			onClick={onClick}
 			disabled={disabled}
 		>
-			{value}
+			<span className={`${textClass}`}>{value}</span>
+			<img src='/icons/arrow_down.svg' alt='arrow-down' />
 		</button>
 	);
 };

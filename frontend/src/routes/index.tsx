@@ -5,7 +5,6 @@ import ClothPage from '@/pages/ClothPage';
 import AuthPage from '@/pages/AuthPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import MyClosetPage from '@/features/closet/pages/MyClosetPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 import RegistPage from '@/pages/RegistPage';
 import NotificationPage from '@/pages/NotificationPage';
@@ -14,6 +13,8 @@ import { useAuthStore } from '@/store/useAuthStore';
 import FriendPage from '@/pages/FriendPage';
 import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
+import MyPage from '@/pages/MyPage';
+import FriendClosetLayoutPage from '@/features/closet/pages/FriendClosetLayoutPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -35,7 +36,7 @@ export const router = createBrowserRouter([
 	{ path: '/auth', element: <AuthPage /> },
 	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
 	{ path: '/link/:code', element: <ExternalUserPage /> },
-	{ path: '/friend/:id', element: <FriendClosetPage /> }, // <-- App 없이 바로!
+	{ path: '/link/friend/:id', element: <FriendClosetLayoutPage /> }, // <-- App 없이 바로!
 
 	// 인증 필요 라우트
 	{
@@ -71,21 +72,21 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: 'mypage',
+				path: 'mypage/*',
 				element: (
 					<ProtectedRoute>
-						<MyClosetPage />
+						<MyPage />
 					</ProtectedRoute>
 				),
 			},
-			// {
-			// 	path: 'friend/:id',
-			// 	element: (
-			// 		<PublicRoute>
-			// 			<FriendClosetPage />
-			// 		</PublicRoute>
-			// 	),
-			// },
+			{
+				path: 'friend/:id',
+				element: (
+					<ProtectedRoute>
+						<FriendClosetPage />
+					</ProtectedRoute>
+				),
+			},
 			{
 				path: 'cloth/*',
 				element: (

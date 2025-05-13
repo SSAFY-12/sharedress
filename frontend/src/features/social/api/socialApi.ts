@@ -103,4 +103,23 @@ export const profileModifyApi = {
 		const response = await client.patch('/api/members/profile', profile);
 		return response.data;
 	},
+	modifyProfileImage: async (image: File) => {
+		const formData = new FormData();
+		formData.append('profileImage', image);
+		const response = await client.patch(
+			'/api/members/profile/image',
+			formData,
+			{
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			},
+		);
+		return response.data;
+	},
+};
+
+export const getMyLoginInfo = async () => {
+	const response = await client.get('/api/me');
+	return response.data.content;
 };
