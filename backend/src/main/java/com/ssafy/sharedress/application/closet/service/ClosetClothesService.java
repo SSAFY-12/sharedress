@@ -36,6 +36,7 @@ import com.ssafy.sharedress.domain.shoppingmall.entity.ShoppingMall;
 import com.ssafy.sharedress.domain.shoppingmall.error.ShoppingMallErrorCode;
 import com.ssafy.sharedress.domain.shoppingmall.repository.ShoppingMallRepository;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
+import com.ssafy.sharedress.global.util.RegexUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -152,7 +153,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			Brand brand = brandRepository.findByExactNameEnOrKr(item.brandNameEng(), item.brandNameKor())
 				.orElseGet(() -> brandRepository.save(new Brand(item.brandNameEng(), item.brandNameKor())));
 
-			String normalizedName = normalizeProductName(item.name());
+			String normalizedName = RegexUtils.normalizeProductName(item.name());
 
 			// 라이브러리 조회 (상품명 + 브랜드 ID 기준)
 			Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(normalizedName, brand.getId());
@@ -214,19 +215,6 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		}
 	}
 
-	private String normalizeProductName(String name) {
-		if (name == null) {
-			return null;
-		}
-		// [] 패턴 제거
-		name = name.replaceAll("^\\s*\\[[^\\]]*\\]\\s*", "");
-		// () 패턴 제거
-		name = name.replaceAll("^\\s*\\([^)]*\\)\\s*", "");
-		// 양쪽 공백 제거
-		return name.trim();
-	}
-
-	// 클래스 내부 어디든 위치 가능
 	private static <T> List<List<T>> batchList(List<T> list, int batchSize) {
 		List<List<T>> batches = new ArrayList<>();
 		for (int i = 0; i < list.size(); i += batchSize) {
