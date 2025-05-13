@@ -46,6 +46,8 @@ public class Member extends BaseTimeEntity {
 		this.profileUrl = profileUrl;
 		this.nickname = nickname;
 		this.code = code;
+		this.isPublic = true;
+		this.notificationStatus = true;
 	}
 
 	public void updateNickname(String nickname) {
