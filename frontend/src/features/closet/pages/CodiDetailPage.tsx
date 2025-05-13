@@ -15,12 +15,14 @@ import { useDeleteCoordination } from '@/features/closet/hooks/useDeleteCoordina
 import { useDeleteCoordinationComment } from '@/features/closet/hooks/useDeleteCoordinationComment';
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
+import { useProfileStore } from '@/store/useProfileStore';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const { id } = useParams();
 	const isMe = location.state?.isMe ?? false;
+	const isGuest = useProfileStore((state) => state.isGuest);
 
 	const coordinationId = Number(id);
 
@@ -245,28 +247,30 @@ const CodiDetailPage = () => {
 			</div>
 
 			{/* 댓글 입력 영역 */}
-			<div className='absolute bottom-0 left-0 right-0 bg-white border-t z-10'>
-				<div className='w-full'>
-					<div className='flex items-center p-4'>
-						<InputField
-							type='text'
-							placeholder='댓글을 입력하세요'
-							value={commentText}
-							onChange={handleCommentChange}
-							onFocus={() => setIsCommentFocused(true)}
-							onBlur={() => setIsCommentFocused(false)}
-						/>
-						{isCommentFocused && (
-							<button
-								className='ml-2 p-2 text-white rounded-full flex items-center justify-center'
-								onMouseDown={handleCommentSubmit}
-							>
-								<img src='/icons/submit.svg' alt='전송' className='w-5 h-5' />
-							</button>
-						)}
+			{!isGuest && (
+				<div className='absolute bottom-0 left-0 right-0 bg-white border-t z-10'>
+					<div className='w-full'>
+						<div className='flex items-center p-4'>
+							<InputField
+								type='text'
+								placeholder='댓글을 입력하세요'
+								value={commentText}
+								onChange={handleCommentChange}
+								onFocus={() => setIsCommentFocused(true)}
+								onBlur={() => setIsCommentFocused(false)}
+							/>
+							{isCommentFocused && (
+								<button
+									className='ml-2 p-2 text-white rounded-full flex items-center justify-center'
+									onMouseDown={handleCommentSubmit}
+								>
+									<img src='/icons/submit.svg' alt='전송' className='w-5 h-5' />
+								</button>
+							)}
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 
 			{/* 수정 삭제 바텀 시트 */}
 			<BottomSheet

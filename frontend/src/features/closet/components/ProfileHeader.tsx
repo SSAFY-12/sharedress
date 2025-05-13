@@ -1,6 +1,7 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
 import { authApi } from '@/features/auth/api/authApi';
+import { useProfileStore } from '@/store/useProfileStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -29,6 +30,7 @@ const ProfileHeader = ({
 	isMe,
 	memberId,
 }: ProfileHeaderProps) => {
+	const isGuest = useProfileStore((state) => state.isGuest);
 	const selectedBackgroundImage = useMemo(() => {
 		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
 		return backgroundImages[randomIndex];
@@ -100,22 +102,20 @@ const ProfileHeader = ({
 							/>
 						</div>
 					</header>
-				) : (
+				) : isGuest ? (
 					<Header
 						logo='쉐어드레스'
+						signUp={true}
+						onSignUpClick={handleSignUpClick}
+					/>
+				) : (
+					<Header
+						showBack={true}
 						badgeIcon='bell'
+						onBackClick={() => navigate(-1)}
 						onBadgeClick={handleNotificationClick}
 					/>
 				)}
-				: !isGuest ? (
-				<Header showBack={true} onBackClick={() => navigate(-1)} />
-				) : (
-				<Header
-					logo='쉐어드레스'
-					signUp={true}
-					onSignUpClick={handleSignUpClick}
-				/>
-				)
 			</div>
 
 			{/* 프로필 카드 컨테이너 */}
