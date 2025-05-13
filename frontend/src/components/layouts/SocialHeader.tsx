@@ -25,8 +25,8 @@ const SocialHeader = ({ onProfileClick, onAddClick }: SocialHeaderProps) => {
 	};
 
 	return (
-		<header className='flex items-center justify-between h-16 px-4 bg-white'>
-			<h1 className='font-bold text-lg text-gray-800 font-logo'>쉐어드레스</h1>
+		<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
+			<img src='/icons/logo_black.svg' alt='쉐어드레스' />
 			<div className='flex gap-4'>
 				<img
 					src='/icons/friend_request.svg'
