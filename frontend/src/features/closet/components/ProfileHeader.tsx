@@ -33,7 +33,6 @@ const ProfileHeader = ({
 		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
 		return backgroundImages[randomIndex];
 	}, []);
-
 	const navigate = useNavigate();
 
 	const handleRecommendClick = () => {
@@ -58,6 +57,10 @@ const ProfileHeader = ({
 
 	const handleProfileEditClick = () => {
 		navigate('/mypage/edit');
+	};
+
+	const handleSignUpClick = () => {
+		navigate('/auth');
 	};
 
 	return (
@@ -98,8 +101,21 @@ const ProfileHeader = ({
 						</div>
 					</header>
 				) : (
-					<Header showBack={true} onBackClick={() => navigate(-1)} />
+					<Header
+						logo='쉐어드레스'
+						badgeIcon='bell'
+						onBadgeClick={handleNotificationClick}
+					/>
 				)}
+				: !isGuest ? (
+				<Header showBack={true} onBackClick={() => navigate(-1)} />
+				) : (
+				<Header
+					logo='쉐어드레스'
+					signUp={true}
+					onSignUpClick={handleSignUpClick}
+				/>
+				)
 			</div>
 
 			{/* 프로필 카드 컨테이너 */}
