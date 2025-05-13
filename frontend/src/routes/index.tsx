@@ -5,7 +5,6 @@ import ClothPage from '@/pages/ClothPage';
 import AuthPage from '@/pages/AuthPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import MyClosetPage from '@/features/closet/pages/MyClosetPage';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
 import RegistPage from '@/pages/RegistPage';
 import NotificationPage from '@/pages/NotificationPage';
@@ -14,6 +13,7 @@ import FriendPage from '@/pages/FriendPage';
 import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
 import FriendClosetLayoutPage from '@/features/closet/pages/FriendClosetLayoutPage';
+import MyPage from '@/pages/MyPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -71,10 +71,10 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: 'mypage',
+				path: 'mypage/*',
 				element: (
 					<ProtectedRoute>
-						<MyClosetPage />
+						<MyPage />
 					</ProtectedRoute>
 				),
 			},
