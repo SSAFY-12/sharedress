@@ -57,9 +57,13 @@ export const captureCanvasImage = async (
 		requestAnimationFrame(() => requestAnimationFrame(r)),
 	);
 
+	if (element.clientWidth === 0 || element.clientHeight === 0) {
+		throw new Error('캔버스 요소가 렌더링되지 않았습니다.'); // 명확하게 경고
+	}
+
 	const canvas = await html2canvas(element, {
 		useCORS: true,
-		scale: 2,
+		scale: 1,
 	});
 
 	const base64 = canvas.toDataURL('image/png');

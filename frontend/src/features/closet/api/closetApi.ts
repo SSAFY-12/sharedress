@@ -280,3 +280,8 @@ export const updateCodiPublicStatus = async (
 	});
 	return response.data;
 };
+
+export const getMyLoginInfo = async () => {
+	const response = await client.get('/api/me');
+	return response.data.content;
+};
