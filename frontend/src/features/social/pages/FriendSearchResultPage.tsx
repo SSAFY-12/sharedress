@@ -91,9 +91,10 @@ export const FriendSearchResultPage = () => {
 	};
 
 	return (
-		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
-			<div className='px-4 py-3'>
+		<div className='flex flex-col h-full w-full bg-white'>
+			<div className='px-4 sm:px-6 py-3'>
 				<SearchBar
+					className='w-full'
 					placeholder='친구 ID'
 					value={searchValue}
 					onChange={handleSearchChange}
@@ -101,72 +102,73 @@ export const FriendSearchResultPage = () => {
 				/>
 			</div>
 
-			<div className='flex-1 p-4'>
+			<div className='flex-1 px-4 sm:px-6 py-4'>
 				{searchUsers && searchUsers.length > 0 ? (
 					searchUsers.map((user, index) => (
-						<div
-							ref={index === searchUsers.length - 1 ? lastElementRef : null}
-							className='border rounded-lg p-6 flex flex-col items-center mb-4'
-							key={user.memberId}
-						>
-							<UserMiniAvatar
-								src={getOptimizedImageUrl(user.profileImage)}
-								size='lg'
-								className='mb-3'
-							/>
-							<h2 className='font-bold mb-1'>{user.nickname}</h2>
+						<div key={user.memberId}>
+							<div
+								ref={index === searchUsers.length - 1 ? lastElementRef : null}
+								className='border rounded-lg p-4 flex flex-col items-center mb-3 w-full'
+							>
+								<UserMiniAvatar
+									src={getOptimizedImageUrl(user.profileImage)}
+									size='lg'
+									className='mb-3'
+								/>
+								<h2 className='font-bold mb-1'>{user.nickname}</h2>
 
-							{user.relationStatus === 0 || user.relationStatus === 3 ? (
-								<PrimaryBtn
-									size='compact'
-									name='친구 신청'
-									color='black'
-									onClick={() => {
-										setModalOpen(true);
-										setSelectedFriend({
-											profileImage: user.profileImage,
-											nickname: user.nickname,
-											relationStatus: user.relationStatus,
-											memberId: user.memberId,
-										});
-									}}
-									className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
-								/>
-							) : user.relationStatus === 1 ? (
-								<PrimaryBtn
-									size='compact'
-									name='친구 취소'
-									color='gray'
-									onClick={() => {
-										setSelectedFriend({
-											profileImage: user.profileImage,
-											nickname: user.nickname,
-											relationStatus: user.relationStatus,
-											memberId: user.memberId,
-										});
-										setActionType('cancel');
-										setActionModalOpen(true);
-									}}
-									className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
-								/>
-							) : user.relationStatus === 2 ? (
-								<PrimaryBtn
-									size='compact'
-									name='친구 수락'
-									color='primary'
-									onClick={() => {
-										setSelectedFriend({
-											profileImage: user.profileImage,
-											nickname: user.nickname,
-											relationStatus: user.relationStatus,
-											memberId: user.memberId,
-										});
-										setActionType('accept');
-										setActionModalOpen(true);
-									}}
-									className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
-								/>
-							) : null}
+								{user.relationStatus === 0 || user.relationStatus === 3 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구 신청'
+										color='black'
+										onClick={() => {
+											setModalOpen(true);
+											setSelectedFriend({
+												profileImage: user.profileImage,
+												nickname: user.nickname,
+												relationStatus: user.relationStatus,
+												memberId: user.memberId,
+											});
+										}}
+										className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : user.relationStatus === 1 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구 취소'
+										color='gray'
+										onClick={() => {
+											setSelectedFriend({
+												profileImage: user.profileImage,
+												nickname: user.nickname,
+												relationStatus: user.relationStatus,
+												memberId: user.memberId,
+											});
+											setActionType('cancel');
+											setActionModalOpen(true);
+										}}
+										className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : user.relationStatus === 2 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구 수락'
+										color='primary'
+										onClick={() => {
+											setSelectedFriend({
+												profileImage: user.profileImage,
+												nickname: user.nickname,
+												relationStatus: user.relationStatus,
+												memberId: user.memberId,
+											});
+											setActionType('accept');
+											setActionModalOpen(true);
+										}}
+										className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : null}
+							</div>
 						</div>
 					))
 				) : (

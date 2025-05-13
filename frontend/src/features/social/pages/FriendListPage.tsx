@@ -31,7 +31,7 @@ export const FriendsListPage = () => {
 
 	// 친구 검색 이름 제한 20글자이내
 	return (
-		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
+		<div className='flex flex-col h-full w-full bg-white px-4 sm:px-6'>
 			{/* 검색 영역 */}
 			<div className='py-3 px-3'>
 				<SearchBar
@@ -46,16 +46,15 @@ export const FriendsListPage = () => {
 			{!keyword ? (
 				<div>
 					{friends?.map((friend) => (
-						//id, nickname, profileImage, oneLiner
-						<UserRowItem
-							key={friend.id}
-							userName={friend.nickname}
-							userAvatar={getOptimizedImageUrl(friend.profileImage)}
-							userStatus={friend.oneLiner}
-							actionType='arrow'
-							onClick={() => console.log('Navigate to user profile')}
-							// user 클릭시 프로필 이동
-						/>
+						<div key={friend.id} className='px-2 sm:px-4'>
+							<UserRowItem
+								userName={friend.nickname}
+								userAvatar={getOptimizedImageUrl(friend.profileImage)}
+								userStatus={friend.oneLiner}
+								actionType='arrow'
+								onClick={() => console.log('Navigate to user profile')}
+							/>
+						</div>
 					))}
 				</div>
 			) : (
@@ -63,15 +62,15 @@ export const FriendsListPage = () => {
 				<div>
 					{Array.isArray(searchMyFriend) && searchMyFriend.length > 0 ? (
 						searchMyFriend.map((friend) => (
-							<UserRowItem
-								key={friend.id}
-								userName={friend.nickname}
-								userAvatar={getOptimizedImageUrl(friend.profileImage)}
-								userStatus={friend.oneLiner}
-								actionType='arrow'
-								onClick={() => console.log('Navigate to user profile')}
-								//user 클릭시 프로필 이동
-							/>
+							<div key={friend.id} className='px-2 sm:px-4'>
+								<UserRowItem
+									userName={friend.nickname}
+									userAvatar={getOptimizedImageUrl(friend.profileImage)}
+									userStatus={friend.oneLiner}
+									actionType='arrow'
+									onClick={() => console.log('Navigate to user profile')}
+								/>
+							</div>
 						))
 					) : (
 						<p>검색 결과가 없습니다.</p>
