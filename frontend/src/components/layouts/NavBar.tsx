@@ -9,9 +9,10 @@ const NavBar = ({ openModal }: NavBarProps) => {
 	const navigate = useNavigate();
 	const currentPath = location.pathname;
 	const isFriendTabActive =
-		currentPath === '/social' || currentPath.startsWith('/friend/');
-	const isClosetTabActive = currentPath === '/mypage';
-
+		currentPath.startsWith('/social') || currentPath.startsWith('/friend/');
+	const isClosetTabActive =
+		currentPath.startsWith('/mypage') ||
+		currentPath.startsWith('/notification');
 	return (
 		<div
 			className='flex items-end justify-between

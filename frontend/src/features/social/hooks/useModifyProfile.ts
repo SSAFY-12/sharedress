@@ -13,12 +13,14 @@ export const useModifyProfile = () => {
 			const previousProfile = queryClient.getQueryData(['myProfile']);
 			// UI 즉시 반영
 			setIsPublic(newProfile.isPublic ?? true);
+			queryClient.setQueryData(['myProfile'], newProfile);
 
 			return { previousProfile };
 		},
 		onSuccess: (data) => {
-			// 프로필 수정 성공 시 캐시 업데이트
-			queryClient.setQueryData(['myProfile'], data);
+			// 프로필 수정 성공 시 캐시 무효화 및 새로운 데이터 가져오기
+			queryClient.invalidateQueries({ queryKey: ['myProfile'] });
+			return { data, success: true };
 		},
 		onError: (error, newProfile, context) => {
 			// 에러 발생 시 이전 상태로 롤백
@@ -27,6 +29,7 @@ export const useModifyProfile = () => {
 			}
 			setIsPublic(!(newProfile.isPublic ?? true)); // 이전 상태로 롤백
 			console.error('프로필 수정 실패:', error);
+			return { success: false };
 		},
 	});
 };
