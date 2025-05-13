@@ -4,6 +4,14 @@ import logging
 import os
 import pickle
 from typing import Dict, List, Optional, Any
+import time
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
 logger = logging.getLogger(__name__)
 
@@ -17,10 +25,14 @@ class HTMLExtractor:
             'User-Agent': (
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
                 'AppleWebKit/537.36 (KHTML, like Gecko) '
-                'Chrome/91.0.4472.124 Safari/537.36'
-            )
+                'Chrome/114.0.0.0 Safari/537.36'
+            ),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Referer': 'https://www.musinsa.com/'
         }
         self._load_extractors()
+        self.use_selenium = True  # 셀레니움 사용 여부 플래그
 
     def _load_extractors(self):
         """학습된 추출기 로드"""
@@ -37,37 +49,121 @@ class HTMLExtractor:
     def extract_from_url(self, url: str, desired_color: Optional[str] = None) -> Dict[str, Any]:
         """URL에서 상품 정보 추출"""
         try:
-            # HTML 콘텐츠 가져오기
-            response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
-            html = response.text
-            soup = BeautifulSoup(html, 'html.parser')
-
-            # 유효하지 않은 상품 체크
-            # 알림창, 에러 메시지 또는 페이지 내용에서 "유효하지 않은 상품" 문구 확인
-            # if "유효하지 않은 상품" in html or "상품을 찾을 수 없습니다" in html:
-            #     logger.warning(f"유효하지 않은 상품 URL: {url}")
-            #     return {"error": "INVALID_PRODUCT", "message": "유효하지 않은 상품입니다"}
-            #
-            # # 페이지가 비어있거나 주요 콘텐츠가 없는 경우 확인
-            # if not soup.select('.product_info_section, .sc-1prswe3-3, [class*="category_navi"], .product-img'):
-            #     logger.warning(f"상품 정보를 찾을 수 없는 URL: {url}")
-            #     return {"error": "INVALID_PRODUCT", "message": "상품 정보를 찾을 수 없습니다"}
+            # 상품 ID 추출
+            product_id = url.split('/')[-1]
+            logger.info(f"상품 ID: {product_id}")
 
             # 상품 정보 추출
             result = {}
 
-            # 1. 카테고리 추출
-            result['category_text'] = self._extract_category(soup)
+            # 1. HTML 콘텐츠 가져오기 (셀레니움 사용하지 않을 경우를 위한 백업)
+            html = ""
+            soup = None
+            try:
+                response = requests.get(url, headers=self.headers)
+                response.raise_for_status()
+                html = response.text
+                soup = BeautifulSoup(html, 'html.parser')
+                logger.info(f"HTML 크기: {len(html)} 바이트")
+            except Exception as e:
+                logger.warning(f"requests로 HTML 가져오기 실패: {e}")
 
-            # 2. 모든 이미지 URL 추출
-            result['image_urls'] = self._extract_image_urls(url, soup, desired_color)
+            # 2. 카테고리 추출 (BeautifulSoup으로 가능)
+            if soup:
+                result['category_text'] = self._extract_category(soup)
+            else:
+                result['category_text'] = "상의"  # 기본값
+
+            # 3. Selenium으로 이미지 URL 추출
+            if self.use_selenium:
+                try:
+                    selenium_urls = self._extract_images_with_selenium(url)
+                    logger.info(f"Selenium으로 {len(selenium_urls)}개 이미지 URL 추출 성공")
+                    result['image_urls'] = selenium_urls
+                    return result
+                except Exception as e:
+                    logger.error(f"Selenium 이미지 추출 실패: {e}, 기존 방식으로 대체")
+
+            # 4. 셀레니움 실패 시 기존 방식으로 대체
+            if soup:
+                result['image_urls'] = self._extract_image_urls(url, soup, desired_color)
+            else:
+                result['image_urls'] = []
 
             return result
-
         except Exception as e:
             logger.error(f"URL {url}에서 정보 추출 실패: {e}")
             return {"error": str(e)}
+
+    def _extract_images_with_selenium(self, url: str) -> List[str]:
+        """Selenium을 사용하여 JavaScript로 로딩된 이미지 추출"""
+        logger.info(f"Selenium으로 이미지 추출 시작: {url}")
+
+        options = Options()
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        image_urls = []
+
+        try:
+            # 페이지 로드
+            driver.get(url)
+            WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "img")))
+            time.sleep(2)  # JavaScript가 로딩될 시간
+
+            # 상품 ID 추출
+            product_id = url.split('/')[-1]
+
+            # 다양한 선택자 시도
+            selectors = [
+                'div.sc-366fl4-2 img',
+                'div.sc-366fl4-3 img',
+                'div.sc-9fdh7f-0 img',
+                '.product_img_basic img',
+                '#detail_thumbs img',
+                '#bigimg img',
+                '.product-img img',
+                '.product_thumb img'
+            ]
+
+            for selector in selectors:
+                elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                if elements:
+                    logger.info(f"선택자 '{selector}'로 {len(elements)}개 이미지 발견")
+
+                    for element in elements:
+                        src = element.get_attribute('src')
+                        if src and src not in image_urls:
+                            # 고품질 이미지 URL로 변환
+                            if "_500.jpg" in src:
+                                src = src.replace("_500.jpg", "_big.jpg?w=1200")
+                            image_urls.append(src)
+
+            # 특정 선택자로 이미지를 못 찾았다면 모든 이미지에서 무신사 패턴 찾기
+            if not image_urls:
+                logger.info("특정 선택자로 이미지를 찾지 못해 모든 이미지 검색")
+                all_images = driver.find_elements(By.TAG_NAME, 'img')
+                for element in all_images:
+                    src = element.get_attribute('src')
+                    if src and src not in image_urls:
+                        # 무신사 이미지 URL 패턴 확인
+                        if any(pattern in src for pattern in ['goods_img', 'prd_img', 'image.msscdn.net']):
+                            # 고품질 이미지 URL로 변환
+                            if "_500.jpg" in src:
+                                src = src.replace("_500.jpg", "_big.jpg?w=1200")
+                            image_urls.append(src)
+
+            # 중복 URL 제거
+            image_urls = list(dict.fromkeys(image_urls))
+
+            logger.info(f"Selenium으로 {len(image_urls)}개 이미지 URL 추출됨")
+
+            return image_urls
+
+        finally:
+            driver.quit()
 
     def _extract_category(self, soup: BeautifulSoup) -> str:
         """카테고리 정보 추출"""
@@ -163,7 +259,6 @@ class HTMLExtractor:
                         logger.info(f"메타 키워드 '{keyword}'를 '{main_category}'로 매핑")
                         return main_category
 
-
         except Exception as e:
             crumbs = [a.get("data-category-name") or a.text.strip()
                       for a in soup.select('a[data-category-name]')][:2]
@@ -177,79 +272,19 @@ class HTMLExtractor:
         return "상의"
 
     def _extract_image_urls(self, url: str, soup: BeautifulSoup, desired_color: Optional[str] = None) -> List[str]:
-        """상품 이미지 URL 추출"""
+        """상품 이미지 URL 추출 (BeautifulSoup 기반, 백업용)"""
         image_urls = []
 
         try:
-            # 디버깅을 위한 HTML 구조 분석
-            logger.info(f"URL 처리 시작: {url}")
-
-            # 1. 새 무신사 UI 검색 (더 자세한 로깅)
-            new_gallery_elements = soup.select('div.sc-366fl4-2, div.sc-366fl4-3')
-            logger.info(f"새 UI div 요소 수: {len(new_gallery_elements)}")
-
-            # 2. 모든 img 태그 확인
-            all_images = soup.find_all('img')
-            logger.info(f"페이지 전체 이미지 태그 수: {len(all_images)}")
-
-            # 이미지 URL 패턴 확인을 위해 처음 5개 이미지의 src 출력
-            for i, img in enumerate(all_images[:5]):
-                src = img.get('src')
-                if src:
-                    logger.info(f"이미지 {i+1} src: {src}")
-            # 1. 새 무신사 UI에서 갤러리 이미지 추출 (div.sc-366fl4-2 내부 이미지)
-            new_gallery_images = soup.select('div.sc-366fl4-2 img, div.sc-366fl4-3 img')
-            if new_gallery_images:
-                logger.info(f"새 UI에서 갤러리 이미지 {len(new_gallery_images)}개 발견")
-                for img in new_gallery_images:
-                    src = img.get('src') or img.get('data-src')
-                    if src:
-                        # 썸네일 이미지 URL을 고품질 이미지 URL로 변환
-                        if '_500.jpg' in src:
-                            high_quality_src = src.replace('_500.jpg', '_big.jpg?w=1200')
-                            image_urls.append(high_quality_src)
-                            logger.info(f"고품질 이미지 URL 추출: {high_quality_src}")
-                        else:
-                            image_urls.append(src)
-
-            # 2. 기존 무신사 갤러리 이미지 찾기 (결과가 없는 경우 대비)
-            if not image_urls:
-                gallery_images = soup.select('#detail_thumbs img, #bigimg img, .product-img img, .product_thumb img, .detail_product_img img')
-                for img in gallery_images:
-                    src = img.get('src') or img.get('data-src') or img.get('data-original')
-                    if src:
-                        # 작은 썸네일 이미지는 건너뛰기
-                        if 'thumbnail' in src and '_30.jpg' in src:
-                            continue
-
-                        # 큰 이미지 URL로 변환 (무신사 패턴)
-                        if '_500.jpg' in src:
-                            src = src.replace('_500.jpg', '_big.jpg?w=1200')
-                        elif '_60.jpg' in src:
-                            src = src.replace('_60.jpg', '_big.jpg?w=1200')
-                        elif '_80.jpg' in src:
-                            src = src.replace('_80.jpg', '_big.jpg?w=1200')
-
-                        # 절대 URL 확인
-                        if src.startswith('//'):
-                            src = 'https:' + src
-                        elif src.startswith('/'):
-                            domain = '/'.join(url.split('/')[:3])
-                            src = domain + src
-
-                        # gif 및 아이콘 제외
-                        if not src.endswith('.gif') and 'icon' not in src.lower():
-                            image_urls.append(src)
-
-            # 3. OpenGraph 이미지 확인 (대체)
-            if not image_urls:
-                og_image = soup.select_one('meta[property="og:image"]')
-                if og_image and og_image.get('content'):
-                    src = og_image['content']
-                    # 만약 OpenGraph 이미지가 500 크기라면 big으로 변환
-                    if '_500.jpg' in src:
-                        src = src.replace('_500.jpg', '_big.jpg?w=1200')
-                    image_urls.append(src)
+            # OpenGraph 이미지 확인
+            og_image = soup.select_one('meta[property="og:image"]')
+            if og_image and og_image.get('content'):
+                src = og_image['content']
+                # 만약 OpenGraph 이미지가 500 크기라면 big으로 변환
+                if '_500.jpg' in src:
+                    src = src.replace('_500.jpg', '_big.jpg?w=1200')
+                image_urls.append(src)
+                logger.info(f"OpenGraph 이미지 URL 추출: {src}")
 
             # 중복 URL 제거
             image_urls = list(dict.fromkeys(image_urls))

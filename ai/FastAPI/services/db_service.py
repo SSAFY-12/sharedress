@@ -78,7 +78,19 @@ class DBService:
             self.db.rollback()
             logger.error("Clothes update failed: %s", e)
             return False
-
+    def update_color_hex(self, color_id: int, hex_code: str) -> bool:
+        try:
+            color = self.db.query(Color).filter(Color.id == color_id).first()
+            if color:
+                color.color_hex = hex_code
+                self.db.commit()
+                logger.info(f"Color(id={color_id}) hex updated → {hex_code}")
+                return True
+            return False
+        except Exception as e:
+            self.db.rollback()
+            logger.error(f"Hex update error: {e}")
+            return False
     # -----------------------------------------------------------
     def close(self):
         self.db.close()
