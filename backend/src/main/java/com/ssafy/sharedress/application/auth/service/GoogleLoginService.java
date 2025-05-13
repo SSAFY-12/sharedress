@@ -3,6 +3,7 @@ package com.ssafy.sharedress.application.auth.service;
 import java.util.Optional;
 import java.util.Random;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,8 +40,12 @@ public class GoogleLoginService implements GoogleLoginUseCase {
 		if (member.isEmpty()) {
 			String code = generateUniqueNicknameCode(userInfo.name());
 			Member newMember = new Member(userInfo.email(), userInfo.picture(), userInfo.name(), code);
-			member = Optional.ofNullable(memberRepository.save(newMember));
-			closetRepository.save(new Closet(member.get()));
+			try {
+				member = Optional.ofNullable(memberRepository.save(newMember));
+				closetRepository.save(new Closet(member.get()));
+			} catch (ConstraintViolationException e) {
+				member = memberRepository.findByEmail(userInfo.email());
+			}
 		}
 
 		// 3. JWT 토큰 발급 & 저장
