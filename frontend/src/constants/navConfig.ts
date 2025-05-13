@@ -2,8 +2,8 @@ export const NavConfig: { [key: string]: boolean } = {
 	'/wardrobe': true,
 	'/social': true,
 	'/mypage': true,
+	'/friend': true,
 	'/mypage/edit': false,
-	/* ...필요한 1뎁스 경로 */
 };
 
 // 특정 경로의 네비게이션 바 표시 여부를 결정하는 함수

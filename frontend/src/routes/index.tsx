@@ -14,6 +14,7 @@ import FriendPage from '@/pages/FriendPage';
 import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
 import MyPage from '@/pages/MyPage';
+import FriendClosetLayoutPage from '@/features/closet/pages/FriendClosetLayoutPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -35,7 +36,7 @@ export const router = createBrowserRouter([
 	{ path: '/auth', element: <AuthPage /> },
 	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
 	{ path: '/link/:code', element: <ExternalUserPage /> },
-	{ path: '/link/friend/:id', element: <FriendClosetPage /> }, // <-- App 없이 바로!
+	{ path: '/link/friend/:id', element: <FriendClosetLayoutPage /> }, // <-- App 없이 바로!
 
 	// 인증 필요 라우트
 	{
