@@ -54,6 +54,8 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 
 		BooleanBuilder condition = new BooleanBuilder();
 
+		condition.and(clothes.imageUrl.isNotNull());
+
 		// 카테고리 필터
 		if (categoryId != null) {
 			condition.and(clothes.category.id.eq(categoryId));
