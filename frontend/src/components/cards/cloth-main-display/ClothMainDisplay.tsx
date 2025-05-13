@@ -17,7 +17,7 @@ export const ClothMainDisplay = ({
 		<img
 			src={item.imageUrl || '/placeholder.svg?height=400&width=400'}
 			alt={item.name}
-			className='object-cover w-full'
+			className='object-cover w-full h-full'
 		/>
 
 		{/* 더보기 버튼 */}

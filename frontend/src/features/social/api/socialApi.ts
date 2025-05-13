@@ -106,11 +106,15 @@ export const profileModifyApi = {
 	modifyProfileImage: async (image: File) => {
 		const formData = new FormData();
 		formData.append('profileImage', image);
-		const response = await client.patch('/api/members/profile/image', formData, {
-			headers: {
-				'Content-Type': 'multipart/form-data',
+		const response = await client.patch(
+			'/api/members/profile/image',
+			formData,
+			{
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
 			},
-		});
+		);
 		return response.data;
 	},
 };
