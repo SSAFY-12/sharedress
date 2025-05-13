@@ -58,9 +58,7 @@ export const MainModal = ({
 			{/* 모달 오버레이 (배경) */}
 			<div
 				className={CN(
-					'fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity duration-300',
-					overlayClassName,
-					isOpen ? 'opacity-100' : 'opacity-0',
+					'fixed inset-0 z-50 flex items-center justify-center duration-300 px-7 bg-black bg-opacity-50 z-40 backdrop-blur-sm',
 				)}
 				onClick={(e) => {
 					if (e.target === e.currentTarget) onClose(); // 배경 클릭 시 모달 닫기
@@ -69,7 +67,7 @@ export const MainModal = ({
 				{/* 모달 컨텐츠 */}
 				<div
 					className={CN(
-						'relative max-h-[90vh] w-full max-w-md overflow-auto rounded-lg bg-white shadow-lg transition-all duration-300',
+						'relative max-h-[90vh] w-full max-w-md overflow-auto rounded-xl bg-white shadow-lg transition-all duration-300',
 						isOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
 						className,
 					)}
@@ -93,7 +91,7 @@ const Close = ({ className }: ModalCloseProps) => {
 		<button
 			onClick={onClose}
 			className={CN(
-				'absolute right-4 top-4 text-gray-500 hover:text-gray-700',
+				'absolute right-3 top-3 p-1 text-low hover:text-gray-700',
 				className,
 			)}
 			aria-label='닫기'
@@ -109,7 +107,7 @@ const Header = ({
 	className,
 	showCloseButton = true,
 }: ModalHeaderProps) => (
-	<div className={CN('relative px-6 pt-6', className)}>
+	<div className={CN('relative pt-6', className)}>
 		{showCloseButton && <MainModal.Close />}
 		{children}
 	</div>
@@ -117,7 +115,7 @@ const Header = ({
 
 // 본문 컴포넌트
 const Body = ({ children, className }: ModalBodyProps) => (
-	<div className={CN('px-6 py-4', className)}>{children}</div>
+	<div className={CN('px-5 pb-5', className)}>{children}</div>
 );
 
 // 푸터 컴포넌트

@@ -53,7 +53,7 @@ export const ExternalShareModal = ({
 		>
 			<MainModal.Header>
 				<MainModal.Body>
-					<div className='flex flex-col items-center gap-[18px]'>
+					<div className='flex flex-col items-center gap-[18px] pb-2.5'>
 						<div className='flex flex-col justify-center items-center gap-1 w-full'>
 							<img src='/images/social/share-profile.png' alt='profile' />
 							<div className='flex flex-col justify-center items-center w-full'>
@@ -98,7 +98,6 @@ export const ExternalShareModal = ({
 								)}
 							</div>
 						</div>
-						<div className='h-1'></div>
 					</div>
 				</MainModal.Body>
 			</MainModal.Header>

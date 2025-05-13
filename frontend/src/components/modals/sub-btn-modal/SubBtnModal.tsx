@@ -32,7 +32,7 @@ export const SubBtnModal = ({
 		<>
 			{/* 배경 오버레이 */}
 			<div
-				className='fixed inset-0 bg-black bg-opacity-50 z-40'
+				className='fixed inset-0 bg-black bg-opacity-50 z-40 backdrop-blur-sm'
 				onClick={onClose}
 			/>
 			{/* 모달 컨테이너 */}
