@@ -121,13 +121,12 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	}
 
 	@Override
-	public List<ClosetClothes> findImgNullByClosetId(Long closetId) {
+	public List<ClosetClothes> findAllByClothesIds(List<Long> clothesIds) {
 		QClosetClothes cc = QClosetClothes.closetClothes;
 		QClothes cl = QClothes.clothes;
 
 		BooleanBuilder condition = new BooleanBuilder()
-			.and(cc.closet.id.eq(closetId))
-			.and(cc.imageUrl.isNull());
+			.and(cc.clothes.id.in(clothesIds));
 
 		return queryFactory
 			.selectFrom(cc)

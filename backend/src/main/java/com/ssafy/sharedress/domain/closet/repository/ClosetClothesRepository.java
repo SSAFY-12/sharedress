@@ -27,5 +27,5 @@ public interface ClosetClothesRepository {
 
 	Boolean existsById(Long closetClothesId);
 
-	List<ClosetClothes> findImgNullByClosetId(Long closetId);
+	List<ClosetClothes> findAllByClothesIds(List<Long> clothesIds);
 }

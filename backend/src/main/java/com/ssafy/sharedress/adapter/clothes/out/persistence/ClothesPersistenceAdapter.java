@@ -114,4 +114,9 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 	public Optional<Clothes> findById(Long id) {
 		return clothesJpaRepository.findById(id);
 	}
+
+	@Override
+	public void deleteById(Long id) {
+		clothesJpaRepository.deleteById(id);
+	}
 }

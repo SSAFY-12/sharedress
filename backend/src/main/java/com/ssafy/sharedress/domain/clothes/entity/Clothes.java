@@ -1,11 +1,16 @@
 package com.ssafy.sharedress.domain.clothes.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ssafy.sharedress.domain.brand.entity.Brand;
 import com.ssafy.sharedress.domain.category.entity.Category;
+import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
 import com.ssafy.sharedress.domain.color.entity.Color;
 import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 import com.ssafy.sharedress.domain.shoppingmall.entity.ShoppingMall;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -15,6 +20,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -56,6 +62,9 @@ public class Clothes extends BaseTimeEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shopping_mall_id")
 	private ShoppingMall shoppingMall;
+
+	@OneToMany(mappedBy = "clothes", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<ClosetClothes> closetClothesList = new ArrayList<>();
 
 	public Clothes(String name, Brand brand, ShoppingMall shoppingMall, String goodsLinkUrl) {
 		this.name = name;
