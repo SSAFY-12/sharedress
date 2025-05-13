@@ -31,8 +31,8 @@ const useDecodePublicLink = (openLink: string) => {
 
 	return {
 		decodedData: data?.content,
-		isLoading,
-		error,
+		isDecodeLoading: isLoading,
+		decodeError: error,
 	};
 };
 
