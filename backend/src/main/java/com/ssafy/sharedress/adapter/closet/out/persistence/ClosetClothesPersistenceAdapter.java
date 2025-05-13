@@ -119,4 +119,20 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	public Boolean existsById(Long closetClothesId) {
 		return closetClothesJpaRepository.existsById(closetClothesId);
 	}
+
+	@Override
+	public List<ClosetClothes> findImgNullByClosetId(Long closetId) {
+		QClosetClothes cc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		BooleanBuilder condition = new BooleanBuilder()
+			.and(cc.closet.id.eq(closetId))
+			.and(cc.imageUrl.isNull());
+
+		return queryFactory
+			.selectFrom(cc)
+			.leftJoin(cc.clothes, cl).fetchJoin()
+			.where(condition)
+			.fetch();
+	}
 }
