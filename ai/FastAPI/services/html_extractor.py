@@ -43,6 +43,17 @@ class HTMLExtractor:
             html = response.text
             soup = BeautifulSoup(html, 'html.parser')
 
+            # 유효하지 않은 상품 체크
+            # 알림창, 에러 메시지 또는 페이지 내용에서 "유효하지 않은 상품" 문구 확인
+            # if "유효하지 않은 상품" in html or "상품을 찾을 수 없습니다" in html:
+            #     logger.warning(f"유효하지 않은 상품 URL: {url}")
+            #     return {"error": "INVALID_PRODUCT", "message": "유효하지 않은 상품입니다"}
+            #
+            # # 페이지가 비어있거나 주요 콘텐츠가 없는 경우 확인
+            # if not soup.select('.product_info_section, .sc-1prswe3-3, [class*="category_navi"], .product-img'):
+            #     logger.warning(f"상품 정보를 찾을 수 없는 URL: {url}")
+            #     return {"error": "INVALID_PRODUCT", "message": "상품 정보를 찾을 수 없습니다"}
+
             # 상품 정보 추출
             result = {}
 
@@ -170,48 +181,80 @@ class HTMLExtractor:
         image_urls = []
 
         try:
-            # 1. 무신사 상품 갤러리 이미지 찾기
-            gallery_images = soup.select('#detail_thumbs img, #bigimg img, .product-img img, .product_thumb img, .detail_product_img img')
-            for img in gallery_images:
-                src = img.get('src') or img.get('data-src') or img.get('data-original')
+            # 디버깅을 위한 HTML 구조 분석
+            logger.info(f"URL 처리 시작: {url}")
+
+            # 1. 새 무신사 UI 검색 (더 자세한 로깅)
+            new_gallery_elements = soup.select('div.sc-366fl4-2, div.sc-366fl4-3')
+            logger.info(f"새 UI div 요소 수: {len(new_gallery_elements)}")
+
+            # 2. 모든 img 태그 확인
+            all_images = soup.find_all('img')
+            logger.info(f"페이지 전체 이미지 태그 수: {len(all_images)}")
+
+            # 이미지 URL 패턴 확인을 위해 처음 5개 이미지의 src 출력
+            for i, img in enumerate(all_images[:5]):
+                src = img.get('src')
                 if src:
-                    # 작은 썸네일 이미지는 건너뛰기
-                    if 'thumbnail' in src or '_30.jpg' in src:
-                        continue
+                    logger.info(f"이미지 {i+1} src: {src}")
+            # 1. 새 무신사 UI에서 갤러리 이미지 추출 (div.sc-366fl4-2 내부 이미지)
+            new_gallery_images = soup.select('div.sc-366fl4-2 img, div.sc-366fl4-3 img')
+            if new_gallery_images:
+                logger.info(f"새 UI에서 갤러리 이미지 {len(new_gallery_images)}개 발견")
+                for img in new_gallery_images:
+                    src = img.get('src') or img.get('data-src')
+                    if src:
+                        # 썸네일 이미지 URL을 고품질 이미지 URL로 변환
+                        if '_500.jpg' in src:
+                            high_quality_src = src.replace('_500.jpg', '_big.jpg?w=1200')
+                            image_urls.append(high_quality_src)
+                            logger.info(f"고품질 이미지 URL 추출: {high_quality_src}")
+                        else:
+                            image_urls.append(src)
 
-                    # 큰 이미지 URL로 변환 (무신사 패턴)
-                    if '_60.jpg' in src:
-                        src = src.replace('_60.jpg', '.jpg')
-                    if '_80.jpg' in src:
-                        src = src.replace('_80.jpg', '.jpg')
+            # 2. 기존 무신사 갤러리 이미지 찾기 (결과가 없는 경우 대비)
+            if not image_urls:
+                gallery_images = soup.select('#detail_thumbs img, #bigimg img, .product-img img, .product_thumb img, .detail_product_img img')
+                for img in gallery_images:
+                    src = img.get('src') or img.get('data-src') or img.get('data-original')
+                    if src:
+                        # 작은 썸네일 이미지는 건너뛰기
+                        if 'thumbnail' in src and '_30.jpg' in src:
+                            continue
 
-                    # 절대 URL 확인
-                    if src.startswith('//'):
-                        src = 'https:' + src
-                    elif src.startswith('/'):
-                        domain = '/'.join(url.split('/')[:3])
-                        src = domain + src
+                        # 큰 이미지 URL로 변환 (무신사 패턴)
+                        if '_500.jpg' in src:
+                            src = src.replace('_500.jpg', '_big.jpg?w=1200')
+                        elif '_60.jpg' in src:
+                            src = src.replace('_60.jpg', '_big.jpg?w=1200')
+                        elif '_80.jpg' in src:
+                            src = src.replace('_80.jpg', '_big.jpg?w=1200')
 
-                    # gif 및 아이콘 제외
-                    if not src.endswith('.gif') and 'icon' not in src.lower():
-                        image_urls.append(src)
+                        # 절대 URL 확인
+                        if src.startswith('//'):
+                            src = 'https:' + src
+                        elif src.startswith('/'):
+                            domain = '/'.join(url.split('/')[:3])
+                            src = domain + src
 
-            # 2. OpenGraph 이미지 확인 (대체)
+                        # gif 및 아이콘 제외
+                        if not src.endswith('.gif') and 'icon' not in src.lower():
+                            image_urls.append(src)
+
+            # 3. OpenGraph 이미지 확인 (대체)
             if not image_urls:
                 og_image = soup.select_one('meta[property="og:image"]')
                 if og_image and og_image.get('content'):
-                    image_urls.append(og_image['content'])
+                    src = og_image['content']
+                    # 만약 OpenGraph 이미지가 500 크기라면 big으로 변환
+                    if '_500.jpg' in src:
+                        src = src.replace('_500.jpg', '_big.jpg?w=1200')
+                    image_urls.append(src)
 
-            # 3. 색상 옵션이 지정된 경우 필터링
-            if desired_color and image_urls:
-                # 색상 옵션 컨테이너 찾기
-                color_containers = soup.select('.option_cont .list_option .option_btn')
-                for container in color_containers:
-                    color_name = container.get('data-color') or container.get('title') or container.text.strip()
-                    if desired_color.lower() in color_name.lower():
-                        # 색상 특정 이미지 찾기 (구현이 필요하다면)
-                        pass
+            # 중복 URL 제거
+            image_urls = list(dict.fromkeys(image_urls))
 
+            logger.info(f"총 {len(image_urls)}개의 이미지 URL 추출됨")
             return image_urls
 
         except Exception as e:

@@ -62,18 +62,21 @@ class DBService:
     # -----------------------------------------------------------
     # Color HEX 업데이트
     # -----------------------------------------------------------
-    def update_color_hex(self, color_id: int, hex_code: str) -> bool:
+    def update_clothes_record(self, clothes_id: int, image_url: str, category_id: int, color_id: int) -> bool:
         try:
-            color = self.db.query(Color).filter(Color.id == color_id).first()
-            if color:
-                color.color_hex = hex_code
+            row = self.db.query(Clothes).filter(Clothes.id == clothes_id).first()
+            if row:
+                row.image_url = image_url
+                row.category_id = category_id
+                row.color_id = color_id
                 self.db.commit()
-                logger.info(f"Color(id={color_id}) hex updated → {hex_code}")
+                logger.info("Clothes updated (id=%s)", clothes_id)
                 return True
+            logger.warning("Clothes not found for update (id=%s)", clothes_id)
             return False
         except Exception as e:
             self.db.rollback()
-            logger.error(f"Hex update error: {e}")
+            logger.error("Clothes update failed: %s", e)
             return False
 
     # -----------------------------------------------------------

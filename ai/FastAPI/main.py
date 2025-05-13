@@ -27,6 +27,8 @@ notification_service = NotificationService()
 # Queue for worker tasks
 message_queue = asyncio.Queue()
 
+# Task tracking dict - keeps track of results for each taskId
+task_results = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize database
@@ -117,7 +119,11 @@ async def message_worker(worker_id):
                 items = [PurchaseItem(clothesId=item['clothesId'], linkUrl=item['linkUrl'])
                          for item in purchase_data['items']]
 
-                logger.info(f"Processing purchase for member {member_id} with {len(items)} items")
+                # 새로운 필드 추출
+                task_id = purchase_data.get('taskId', '')
+                is_last = purchase_data.get('isLast', True)
+
+                logger.info(f"Processing purchase for member {member_id} with {len(items)} items (taskId: {task_id}, isLast: {is_last})")
 
                 # Process purchase items
                 processor = PurchaseProcessor()
@@ -127,11 +133,29 @@ async def message_worker(worker_id):
                     message_id=message_data['message_id']
                 )
 
-                # Send completion notification for all processed items
-                notification_success = await notification_service.send_completion_notification(results)
+                # taskId가 있는 경우의 처리 로직 추가
+                if task_id:
+                    if task_id not in task_results:
+                        task_results[task_id] = []
+                    task_results[task_id].extend(results)
+
+                    # isLast가 true인 경우에만 알림 전송
+                    if is_last:
+                        all_results = task_results[task_id]
+                        notification_success = await notification_service.send_completion_notification(all_results)
+                        logger.info(f"Sent completion notification for task {task_id} ({len(all_results)} items)")
+
+                        # 작업 완료 후 결과 정리
+                        del task_results[task_id]
+                    else:
+                        logger.info(f"Skipping notification for task {task_id} (not last message)")
+                        notification_success = True  # 아직 알림을 보내지 않지만 성공으로 처리
+                else:
+                    # taskId가 없는 경우 기존 방식대로 처리
+                    notification_success = await notification_service.send_completion_notification(results)
 
             else:
-                # Process standard product URL request
+                # Process standard product URL request (일반 상품 URL 처리 - 변경 없음)
                 product_data = message_data['data']
                 processor = ProductProcessor()
                 result = await processor.process_product(

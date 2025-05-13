@@ -86,7 +86,7 @@ class ImageProcessor:
         out = self.yolo.predict(img,
                                 device=0 if self.device == "cuda" else "cpu",
                                 verbose=False)
-        return any(int(b.cls) == 0 and float(b.conf) > .45
+        return any(int(b.cls) == 0 and float(b.conf) > .65
                    for r in out for b in r.boxes)
 
     def _product_score(self, img: Image.Image) -> float:
@@ -128,12 +128,14 @@ class ImageProcessor:
         """참조 이미지를 사용하여 이미지 생성"""
         try:
             # 프롬프트 준비
-            prompt = f"모델이 착용하고 있는 옷 중에 해당 카테고리에 맞는 옷만 있는 상품페이지에 쓰일 상품사진을 만들어줘. 옷의 특징(핏, 질감, 색감, 프린팅 등등)을 잘 살려서. 배경은 투명하게. 이미지에 상품 전체가 나오게 가운데(짤리지않고). 카테고리는 {category}야"
+            prompt = f"모델이 착용하고 있는 옷 중에 해당 카테고리에 맞는 옷만 있는 상품페이지에 쓰일 상품사진을 만들어줘. 옷의 특징(핏, 질감, 색감, 톤 , 프린팅, 단추, 스티치, 포인트 등등)을 잘 살려서. 배경은 투명하게. 이미지에 상품 전체가 나오게 가운데(짤리지않고 위 아래 여유 공간이 있게). 카테고리는 {category}야"
 
-            # 참조 이미지가 있는 경우
+            # 이미지 스코어 로깅 추가
             if reference_img:
+                ref_score = self._product_score(reference_img)
+                logger.info(f"GPT 호출 - 참조 이미지 사용 (카테고리: {category}, 참조 이미지 스코어: {ref_score})")
                 ref_path = self._save_image_to_log(reference_img, f"reference_{category}.png")
-                logger.info(f"참조 이미지 사용 ({category}): {ref_path}")
+                logger.info(f"참조 이미지 저장됨: {ref_path}")
 
                 # 이미지를 임시 파일로 저장
                 temp_file = os.path.join(self.log_dir, f"temp_{category}.png")
@@ -141,7 +143,7 @@ class ImageProcessor:
 
                 # images.edit API 사용
                 try:
-                    logger.info(f"이미지 편집 API 호출 (카테고리: {category}, 프롬프트: {prompt})")
+                    logger.info(f"GPT 이미지 편집 API 호출 (카테고리: {category}, 프롬프트: {prompt})")
 
                     # 이미지 편집 API 호출 - 간소화된 매개변수
                     response = self.openai.images.edit(
@@ -158,11 +160,11 @@ class ImageProcessor:
                     except:
                         pass
 
-                    logger.info(f"이미지 편집 API 응답 성공")
+                    logger.info(f"GPT 이미지 편집 API 응답 성공 (참조 이미지 스코어: {ref_score})")
                 except Exception as e:
-                    logger.error(f"이미지 편집 API 호출 실패: {e}")
+                    logger.error(f"GPT 이미지 편집 API 호출 실패: {e}")
                     # 실패 시 일반 생성 API로 폴백
-                    logger.info(f"일반 이미지 생성 API로 폴백")
+                    logger.info(f"일반 이미지 생성 API로 폴백 (참조 이미지 스코어: {ref_score})")
                     response = self.openai.images.generate(
                         model="gpt-image-1",
                         prompt=prompt,
@@ -173,7 +175,7 @@ class ImageProcessor:
                     )
             else:
                 # 참조 이미지 없는 경우 일반 생성
-                logger.info(f"일반 이미지 생성 (카테고리: {category}, 프롬프트: {prompt})")
+                logger.info(f"GPT 일반 이미지 생성 (카테고리: {category}, 참조 이미지 없음)")
                 response = self.openai.images.generate(
                     model="gpt-image-1",
                     prompt=prompt,
@@ -263,20 +265,37 @@ class ImageProcessor:
         if not urls:
             return None
 
-        # ① 후보 수집: '사람 없는' 이미지 전부
+        # 제품 스코어 임계값 설정 - 이 값보다 높으면 무조건 제품 이미지로 간주
+        PRODUCT_SCORE_THRESHOLD = 0.060  # 조정 가능한 값
+
+        # ① 후보 수집: '사람 없는' 이미지 전부 + 스코어가 높은 이미지
         no_person: list[Tuple[BytesIO, Image.Image, float]] = []
-        for u in urls:
+        high_score_images: list[Tuple[BytesIO, Image.Image, float]] = []
+
+        for i, u in enumerate(urls):
             try:
                 buf, img = self._download(u)
-                if not self._has_person(img):
-                    score = self._product_score(img)
+                has_person = self._has_person(img)
+                score = self._product_score(img)
+
+                # 모든 이미지의 스코어와 사람 탐지 결과 로깅
+                logger.info(f"이미지 {i+1} 분석 (URL: {u}, 사람 있음: {has_person}, 상품 스코어: {score})")
+
+                # 스코어가 임계값보다 높으면 높은 스코어 후보에 추가
+                if score >= PRODUCT_SCORE_THRESHOLD:
+                    high_score_images.append((buf, img, score))
+                    logger.info(f"높은 스코어 이미지 추가: {score} >= {PRODUCT_SCORE_THRESHOLD}")
+                    self._save_image_to_log(img, f"high_score_{len(high_score_images)}_{category}.png")
+
+                # 사람이 없는 이미지는 기존처럼 수집
+                if not has_person:
                     no_person.append((buf, img, score))
-                    # 이미지 로깅
                     self._save_image_to_log(img, f"no_person_{len(no_person)}_{category}.png")
+
             except Exception as e:
                 logger.warning("DL fail %s: %s", u, e)
 
-        # 모델이 착용한 이미지들도 로깅
+        # 모델 착용 이미지 로깅 (변경 없음)
         person_images = []
         try:
             for i, u in enumerate(urls):
@@ -284,38 +303,50 @@ class ImageProcessor:
                     try:
                         _, img = self._download(u)
                         if self._has_person(img):
+                            wear_score = self._product_score(img)
+                            logger.info(f"모델 착용 이미지 {i+1} 분석 (URL: {u}, 상품 스코어: {wear_score})")
                             self._save_image_to_log(img, f"with_person_{i}_{category}.png")
-                            person_images.append(img)
+                            person_images.append((img, wear_score))
                     except Exception as e:
                         logger.warning(f"이미지 로깅 실패 {u}: {e}")
         except Exception as e:
             logger.warning(f"모델 이미지 로깅 중 오류: {e}")
 
-        # ② 가장 product-like 높은 점수 선택
+        # ② 높은 스코어 이미지가 있으면 우선 사용 (새로운 우선순위)
+        if high_score_images:
+            buf, img, score = max(high_score_images, key=lambda x: x[2])
+            logger.info(f"높은 스코어 이미지 선택됨 (카테고리: {category}, 스코어: {score})")
+            self._save_image_to_log(img, f"selected_high_score_{category}.png")
+            return self.remove_background(buf)
+
+        # ③ 사람이 없는 이미지가 있으면 다음 우선순위로 사용
         if no_person:
             buf, img, score = max(no_person, key=lambda x: x[2])
-            logger.info(f"사람 없는 이미지 선택됨 (score: {score})")
+            logger.info(f"사람 없는 이미지 선택됨 (카테고리: {category}, 스코어: {score})")
             self._save_image_to_log(img, f"selected_no_person_{category}.png")
             return self.remove_background(buf)
 
-        # ③ 모델이 착용한 이미지가 있으면 참조 이미지로 사용 (최초 1개)
+        # 나머지 로직은 기존과 동일
+        # ④ 모델 착용 이미지가 있으면 참조하여 GPT 생성
         if person_images:
-            logger.info(f"모델 착용 이미지 참조하여 생성 시도 (카테고리: {category})")
-            gen = self._generate_with_reference(category, person_images[0])
+            best_img, best_score = max(person_images, key=lambda x: x[1])
+            logger.info(f"GPT 호출 - 모델 착용 이미지 참조 (카테고리: {category}, 베스트 스코어: {best_score})")
+            gen = self._generate_with_reference(category, best_img)
             if gen:
                 return gen
 
-        # ④ 없으면 일반 프롬프트로 DALL·E3 생성
-        logger.info(f"참조 이미지 없이 생성 시도 (카테고리: {category})")
+        # ⑤ 참조 이미지 없이 GPT 생성
+        logger.info(f"GPT 호출 - 참조 이미지 없이 생성 시도 (카테고리: {category})")
         gen = self._generate(category)
         if gen:
             return gen
 
-        # ⑤ 최후: 첫 번째 이미지 rembg
+        # ⑥ 최후 수단: 첫 번째 이미지 배경 제거
         try:
             buf, img = self._download(urls[0])
+            score = self._product_score(img)
             self._save_image_to_log(img, f"fallback_{category}.png")
-            logger.info("최후 수단: 첫 번째 이미지 배경 제거")
+            logger.info(f"최후 수단: 첫 번째 이미지 배경 제거 (스코어: {score})")
             return self.remove_background(buf)
         except Exception as e:
             logger.error("Ultimate fallback error: %s", e)

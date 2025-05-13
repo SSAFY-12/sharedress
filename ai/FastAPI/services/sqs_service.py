@@ -70,7 +70,9 @@ class SQSService:
                     'data': {
                         'memberId': body.get('memberId'),
                         'fcmToken': body.get('fcmToken', ''),
-                        'items': body.get('items', [])
+                        'items': body.get('items', []),
+                        'taskId': body.get('taskId', ''),  # 새로 추가
+                        'isLast': body.get('isLast', True)  # 새로 추가, 기본값은 True
                     }
                 }
             else:

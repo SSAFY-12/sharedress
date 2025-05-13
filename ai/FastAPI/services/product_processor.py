@@ -39,17 +39,38 @@ class ProductProcessor:
             self,
             url: str,
             desired_color: Optional[str] = None,
-            message_id: Optional[str] = None
+            message_id: Optional[str] = None,
+            clothes_id: Optional[int] = None
     ) -> ProductProcessingResult:
 
         try:
             html = self.html_extractor.extract_from_url(url, desired_color)
+
+            # 유효하지 않은 상품 체크
             if "error" in html:
+                if html.get("error") == "INVALID_PRODUCT":
+                    logger.info(f"유효하지 않은 상품 건너뛰기: {url}")
+                    return ProductProcessingResult(
+                        url=url,
+                        product_name="Invalid Product",
+                        category_id=0,  # 0으로 설정하여 무효한 상품임을 표시
+                        category_name="무효",
+                        color_id=0,
+                        color_name="무효",
+                        color_hex="#000000",
+                        image_url="",
+                        processing_status="SKIPPED",  # 상태를 SKIPPED로 변경
+                        message_id=message_id
+                    )
+                # 다른 일반적인 에러의 경우 기존 에러 처리 유지
                 return self._err(url, message_id, html["error"])
 
             # 카테고리 확인 - 지원되는 카테고리인지 검사
             cat_txt = html.get("category_text", "상의")
-            valid_categories = ["상의", "하의", "아우터", "신발", "악세사리", "악세서리"]
+
+            if cat_txt in ["악세사리", "악세서리","액세서리","액세사리"]:
+                cat_txt = "악세사리"
+            valid_categories = ["상의", "하의", "아우터", "신발", "악세사리"]
 
             if cat_txt not in valid_categories:
                 logger.warning(f"카테고리 '{cat_txt}' 지원하지 않음. 처리 중단: {url}")
@@ -83,9 +104,16 @@ class ProductProcessor:
             if not uri:
                 return self._err(url, message_id, "S3 업로드 실패")
 
-            # 5) DB 저장
-            if not self.db_service.create_clothes_record(uri, cat_id, cid):
-                return self._err(url, message_id, "DB 저장 실패")
+            # 5) DB 저장 - 변경된 부분
+            if clothes_id:
+                # 기존 레코드 업데이트
+                if not self.db_service.update_clothes_record(clothes_id, uri, cat_id, cid):
+                    return self._err(url, message_id, "DB 업데이트 실패")
+            else:
+                # 새 레코드 생성 (기존 로직)
+                if not self.db_service.create_clothes_record(uri, cat_id, cid):
+                    return self._err(url, message_id, "DB 저장 실패")
+
             self.db_service.update_color_hex(cid, chex)
 
             return ProductProcessingResult(
@@ -106,7 +134,6 @@ class ProductProcessor:
             return self._err(url, message_id, str(e))
         finally:
             self.db_service.close()
-
     # ───────────────────────────────────────────
     def _err(self, url, msg_id, msg):
         return ProductProcessingResult(
