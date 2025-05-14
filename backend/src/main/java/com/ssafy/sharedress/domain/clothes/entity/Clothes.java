@@ -48,19 +48,19 @@ public class Clothes extends BaseTimeEntity {
 	private String goodsLinkUrl;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "brand_id")
+	@JoinColumn(name = "brand_id", nullable = false)
 	private Brand brand;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "color_id")
+	@JoinColumn(name = "color_id", nullable = false)
 	private Color color;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id")
+	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "shopping_mall_id")
+	@JoinColumn(name = "shopping_mall_id", nullable = false)
 	private ShoppingMall shoppingMall;
 
 	@OneToMany(mappedBy = "clothes", cascade = CascadeType.REMOVE, orphanRemoval = true)
