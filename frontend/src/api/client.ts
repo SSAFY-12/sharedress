@@ -31,22 +31,32 @@ client.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config;
 		const { isGuest, clearAuth } = useAuthStore.getState();
-		const hasGuestToken = document.cookie.includes('guestToken');
+
+		// 쿠키에서 guestToken을 더 정확하게 파싱
+		const getGuestToken = () => {
+			const cookies = document.cookie.split(';');
+			const guestTokenCookie = cookies.find((cookie) =>
+				cookie.trim().startsWith('guestToken='),
+			);
+			return guestTokenCookie ? guestTokenCookie.split('=')[1].trim() : null;
+		};
+
+		const guestToken = getGuestToken();
+		const hasGuestToken = !!guestToken;
 
 		console.log('🔍 API 응답 에러:', {
 			status: error.response?.status,
 			url: originalRequest.url,
 			guestToken: hasGuestToken,
+			guestTokenValue: guestToken ? '존재함' : '없음',
+			cookies: document.cookie,
 			시간: new Date().toLocaleString('ko-KR'),
 		});
 
 		// guestToken이 있는 경우 401 에러를 무시하고 원래 요청을 재시도
 		if (error.response?.status === 401 && hasGuestToken) {
 			console.log('게스트 토큰 존재, 원래 요청 재시도');
-			// guestToken을 Authorization 헤더에 추가
-			originalRequest.headers['Authorization'] = `Bearer ${
-				document.cookie.split('guestToken=')[1].split(';')[0]
-			}`;
+			originalRequest.headers['Authorization'] = `Bearer ${guestToken}`;
 			return client(originalRequest);
 		}
 
