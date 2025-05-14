@@ -29,7 +29,11 @@ export const ExternalShareModal = ({
 	};
 
 	const linkTitle = 'Sharedress - 내 옷장을 공유해요';
-	const linkUrl = `https://sharedress.co.kr/link/${publicLink}`;
+	// const linkUrl = `https://sharedress.co.kr/link/${publicLink}`;
+	const isProd = import.meta.env.MODE === 'production';
+	const linkUrl = isProd
+		? `https://sharedress.co.kr/link/${publicLink}`
+		: `https://localhost:5173/link/${publicLink}`;
 	const linkText = '나의 옷장을 보고 코디를 만들어 줘!';
 
 	const handleCopyShare = async () => {

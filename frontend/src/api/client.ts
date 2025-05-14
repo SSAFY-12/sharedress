@@ -37,6 +37,22 @@ const handleGlobalError = (status: number, serverMessage?: string) => {
 	}
 };
 
+// 비회원 허용 라우트 예외 처리
+const guestAllowedPaths = [
+	'/api/members/', // 예시: 비회원 프로필 조회
+	'/api/link/', // 예시: 외부 링크 접근
+	'/api/closet/',
+	'/api/coordinations/',
+];
+
+const getPath = (url: string) => {
+	try {
+		return new URL(url).pathname;
+	} catch {
+		return url;
+	}
+};
+
 // 요청 인터셉터
 client.interceptors.request.use(
 	(config) => {
@@ -64,6 +80,18 @@ client.interceptors.response.use(
 			!originalRequest._retry &&
 			!originalRequest.url?.includes('/auth/refresh')
 		) {
+			// -------------------비회원 ------------------------
+
+			console.log('API 요청 URL:', originalRequest.url);
+
+			const isGuestAllowed = guestAllowedPaths.some((guestPath) =>
+				getPath(originalRequest.url).startsWith(guestPath),
+			);
+			if (isGuestAllowed) {
+				return Promise.reject(error);
+			}
+			// -------------------비회원 ------------------------
+
 			originalRequest._retry = true;
 
 			try {
@@ -78,6 +106,10 @@ client.interceptors.response.use(
 				return client(originalRequest);
 			} catch (refreshError) {
 				// 리프레시 토큰 갱신 실패 시 로그아웃 처리
+
+				if (isGuestAllowed) {
+					return Promise.reject(refreshError);
+				}
 				const { clearAuth } = useAuthStore.getState();
 				clearAuth();
 
