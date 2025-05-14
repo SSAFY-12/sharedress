@@ -1,23 +1,12 @@
 import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
+import { getMyLoginInfo } from '@/features/social/api/socialApi';
 import { useLoginInfo } from '@/features/social/hooks/useLoginInfo';
-import { useAuthStore } from '@/store/useAuthStore';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
 
 const FriendClosetLayoutPage = () => {
 	const useLogin = useLoginInfo();
-	// const navigate = useNavigate();
-	// const { setIsGuest } = useAuthStore();
-	// const { id } = useParams();
-	// const hasRedirectedRef = useRef(false);
-
-	// useEffect(() => {
-	// 	if (hasRedirectedRef.current) return;
-	// 	if (!useLogin.loginInfo?.isGuest) {
-	// 		setIsGuest(false);
-	// 		navigate(`/friend/${id}`);
-	// 	}
-	// }, [useLogin.loginInfo, id, navigate, setIsGuest]);
+	console.log('useLogin', useLogin);
+	const data = getMyLoginInfo();
+	console.log('data', data);
 
 	return (
 		<>
