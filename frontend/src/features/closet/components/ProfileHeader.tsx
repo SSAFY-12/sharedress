@@ -136,9 +136,9 @@ const ProfileHeader = ({
 				{/* 프로필 카드 */}
 				<div className='bg-white/70 backdrop-blur-sm rounded-xl pt-16 pb-6 shadow-sm border-white border-2'>
 					<div className='flex flex-col items-center'>
-						<h2 className='text-title font-bold mb-1 text-center'>
-							<span className='text-regular'>{nickname}</span>
-							<span className='text-low'>#{code}</span>
+						<h2 className='mb-1 text-center'>
+							<span className=' text-title text-regular'>{nickname}</span>
+							<span className='text-titleThin text-low'>#{code}</span>
 						</h2>
 						<p className='text-description text-regular mb-4 text-center mt-2.5'>
 							{statusMessage}
