@@ -31,13 +31,22 @@ client.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config;
 		const { isGuest } = useAuthStore.getState();
+		const hasGuestToken = document.cookie.includes('guestToken');
+
+		// guestToken이 있는 경우 401 에러를 무시하고 원래 요청을 재시도
+		if (error.response?.status === 401 && hasGuestToken) {
+			console.log('게스트 토큰 존재, 원래 요청 재시도');
+			// 원래 요청을 그대로 재시도 (guestToken은 쿠키에 있으므로 자동으로 전송됨)
+			return client(originalRequest);
+		}
 
 		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도
 		if (
 			error.response?.status === 401 &&
 			!originalRequest._retry &&
 			!originalRequest.url?.includes('/auth/refresh') &&
-			!isGuest // 게스트가 아닌 경우에만 리프레시 시도
+			!isGuest && // 게스트가 아닌 경우에만 리프레시 시도
+			!hasGuestToken // guestToken이 없는 경우에만 리프레시 시도
 		) {
 			originalRequest._retry = true;
 
