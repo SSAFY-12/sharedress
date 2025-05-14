@@ -114,6 +114,9 @@ dependencies {
 
 	// Firebase
 	implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+	// json
+	implementation 'org.json:json:20250107'
 }
 
 tasks.named('test') {

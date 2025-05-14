@@ -61,9 +61,11 @@ public class ClosetClothesController {
 	@GetMapping("/closet/clothes/{closetClothesId}")
 	public ResponseEntity<ResponseWrapper<ClosetClothesDetailResponse>> getClosetClothesDetail(
 		@PathVariable("closetClothesId") Long closetClothesId,
-		@CurrentMember Member member
+		@CurrentMember(required = false) Member member,
+		@CurrentGuest(required = false) Guest guest
 	) {
-		ClosetClothesDetailResponse result = closetClothesQueryUseCase.getClosetClothesDetail(member.getId(),
+		UserContext userContext = new UserContext(member, guest);
+		ClosetClothesDetailResponse result = closetClothesQueryUseCase.getClosetClothesDetail(userContext.getId(),
 			closetClothesId);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);

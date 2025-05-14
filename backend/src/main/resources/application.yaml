@@ -14,7 +14,7 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
-        show-sql: true
+        show-sql: false
         properties:
             hibernate:
                 format_sql: true
@@ -35,9 +35,13 @@ jwt:
     secret: ${JWT_SECRET}
 
 ---
-logging.level:
-    show_sql: debug
-    org.hibernate.type: trace
+logging:
+    level:
+        root: INFO
+        com.ssafy.sharedress.config: DEBUG
+        com.ssafy.sharedress.adapter: INFO
+        com.ssafy.sharedress.application: INFO
+        org.springframework.web: INFO
 
 ---
 cloud:

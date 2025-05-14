@@ -13,13 +13,16 @@ import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
 	// Runtime 에 발생하는 예외를 처리하는 핸들러
 	@ExceptionHandler(BaseException.class)
 	public ResponseEntity<ResponseWrapper<Void>> handleBaseException(BaseException ex) {
+		log.error("BaseException: {}", ex.getResponseCode().getMessage());
 		ResponseCode code = ex.getResponseCode();
 		return ResponseWrapperFactory.toResponseEntity(code, null);
 	}
@@ -70,6 +73,7 @@ public class GlobalExceptionHandler {
 	// 그 외 모든 예외를 처리하는 핸들러
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseWrapper<Void>> handleException(Exception ex) {
+		log.error("Exception: {}", ex.getMessage());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, null);
 	}
 }
