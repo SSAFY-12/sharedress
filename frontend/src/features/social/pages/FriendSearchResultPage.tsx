@@ -114,7 +114,17 @@ export const FriendSearchResultPage = () => {
 								/>
 								<h2 className='font-bold mb-1'>{user.nickname}</h2>
 
-								{user.relationStatus === 0 || user.relationStatus === 3 ? (
+								{user.relationStatus === 0 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구'
+										color='gray'
+										activate={false}
+										// eslint-disable-next-line @typescript-eslint/no-empty-function
+										onClick={() => {}}
+										className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : user.relationStatus === 3 ? (
 									<PrimaryBtn
 										size='compact'
 										name='친구 신청'
