@@ -193,7 +193,12 @@ const CodiDetailPage = () => {
 				},
 			});
 		} else {
-			navigate(`/friend/${coordination.owner.id}`);
+			navigate(`/friend/${coordination.owner.id}`, {
+				state: {
+					initialTab: '코디',
+					initialSubTab: 'recommended',
+				},
+			});
 		}
 	};
 
