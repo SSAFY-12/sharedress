@@ -32,7 +32,7 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 
 	const handleItemClick = (item: ClothItem) => {
 		navigate(`/cloth/${item.id}`, {
-			state: { isMe },
+			state: { isMe, ownerId: memberId },
 		});
 	};
 

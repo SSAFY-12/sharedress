@@ -22,6 +22,8 @@ const CodiDetailPage = () => {
 	const location = useLocation();
 	const { id } = useParams();
 	const isMe = location.state?.isMe ?? false;
+	const source = location.state?.source ?? 'my';
+	const ownerId = location.state?.ownerId ?? 0;
 	const isGuest = useProfileStore((state) => state.isGuest);
 
 	const coordinationId = Number(id);
@@ -185,15 +187,32 @@ const CodiDetailPage = () => {
 
 	const isMyCodi = coordination.creator.id === coordination.owner.id;
 
+	console.log(source);
+
 	const handleBackClick = () => {
-		if (isMyCodi) {
-			navigate('/mypage', {
-				state: {
-					initialTab: '코디',
-				},
-			});
+		if (isMe) {
+			if (source === 'my') {
+				navigate('/mypage', {
+					state: { initialTab: '코디' },
+				});
+			} else if (source === 'friends') {
+				navigate(`/mypage`, {
+					state: { initialTab: '코디', initialSubTab: 'friends' },
+				});
+			}
 		} else {
-			navigate(`/friend/${coordination.owner.id}`);
+			if (source === 'friends') {
+				navigate(`/friend/${ownerId}`, {
+					state: { initialTab: '코디' },
+				});
+			} else if (source === 'recommended') {
+				navigate(`/friend/${ownerId}`, {
+					state: {
+						initialTab: '코디',
+						initialSubTab: 'recommended',
+					},
+				});
+			}
 		}
 	};
 
@@ -261,10 +280,10 @@ const CodiDetailPage = () => {
 							/>
 							{isCommentFocused && (
 								<button
-									className='ml-2 p-2 text-white rounded-full flex items-center justify-center'
+									className='ml-4 p-0 text-white rounded-full flex items-center justify-center'
 									onMouseDown={handleCommentSubmit}
 								>
-									<img src='/icons/submit.svg' alt='전송' className='w-5 h-5' />
+									<img src='/icons/submit.svg' alt='전송' />
 								</button>
 							)}
 						</div>

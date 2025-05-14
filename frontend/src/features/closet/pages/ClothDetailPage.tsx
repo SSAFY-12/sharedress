@@ -13,6 +13,7 @@ const ClothDetailPage = () => {
 	const { id } = useParams();
 	const clothId = Number(id);
 	const isMe = location.state?.isMe ?? false;
+	const ownerId = location.state?.ownerId ?? 0;
 
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -29,7 +30,13 @@ const ClothDetailPage = () => {
 	};
 
 	const handleBackClick = () => {
-		navigate('/mypage');
+		if (isMe) {
+			navigate('/mypage');
+		} else if (ownerId) {
+			navigate(`/friend/${ownerId}`);
+		} else {
+			navigate('/mypage');
+		}
 	};
 
 	const handleEdit = () => {

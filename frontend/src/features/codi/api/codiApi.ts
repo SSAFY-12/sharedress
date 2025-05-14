@@ -2,6 +2,7 @@ import client from '@/api/client';
 import { replaceImageWithBase64 } from '@/features/codi/utils/replaceImageWithBase64';
 import html2canvas from 'html2canvas';
 import { waitAllImagesLoaded } from '@/features/codi/utils/watiForAllImages';
+// import { toPng } from 'html-to-image';
 
 interface Position {
 	x: number;
@@ -60,6 +61,18 @@ export const captureCanvasImage = async (
 	if (element.clientWidth === 0 || element.clientHeight === 0) {
 		throw new Error('캔버스 요소가 렌더링되지 않았습니다.'); // 명확하게 경고
 	}
+
+	// const base64 = await toPng(element, {
+	// 	pixelRatio: 2,
+	// 	backgroundColor: undefined,
+	// 	cacheBust: false,
+	// });
+
+	// if (!base64.startsWith('data:image/') || base64.length < 1000) {
+	// 	throw new Error('캔버스 이미지 변환 실패');
+	// }
+
+	// return base64;
 
 	const canvas = await html2canvas(element, {
 		useCORS: true,

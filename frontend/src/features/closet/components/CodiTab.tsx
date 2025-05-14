@@ -27,7 +27,7 @@ const CodiTab = ({ memberId, activeSubTab }: CodiTabProps) => {
 
 	const handleItemClick = (item: ClothItem) => {
 		navigate(`/codi/${item.id}`, {
-			state: { isMe: true },
+			state: { isMe: true, source: activeSubTab },
 		});
 	};
 
