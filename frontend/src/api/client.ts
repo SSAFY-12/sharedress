@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import { getErrorMessage } from './errorHandler';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authApi } from '@/features/auth/api/authApi';
@@ -17,23 +16,32 @@ export const client = axios.create({
 });
 
 // 전역 에러 처리 함수
-const handleGlobalError = (status: number, serverMessage?: string) => {
-	// 기본 에러 메시지 표시
-	const defaultMessage = getErrorMessage(status); // 에러 메시지 표시
-	toast.error(defaultMessage, {
-		// 토스트 메시지 표시
-		position: 'top-right', // 토스트 위치
-		autoClose: 3000, // 토스트 자동 닫기 시간
-	});
+const handleGlobalError = async (status: number, serverMessage?: string) => {
+	try {
+		// FCM 메시징 서비스 워커에 메시지 전송
+		if ('serviceWorker' in navigator && 'Notification' in window) {
+			const registration = await navigator.serviceWorker.ready;
+			await registration.showNotification('오류 발생', {
+				body: getErrorMessage(status),
+				icon: '/android-chrome-192x192.png',
+				badge: '/favicon-32x32.png',
+				data: {
+					status: status.toString(),
+					message: serverMessage || '',
+				},
+			});
 
-	// 서버에서 추가 에러 메시지가 있다면 표시
-	if (serverMessage && typeof serverMessage === 'string') {
-		// 서버에서 추가 에러 메시지가 있다면 표시
-		toast.error(serverMessage, {
-			// 토스트 메시지 표시
-			position: 'top-right', // 토스트 위치
-			autoClose: 3000, // 토스트 자동 닫기 시간
-		});
+			// 추가 에러 메시지가 있는 경우 별도 알림
+			if (serverMessage && typeof serverMessage === 'string') {
+				await registration.showNotification('추가 정보', {
+					body: serverMessage,
+					icon: '/android-chrome-192x192.png',
+					badge: '/favicon-32x32.png',
+				});
+			}
+		}
+	} catch (error) {
+		console.error('FCM 알림 전송 실패:', error);
 	}
 };
 

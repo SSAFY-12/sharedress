@@ -7,12 +7,12 @@
 		);
 
 		firebase.initializeApp({
-			apiKey: 'undefined',
-			authDomain: 'undefined',
-			projectId: 'undefined',
+			apiKey: 'AIzaSyAohU9TYUEdEKjkItxUBoK9OHiiB4XyMYc',
+			authDomain: 'sharedress-ef653.firebaseapp.com',
+			projectId: 'sharedress-ef653',
 			storageBucket: 'undefined',
-			messagingSenderId: 'undefined',
-			appId: 'undefined',
+			messagingSenderId: '237733873208',
+			appId: '1:237733873208:web:05c3c8f958024eb3fb88cd',
 		});
 
 		const messaging = firebase.messaging();

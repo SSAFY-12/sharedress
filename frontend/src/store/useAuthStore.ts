@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { toast } from 'react-toastify';
 import { authApi } from '@/features/auth/api/authApi';
 
 interface AuthState {
@@ -23,9 +22,9 @@ export const useAuthStore = create<AuthState>()(
 			setAccessToken: (token) => {
 				set({ accessToken: token, isAuthenticated: !!token }); // 액세스 토큰 설정
 			},
-			logout: () => {
+			logout: async () => {
 				// 로그아웃 처리
-				toast.info('로그아웃되었습니다.');
+				await showLogoutNotification();
 				useAuthStore.getState().clearAuth();
 				window.location.href = '/auth';
 			},
@@ -87,3 +86,14 @@ export const useAuthStore = create<AuthState>()(
 		},
 	),
 );
+
+const showLogoutNotification = async () => {
+	if ('serviceWorker' in navigator && 'Notification' in window) {
+		const registration = await navigator.serviceWorker.ready;
+		await registration.showNotification('로그아웃', {
+			body: '로그아웃되었습니다.',
+			icon: '/android-chrome-192x192.png',
+			badge: '/favicon-32x32.png',
+		});
+	}
+};
