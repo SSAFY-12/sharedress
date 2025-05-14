@@ -34,7 +34,7 @@ const FriendCodiTab = ({ memberId, activeSubTab }: FriendCodiTabProps) => {
 
 	const handleItemClick = (item: ClothItem) => {
 		navigate(`/codi/${item.id}`, {
-			state: { isMe: false },
+			state: { isMe: false, source: activeSubTab, ownerId: memberId },
 		});
 	};
 

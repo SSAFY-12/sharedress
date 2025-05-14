@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProfileHeader from '@/features/closet/components/ProfileHeader';
 import ClosetTab from '@/features/closet/components/ClosetTab';
 import CodiTab from '@/features/closet/components/CodiTab';
@@ -26,13 +26,23 @@ const MyClosetPage = () => {
 	const location = useLocation();
 	const initialTab =
 		(location.state?.initialTab as (typeof closetTab)[number]) ?? '옷장';
+	const initialSubTab =
+		(location.state?.initialSubTab as (typeof CodiTabs)[number])?.id ?? 'my';
 
 	// 상태 관리
 	const [activeMainTab, setActiveMainTab] = useState<
 		(typeof closetTab)[number]
 	>(initialTab ?? '옷장');
 	const [selectedCategory, setSelectedCategory] = useState(categoryConfig[0]);
-	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friends'>('my');
+	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friends'>(
+		initialSubTab,
+	);
+
+	useEffect(() => {
+		if (initialTab === '코디') {
+			setActiveSubTab(initialSubTab);
+		}
+	}, [initialTab, initialSubTab]);
 
 	const { data: profile } = useMyProfile();
 
