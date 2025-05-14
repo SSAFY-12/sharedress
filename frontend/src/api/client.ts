@@ -34,11 +34,26 @@ client.interceptors.response.use(
 
 		// 쿠키에서 guestToken을 더 정확하게 파싱
 		const getGuestToken = () => {
-			const cookies = document.cookie.split(';');
-			const guestTokenCookie = cookies.find((cookie) =>
-				cookie.trim().startsWith('guestToken='),
-			);
-			return guestTokenCookie ? guestTokenCookie.split('=')[1].trim() : null;
+			try {
+				// 모든 쿠키를 가져와서 파싱
+				const allCookies = document.cookie;
+				console.log('현재 모든 쿠키:', allCookies);
+
+				// guestToken 쿠키 찾기
+				const match = allCookies.match(/guestToken=([^;]+)/);
+				if (match) {
+					const token = match[1];
+					console.log('찾은 guestToken:', token);
+					return token;
+				}
+
+				// 쿠키가 없거나 찾을 수 없는 경우
+				console.log('guestToken을 찾을 수 없음');
+				return null;
+			} catch (e) {
+				console.error('쿠키 파싱 중 에러:', e);
+				return null;
+			}
 		};
 
 		const guestToken = getGuestToken();
@@ -48,7 +63,7 @@ client.interceptors.response.use(
 			status: error.response?.status,
 			url: originalRequest.url,
 			guestToken: hasGuestToken,
-			guestTokenValue: guestToken ? '존재함' : '없음',
+			guestTokenValue: guestToken || '없음',
 			cookies: document.cookie,
 			시간: new Date().toLocaleString('ko-KR'),
 		});
