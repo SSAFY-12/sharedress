@@ -1,4 +1,4 @@
-import client from '@/api/client';
+import { client } from '@/api/client';
 
 export const socialApi = {
 	// 친구 목록 조회

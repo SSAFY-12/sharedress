@@ -1,7 +1,7 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
 import { authApi } from '@/features/auth/api/authApi';
-import { useProfileStore } from '@/store/useProfileStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,7 @@ const ProfileHeader = ({
 	isMe,
 	memberId,
 }: ProfileHeaderProps) => {
-	const isGuest = useProfileStore((state) => state.isGuest);
+	const isGuest = useAuthStore((state) => state.isGuest);
 	const selectedBackgroundImage = useMemo(() => {
 		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
 		return backgroundImages[randomIndex];
