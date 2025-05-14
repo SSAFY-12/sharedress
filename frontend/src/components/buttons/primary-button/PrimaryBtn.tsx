@@ -17,8 +17,10 @@ export const PrimaryBtn = ({
 	const colorClass = {
 		primary: 'bg-regular hover:bg-regular/80 text-white',
 		gray: 'bg-gray-400 hover:bg-gray-500 text-white',
-		black: 'bg-black hover:bg-gray-800 text-white',
+		black: 'bg-regular hover:bg-regular/80 text-white',
 		white: 'bg-white hover:bg-gray-100 text-regular',
+		brown: 'bg-brownButton hover:bg-brownButton/80 text-white',
+		background: 'bg-background hover:bg-light text-regular',
 	}[color];
 
 	return (

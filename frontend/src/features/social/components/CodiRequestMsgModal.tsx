@@ -59,7 +59,7 @@ export const CodiRequestMsgModal = ({
 					<PrimaryBtn
 						size='compact'
 						name='친구 요청'
-						color='black'
+						color='primary'
 						className='w-full bg-regular text-white mt-2'
 						onClick={onConfirm}
 					/>
