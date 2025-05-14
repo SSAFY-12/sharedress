@@ -30,13 +30,23 @@ client.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config;
-		const { isGuest } = useAuthStore.getState();
+		const { isGuest, clearAuth } = useAuthStore.getState();
 		const hasGuestToken = document.cookie.includes('guestToken');
+
+		console.log('🔍 API 응답 에러:', {
+			status: error.response?.status,
+			url: originalRequest.url,
+			guestToken: hasGuestToken,
+			시간: new Date().toLocaleString('ko-KR'),
+		});
 
 		// guestToken이 있는 경우 401 에러를 무시하고 원래 요청을 재시도
 		if (error.response?.status === 401 && hasGuestToken) {
 			console.log('게스트 토큰 존재, 원래 요청 재시도');
-			// 원래 요청을 그대로 재시도 (guestToken은 쿠키에 있으므로 자동으로 전송됨)
+			// guestToken을 Authorization 헤더에 추가
+			originalRequest.headers['Authorization'] = `Bearer ${
+				document.cookie.split('guestToken=')[1].split(';')[0]
+			}`;
 			return client(originalRequest);
 		}
 
@@ -48,24 +58,14 @@ client.interceptors.response.use(
 			!isGuest && // 게스트가 아닌 경우에만 리프레시 시도
 			!hasGuestToken // guestToken이 없는 경우에만 리프레시 시도
 		) {
-			originalRequest._retry = true;
-
 			try {
-				// 리프레시 토큰으로 새로운 액세스 토큰 요청
-				const { content } = await authApi.refresh();
-				const { accessToken } = content;
-
-				useAuthStore.getState().setAccessToken(accessToken);
-
-				// 원래 요청 재시도
-				originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+				const response = await authApi.refresh();
+				const newToken = response.content.accessToken;
+				useAuthStore.getState().setAccessToken(newToken);
+				originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
 				return client(originalRequest);
 			} catch (refreshError) {
-				// 리프레시 토큰 갱신 실패 시 로그아웃 처리
-				const { clearAuth } = useAuthStore.getState();
 				clearAuth();
-
-				// 로그아웃 후 /auth로 이동
 				window.location.href = '/auth';
 				return Promise.reject(refreshError);
 			}
