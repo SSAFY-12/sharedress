@@ -93,10 +93,10 @@ export const FriendSearchResultPage = () => {
 	return (
 		<div className='flex flex-col w-full h-full mx-auto bg-white gap-3.5 px-4 pt-2'>
 			<SearchBar
-					placeholder='친구 ID'
-					value={searchValue}
-					onChange={handleSearchChange}
-					onKeyDown={handleSearch}
+				placeholder='친구 ID'
+				value={searchValue}
+				onChange={handleSearchChange}
+				onKeyDown={handleSearch}
 			/>
 
 			<div className='flex-1 px-4 sm:px-6 py-4'>

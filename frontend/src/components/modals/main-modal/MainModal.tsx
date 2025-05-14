@@ -29,7 +29,6 @@ export const MainModal = ({
 	onClose,
 	children,
 	className,
-	overlayClassName,
 }: ModalProps) => {
 	// 모달의 애니메이션을 위한 상태
 	const [isVisible, setIsVisible] = useState(false);

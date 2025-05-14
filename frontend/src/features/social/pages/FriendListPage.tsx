@@ -39,24 +39,24 @@ export const FriendsListPage = () => {
 	return (
 		<div className='flex flex-col w-full h-full mx-auto bg-white gap-3.5 px-4 pt-2'>
 			{/* 검색 영역 */}
-				<SearchBar
-					placeholder='친구 검색 (최대 20자)'
-					value={searchValue}
-					onChange={handleSearchChange}
-					onKeyDown={handleSearch}
-				/>
+			<SearchBar
+				placeholder='친구 검색 (최대 20자)'
+				value={searchValue}
+				onChange={handleSearchChange}
+				onKeyDown={handleSearch}
+			/>
 
 			{/* 친구 목록 영역 */}
 			{!keyword ? (
 				<div>
 					{friends?.map((friend) => (
 						<UserRowItem
-								key={friend.id}
-								userName={friend.nickname}
-								userAvatar={getOptimizedImageUrl(friend.profileImage)}
-								userStatus={friend.oneLiner}
-								actionType='arrow'
-								onClick={() => handleFriendArrowClick(friend.id)}
+							key={friend.id}
+							userName={friend.nickname}
+							userAvatar={getOptimizedImageUrl(friend.profileImage)}
+							userStatus={friend.oneLiner}
+							actionType='arrow'
+							onClick={() => handleFriendArrowClick(friend.id)}
 						/>
 					))}
 				</div>
@@ -65,14 +65,14 @@ export const FriendsListPage = () => {
 				<div>
 					{Array.isArray(searchMyFriend) && searchMyFriend.length > 0 ? (
 						searchMyFriend.map((friend) => (
-								<UserRowItem
-									key={friend.id}
-									userName={friend.nickname}
-									userAvatar={getOptimizedImageUrl(friend.profileImage)}
-									userStatus={friend.oneLiner}
-									actionType='arrow'
-									onClick={() => handleFriendArrowClick(friend.id)}
-								/>
+							<UserRowItem
+								key={friend.id}
+								userName={friend.nickname}
+								userAvatar={getOptimizedImageUrl(friend.profileImage)}
+								userStatus={friend.oneLiner}
+								actionType='arrow'
+								onClick={() => handleFriendArrowClick(friend.id)}
+							/>
 						))
 					) : (
 						<p>검색 결과가 없습니다.</p>
