@@ -20,7 +20,9 @@ public class ColorService implements ColorUseCase {
 	@Override
 	public List<ColorResponse> getAllColors() {
 		List<Color> colors = colorRepository.findAllByOrderByIdAsc();
+
 		return colors.stream()
+			.filter(color -> !color.getId().equals(-1L)) // color_id = -1 제외
 			.map(ColorResponse::from)
 			.toList();
 	}
