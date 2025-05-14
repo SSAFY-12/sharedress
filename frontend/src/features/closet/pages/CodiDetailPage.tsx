@@ -261,10 +261,10 @@ const CodiDetailPage = () => {
 							/>
 							{isCommentFocused && (
 								<button
-									className='ml-2 p-2 text-white rounded-full flex items-center justify-center'
+									className='ml-4 p-0 text-white rounded-full flex items-center justify-center'
 									onMouseDown={handleCommentSubmit}
 								>
-									<img src='/icons/submit.svg' alt='전송' className='w-5 h-5' />
+									<img src='/icons/submit.svg' alt='전송' />
 								</button>
 							)}
 						</div>
