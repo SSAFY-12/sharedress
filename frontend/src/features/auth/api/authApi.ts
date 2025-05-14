@@ -45,4 +45,9 @@ export const authApi = {
 			console.error('로그아웃 실패', error);
 		}
 	},
+
+	getMe: async () => {
+		const response = await client.get('/api/me');
+		return response.data;
+	},
 };

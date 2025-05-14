@@ -73,6 +73,12 @@ client.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config;
+		const { isGuest } = useAuthStore.getState();
+
+		// 게스트 사용자는 토큰 갱신을 시도하지 않음
+		if (isGuest) {
+			return Promise.reject(error);
+		}
 
 		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도
 		if (

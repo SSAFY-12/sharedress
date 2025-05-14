@@ -7,7 +7,9 @@ interface AuthState {
 	accessToken: string | null; // 액세스 토큰
 	isAuthenticated: boolean; // 인증 여부
 	isInitialized: boolean; // 초기화 여부
+	isGuest: boolean; // 게스트 여부
 	setAccessToken: (token: string | null) => void; // 액세스 토큰 설정
+	setIsGuest: (isGuest: boolean) => void; // 게스트 상태 설정 메서드 추가
 	logout: () => void; // 로그아웃
 	clearAuth: () => void; // 인증 정보 초기화
 	initializeAuth: () => Promise<void>; // 인증 정보 초기화
@@ -20,8 +22,12 @@ export const useAuthStore = create<AuthState>()(
 			accessToken: null, // 액세스 토큰
 			isAuthenticated: false, // 인증 여부
 			isInitialized: false, // 초기화 여부
+			isGuest: false, // 초기값 false
 			setAccessToken: (token) => {
 				set({ accessToken: token, isAuthenticated: !!token }); // 액세스 토큰 설정
+			},
+			setIsGuest: (isGuest) => {
+				set({ isGuest });
 			},
 			logout: () => {
 				// 로그아웃 처리
@@ -31,20 +37,34 @@ export const useAuthStore = create<AuthState>()(
 			},
 			clearAuth: () => {
 				// 인증 정보 초기화
-				set({ accessToken: null, isAuthenticated: false });
+				set({ accessToken: null, isAuthenticated: false, isGuest: false });
 			},
 			// 앱이 시작될 때 인증 정보 초기화(처음 로드 될때, 페이지를 새로 고침 할 때) === 다시 로그인 하지 않게
 			initializeAuth: async () => {
 				try {
-					// 이미 초기화되었다면 중복 실행 방지
 					if (useAuthStore.getState().isInitialized) {
 						return;
 					}
 
-					// 리프레시 토큰 존재 여부 확인
-					const hasRefreshToken = document.cookie.includes('refreshToken');
+					// 게스트 토큰 확인
+					const guestToken = document.cookie
+						.split('; ')
+						.find((row) => row.startsWith('guestToken='))
+						?.split('=')[1];
 
-					// 리프레시 토큰이 있는 경우에만 토큰 갱신 시도
+					if (guestToken) {
+						// 게스트 토큰이 있으면 게스트 상태로 설정
+						set({
+							accessToken: guestToken,
+							isAuthenticated: true,
+							isInitialized: true,
+							isGuest: true,
+						});
+						return;
+					}
+
+					// 일반 사용자 토큰 처리
+					const hasRefreshToken = document.cookie.includes('refreshToken');
 					if (hasRefreshToken) {
 						const response = await authApi.refresh();
 						if (response.content.accessToken) {
@@ -52,20 +72,22 @@ export const useAuthStore = create<AuthState>()(
 								accessToken: response.content.accessToken,
 								isAuthenticated: true,
 								isInitialized: true,
+								isGuest: false,
 							});
 						} else {
 							set({
 								accessToken: null,
 								isAuthenticated: false,
 								isInitialized: true,
+								isGuest: false,
 							});
 						}
 					} else {
-						// 리프레시 토큰이 없는 경우 초기화만 수행
 						set({
 							accessToken: null,
 							isAuthenticated: false,
 							isInitialized: true,
+							isGuest: false,
 						});
 					}
 				} catch (error) {
@@ -73,6 +95,7 @@ export const useAuthStore = create<AuthState>()(
 						accessToken: null,
 						isAuthenticated: false,
 						isInitialized: true,
+						isGuest: false,
 					});
 				}
 			},
@@ -83,6 +106,7 @@ export const useAuthStore = create<AuthState>()(
 				accessToken: state.accessToken,
 				isAuthenticated: state.isAuthenticated,
 				isInitialized: state.isInitialized,
+				isGuest: state.isGuest,
 			}),
 		},
 	),
