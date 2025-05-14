@@ -114,7 +114,7 @@ export const FriendSearchResultPage = () => {
 								/>
 								<h2 className='font-bold mb-1'>{user.nickname}</h2>
 
-								{user.relationStatus === 0 || user.relationStatus === 3 ? (
+								{user.relationStatus === 3 ? (
 									<PrimaryBtn
 										size='compact'
 										name='친구 신청'
