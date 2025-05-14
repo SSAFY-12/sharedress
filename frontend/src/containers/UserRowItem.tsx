@@ -1,3 +1,4 @@
+import { PrimaryBtn } from '@/components/buttons/primary-button/PrimaryBtn';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
 import { Friend } from '@/features/social/pages/FriendCodiRequestPage';
 
@@ -45,9 +46,10 @@ export const UserRowItem = ({
 			</div>
 		</div>
 		{actionType === 'button' && actionButtonText && (
-			<button
-				type='button'
-				className='py-2 px-3.5 rounded-xl hover:bg-low transition bg-brownButton text-white text-description'
+			<PrimaryBtn
+				size='compact'
+				name={actionButtonText}
+				color='brown'
 				onClick={(e) => {
 					e.stopPropagation();
 					if (codiRequestClick && userId)
@@ -59,7 +61,7 @@ export const UserRowItem = ({
 				}}
 			>
 				{actionButtonText}
-			</button>
+			</PrimaryBtn>
 		)}
 		{actionType === 'arrow' && (
 			<button

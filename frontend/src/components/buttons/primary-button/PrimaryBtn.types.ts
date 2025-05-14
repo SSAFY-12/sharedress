@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface PrimaryBtnProps {
-	size: 'full' | 'medium' | 'compact'; // 버튼 크기
+	size: 'full' | 'medium' | 'compact' | 'tiny'; // 버튼 크기
 	name: string; // 버튼에 표시될 텍스트
 	color?: 'primary' | 'black' | 'gray' | 'white' | 'brown' | 'background'; // 버튼 색상
 	activate?: boolean; // 활성화 여부

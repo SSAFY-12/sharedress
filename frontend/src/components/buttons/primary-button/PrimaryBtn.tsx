@@ -9,9 +9,10 @@ export const PrimaryBtn = ({
 	className = '',
 }: PrimaryBtnProps) => {
 	const sizeClass = {
-		full: 'w-full',
-		medium: 'w-2/3',
-		compact: 'w-1/3',
+		full: 'w-full px-4 py-4 text-button',
+		medium: 'w-full px-4 py-3.5 text-smallButton',
+		compact: 'py-2 px-3.5 rounded-xl transition text-description',
+		tiny: 'py-2 px-3 rounded-xl transition text-description',
 	}[size];
 
 	const colorClass = {
@@ -27,7 +28,7 @@ export const PrimaryBtn = ({
 		<button
 			onClick={onClick}
 			disabled={!activate}
-			className={`${sizeClass} ${colorClass} py-3.5 rounded-md text-smallButton font-smallButton transition-colors ${
+			className={`${sizeClass} ${colorClass} rounded-md transition-colors ${
 				!activate ? 'opacity-50 cursor-not-allowed' : ''
 			} ${className}`}
 		>
