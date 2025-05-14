@@ -117,7 +117,7 @@ const CodiDetailPage = () => {
 	};
 
 	const handleAddToMyCloset = () => {
-		copyCoordination(id!, {
+		copyCoordination(coordinationId.toString(), {
 			onSuccess: () => {
 				alert('코디가 내 코디에 추가되었습니다.');
 				navigate(`/mypage`, {
