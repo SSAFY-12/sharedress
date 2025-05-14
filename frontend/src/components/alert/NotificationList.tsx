@@ -8,6 +8,7 @@ import {
 	Shuffle, // 코디 복사
 	MessageCircle, // 코디 댓글
 	FileText, // (기본값)
+	Bot, // AI 관련
 } from 'lucide-react';
 import useNotification from '@/features/alert/hooks/useNotification';
 import { formatDistanceToNow } from 'date-fns';
@@ -29,6 +30,7 @@ const typeIconMap: Record<number, any> = {
 	4: ThumbsUp, // 코디 추천
 	5: Shuffle, // 코디 복사
 	6: MessageCircle, // 코디 댓글
+	7: Bot, // AI 관련
 };
 
 const NotificationList: FC = () => {
