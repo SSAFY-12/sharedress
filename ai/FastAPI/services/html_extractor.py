@@ -96,7 +96,7 @@ class HTMLExtractor:
             return {"error": str(e)}
 
     def _extract_images_with_selenium(self, url: str) -> List[str]:
-        """Selenium을 사용하여 JavaScript로 로딩된 이미지 추출"""
+        """Selenium을 사용하여 JavaScript로 로딩된 이미지 추출 (최대 5개만)"""
         logger.info(f"Selenium으로 이미지 추출 시작: {url}")
 
         options = Options()
@@ -128,6 +128,7 @@ class HTMLExtractor:
                 '.product_thumb img'
             ]
 
+            # 최대 5개 이미지만 추출
             for selector in selectors:
                 elements = driver.find_elements(By.CSS_SELECTOR, selector)
                 if elements:
@@ -141,9 +142,14 @@ class HTMLExtractor:
                                 src = src.replace("_500.jpg", "_big.jpg?w=1200")
                             image_urls.append(src)
 
+                            # 5개 이미지를 찾으면 중단
+                            if len(image_urls) >= 3:
+                                logger.info(f"5개 이미지 찾음, 검색 중단")
+                                return image_urls
+
             # 특정 선택자로 이미지를 못 찾았다면 모든 이미지에서 무신사 패턴 찾기
-            if not image_urls:
-                logger.info("특정 선택자로 이미지를 찾지 못해 모든 이미지 검색")
+            if not image_urls or len(image_urls) < 3:
+                logger.info("특정 선택자로 충분한 이미지를 찾지 못해 모든 이미지 검색")
                 all_images = driver.find_elements(By.TAG_NAME, 'img')
                 for element in all_images:
                     src = element.get_attribute('src')
@@ -155,8 +161,13 @@ class HTMLExtractor:
                                 src = src.replace("_500.jpg", "_big.jpg?w=1200")
                             image_urls.append(src)
 
+                            # 5개 이미지를 찾으면 중단
+                            if len(image_urls) >= 3:
+                                logger.info(f"5개 이미지 찾음, 검색 중단")
+                                break
+
             # 중복 URL 제거
-            image_urls = list(dict.fromkeys(image_urls))
+            image_urls = list(dict.fromkeys(image_urls))[:3]  # 최대 5개로 제한
 
             logger.info(f"Selenium으로 {len(image_urls)}개 이미지 URL 추출됨")
 
