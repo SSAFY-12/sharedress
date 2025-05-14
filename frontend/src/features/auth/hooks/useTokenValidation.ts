@@ -35,18 +35,24 @@ export const useTokenValidation = () => {
 	// 토큰 검증 함수
 	const validateToken = useCallback(async () => {
 		const hasRefreshToken = document.cookie.includes('refreshToken');
+		const hasGuestToken = document.cookie.includes('guestToken');
 		const currentToken = useAuthStore.getState().accessToken;
 
 		console.log('🔍 토큰 검증 시작:', {
 			토큰존재: !!currentToken,
 			리프레시토큰존재: hasRefreshToken,
+			게스트토큰존재: hasGuestToken,
 			시간: new Date().toLocaleString('ko-KR'),
 		});
 
 		if (!currentToken) {
-			console.log('⚠️ 액세스 토큰 없음');
 			if (hasRefreshToken) {
 				return await handleTokenRefresh();
+			}
+			// guestToken만 있을 때는 그냥 통과
+			if (hasGuestToken) {
+				console.log('게스트 토큰만 존재, 토큰 검증/갱신 스킵');
+				return true;
 			}
 			navigate('/auth', { replace: true });
 			return false;
