@@ -6,6 +6,16 @@ import { authApi } from '@/features/auth/api/authApi';
 
 const baseURL = import.meta.env.VITE_API_URL || 'https://www.sharedress.co.kr';
 
+const getCookie = (name: string): string | null => {
+	const value = `; ${document.cookie}`;
+	const parts = value.split(`; ${name}=`);
+	if (parts.length === 2) {
+		const part = parts.pop();
+		if (part !== undefined) return part.split(';').shift() ?? null;
+	}
+	return null;
+};
+
 export const client = axios.create({
 	baseURL,
 	withCredentials: true, // 크로스 사이트 요청 시 쿠키 전송 필수
@@ -56,9 +66,16 @@ const getPath = (url: string) => {
 // 요청 인터셉터
 client.interceptors.request.use(
 	(config) => {
-		const token = useAuthStore.getState().accessToken; // 토큰 가져오기
+		// 디버깅: 쿠키에서 guestToken 읽기
+		const guestToken = getCookie('guestToken');
+		const token = useAuthStore.getState().accessToken;
+		console.log('[디버깅] document.cookie:', document.cookie);
+		console.log('[디버깅] getCookie(guestToken):', guestToken);
+		console.log('[디버깅] useAuthStore accessToken:', token);
+
 		if (token) {
-			config.headers.Authorization = `Bearer ${token}`; // 토큰 헤더에 추가
+			config.headers.Authorization = `Bearer ${token}`;
+			console.log('[디버깅] Authorization 헤더에 토큰 추가:', token);
 		}
 		return config;
 	},

@@ -41,11 +41,14 @@ const GoogleAuthPage = () => {
 	// });
 
 	const handleLogin = async () => {
+		const isProd = import.meta.env.MODE === 'production';
+		const redirect_uri = isProd
+			? 'https://www.callback.co.kr/oauth/google/callback'
+			: 'https://localhost:5173/oauth/google/callback';
 		const params = new URLSearchParams({
 			response_type: 'token',
 			client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-			redirect_uri: `https://www.sharedress.co.kr/oauth/google/callback`,
-			// redirect_uri: `https://localhost:5173/oauth/google/callback`,
+			redirect_uri: redirect_uri,
 			scope: 'openid profile email',
 		});
 		// console.log(params.toString(), 'test');

@@ -21,17 +21,19 @@ const ExternalUserPage = () => {
 					?.split('=')[1];
 
 				if (guestToken) {
-					// 게스트 토큰을 accessToken 등 상태를 한 번에 저장
 					useAuthStore.setState({
 						accessToken: guestToken,
 						isAuthenticated: true,
 						isInitialized: true,
 						isGuest: true,
 					});
+					setTimeout(() => {
+						console.log('auth-storage:', localStorage.getItem('auth-storage'));
+						navigate(`/link/friend/${decodedData.memberId}`);
+					}, 100);
+				} else {
+					navigate(`/link/friend/${decodedData.memberId}`);
 				}
-
-				// 비회원으로 간주하고 친구 옷장으로 이동
-				navigate(`/link/friend/${decodedData.memberId}`);
 			}
 		}
 	}, [decodedData, navigate, isDecodeLoading]);
