@@ -18,7 +18,7 @@ const useFcmInitialization = () => {
 			try {
 				// 현재 알림 권한 상태 확인
 				const permission = await Notification.permission;
-				const { isAuthenticated } = useAuthStore.getState();
+				const { accessToken } = useAuthStore.getState();
 				let isSavingFcmToken = false;
 
 				if (permission === 'default') {
@@ -29,7 +29,7 @@ const useFcmInitialization = () => {
 							if (token) {
 								toast.success('알림 권한이 허용되었습니다!');
 								useFcmStore.setState({ token });
-								if (isAuthenticated && !isSavingFcmToken) {
+								if (accessToken && !isSavingFcmToken) {
 									isSavingFcmToken = true;
 									try {
 										await fcmApi.saveFcmToken(token);
@@ -55,7 +55,7 @@ const useFcmInitialization = () => {
 					const token = await requestNotificationPermission();
 					if (token) {
 						useFcmStore.setState({ token });
-						if (isAuthenticated) {
+						if (accessToken) {
 							try {
 								await fcmApi.saveFcmToken(token);
 							} catch (error) {

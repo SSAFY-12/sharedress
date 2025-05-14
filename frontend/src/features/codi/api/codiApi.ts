@@ -1,4 +1,4 @@
-import client from '@/api/client';
+import { client } from '@/api/client';
 import { replaceImageWithBase64 } from '@/features/codi/utils/replaceImageWithBase64';
 import html2canvas from 'html2canvas';
 import { waitAllImagesLoaded } from '@/features/codi/utils/watiForAllImages';
