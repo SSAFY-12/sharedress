@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.adapter.clothes.out.messaging.SqsMessageSender;
+import com.ssafy.sharedress.application.category.service.CategoryService;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
@@ -58,6 +59,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final SqsMessageSender sqsMessageSender;
 
 	private static final int MAX_ITEMS_PER_MESSAGE = 30;
+	private final CategoryService categoryService;
 
 	@Transactional
 	@Override
@@ -157,12 +159,17 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 			String normalizedName = RegexUtils.normalizeProductName(item.name());
 
+			Category category = categoryRepository.getReferenceById(-1L);
+			Color color = colorRepository.getReferenceById(-1L);
+
 			// 라이브러리 조회 (상품명 + 브랜드 ID 기준)
 			Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(normalizedName, brand.getId());
 
 			// Clothes 객체 (있으면 재사용, 없으면 생성 및 저장)
 			Clothes clothes = existing.orElseGet(() ->
-				clothesRepository.save(new Clothes(normalizedName, brand, shoppingMall, item.linkUrl()))
+				clothesRepository.save(
+					new Clothes(normalizedName, brand, color, category, shoppingMall, item.linkUrl())
+				)
 			);
 
 			// 내 옷장에 이미 있는 옷인지 확인
