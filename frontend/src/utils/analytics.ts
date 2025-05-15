@@ -15,10 +15,12 @@ declare global {
 
 // 페이지 뷰 추적
 export const trackPageView = (path: string, title: string) => {
-	window.gtag('event', 'page_view', {
-		page_path: path,
-		page_title: title,
-	});
+	if (typeof window.gtag === 'function') {
+		window.gtag('event', 'page_view', {
+			page_path: path,
+			page_title: title,
+		});
+	}
 };
 
 // 사용자 행동 추적을 위한 이벤트 추적
@@ -28,27 +30,35 @@ export const trackEvent = (
 		[key: string]: any;
 	},
 ) => {
-	window.gtag('event', eventName, eventParams);
+	if (typeof window.gtag === 'function') {
+		window.gtag('event', eventName, eventParams);
+	}
 };
 
 // 사용자 클릭 추적
 export const trackClick = (elementName: string, elementId?: string) => {
-	window.gtag('event', 'click', {
-		element_name: elementName,
-		element_id: elementId,
-	});
+	if (typeof window.gtag === 'function') {
+		window.gtag('event', 'click', {
+			element_name: elementName,
+			element_id: elementId,
+		});
+	}
 };
 
 // 사용자 스크롤 추적
 export const trackScroll = (scrollDepth: number) => {
-	window.gtag('event', 'scroll', {
-		scroll_depth: scrollDepth,
-	});
+	if (typeof window.gtag === 'function') {
+		window.gtag('event', 'scroll', {
+			scroll_depth: scrollDepth,
+		});
+	}
 };
 
 // 사용자 검색 추적
 export const trackSearch = (searchTerm: string) => {
-	window.gtag('event', 'search', {
-		search_term: searchTerm,
-	});
+	if (typeof window.gtag === 'function') {
+		window.gtag('event', 'search', {
+			search_term: searchTerm,
+		});
+	}
 };
