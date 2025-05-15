@@ -56,8 +56,7 @@ export const LibraryApis = {
 		const response = await client.post('/api/closet/clothes/library', {
 			itemId: itemId,
 		});
-		console.log(itemId, 'request');
-		console.log(response.data, 'response');
+
 		return response.data;
 	},
 	deleteCloth: async (closetClothesId: number) => {

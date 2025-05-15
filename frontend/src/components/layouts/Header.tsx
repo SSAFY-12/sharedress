@@ -2,6 +2,7 @@ import { Badge } from '@/components/etc/badge/Badge';
 import { Icon } from '@/components/etc/badge/Badge.types';
 
 export interface HeaderProps {
+	closet?: boolean;
 	showBack?: boolean;
 	subtitle?: string;
 	logo?: string;
@@ -14,6 +15,7 @@ export interface HeaderProps {
 }
 
 const Header = ({
+	closet = false,
 	showBack = false,
 	subtitle,
 	logo,
@@ -23,9 +25,11 @@ const Header = ({
 	onBadgeClick,
 	signUp,
 	onSignUpClick,
-}: HeaderProps) => (
-	<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
-		<div className='flex items-center min-w-0'>
+}: HeaderProps) => {
+	const backIcon = closet ? '/icons/arrow_left_white.svg' : '/icons/arrow_left_black.svg';
+	return (
+		<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
+			<div className='flex items-center min-w-0'>
 			{showBack && (
 				<div className='flex items-center gap-1 min-w-0'>
 					<button
@@ -33,7 +37,7 @@ const Header = ({
 						onClick={onBackClick}
 						aria-label='뒤로가기'
 					>
-						<img src='/icons/arrow_left_black.svg' alt='뒤로가기' />
+						<img src={backIcon} alt='뒤로가기' />
 					</button>
 					{subtitle && (
 						<h1 className='text-[15px] text-gray-900 font-medium truncate'>
@@ -42,7 +46,7 @@ const Header = ({
 					)}
 				</div>
 			)}
-			{!showBack && logo && <img src='/icons/logo_black.svg' alt='로고' />}
+			{!showBack && logo && <img src='/icons/logo_white.svg' alt='로고' />}
 		</div>
 
 		{signUp && (
@@ -56,12 +60,13 @@ const Header = ({
 
 		{badgeIcon === 'bell' ? (
 			<button onClick={onBadgeClick} aria-label='알림' className='p-0'>
-				<img src='/icons/notification_black.svg' alt='알림 아이콘' />
+				<img src='/icons/notification_white.svg' alt='알림 아이콘' />
 			</button>
 		) : badgeIcon || badgeText ? (
 			<Badge icon={badgeIcon} text={badgeText} onClick={onBadgeClick} />
 		) : null}
 	</header>
 );
+};
 
 export default Header;
