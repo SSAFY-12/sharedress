@@ -95,16 +95,16 @@ const ProfileHeader = ({
 			<div className='relative z-10'>
 				{isMe ? (
 					<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
-						<img src='/icons/logo_black.svg' alt='쉐어드레스' />
+						<img src='/icons/logo_white.svg' alt='쉐어드레스' />
 						<div className='flex gap-4'>
 							<img
-								src='/icons/logout_black.svg'
+								src='/icons/logout_white.svg'
 								alt='로그아웃'
 								onClick={handleLogoutClick}
 								className='cursor-pointer'
 							/>
 							<img
-								src='/icons/notification_black.svg'
+								src='/icons/notification_white.svg'
 								alt='알림'
 								onClick={handleNotificationClick}
 								className='cursor-pointer'
@@ -121,6 +121,7 @@ const ProfileHeader = ({
 					<Header
 						showBack={true}
 						badgeIcon='bell'
+						closet={true}
 						onBackClick={() => navigate(-1)}
 						onBadgeClick={handleNotificationClick}
 					/>
