@@ -1,13 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { LibraryApis, ClosetApis } from '@/features/regist/api/registApis';
+import { LibraryApis } from '@/features/regist/api/registApis';
+import { useClosetStore } from '@/store/useClosetStore';
 
 export const useRegistCloth = (id: number) => {
 	const qc = useQueryClient();
+	const { addCloset } = useClosetStore();
 
 	return useMutation({
-		mutationFn: () => LibraryApis.registCloth(id),
+		mutationFn: async () => {
+			const response = await LibraryApis.registCloth(id);
+			return response;
+		},
 		retry: false, // 409 재시도 금지
-		onSuccess: async () => {
+		onSuccess: async (response) => {
+			addCloset({ closetId: response.closetId, libraryId: id });
 			if ('serviceWorker' in navigator && 'Notification' in window) {
 				const registration = await navigator.serviceWorker.ready;
 				await registration.showNotification('옷을 등록했어요 👚', {
@@ -44,16 +50,18 @@ export const useRegistCloth = (id: number) => {
 
 export const useDeleteCloth = (id: number | undefined) => {
 	const qc = useQueryClient();
+	const { removeCloset } = useClosetStore();
 
 	return useMutation({
 		mutationFn: () => {
 			if (!id) {
 				throw new Error('삭제할 옷의 ID가 없습니다.');
 			}
-			return ClosetApis.deleteCloth(id);
+			return LibraryApis.deleteCloth(id);
 		},
 		retry: false,
 		onSuccess: async () => {
+			removeCloset(id ?? 0);
 			if ('serviceWorker' in navigator && 'Notification' in window) {
 				const registration = await navigator.serviceWorker.ready;
 				await registration.showNotification('옷 삭제', {
@@ -71,7 +79,7 @@ export const useDeleteCloth = (id: number | undefined) => {
 			if ('serviceWorker' in navigator && 'Notification' in window) {
 				const registration = await navigator.serviceWorker.ready;
 				await registration.showNotification('옷 삭제 실패', {
-					body: '삭제 실패 😥',
+					body: '삭제 실패 ',
 					icon: '/android-chrome-192x192.png',
 					badge: '/favicon-32x32.png',
 				});
