@@ -26,21 +26,34 @@ export interface SaveCodiRequest {
 }
 
 export const myCodiSaveApi = async (data: SaveCodiRequest) => {
-	const response = await client.post('api/coordinations/my', data);
-	console.log(response.data);
-	return response.data;
+	try {
+		const response = await client.post('api/coordinations/my', data, {
+			withCredentials: true,
+		});
+		return response.data;
+	} catch (error) {
+		console.error('코디 저장 실패:', error);
+		throw error;
+	}
 };
 
 export const recommendedCodiSaveApi = async (
 	friendId: string,
 	data: Omit<SaveCodiRequest, 'isPublic'>,
 ) => {
-	const response = await client.post(
-		`api/coordinations/friends/${friendId}`,
-		data,
-	);
-	console.log(response.data.content);
-	return response.data;
+	try {
+		const response = await client.post(
+			`api/coordinations/friends/${friendId}`,
+			data,
+			{
+				withCredentials: true,
+			},
+		);
+		return response.data;
+	} catch (error) {
+		console.error('추천 코디 저장 실패:', error);
+		throw error;
+	}
 };
 
 export const captureCanvasImage = async (
