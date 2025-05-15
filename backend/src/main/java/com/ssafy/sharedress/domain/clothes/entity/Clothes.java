@@ -79,5 +79,6 @@ public class Clothes extends BaseTimeEntity {
 		this.shoppingMall = shoppingMall;
 		this.goodsLinkUrl = goodsLinkUrl;
 		this.type = ClothesSourceType.SHOPPING_MALL;
+		this.aiProcessStatus = AiProcessStatus.NOT_PROCESSED;
 	}
 }
