@@ -69,7 +69,7 @@ export const LibraryApis = {
 };
 
 import { MyClosetContent } from '@/store/useClosetStore';
-interface MyClosetResponse {
+export interface MyClosetResponse {
 	status: Status;
 	content: MyClosetContent[];
 }
@@ -77,8 +77,10 @@ interface MyClosetResponse {
 export const ClosetApis = {
 	// --------------------옷장 옷 조회------------------------
 	getMyCloset: async (): Promise<MyClosetResponse> => {
+		console.log('옷장 api 호출');
 		const response = await client.get('/api/closet/my');
-		return response.data.content;
+		console.log(response, 'APIresponse');
+		return response.data;
 	},
 };
 

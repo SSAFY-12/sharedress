@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export interface MyClosetContent {
-	closetId: number;
+	id: number; // closetId
 	libraryId: number;
 }
 
@@ -24,7 +24,7 @@ export const useClosetStore = create<ClosetState>()(
 				set((state) => ({ closet: [...state.closet, closet] })),
 			removeCloset: (closetId: number) =>
 				set((state) => ({
-					closet: state.closet.filter((item) => item.closetId !== closetId),
+					closet: state.closet.filter((item) => item.id !== closetId),
 				})),
 		}),
 

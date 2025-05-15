@@ -3,7 +3,6 @@ import Header from '@/components/layouts/Header';
 import { authApi } from '@/features/auth/api/authApi';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface ProfileHeaderProps {
