@@ -192,7 +192,7 @@ public class NotificationService implements NotificationUseCase {
 			String fcmToken = member.getFcmToken();
 			sendFcmNotification(
 				fcmToken,
-				"AI 처리 완료",
+				"옷 등록 완료",
 				"AI 처리가 완료되었습니다."
 			);
 
@@ -200,7 +200,7 @@ public class NotificationService implements NotificationUseCase {
 				memberRepository.getReferenceById(-1L),
 				memberRepository.getReferenceById(memberId),
 				"옷 등록 완료",
-				"AI의 옷 등록이 완료되었습니다.",
+				"AI 처리가 완료되었습니다.",
 				NotificationType.AI_COMPLETE
 			);
 		});
