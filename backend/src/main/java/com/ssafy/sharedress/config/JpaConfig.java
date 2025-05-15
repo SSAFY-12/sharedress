@@ -12,12 +12,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Configuration
 @EnableJpaAuditing
 public class JpaConfig {
-	// TODO: 현재 테스트 코드, 추후 주석처리된 내용으로 변경해야함.
 	@Bean
-	public AuditorAware<String> auditorAware() {
+	public AuditorAware<Long> auditorAware() {
 		return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
 			.map(Principal::getName)
-			.orElse("test@email.com")
+			.map(Long::valueOf)
+			.orElse(-1L)
 			.describeConstable();
 	}
 }

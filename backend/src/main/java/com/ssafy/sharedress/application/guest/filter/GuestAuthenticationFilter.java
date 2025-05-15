@@ -27,9 +27,9 @@ public class GuestAuthenticationFilter extends OncePerRequestFilter {
 	private static final List<String> GUEST_PATH_PREFIXES = List.of(
 		"/api/closet",
 		"/api/coordinations",
-		"/api/comment",
 		"/api/open-link",
-		"/api/me"
+		"/api/me",
+		"/api/members"
 	);
 
 	@Override

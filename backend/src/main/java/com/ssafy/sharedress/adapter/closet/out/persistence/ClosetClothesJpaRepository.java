@@ -19,4 +19,12 @@ public interface ClosetClothesJpaRepository extends JpaRepository<ClosetClothes,
 	List<Long> findClothesIdsByClosetIdAndClothesIdIn(
 		@Param("closetId") Long closetId,
 		@Param("clothesIds") List<Long> clothesIds);
+
+	@Query("""
+			SELECT CASE WHEN COUNT(cc) > 0 THEN true ELSE false END
+			FROM ClosetClothes cc
+			JOIN cc.closet cls
+			WHERE cc.id = :closetClothesId AND cls.member.id = :memberId
+		""")
+	Boolean existsByIdAndMemberId(@Param("closetClothesId") Long closetClothesId, @Param("memberId") Long memberId);
 }

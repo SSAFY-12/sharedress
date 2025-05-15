@@ -1,6 +1,5 @@
 package com.ssafy.sharedress.adapter.coordination.in;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -54,8 +53,6 @@ public class S3ProxyController {
 
 		} catch (MalformedURLException e) {
 			return ResponseWrapperFactory.toResponseEntity(HttpStatus.BAD_REQUEST, null);
-		} catch (IOException e) {
-			return ResponseWrapperFactory.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, null);
 		} catch (Exception e) {
 			return ResponseWrapperFactory.toResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, null);
 		}

@@ -66,7 +66,10 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		Long closetClothesId,
 		ClosetClothesUpdateRequest request
 	) {
-		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
+		if (!closetClothesRepository.existsByIdAndMemberId(closetClothesId, memberId)) {
+			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_BELONG_TO_MEMBER);
+		}
+
 		ClosetClothes closetClothes = closetClothesRepository.findById(closetClothesId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
 
@@ -95,9 +98,8 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	@Transactional
 	@Override
 	public void removeClosetClothes(Long memberId, Long closetClothesId) {
-		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
-		if (!closetClothesRepository.existsById(closetClothesId)) {
-			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND);
+		if (!closetClothesRepository.existsByIdAndMemberId(closetClothesId, memberId)) {
+			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_BELONG_TO_MEMBER);
 		}
 
 		closetClothesRepository.deleteById(closetClothesId);

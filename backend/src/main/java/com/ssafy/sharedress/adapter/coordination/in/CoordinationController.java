@@ -116,11 +116,10 @@ public class CoordinationController {
 	@PatchMapping("/coordinations/{coordinationId}/thumbnail")
 	public ResponseEntity<ResponseWrapper<UpdateCoordinationThumbnailResponse>> updateCoordinationThumbnail(
 		@PathVariable("coordinationId") Long coordinationId,
-		@RequestPart("thumbnail") MultipartFile thumbnail,
-		@CurrentMember Member member
+		@RequestPart("thumbnail") MultipartFile thumbnail
 	) {
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
-			coordinationUseCase.updateThumbnail(member.getId(), thumbnail, coordinationId));
+			coordinationUseCase.updateThumbnail(thumbnail, coordinationId));
 	}
 
 	@PatchMapping("/coordinations/{coordinationId}")
@@ -136,9 +135,11 @@ public class CoordinationController {
 	@DeleteMapping("/coordinations/{coordinationId}")
 	public ResponseEntity<ResponseWrapper<Void>> removeCoordination(
 		@PathVariable("coordinationId") Long coordinationId,
-		@CurrentMember Member member
+		@CurrentMember(required = false) Member member,
+		@CurrentGuest(required = false) Guest guest
 	) {
-		coordinationUseCase.removeCoordination(member.getId(), coordinationId);
+		UserContext userContext = new UserContext(member, guest);
+		coordinationUseCase.removeCoordination(userContext.getId(), coordinationId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
