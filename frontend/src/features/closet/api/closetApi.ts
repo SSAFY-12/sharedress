@@ -265,10 +265,17 @@ export const fetchFriendProfile = async (
 
 export const fetchRecommendedToFriend = async (memberId: number) => {
 	try {
-		const response = await client.get(`/api/coordinations/friends/${memberId}`);
+		const response = await client.get(
+			`/api/coordinations/friends/${memberId}`,
+			{
+				withCredentials: true,
+			},
+		);
 		return response.data.content as CoordinationItem[];
 	} catch (error) {
+		console.error('친구 추천 코디 조회 실패:', error);
 		if (axios.isAxiosError(error) && error.response?.status === 401) {
+			console.log('게스트 사용자 권한 없음');
 			return [];
 		}
 		throw error;
