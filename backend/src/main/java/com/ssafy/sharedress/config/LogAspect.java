@@ -77,7 +77,6 @@ public class LogAspect {
 			loggingCompleted(
 				joinPoint.getSignature().getDeclaringTypeName(),
 				joinPoint.getSignature().getName(),
-				result,
 				elapsedTime
 			);
 		}
@@ -101,7 +100,7 @@ public class LogAspect {
 		long endTime = System.currentTimeMillis();
 		long elapsedTime = endTime - startTime;
 
-		loggingCompleted(className, methodName, result, elapsedTime);
+		loggingCompleted(className, methodName, elapsedTime);
 
 		return result;
 	}
@@ -121,7 +120,7 @@ public class LogAspect {
 		log.debug("▶ Executing: {}.{}", className, methodName);
 	}
 
-	private static void loggingCompleted(String className, String methodName, Object result, long elapsedTime) {
-		log.debug("✔ Completed: {}.{} with result: {} ({} ms)", className, methodName, result, elapsedTime);
+	private static void loggingCompleted(String className, String methodName, long elapsedTime) {
+		log.debug("✔ Completed: {}.{} ({} ms)", className, methodName, elapsedTime);
 	}
 }

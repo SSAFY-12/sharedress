@@ -24,6 +24,9 @@ spring:
     datasource.hikari:
         connection-init-sql: SET NAMES utf8mb4
 
+    jackson:
+        time-zone: Asia/Seoul
+
 ---
 management:
     endpoints:
