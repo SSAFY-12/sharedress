@@ -15,10 +15,10 @@ import lombok.Getter;
 public abstract class BaseAuthorEntity {
 
 	@CreatedBy
-	@Column(nullable = false, updatable = false, length = 100)
-	protected String createdBy;
+	@Column(nullable = false, updatable = false)
+	protected Long createdBy;
 
 	@LastModifiedBy
-	@Column(nullable = false, length = 100)
-	protected String modifiedBy;
+	@Column(nullable = false)
+	protected Long modifiedBy;
 }
