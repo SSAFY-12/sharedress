@@ -47,6 +47,10 @@ public class Clothes extends BaseTimeEntity {
 
 	private String goodsLinkUrl;
 
+	@Column(name = "ai_process_status")
+	@Convert(converter = AiProcessStatusConverter.class)
+	private AiProcessStatus aiProcessStatus;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "brand_id", nullable = false)
 	private Brand brand;
