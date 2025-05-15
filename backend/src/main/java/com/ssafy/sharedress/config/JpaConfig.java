@@ -13,11 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @EnableJpaAuditing
 public class JpaConfig {
 	@Bean
-	public AuditorAware<Long> auditorAware() {
+	public AuditorAware<String> auditorAware() {
 		return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
 			.map(Principal::getName)
-			.map(Long::valueOf)
-			.orElse(-1L)
+			.orElse("AI@email.com")
 			.describeConstable();
 	}
 }

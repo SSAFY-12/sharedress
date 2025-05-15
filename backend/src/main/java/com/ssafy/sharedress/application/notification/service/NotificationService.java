@@ -187,12 +187,23 @@ public class NotificationService implements NotificationUseCase {
 	}
 
 	@Override
-	public void sendAiCompleteNotification(Long memberId, String fcmToken) {
-		sendFcmNotification(
-			fcmToken,
-			"AI 처리 완료",
-			"AI 처리가 완료되었습니다."
-		);
+	public void sendAiCompleteNotification(Long memberId) {
+		memberRepository.findById(memberId).ifPresent(member -> {
+			String fcmToken = member.getFcmToken();
+			sendFcmNotification(
+				fcmToken,
+				"AI 처리 완료",
+				"AI 처리가 완료되었습니다."
+			);
+
+			saveNotification(
+				memberRepository.getReferenceById(-1L),
+				memberRepository.getReferenceById(memberId),
+				"옷 등록 완료",
+				"AI의 옷 등록이 완료되었습니다.",
+				NotificationType.AI_COMPLETE
+			);
+		});
 	}
 
 	@Override

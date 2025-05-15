@@ -42,16 +42,19 @@ public class ClothesService implements ClothesUseCase {
 	@Transactional
 	@Override
 	public void markClothesAsAiCompleted(Long memberId, List<Long> successClothes, List<Long> failClothes) {
-		// 성공한 의류에 대한 처리
-		List<ClosetClothes> successClosetClothes = closetClothesRepository.findAllByClothesIds(successClothes);
-		for (ClosetClothes closetClothes : successClosetClothes) {
-			closetClothes.updateImgUrl(closetClothes.getClothes().getImageUrl());
+		if (successClothes != null && !successClothes.isEmpty()) {
+			List<ClosetClothes> successClosetClothes = closetClothesRepository.findAllByClothesIds(successClothes);
+			for (ClosetClothes closetClothes : successClosetClothes) {
+				closetClothes.updateImgUrl(closetClothes.getClothes().getImageUrl());
+			}
 		}
 
-		// 실패한 의류에 대한 처리
-		List<Clothes> failedClothes = clothesRepository.findAllByIds(failClothes);
-		for (Clothes clothes : failedClothes) {
-			clothesRepository.deleteById(clothes.getId());
+		// 실패한 의류 처리
+		if (failClothes != null && !failClothes.isEmpty()) {
+			List<Clothes> failedClothes = clothesRepository.findAllByIds(failClothes);
+			for (Clothes clothes : failedClothes) {
+				clothesRepository.deleteById(clothes.getId());
+			}
 		}
 	}
 }

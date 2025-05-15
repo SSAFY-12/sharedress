@@ -16,9 +16,9 @@ public abstract class BaseAuthorEntity {
 
 	@CreatedBy
 	@Column(nullable = false, updatable = false)
-	protected Long createdBy;
+	protected String createdBy;
 
 	@LastModifiedBy
 	@Column(nullable = false)
-	protected Long modifiedBy;
+	protected String modifiedBy;
 }

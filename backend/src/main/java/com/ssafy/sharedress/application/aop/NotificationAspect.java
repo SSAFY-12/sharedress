@@ -68,8 +68,7 @@ public class NotificationAspect {
 			}
 			case AI_COMPLETE -> {
 				Long memberId = (Long)args[0];
-				String fcmToken = (String)args[1];
-				notificationUseCase.sendAiCompleteNotification(memberId, fcmToken);
+				notificationUseCase.sendAiCompleteNotification(memberId);
 			}
 			// TODO: 알림이 필요한 부분 추가
 		}
