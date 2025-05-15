@@ -1,31 +1,44 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDecodePublicLink } from '@/features/social/hooks/usePublicLink';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 // import { useLoginInfo } from '@/features/social/hooks/useLoginInfo';
 import { useAuthStore } from '@/store/useAuthStore';
 
 const ExternalUserPage = () => {
 	const navigate = useNavigate();
 	const { code } = useParams<{ code: string }>();
-	const token = useAuthStore((state) => state.accessToken); // 토큰으로 판단
+	const { accessToken, setAccessToken } = useAuthStore();
+	const { setIsGuest } = useAuthStore();
 
 	const { decodedData, isDecodeLoading, decodeError } = useDecodePublicLink(
 		code ?? '',
 	);
-	// const { loginInfo, isLoginInfoLoading } = useLoginInfo();
+
+	const hasRedirectedRef = useRef(false);
 
 	useEffect(() => {
+		if (hasRedirectedRef.current) return;
 		if (!isDecodeLoading && decodedData) {
 			if (decodedData.isPublic) {
-				if (!token) {
-					// 토큰이 없으면 비회원으로 간주
+				hasRedirectedRef.current = true; // 이후 실행 방지
+
+				if (!accessToken) {
+					setAccessToken('111');
+					setIsGuest(true);
 					navigate(`/link/friend/${decodedData.memberId}`);
 				} else {
 					navigate(`/friend/${decodedData.memberId}`);
 				}
 			}
 		}
-	}, [decodedData, token, navigate, isDecodeLoading]);
+	}, [
+		decodedData,
+		accessToken,
+		navigate,
+		isDecodeLoading,
+		setAccessToken,
+		setIsGuest,
+	]);
 
 	if (decodeError) return <div>잘못된 링크입니다.</div>;
 	else if (isDecodeLoading) return <div>Loading...</div>;

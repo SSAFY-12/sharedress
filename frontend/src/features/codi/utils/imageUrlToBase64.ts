@@ -1,4 +1,4 @@
-import client from '@/api/client';
+import { client } from '@/api/client';
 
 export const imageUrlToBase64 = async (imageUrl: string): Promise<string> => {
 	const encodedUrl = encodeURIComponent(imageUrl);

@@ -1,4 +1,5 @@
-import client from '@/api/client';
+import { client } from '@/api/client';
+import axios from 'axios';
 
 export interface Profile {
 	id: number;
@@ -150,13 +151,20 @@ export const getCoordinationList = async (
 	memberId: number,
 	scope: CoordinationScope,
 ) => {
-	const response = await client.get('/api/coordinations', {
-		params: {
-			memberId,
-			scope,
-		},
-	});
-	return response.data.content as CoordinationItem[];
+	try {
+		const response = await client.get('/api/coordinations', {
+			params: {
+				memberId,
+				scope,
+			},
+		});
+		return response.data.content as CoordinationItem[];
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response?.status === 401) {
+			return [];
+		}
+		throw error;
+	}
 };
 
 export const fetchClothDetail = async (clothId: number) => {
@@ -165,29 +173,49 @@ export const fetchClothDetail = async (clothId: number) => {
 };
 
 export const fetchCoordinationDetail = async (coordinationId: number) => {
-	const response = await client.get(`/api/coordinations/${coordinationId}`);
-	return response.data.content as CoordinationDetail;
+	try {
+		const response = await client.get(`/api/coordinations/${coordinationId}`);
+		return response.data.content as CoordinationDetail;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response?.status === 401) {
+			return null;
+		}
+		throw error;
+	}
 };
 
 export const fetchCoordinationComments = async (coordinationId: number) => {
-	const response = await client.get(
-		`/api/coordinations/${coordinationId}/comments`,
-	);
-	console.log(response.data.content);
-	return response.data.content as CoordinationComment[];
+	try {
+		const response = await client.get(
+			`/api/coordinations/${coordinationId}/comments`,
+		);
+		return response.data.content as CoordinationComment[];
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response?.status === 401) {
+			return [];
+		}
+		throw error;
+	}
 };
 
 export const postCoordinationComment = async ({
 	coordinationId,
 	content,
 }: PostCommentParams) => {
-	const response = await client.post(
-		`/api/coordinations/${coordinationId}/comments`,
-		{
-			content,
-		},
-	);
-	return response.data.content;
+	try {
+		const response = await client.post(
+			`/api/coordinations/${coordinationId}/comments`,
+			{
+				content,
+			},
+		);
+		return response.data.content;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response?.status === 401) {
+			throw new Error('댓글을 작성할 권한이 없습니다.');
+		}
+		throw error;
+	}
 };
 
 export const postCopyCoordination = async (coordinationId: string) => {
@@ -206,7 +234,9 @@ export const deleteCloth = async (closetClothesId: number) => {
 };
 
 export const deleteCoordination = async (coordinationId: number) => {
-	const response = await client.delete(`/api/coordinations/${coordinationId}`);
+	const response = await client.delete(`/api/coordinations/${coordinationId}`, {
+		withCredentials: true, //쿠키 전송 추가
+	});
 	return response.data;
 };
 
@@ -219,6 +249,9 @@ export const deleteCoordinationComment = async ({
 }) => {
 	const response = await client.delete(
 		`/api/coordinations/${coordinationId}/comments/${commentId}`,
+		{
+			withCredentials: true, //쿠키 전송 추가
+		},
 	);
 	return response.data;
 };
@@ -231,8 +264,22 @@ export const fetchFriendProfile = async (
 };
 
 export const fetchRecommendedToFriend = async (memberId: number) => {
-	const response = await client.get(`/api/coordinations/friends/${memberId}`);
-	return response.data.content as CoordinationItem[];
+	try {
+		const response = await client.get(
+			`/api/coordinations/friends/${memberId}`,
+			{
+				withCredentials: true,
+			},
+		);
+		return response.data.content as CoordinationItem[];
+	} catch (error) {
+		console.error('친구 추천 코디 조회 실패:', error);
+		if (axios.isAxiosError(error) && error.response?.status === 401) {
+			console.log('게스트 사용자 권한 없음');
+			return [];
+		}
+		throw error;
+	}
 };
 
 export const updateCloth = async (
@@ -275,8 +322,14 @@ export const updateCodiPublicStatus = async (
 	coordinationId: number,
 	isPublic: boolean,
 ) => {
-	const response = await client.patch(`/api/coordinations/${coordinationId}`, {
-		isPublic,
-	});
+	const response = await client.patch(
+		`/api/coordinations/${coordinationId}`,
+		{
+			isPublic,
+		},
+		{
+			withCredentials: true, //쿠키 전송 추가
+		},
+	);
 	return response.data;
 };
