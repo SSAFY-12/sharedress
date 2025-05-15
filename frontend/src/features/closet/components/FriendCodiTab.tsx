@@ -39,13 +39,21 @@ const FriendCodiTab = ({ memberId, activeSubTab }: FriendCodiTabProps) => {
 	};
 
 	return (
-		<div className='px-4'>
-			<ClothListContainer
-				items={items}
-				onItemClick={handleItemClick}
-				columns={2}
-				type='codi'
-			/>
+		<div className='px-4 flex flex-col flex-1'>
+			{items.length === 0 ? (
+				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor'>
+					{activeSubTab === 'friends'
+						? '저장한 코디가 없습니다'
+						: '내가 추천한 코디가 없습니다'}
+				</div>
+			) : (
+				<ClothListContainer
+					items={items}
+					onItemClick={handleItemClick}
+					columns={2}
+					type='codi'
+				/>
+			)}
 		</div>
 	);
 };

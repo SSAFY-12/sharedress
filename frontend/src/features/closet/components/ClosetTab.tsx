@@ -38,24 +38,30 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 
 	return (
 		<div className='flex flex-col h-full'>
-			<div className='flex-1 px-4'>
-				<ClothListContainer
-					items={
-						visibleItems.map((item) => ({
-							id: item.id,
-							category: selectedCategory,
-							imageUrl: item.image,
-							name: item.name,
-							brand: item.brandName,
-							isPublic: item.isPublic,
-						})) ?? []
-					}
-					onItemClick={handleItemClick}
-					columns={3}
-					className='mt-1'
-					type='cloth'
-				/>
-			</div>
+			{(closetItems?.length ?? 0) === 0 ? (
+				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor'>
+					저장한 옷이 없습니다.
+				</div>
+			) : (
+				<div className='flex-1 px-4'>
+					<ClothListContainer
+						items={
+							visibleItems.map((item) => ({
+								id: item.id,
+								category: selectedCategory,
+								imageUrl: item.image,
+								name: item.name,
+								brand: item.brandName,
+								isPublic: item.isPublic,
+							})) ?? []
+						}
+						onItemClick={handleItemClick}
+						columns={3}
+						className='mt-1'
+						type='cloth'
+					/>
+				</div>
+			)}
 		</div>
 	);
 };

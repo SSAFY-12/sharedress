@@ -44,6 +44,12 @@ const MyClosetPage = () => {
 		}
 	}, [initialTab, initialSubTab]);
 
+	useEffect(() => {
+		if (activeMainTab === '옷장') {
+			setSelectedCategory(categoryConfig[0]);
+		}
+	}, [activeMainTab]);
+
 	const { data: profile } = useMyProfile();
 
 	return (
