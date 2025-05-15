@@ -64,7 +64,9 @@ public class CoordinationService implements CoordinationUseCase {
 		);
 
 		coordinationRequestDto.items().forEach(item -> {
-			// TODO[준]: 상대방의 옷장에 있는 옷인지 확인하는 로직 추가
+			if (closetClothesRepository.existsByIdAndMemberId(item.id(), myId)) {
+				return;
+			}
 			ClosetClothes closetClothes = closetClothesRepository.getReferenceById(item.id());
 			CoordinationClothes coordinationClothes = item.toEntity(coordination, closetClothes);
 			coordination.addCoordinationClothes(coordinationClothes);
@@ -174,7 +176,6 @@ public class CoordinationService implements CoordinationUseCase {
 	@Transactional
 	@Override
 	public void removeCoordination(Long myId, Long coordinationId) {
-		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
 		coordinationRepository.deleteById(coordinationId);
 	}
 
@@ -182,8 +183,6 @@ public class CoordinationService implements CoordinationUseCase {
 	@Override
 	public CoordinationResponse updateIsPublic(Long myId, Long coordinationId,
 		UpdateCoordinationIsPublicRequest request) {
-		// TODO[준]: memberId가 closetClothesId의 소유자와 같은지 확인하는 로직 추가
-
 		Coordination coordination = coordinationRepository.findById(coordinationId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(CoordinationErrorCode.COORDINATION_NOT_FOUND));
 

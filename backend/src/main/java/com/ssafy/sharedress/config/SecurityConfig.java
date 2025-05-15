@@ -43,6 +43,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/auth/**").permitAll()
 				.requestMatchers("/api/open-link/**").permitAll()
 				.requestMatchers("/api/clothes/ai-complete").permitAll()
+				.requestMatchers("/api/html2canvas/proxy").permitAll()
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
