@@ -21,6 +21,16 @@ const backgroundImages = [
 	'/images/backgrounds/2.jpg',
 	'/images/backgrounds/3.jpg',
 	'/images/backgrounds/4.jpg',
+	'/images/backgrounds/5.jpg',
+	'/images/backgrounds/6.jpg',
+	'/images/backgrounds/7.jpg',
+	'/images/backgrounds/8.jpg',
+	'/images/backgrounds/9.jpg',
+	'/images/backgrounds/10.jpg',
+	'/images/backgrounds/11.jpg',
+	'/images/backgrounds/12.jpg',
+	'/images/backgrounds/13.jpg',
+	'/images/backgrounds/14.jpg',
 ];
 
 const ProfileHeader = ({
@@ -33,10 +43,6 @@ const ProfileHeader = ({
 	handleModalOpen,
 }: ProfileHeaderProps) => {
 	const isGuest = useAuthStore((state) => state.isGuest);
-	const selectedBackgroundImage = useMemo(() => {
-		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-		return backgroundImages[randomIndex];
-	}, []);
 	const navigate = useNavigate();
 
 	const handleRecommendClick = () => {
@@ -73,7 +79,9 @@ const ProfileHeader = ({
 				<div
 					className='absolute inset-0'
 					style={{
-						backgroundImage: `url(${selectedBackgroundImage})`,
+						backgroundImage: isMe
+							? `url(${backgroundImages[2]})`
+							: `url(${backgroundImages[1]})`,
 						backgroundSize: 'cover',
 						backgroundPosition: 'center',
 						filter: 'blur(2px)',
