@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
+import com.ssafy.sharedress.application.closet.dto.ClosetClothesIdResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
@@ -55,8 +56,11 @@ public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 	}
 
 	@Override
-	public List<Long> getMyClosetClothesIds(Long myId) {
-		return closetClothesRepository.findAllByMemberId(myId);
+	public List<ClosetClothesIdResponse> getMyClosetClothesIds(Long myId) {
+		return closetClothesRepository.findAllByMemberId(myId)
+			.stream()
+			.map(ClosetClothesIdResponse::fromEntity)
+			.toList();
 	}
 
 	// -- 게스트 -- //

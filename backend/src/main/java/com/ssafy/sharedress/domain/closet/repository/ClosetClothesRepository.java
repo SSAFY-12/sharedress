@@ -29,5 +29,5 @@ public interface ClosetClothesRepository {
 
 	List<ClosetClothes> findAllByClothesIds(List<Long> clothesIds);
 
-	List<Long> findAllByMemberId(Long myId);
+	List<ClosetClothes> findAllByMemberId(Long myId);
 }

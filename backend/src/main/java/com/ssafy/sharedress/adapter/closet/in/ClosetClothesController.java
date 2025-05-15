@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
+import com.ssafy.sharedress.application.closet.dto.ClosetClothesIdResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
@@ -104,11 +105,12 @@ public class ClosetClothesController {
 	}
 
 	@GetMapping("/closet/my")
-	public ResponseEntity<ResponseWrapper<List<Long>>> getMyClosetClothesIds(
+	public ResponseEntity<ResponseWrapper<List<ClosetClothesIdResponse>>> getMyClosetClothesIds(
 		@CurrentMember Member member
 	) {
-		List<Long> result = closetClothesQueryUseCase.getMyClosetClothesIds(member.getId());
-
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+		return ResponseWrapperFactory.toResponseEntity(
+			HttpStatus.OK,
+			closetClothesQueryUseCase.getMyClosetClothesIds(member.getId())
+		);
 	}
 }

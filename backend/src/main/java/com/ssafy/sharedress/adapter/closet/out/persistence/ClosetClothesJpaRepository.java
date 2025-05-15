@@ -29,9 +29,10 @@ public interface ClosetClothesJpaRepository extends JpaRepository<ClosetClothes,
 	Boolean existsByIdAndMemberId(@Param("closetClothesId") Long closetClothesId, @Param("memberId") Long memberId);
 
 	@Query("""
-			SELECT cc.clothes.id
+			SELECT cc
 			FROM ClosetClothes cc
+			JOIN FETCH cc.clothes cl
 			WHERE cc.closet.member.id = :memberId
 		""")
-	List<Long> findAllByMemberId(@Param("memberId") Long memberId);
+	List<ClosetClothes> findAllByMemberId(@Param("memberId") Long memberId);
 }

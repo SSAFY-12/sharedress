@@ -136,7 +136,7 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	}
 
 	@Override
-	public List<Long> findAllByMemberId(Long myId) {
+	public List<ClosetClothes> findAllByMemberId(Long myId) {
 		return closetClothesJpaRepository.findAllByMemberId(myId);
 	}
 }
