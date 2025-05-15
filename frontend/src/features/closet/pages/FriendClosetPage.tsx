@@ -9,7 +9,7 @@ import { categoryConfig } from '@/constants/categoryConfig';
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 import FriendCodiTab from '@/features/closet/components/FriendCodiTab';
 import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
-import { GuestModal } from '../components/GuestModal';
+import { GuestModal } from '@/features/closet/components/GuestModal';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [

@@ -4,7 +4,7 @@ import { useClosetStore } from '@/store/useClosetStore';
 
 export const useRegistCloth = (id: number) => {
 	const qc = useQueryClient();
-	const { addCloset } = useClosetStore();
+	const addCloset = useClosetStore((state) => state.addCloset);
 
 	return useMutation({
 		mutationFn: async () => {
@@ -13,7 +13,7 @@ export const useRegistCloth = (id: number) => {
 		},
 		retry: false, // 409 재시도 금지
 		onSuccess: async (response) => {
-			addCloset({ closetId: response.closetId, libraryId: id });
+			addCloset({ id: response.content, libraryId: id });
 			if ('serviceWorker' in navigator && 'Notification' in window) {
 				const registration = await navigator.serviceWorker.ready;
 				await registration.showNotification('옷을 등록했어요 👚', {
@@ -50,7 +50,7 @@ export const useRegistCloth = (id: number) => {
 
 export const useDeleteCloth = (id: number | undefined) => {
 	const qc = useQueryClient();
-	const { removeCloset } = useClosetStore();
+	const removeCloset = useClosetStore((state) => state.removeCloset);
 
 	return useMutation({
 		mutationFn: () => {
