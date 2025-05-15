@@ -1666,6 +1666,78 @@ if (permission === 'granted') {
 - FCM 토큰 저장 타이밍을 명확히 하여, 안정적인 알림 서비스 제공이 가능해짐
 - 인증 상태 변화와 FCM 토큰 관리의 연동이 중요함을 확인한 사례
 
+<<<<<<< HEAD
+
+
+
+### [트러블슈팅] 웹앱의 모든 Toast 알림을 FCM(브라우저/OS 푸시 알림)으로 전환(2025/05/14-안주민)
+
+---
+
+### 문제상황
+- 기존에는 react-toastify의 Toast 알림(화면 우측 상단 팝업)으로 사용자에게 안내 메시지를 보여줬음.
+- 하지만, Toast는 웹앱이 포그라운드(열려있는 상태)일 때만 보이고, 사용자가 탭을 닫거나 백그라운드에 있으면 알림을 받을 수 없음.
+
+---
+
+### 원인 분석
+- Toast는 UI 컴포넌트이기 때문에, 브라우저/OS의 알림 시스템과는 별개로 동작함.
+- 중요한 알림(예: 등록 성공, 실패, 복사 완료, 로그아웃 등)을 사용자가 앱을 보고 있지 않아도 받을 수 있도록 하려면, FCM(푸시 알림)으로 전환이 필요함.
+
+---
+
+### 해결방법
+1. **Toast 알림 코드(react-toastify의 toast.XXX) 전체 검색**
+2. 각 알림 위치에서 toast 호출을 FCM의 `showNotification`으로 변경
+   - `serviceWorker`와 `Notification` API를 활용하여 브라우저/OS 알림을 띄움
+3. 기존 ToastContainer 등 Toast 관련 코드 제거(또는 미사용 처리)
+4. 알림 메시지, 아이콘 등은 기존 Toast와 동일하게 유지
+
+---
+
+### 예시
+
+#### (1) 기존 코드
+```typescript
+import { toast } from 'react-toastify';
+
+toast.success('옷을 등록했어요 👚');
+toast.error('삭제 실패 😥');
+toast.info('내 옷장 주소가 복사됐어요');
+toast.info('로그아웃되었습니다.');
+```
+
+#### (2) 변경 후 코드
+```typescript
+if ('serviceWorker' in navigator && 'Notification' in window) {
+  const registration = await navigator.serviceWorker.ready;
+  await registration.showNotification('알림 제목', {
+    body: '알림 내용',
+    icon: '/android-chrome-192x192.png',
+    badge: '/favicon-32x32.png',
+  });
+}
+```
+- 예시: 옷 등록 성공 → `'옷을 등록했어요 👚'`라는 푸시 알림이 브라우저/OS에 뜸
+
+---
+
+### 결론 및 정리
+
+- **이제 모든 안내 메시지는 Toast 대신 FCM 푸시 알림으로 노출됨**
+  - 사용자가 웹앱을 보고 있지 않아도(탭이 닫혀있거나 백그라운드여도) 알림을 받을 수 있음
+  - 알림 권한이 필요하므로, 사용자가 권한을 허용해야 정상적으로 동작함
+- 적용 파일:  
+  - `useRegistCloth.ts` (옷 등록/삭제 성공/실패)
+  - `ExternalShareModal.tsx` (복사 완료)
+  - `useAuthStore.ts` (로그아웃)
+  - `useFcmInitialization.ts` (알림 권한 안내 등)
+- **중요한 알림을 더 확실하게 사용자에게 전달할 수 있게 됨**
+
+---
+
+추가로 궁금한 점이나, 더 보고 싶은 예시가 있으면 언제든 말씀해 주세요!
+=======
 ## [트러블슈팅] Guest Token 인증 처리 문제 해결(2025/05/15-안주민)
 
 ### 문제상황
@@ -1911,3 +1983,4 @@ client.interceptors.response.use(
    - guestToken이 있는 경우에도 일부 API는 접근 제한 필요
    - guestToken 만료 시 적절한 처리 필요
    - 서버와의 협의를 통한 guestToken 권한 범위 설정 필요
+>>>>>>> 3186cb4fb37114ee3bf8bf037ffc3908c60e4457

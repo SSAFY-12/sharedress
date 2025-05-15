@@ -81,3 +81,14 @@ export const useAuthStore = create<AuthState>()(
 		},
 	),
 );
+
+// const showLogoutNotification = async () => {
+// 	if ('serviceWorker' in navigator && 'Notification' in window) {
+// 		const registration = await navigator.serviceWorker.ready;
+// 		await registration.showNotification('로그아웃', {
+// 			body: '로그아웃되었습니다.',
+// 			icon: '/android-chrome-192x192.png',
+// 			badge: '/favicon-32x32.png',
+// 		});
+// 	}
+// };

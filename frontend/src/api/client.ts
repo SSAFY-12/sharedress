@@ -13,6 +13,39 @@ export const client = axios.create({
 	},
 });
 
+// 전역 에러 처리 함수
+const handleGlobalError = async (status: number, serverMessage?: string) => {
+	const errorMessage = serverMessage || getErrorMessage(status);
+	console.error(`API Error (${status}):`, errorMessage);
+
+	try {
+		// FCM 메시징 서비스 워커에 메시지 전송
+		if ('serviceWorker' in navigator && 'Notification' in window) {
+			const registration = await navigator.serviceWorker.ready;
+			await registration.showNotification('오류 발생', {
+				body: errorMessage,
+				icon: '/android-chrome-192x192.png',
+				badge: '/favicon-32x32.png',
+				data: {
+					status: status.toString(),
+					message: serverMessage || '',
+				},
+			});
+
+			// 추가 에러 메시지가 있는 경우 별도 알림
+			if (serverMessage && typeof serverMessage === 'string') {
+				await registration.showNotification('추가 정보', {
+					body: serverMessage,
+					icon: '/android-chrome-192x192.png',
+					badge: '/favicon-32x32.png',
+				});
+			}
+		}
+	} catch (error) {
+		console.error('FCM 알림 전송 실패:', error);
+	}
+};
+
 // 요청 인터셉터
 client.interceptors.request.use(
 	(config) => {
@@ -94,10 +127,3 @@ client.interceptors.response.use(
 		return Promise.reject(error);
 	},
 );
-
-// 전역 에러 핸들러
-const handleGlobalError = (status: number, message?: string) => {
-	const errorMessage = message || getErrorMessage(status);
-	console.error(`API Error (${status}):`, errorMessage);
-	// 여기에 필요한 에러 처리 로직 추가 (예: 토스트 메시지 표시 등)
-};
