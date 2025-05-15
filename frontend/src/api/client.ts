@@ -16,15 +16,11 @@ export const client = axios.create({
 // 요청 인터셉터
 client.interceptors.request.use(
 	(config) => {
-		const { accessToken, isGuest } = useAuthStore.getState();
+		const { accessToken } = useAuthStore.getState();
 
 		// 액세스 토큰이 있으면 Bearer 토큰으로 전송
 		if (accessToken) {
 			config.headers.Authorization = `Bearer ${accessToken}`;
-		}
-		// 게스트인 경우 쿠키만 전송 (서버에서 guestToken 검증)
-		else if (isGuest) {
-			config.withCredentials = true;
 		}
 
 		return config;
@@ -59,10 +55,9 @@ client.interceptors.response.use(
 					return Promise.reject(refreshError);
 				}
 			}
-			// 게스트인 경우 쿠키만 전송
+			// 게스트인 경우 401 에러를 그대로 반환
 			else if (isGuest) {
-				originalRequest.withCredentials = true;
-				return client(originalRequest);
+				return Promise.reject(error);
 			}
 		}
 
