@@ -134,4 +134,9 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 			.where(condition)
 			.fetch();
 	}
+
+	@Override
+	public List<Long> findAllByMemberId(Long myId) {
+		return closetClothesJpaRepository.findAllByMemberId(myId);
+	}
 }

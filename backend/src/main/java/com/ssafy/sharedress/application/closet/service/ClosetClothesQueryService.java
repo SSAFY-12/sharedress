@@ -54,6 +54,11 @@ public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
 	}
 
+	@Override
+	public List<Long> getMyClosetClothesIds(Long myId) {
+		return closetClothesRepository.findAllByMemberId(myId);
+	}
+
 	// -- 게스트 -- //
 	private CursorPageResult<ClosetClothesResponse> handleGuestClosetClothes(
 		Long guestId,

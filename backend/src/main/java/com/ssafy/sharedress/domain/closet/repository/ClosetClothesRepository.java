@@ -28,4 +28,6 @@ public interface ClosetClothesRepository {
 	Boolean existsByIdAndMemberId(Long closetClothesId, Long memberId);
 
 	List<ClosetClothes> findAllByClothesIds(List<Long> clothesIds);
+
+	List<Long> findAllByMemberId(Long myId);
 }

@@ -102,4 +102,13 @@ public class ClosetClothesController {
 			closetClothesUseCase.addLibraryClothesToCloset(request.itemId(), member.getId())
 		);
 	}
+
+	@GetMapping("/closet/my")
+	public ResponseEntity<ResponseWrapper<List<Long>>> getMyClosetClothesIds(
+		@CurrentMember Member member
+	) {
+		List<Long> result = closetClothesQueryUseCase.getMyClosetClothesIds(member.getId());
+
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+	}
 }

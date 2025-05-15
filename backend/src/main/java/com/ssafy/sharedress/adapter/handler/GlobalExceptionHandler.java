@@ -52,6 +52,7 @@ public class GlobalExceptionHandler {
 	// EntityNotFoundException 에서 발생하는 예외를 처리하는 핸들러
 	@ExceptionHandler({EntityNotFoundException.class, DataAccessException.class})
 	public ResponseEntity<ResponseWrapper<Void>> handleEntityNotFoundException(Exception ex) {
+		log.error("EntityNotFoundException: {}", ex.getMessage(), ex);
 		return ResponseWrapperFactory.toResponseEntity(new ResponseCode() {
 			@Override
 			public String getCode() {

@@ -1,5 +1,7 @@
 package com.ssafy.sharedress.application.closet.usecase;
 
+import java.util.List;
+
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
 import com.ssafy.sharedress.domain.common.context.UserContext;
@@ -15,4 +17,6 @@ public interface ClosetClothesQueryUseCase {
 	);
 
 	ClosetClothesDetailResponse getClosetClothesDetail(Long memberId, Long closetClothesId);
+
+	List<Long> getMyClosetClothesIds(Long myId);
 }
