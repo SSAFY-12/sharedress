@@ -1,8 +1,11 @@
+import React from 'react';
+
 interface PlatFormBlockProps {
 	title: string;
 	description: string;
 	image: string;
 	onClick?: () => void;
+	children?: React.ReactNode;
 }
 
 const PlatFormBlock = ({
@@ -10,15 +13,17 @@ const PlatFormBlock = ({
 	description,
 	image,
 	onClick,
+	children,
 }: PlatFormBlockProps) => (
 	<div
-		className='flex justify-start items-center gap-4 w-full p-2 py-2'
+		className='relative flex justify-start items-center gap-4 w-full p-2 py-2'
 		onClick={onClick}
 	>
+		{children}
 		<img
 			src={`/images/regist/${image}`}
 			alt={title}
-			className=' h-14 object-cover border border-light rounded-lg'
+			className='h-14 object-cover border border-light rounded-lg'
 		/>
 		<div className='flex flex-col items-start gap-1 py-2'>
 			<h1 className='text-smallButton text-regular'>{title}</h1>

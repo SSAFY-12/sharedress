@@ -64,4 +64,8 @@ export const headerConfig: HeaderConfig = {
 		showBack: true,
 		subtitle: '친구에게 코디 요청',
 	},
+	'/regist/scan/musinsa': {
+		showBack: true,
+		subtitle: '구매내역 스캔',
+	},
 } as const;

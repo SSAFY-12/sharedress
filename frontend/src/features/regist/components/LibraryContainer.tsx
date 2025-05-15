@@ -12,7 +12,6 @@ import {
 } from '@/features/regist/api/registApis';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
-
 const LibraryContainer = () => {
 	const [selectedCategory, setSelectedCategory] = useState<
 		(typeof categoryConfig)[number]

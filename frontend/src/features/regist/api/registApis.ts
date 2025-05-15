@@ -60,13 +60,46 @@ export const LibraryApis = {
 		console.log(response.data, 'response');
 		return response.data;
 	},
-};
-
-export const ClosetApis = {
-	// --------------------옷장 옷 조회------------------------
 	deleteCloth: async (closetClothesId: number) => {
 		const response = await client.delete(
 			`/api/closet/clothes/${closetClothesId}`,
+		);
+		return response.data;
+	},
+};
+
+import { MyClosetContent } from '@/store/useClosetStore';
+interface MyClosetResponse {
+	status: Status;
+	content: MyClosetContent[];
+}
+
+export const ClosetApis = {
+	// --------------------옷장 옷 조회------------------------
+	getMyCloset: async (): Promise<MyClosetResponse> => {
+		const response = await client.get('/api/closet/my');
+		return response.data.content;
+	},
+};
+
+interface PurchaseHistoryRequest {
+	shopId: number;
+	id: string;
+	password: string;
+}
+
+interface PurchaseHistoryResponse {
+	status: Status;
+}
+
+export const ScanApis = {
+	// --------------------무신사 옷 등록------------------------
+	getPurchaseHistory: async (
+		data: PurchaseHistoryRequest,
+	): Promise<PurchaseHistoryResponse> => {
+		const response = await client.post(
+			'/api/closet/clothes/purchase-history',
+			data,
 		);
 		return response.data;
 	},
