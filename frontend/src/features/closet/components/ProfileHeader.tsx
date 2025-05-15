@@ -146,14 +146,14 @@ const ProfileHeader = ({
 						<div className='w-full px-4'>
 							{isMe ? (
 								<PrimaryBtn
-									size='full'
+									size='medium'
 									name='프로필 수정하기'
 									onClick={() => handleProfileEditClick()}
 									color='white'
 								/>
 							) : (
 								<PrimaryBtn
-									size='full'
+									size='medium'
 									name='코디 추천하기'
 									onClick={handleRecommendClick}
 									color='white'

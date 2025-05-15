@@ -12,7 +12,7 @@ const PlatFormBlock = ({
 	onClick,
 }: PlatFormBlockProps) => (
 	<div
-		className='flex justify-start items-center gap-4 w-full'
+		className='flex justify-start items-center gap-4 w-full p-2 py-2'
 		onClick={onClick}
 	>
 		<img

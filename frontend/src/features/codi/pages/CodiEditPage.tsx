@@ -156,7 +156,9 @@ const CodiEditPage = () => {
 				<CodiEditBottomSection
 					categories={CATEGORIES}
 					activeCategory={activeCategory}
-					filteredProducts={(products || [])
+					filteredProducts={(
+						products?.pages.flatMap((page) => page.content) || []
+					)
 						.filter((item) => {
 							if (isRecommendedMode) return item.isPublic;
 							return true;
