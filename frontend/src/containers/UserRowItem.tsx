@@ -1,13 +1,15 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button/PrimaryBtn';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar/UserMiniAvatar';
-import { ChevronRight } from 'lucide-react';
+import { Friend } from '@/features/social/pages/FriendCodiRequestPage';
 
 interface UserRowItemProps {
+	userId?: number;
 	userName: string;
 	userAvatar: string;
 	userStatus?: string;
 	actionButtonText?: string;
 	onActionClick?: () => void;
+	codiRequestClick?: (friend: Friend) => void;
 	onClick?: () => void;
 	className?: string;
 	actionType?: 'arrow' | 'button';
@@ -16,17 +18,18 @@ interface UserRowItemProps {
 // rowItem 컴포넌트 -> 상태메세지 데이터가 없음
 
 export const UserRowItem = ({
+	userId,
 	userName,
 	userAvatar,
 	userStatus,
 	actionButtonText,
-	onActionClick,
+	codiRequestClick,
 	onClick,
 	className = '',
 	actionType = 'arrow',
 }: UserRowItemProps) => (
 	<div
-		className={`flex items-center justify-between px-3 py-3 last:border-b-0 ${
+		className={`flex items-center justify-between py-2.5 last:border-b-0 ${
 			onClick ? 'cursor-pointer' : ''
 		} ${className}`}
 		onClick={onClick}
@@ -34,13 +37,11 @@ export const UserRowItem = ({
 		<div className='flex items-center'>
 			<UserMiniAvatar src={userAvatar} size='md' />
 			<div className='flex flex-col text-left'>
-				<span className='ml-3 flex-1 font-extrabold text-smallButton'>
+				<span className='ml-3 flex-1 text-smallButton text-regular'>
 					{userName}
 				</span>
 				{userStatus && (
-					<span className='ml-3 flex-1 font-medium text-description'>
-						{userStatus}
-					</span>
+					<span className='ml-3 flex-1 text-description'>{userStatus}</span>
 				)}
 			</div>
 		</div>
@@ -48,22 +49,30 @@ export const UserRowItem = ({
 			<PrimaryBtn
 				size='compact'
 				name={actionButtonText}
+				color='brown'
 				onClick={(e) => {
 					e.stopPropagation();
-					if (onActionClick) onActionClick();
+					if (codiRequestClick && userId)
+						codiRequestClick({
+							receiverId: userId,
+							nickname: userName,
+							profileImage: userAvatar,
+						});
 				}}
-			/>
+			>
+				{actionButtonText}
+			</PrimaryBtn>
 		)}
 		{actionType === 'arrow' && (
 			<button
 				type='button'
-				className='ml-2 p-2 rounded-full hover:bg-gray-100 transition'
+				className='p-1 rounded-full hover:bg-gray-100 transition'
 				onClick={(e) => {
 					e.stopPropagation();
 					if (onClick) onClick();
 				}}
 			>
-				<ChevronRight size={24} />
+				<img src='/icons/arrow_right_black.svg' alt='arrow' />
 			</button>
 		)}
 	</div>

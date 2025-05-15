@@ -1,34 +1,94 @@
+import { authApi } from '@/features/auth/api/authApi';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface AuthStore {
+interface AuthState {
 	accessToken: string | null;
-	isAuthenticated: boolean;
+	isGuest: boolean;
+	isInitialized: boolean;
 	setAccessToken: (token: string | null) => void;
-	logout: () => void;
+	setIsGuest: (isGuest: boolean) => void;
+	clearAuth: () => void;
+	initializeAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthStore>()(
-	persist<AuthStore>(
+export const useAuthStore = create<AuthState>()(
+	persist(
 		(set) => ({
 			accessToken: null,
-			isAuthenticated: false,
-			setAccessToken: (token) => {
-				console.log('setAccessToken 호출됨', token);
-				set({
-					accessToken: token,
-					isAuthenticated: !!token,
-				});
+			isGuest: false,
+			isInitialized: false,
+			setAccessToken: (token) => set({ accessToken: token }),
+			setIsGuest: (isGuest) => {
+				console.log('게스트 상태 변경:', isGuest);
+				set({ isGuest });
 			},
-			logout: () =>
-				set({
-					accessToken: null,
-					isAuthenticated: false,
-				}),
+			clearAuth: () => {
+				console.log('인증 정보 초기화');
+				set({ accessToken: null, isGuest: false });
+			},
+			initializeAuth: async () => {
+				try {
+					if (useAuthStore.getState().isInitialized) {
+						return;
+					}
+
+					const hasRefreshToken = document.cookie.includes('refreshToken');
+					console.log('리프레시 토큰 존재 여부:', hasRefreshToken);
+
+					if (hasRefreshToken) {
+						const response = await authApi.refresh();
+						if (response.content.accessToken) {
+							console.log('일반 사용자로 초기화');
+							set({
+								accessToken: response.content.accessToken,
+								isGuest: false,
+								isInitialized: true,
+							});
+						} else {
+							console.log('게스트로 초기화 (토큰 없음)');
+							set({
+								accessToken: null,
+								isGuest: true,
+								isInitialized: true,
+							});
+						}
+					} else {
+						console.log('게스트로 초기화 (리프레시 토큰 없음)');
+						set({
+							accessToken: null,
+							isGuest: true,
+							isInitialized: true,
+						});
+					}
+				} catch (error) {
+					console.log('게스트로 초기화 (에러 발생)');
+					set({
+						accessToken: null,
+						isGuest: true,
+						isInitialized: true,
+					});
+				}
+			},
 		}),
 		{
-			name: 'auth-storage', // localStorage key
-			partialize: (state) => ({ ...state }), // persist all fields
+			name: 'auth-storage',
+			partialize: (state) => ({
+				accessToken: state.accessToken,
+				isGuest: state.isGuest,
+				isInitialized: state.isInitialized,
+			}),
 		},
 	),
 );
+
+// const showLogoutNotification = async () => {
+// 	if ('serviceWorker' in navigator && 'Notification' in window) {
+// 		const registration = await navigator.serviceWorker.ready;
+// 		await registration.showNotification('로그아웃', {
+// 			body: '로그아웃되었습니다.',
+// 			icon: '/android-chrome-192x192.png',
+// 			badge: '/favicon-32x32.png',
+// 		});
+// 	}
+// };

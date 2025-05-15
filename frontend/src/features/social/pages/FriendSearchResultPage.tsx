@@ -2,15 +2,18 @@ import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { SearchBar } from '@/components/inputs/search-bar';
 import { FriendRequestMsgModal } from '@/features/social/components/FriendRequestMsgModal';
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { FriendRequestActionModal } from '@/features/social/components/FriendRequestActionModal';
+import { RelationStatus } from '@/features/social/types/social';
+import React, { useState, useRef, useCallback } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 import useSearchUser from '@/features/social/hooks/useSearchUser';
-import { RelationStatus } from '@/features/social/types/social';
+import { getOptimizedImageUrl } from '@/utils/imageUtils';
 
 export const FriendSearchResultPage = () => {
 	const [searchValue, setSearchValue] = useState('');
 	const [resultValue, setResultValue] = useState('');
-	const [modalOpen, setModalOpen] = useState(false);
+	// 친구 요청 관련 모달 : 목적에 맞는 상태만 관리
+	const [modalOpen, setModalOpen] = useState(false); // 친구 요청 관련 모달
 	const [requestMessage, setRequestMessage] = useState(''); // 친구 요청 메시지
 	const [selectedFriend, setSelectedFriend] = useState<{
 		// 선택된 친구 정보
@@ -19,15 +22,13 @@ export const FriendSearchResultPage = () => {
 		relationStatus: RelationStatus;
 		memberId: number; //서버에서 memberId로 받아오기 때문
 	} | null>(null);
+	// 친구 요청 취소/수락 모달
+	const [actionModalOpen, setActionModalOpen] = useState(false); // 친구 요청 취소/수락 모달
+	const [actionType, setActionType] = useState<'accept' | 'cancel'>('accept'); //수락 디폴트
 
 	const { searchUsers, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useSearchUser(resultValue); // 검색 결과 목록 영역(무한 스크롤 구현)
-	const { requestFriend, cancelRequest, acceptRequest } = useRequest(); // 친구 요청 전송/취소 버튼 로직
-
-	// selectedFriend 객체 로깅
-	useEffect(() => {
-		console.log('selectedFriend : ', selectedFriend);
-	}, [selectedFriend]);
+	const { requestFriend } = useRequest(); // 친구 요청 전송/취소 버튼 로직
 
 	// Intersection Observer를 위한 ref
 	const observerRef = useRef<IntersectionObserver | null>(null); // IntersectionObserver 객체 저장
@@ -72,12 +73,14 @@ export const FriendSearchResultPage = () => {
 		}
 	};
 
+	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.value.length <= 20) {
+			setSearchValue(e.target.value);
+		}
+	};
+
 	const handleSubmit = () => {
 		if (selectedFriend) {
-			console.log('Submitting friend request:', {
-				receiverId: selectedFriend.memberId,
-				message: requestMessage,
-			});
 			requestFriend({
 				receiverId: selectedFriend.memberId,
 				message: requestMessage,
@@ -87,106 +90,92 @@ export const FriendSearchResultPage = () => {
 		}
 	};
 
-	const handleCancel = () => {
-		if (selectedFriend?.memberId) {
-			if (selectedFriend.relationStatus !== 1) {
-				console.error(
-					'Cannot cancel request: Invalid relation status',
-					selectedFriend.relationStatus,
-				);
-				return;
-			}
-			console.log('Cancelling request for user:', {
-				memberId: selectedFriend.memberId,
-				nickname: selectedFriend.nickname,
-				relationStatus: selectedFriend.relationStatus,
-			});
-			cancelRequest(selectedFriend.memberId);
-		} else {
-			console.error('No request found for user:', selectedFriend);
-		}
-	};
-
-	const handleAccept = () => {
-		if (selectedFriend?.memberId) {
-			console.log('Accepting request with ID:', selectedFriend.memberId);
-			acceptRequest(selectedFriend.memberId);
-		} else {
-			console.error('No requestId found in selectedFriend:', selectedFriend);
-		}
-	};
-
 	return (
-		<div className='flex flex-col h-full max-w-md mx-auto bg-white'>
-			<div className='px-4 py-3'>
-				<SearchBar
-					placeholder='친구 ID'
-					value={searchValue}
-					onChange={(e) => setSearchValue(e.target.value)}
-					onKeyDown={handleSearch}
-				/>
-			</div>
+		<div className='flex flex-col w-full h-full mx-auto bg-white gap-3.5 px-4 pt-2'>
+			<SearchBar
+				placeholder='친구 ID'
+				value={searchValue}
+				onChange={handleSearchChange}
+				onKeyDown={handleSearch}
+			/>
 
-			<div className='flex-1 p-4'>
+			<div className='flex-1 px-4 sm:px-6 py-4'>
 				{searchUsers && searchUsers.length > 0 ? (
 					searchUsers.map((user, index) => (
-						<div
-							ref={index === searchUsers.length - 1 ? lastElementRef : null}
-							className='border rounded-lg p-6 flex flex-col items-center mb-4'
-							key={user.memberId}
-						>
-							<UserMiniAvatar
-								src={user.profileImage}
-								size='lg'
-								className='mb-3'
-							/>
-							<h2 className='font-bold mb-1'>{user.nickname}</h2>
+						<div key={user.memberId}>
+							<div
+								ref={index === searchUsers.length - 1 ? lastElementRef : null}
+								className='border rounded-lg p-4 flex flex-col items-center mb-3 w-full'
+							>
+								<UserMiniAvatar
+									src={getOptimizedImageUrl(user.profileImage)}
+									size='lg'
+									className='mb-3'
+								/>
+								<h2 className='font-bold mb-1'>{user.nickname}</h2>
 
-							{user.relationStatus === 0 || user.relationStatus === 3 ? (
-								<PrimaryBtn
-									size='compact'
-									name='친구 요청'
-									color='black'
-									onClick={() => {
-										console.log('Setting selectedFriend:', user); //정보가 맞게 출력되는 것을 볼 수 있음
-										setModalOpen(true);
-										setSelectedFriend({
-											profileImage: user.profileImage,
-											nickname: user.nickname,
-											relationStatus: user.relationStatus,
-											memberId: user.memberId,
-										});
-									}}
-									className='mt-3'
-								/>
-							) : user.relationStatus === 1 ? (
-								<PrimaryBtn
-									size='compact'
-									name='요청 취소'
-									color='gray'
-									onClick={() => {
-										console.log('Setting selectedFriend for cancel:', user);
-										setSelectedFriend({
-											profileImage: user.profileImage,
-											nickname: user.nickname,
-											relationStatus: user.relationStatus,
-											memberId: user.memberId,
-										});
-										handleCancel();
-									}}
-									className='mt-3'
-								/>
-							) : user.relationStatus === 2 ? (
-								<PrimaryBtn
-									size='compact'
-									name='요청 수락'
-									color='primary'
-									onClick={() => {
-										handleAccept();
-									}}
-									className='mt-3'
-								/>
-							) : null}
+								{user.relationStatus === 0 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구'
+										color='gray'
+										activate={false}
+										// eslint-disable-next-line @typescript-eslint/no-empty-function
+										onClick={() => {}}
+										className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : user.relationStatus === 3 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구 신청'
+										color='black'
+										onClick={() => {
+											setModalOpen(true);
+											setSelectedFriend({
+												profileImage: user.profileImage,
+												nickname: user.nickname,
+												relationStatus: user.relationStatus,
+												memberId: user.memberId,
+											});
+										}}
+										className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : user.relationStatus === 1 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구 취소'
+										color='gray'
+										onClick={() => {
+											setSelectedFriend({
+												profileImage: user.profileImage,
+												nickname: user.nickname,
+												relationStatus: user.relationStatus,
+												memberId: user.memberId,
+											});
+											setActionType('cancel');
+											setActionModalOpen(true);
+										}}
+										className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : user.relationStatus === 2 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구 수락'
+										color='primary'
+										onClick={() => {
+											setSelectedFriend({
+												profileImage: user.profileImage,
+												nickname: user.nickname,
+												relationStatus: user.relationStatus,
+												memberId: user.memberId,
+											});
+											setActionType('accept');
+											setActionModalOpen(true);
+										}}
+										className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : null}
+							</div>
 						</div>
 					))
 				) : (
@@ -219,6 +208,23 @@ export const FriendSearchResultPage = () => {
 					message={requestMessage}
 					onMessageChange={setRequestMessage}
 					onConfirm={handleSubmit}
+				/>
+			)}
+
+			{/* 친구 요청 수락/취소 모달 */}
+			{selectedFriend && (
+				<FriendRequestActionModal
+					isOpen={actionModalOpen}
+					onClose={() => {
+						setActionModalOpen(false);
+					}}
+					memberId={selectedFriend.memberId}
+					actionType={actionType}
+					friend={{
+						profileImage: selectedFriend.profileImage,
+						nickname: selectedFriend.nickname,
+						memberId: selectedFriend.memberId,
+					}}
 				/>
 			)}
 		</div>

@@ -1,45 +1,34 @@
-// src/auth/GoogleCallbackHandler.tsx
-// import { useAuthStore } from '@/store/useAuthStore';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRef, useEffect } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
-import { useAuthStore } from '@/store/useAuthStore';
 
 const GoogleCallbackHandler = () => {
 	const { mutation } = useAuth();
-	const navigate = useNavigate();
-	const accessToken = useAuthStore((state) => state.accessToken);
+	const calledRef = useRef(false);
 
 	useEffect(() => {
-		const handleToken = () => {
-			const urlHash = new URLSearchParams(window.location.hash.substring(1));
-			const accessToken = urlHash.get('access_token');
+		const handleToken = async () => {
+			if (calledRef.current) return;
+			calledRef.current = true;
 
-			if (accessToken) {
-				console.log(accessToken, 'test!!!!!!!!');
-				mutation.mutate(accessToken, {
-					onError: (error) => {
-						console.error('토큰 검증 실패:', error);
-						navigate('/login');
-					},
-				});
-			} else {
-				console.error('토큰을 찾을 수 없습니다.');
-				navigate('/login');
+			try {
+				const urlHash = new URLSearchParams(window.location.hash.substring(1));
+				const accessToken = urlHash.get('access_token');
+				console.log('콜백 accessToken:', accessToken); // 디버깅용
+				if (!accessToken) return;
+				await mutation.mutateAsync(accessToken);
+			} catch (error) {
+				console.error('토큰 검증 실패:', error);
 			}
 		};
-
 		handleToken();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [navigate]);
+	}, [mutation]);
 
-	// accessToken이 store에 저장된 후에만 wardrobe로 이동
-	useEffect(() => {
-		if (accessToken) {
-			navigate('/wardrobe');
-		}
-	}, [accessToken, navigate]);
-
+	if (mutation.isPending) {
+		return <div>구글 로그인 중입니다... (잠시만 기다려주세요)</div>;
+	}
+	if (mutation.isError) {
+		return <div>로그인 실패! 다시 시도해주세요.</div>;
+	}
 	return <div>구글 로그인 중입니다...</div>;
 };
 

@@ -1,8 +1,11 @@
 import { socialApi } from '@/features/social/api/socialApi';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FriendRequestList } from '@/features/social/types/social';
+import {
+	FriendRequest,
+	FriendRequestList,
+} from '@/features/social/types/social';
 
-const useRequest = () => {
+const useRequest = (memberId?: number) => {
 	const queryClient = useQueryClient();
 
 	// 내가 보낸 친구 요청 목록 조회
@@ -24,11 +27,24 @@ const useRequest = () => {
 		},
 	});
 
+	// 특정 친구 요청 조회 - memberId가 있을 때만 실행
+	const {
+		data: friendRequest,
+		isLoading: isFriendRequestLoading,
+		error: friendRequestError,
+	} = useQuery<FriendRequest, Error>({
+		queryKey: ['friendRequest', memberId],
+		queryFn: () => socialApi.getFriendRequest(memberId as number),
+		enabled: !!memberId, // memberId가 있을 때만 실행
+	});
+
 	// 친구 요청 수락
 	const acceptRequest = useMutation({
 		mutationFn: (requestId: number) => socialApi.acceptFriendRequest(requestId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['searchUser'] }); // 친구 요청 수락 성공 시 친구 검색 목록 갱신
+			// 친구 요청 목록 갱신
+			queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
 		},
 	});
 
@@ -37,6 +53,7 @@ const useRequest = () => {
 		mutationFn: (requestId: number) => socialApi.cancelFriendRequest(requestId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['searchUser'] }); // 친구 요청 취소 성공 시 친구 검색 목록 갱신
+			queryClient.invalidateQueries({ queryKey: ['friendRequests'] }); // 친구 요청 목록 갱신
 		},
 	});
 
@@ -45,6 +62,8 @@ const useRequest = () => {
 		mutationFn: (requestId: number) => socialApi.rejectFriendRequest(requestId),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ['searchUser'] }); // 친구 요청 거절 성공 시 친구 검색 목록 갱신
+			// 친구 요청 목록 갱신
+			queryClient.invalidateQueries({ queryKey: ['friendRequests'] });
 		},
 	});
 
@@ -53,6 +72,11 @@ const useRequest = () => {
 		friendRequests: friendRequests?.content,
 		isFriendRequestsLoading,
 		friendRequestsError,
+
+		// 특정 친구 요청 조회
+		friendRequest: friendRequest?.content,
+		isFriendRequestLoading,
+		friendRequestError,
 
 		// 친구 요청 보내기
 		requestFriend: requestFriend.mutate, // 친구 요청 보내기

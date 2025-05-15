@@ -1,69 +1,120 @@
-import WardrobePage from '@/pages/WardrobePage';
+import React from 'react';
+// import WardrobePage from '@/pages/WardrobePage';
 import CodiPage from '@/pages/CodiPage';
+import ClothPage from '@/pages/ClothPage';
 import AuthPage from '@/pages/AuthPage';
-import FriendAddPage from '@/pages/social/FriendAddPage';
-import FriendRequestListPage from '@/pages/social/FriendRequestListPage';
 import { App } from '@/App';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import GoogleCallbackHandler from '@/features/auth/pages/GoogleCallbackHandler';
-import CodiEditPage from '@/features/codi/pages/CodiEditPage';
-import CodiSavePage from '@/features/codi/pages/CodiSavePage';
-import FriendPage from '@/pages/social/FriendPage';
+import RegistPage from '@/pages/RegistPage';
+import NotificationPage from '@/pages/NotificationPage';
+import FriendClosetPage from '@/features/closet/pages/FriendClosetPage';
+import { useAuthStore } from '@/store/useAuthStore';
+import FriendPage from '@/pages/FriendPage';
+import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
+import ExternalUserPage from '@/pages/ExternalUserPage';
+import MyPage from '@/pages/MyPage';
+import FriendClosetLayoutPage from '@/features/closet/pages/FriendClosetLayoutPage';
+
+// 인증된 사용자만 접근 가능한 라우트
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+	const { accessToken } = useAuthStore();
+	if (!accessToken) {
+		return <Navigate to='/auth' replace />;
+	}
+	return <>{children}</>;
+};
+
+// 초기 라우트 컴포넌트
+const InitialRoute = () => {
+	const { accessToken } = useAuthStore();
+	return <Navigate to={accessToken ? '/mypage' : '/auth'} replace />;
+};
+
 export const router = createBrowserRouter([
+	// 공개 라우트
+	{ path: '/auth', element: <AuthPage /> },
+	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
+	{ path: '/link/:code', element: <ExternalUserPage /> },
+	{ path: '/link/friend/:id', element: <FriendClosetLayoutPage /> }, // <-- App 없이 바로!
+
+	// 인증 필요 라우트
 	{
 		path: '/',
 		element: <App />,
 		children: [
 			{
 				index: true,
-				element: <Navigate to='/wardrobe' replace />,
-				// 초기 세팅값 wardrobe
-			},
-			// {
-			// 	path: 'auth',
-			// 	element: <AuthPage />,
-			// },
-			{
-				path: 'wardrobe',
-				element: <WardrobePage />,
+				element: <InitialRoute />,
 			},
 			{
-				path: 'codi',
-				element: <CodiPage />,
+				path: 'social/*',
+				element: (
+					<ProtectedRoute>
+						<FriendPage />
+					</ProtectedRoute>
+				),
 			},
 			{
-				path: 'social',
-				// element: <SocialPage />,
-				element: <FriendPage />,
+				path: 'regist/*',
+				element: (
+					<ProtectedRoute>
+						<RegistPage />
+					</ProtectedRoute>
+				),
 			},
 			{
-				path: 'social/add',
-				element: <FriendAddPage />,
+				path: 'notification',
+				element: (
+					<ProtectedRoute>
+						<NotificationPage />
+					</ProtectedRoute>
+				),
 			},
 			{
-				path: 'social/request',
-				element: <FriendRequestListPage />,
+				path: 'mypage/*',
+				element: (
+					<ProtectedRoute>
+						<MyPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: 'friend/:id',
+				element: (
+					<ProtectedRoute>
+						<FriendClosetPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: 'cloth/*',
+				element: (
+					<ProtectedRoute>
+						<ClothPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: 'codi/*',
+				element: (
+					<ProtectedRoute>
+						<CodiPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: '/codi/:id/edit',
+				element: (
+					<ProtectedRoute>
+						<CodiPublicEditPage />
+					</ProtectedRoute>
+				),
 			},
 			{
 				path: '*',
-				element: <Navigate to='/wardrobe' replace />,
+				element: <Navigate to='/' replace />,
 			},
 		],
-	},
-	{
-		path: '/auth',
-		element: <AuthPage />,
-	},
-	{
-		path: '/oauth/google/callback',
-		element: <GoogleCallbackHandler />,
-	},
-	{
-		path: 'codi/edit',
-		element: <CodiEditPage />,
-	},
-	{
-		path: 'codi/save',
-		element: <CodiSavePage />,
 	},
 ]);
