@@ -51,8 +51,10 @@ client.interceptors.response.use(
 				// 코디 관련 API는 게스트 사용자도 접근 가능하도록 처리
 				// ------------------------------- 코디 관련 API 처리 로직 추가 ----------------------------------
 				if (originalRequest.url?.includes('/coordinations')) {
-					console.log('게스트 사용자 코디 API 호출 허용:', originalRequest.url);
-					return Promise.resolve({ data: null, status: 200 });
+					console.log('게스트 사용자 코디 API 호출:', originalRequest.url);
+					// 원래 요청을 그대로 진행하되, 인증 헤더는 제거
+					delete originalRequest.headers.Authorization;
+					return client(originalRequest);
 				}
 				// ------------------------------- 코디 관련 API 처리 로직 추가 ----------------------------------
 				console.log('게스트 사용자 401 에러 처리:', originalRequest.url);
