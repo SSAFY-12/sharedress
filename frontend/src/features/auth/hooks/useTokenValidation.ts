@@ -34,7 +34,7 @@ export const useTokenValidation = () => {
 
 	// 토큰 검증 함수
 	const validateToken = useCallback(async () => {
-		// 게스트인 경우 쿠키 검증은 서버에서 처리
+		// 게스트인 경우 토큰 검증 완전히 건너뛰기
 		if (isGuest) {
 			console.log('게스트 사용자, 토큰 검증 스킵');
 			return true;
@@ -78,7 +78,8 @@ export const useTokenValidation = () => {
 	}, [handleTokenRefresh, navigate, isGuest]);
 
 	useEffect(() => {
-		if (!isInitialized) return;
+		// 게스트이거나 초기화되지 않은 경우 검증 건너뛰기
+		if (!isInitialized || isGuest) return;
 
 		// 인증 관련 페이지 체크
 		if (
@@ -106,5 +107,12 @@ export const useTokenValidation = () => {
 			clearTimeout(initialCheckTimeout);
 			clearInterval(intervalId);
 		};
-	}, [accessToken, isInitialized, navigate, location.pathname, validateToken]);
+	}, [
+		accessToken,
+		isInitialized,
+		navigate,
+		location.pathname,
+		validateToken,
+		isGuest,
+	]);
 };

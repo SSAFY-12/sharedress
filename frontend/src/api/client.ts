@@ -40,9 +40,14 @@ client.interceptors.response.use(
 		const { isGuest } = useAuthStore.getState();
 
 		if (error.response?.status === 401) {
+			// 게스트인 경우 401 에러를 그대로 반환
+			if (isGuest) {
+				console.log('게스트 사용자 401 에러:', originalRequest.url);
+				return Promise.reject(error);
+			}
+
 			// 게스트가 아닌 경우에만 리프레시 시도
 			if (
-				!isGuest &&
 				!originalRequest._retry &&
 				!originalRequest.url?.includes('/auth/refresh')
 			) {
@@ -58,11 +63,6 @@ client.interceptors.response.use(
 					window.location.href = '/auth';
 					return Promise.reject(refreshError);
 				}
-			}
-			// 게스트인 경우 401 에러를 그대로 반환
-			else if (isGuest) {
-				console.log('게스트 사용자 401 에러:', originalRequest.url);
-				return Promise.reject(error);
 			}
 		}
 
