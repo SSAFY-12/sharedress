@@ -25,7 +25,7 @@ public interface ClosetClothesRepository {
 
 	void deleteById(Long closetClothesId);
 
-	Boolean existsById(Long closetClothesId);
+	Boolean existsByIdAndMemberId(Long closetClothesId, Long memberId);
 
 	List<ClosetClothes> findAllByClothesIds(List<Long> clothesIds);
 }
