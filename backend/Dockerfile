@@ -2,6 +2,12 @@
 # 다중 아키텍처(amd64·arm64) 지원 JRE 17
 FROM eclipse-temurin:17-jre
 
+# TimeZone 설정
+ENV TZ=Asia/Seoul
+RUN yum install -y tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    echo "Asia/Seoul" > /etc/timezone
+
 # JAR를 넣을 디렉터리
 WORKDIR /app
 

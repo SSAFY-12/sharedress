@@ -92,6 +92,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    environment:
+      - TZ=Asia/Seoul
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
 
   # 2) 새로 추가할 Musinsa 서비스 (Docker Hub)
   musinsa:
