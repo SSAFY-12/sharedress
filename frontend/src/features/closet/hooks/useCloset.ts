@@ -1,9 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import {
-	ClosetItem,
-	ClosetResponse,
-	fetchCloset,
-} from '@/features/closet/api/closetApi';
+import { ClosetResponse, fetchCloset } from '@/features/closet/api/closetApi';
 
 export const useCloset = (memberId: number, categoryId?: number) =>
 	useInfiniteQuery<ClosetResponse>({

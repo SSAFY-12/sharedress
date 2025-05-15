@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 import useFcmStore from '@/store/useFcmStore';
+import { GoogleAnalytics } from './components/GoogleAnalytics';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
@@ -64,6 +65,7 @@ export const App = () => {
 
 	return (
 		<>
+			<GoogleAnalytics />
 			{/* Sentry 테스트 버튼 */}
 			{/* <div className='fixed top-4 right-4 flex flex-col gap-2'> */}
 			{/* 자동 에러 테스트 */}
