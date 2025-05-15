@@ -48,6 +48,13 @@ client.interceptors.response.use(
 
 			// 게스트인 경우 401 에러를 그대로 반환하고 리다이렉트하지 않음
 			if (isGuest) {
+				// 코디 관련 API는 게스트 사용자도 접근 가능하도록 처리
+				// ------------------------------- 코디 관련 API 처리 로직 추가 ----------------------------------
+				if (originalRequest.url?.includes('/coordinations')) {
+					console.log('게스트 사용자 코디 API 호출 허용:', originalRequest.url);
+					return Promise.resolve({ data: null, status: 200 });
+				}
+				// ------------------------------- 코디 관련 API 처리 로직 추가 ----------------------------------
 				console.log('게스트 사용자 401 에러 처리:', originalRequest.url);
 				return Promise.reject(error);
 			}
