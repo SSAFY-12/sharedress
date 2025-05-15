@@ -25,15 +25,6 @@ client.interceptors.request.use(
 		// 게스트인 경우 쿠키 전송
 		else if (isGuest) {
 			config.withCredentials = true;
-			// 코디 관련 API는 게스트도 허용
-			if (
-				config.url?.includes('/coordinations/my') ||
-				config.url?.includes('/coordinations/friends/') ||
-				config.url?.includes('/codi/edit') ||
-				config.url?.includes('/codi/save')
-			) {
-				console.log('게스트 코디 요청:', config.url);
-			}
 		}
 
 		return config;
