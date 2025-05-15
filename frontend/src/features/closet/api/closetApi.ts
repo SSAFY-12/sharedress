@@ -129,6 +129,14 @@ interface UpdateClothRequest {
 	isPublic: boolean;
 }
 
+export interface ClosetResponse {
+	content: ClosetItem[];
+	pagination: {
+		cursor: number | null;
+		hasNext: boolean;
+	};
+}
+
 export const getMyProfile = async (): Promise<MemberProfile> => {
 	const response = await client.get('/api/members/profile/my');
 	return response.data.content;
@@ -137,14 +145,19 @@ export const getMyProfile = async (): Promise<MemberProfile> => {
 export const fetchCloset = async ({
 	memberId,
 	categoryId,
+	cursor,
 }: {
 	memberId: number;
 	categoryId?: number;
+	cursor?: number;
 }) => {
 	const response = await client.get(`/api/closet/${memberId}`, {
-		params: categoryId !== undefined ? { categoryId } : undefined,
+		params: {
+			...(categoryId !== undefined ? { categoryId } : {}),
+			...(cursor !== undefined ? { cursor } : {}),
+		},
 	});
-	return response.data.content as ClosetItem[];
+	return response.data as ClosetResponse;
 };
 
 export const getCoordinationList = async (
