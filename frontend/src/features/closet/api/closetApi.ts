@@ -155,6 +155,7 @@ export const getCoordinationList = async (
 			memberId,
 			scope,
 		},
+		withCredentials: true, //쿠키 전송 추가
 	});
 	return response.data.content as CoordinationItem[];
 };
@@ -165,13 +166,18 @@ export const fetchClothDetail = async (clothId: number) => {
 };
 
 export const fetchCoordinationDetail = async (coordinationId: number) => {
-	const response = await client.get(`/api/coordinations/${coordinationId}`);
+	const response = await client.get(`/api/coordinations/${coordinationId}`, {
+		withCredentials: true, //쿠키 전송 추가
+	});
 	return response.data.content as CoordinationDetail;
 };
 
 export const fetchCoordinationComments = async (coordinationId: number) => {
 	const response = await client.get(
 		`/api/coordinations/${coordinationId}/comments`,
+		{
+			withCredentials: true, //쿠키 전송 추가
+		},
 	);
 	console.log(response.data.content);
 	return response.data.content as CoordinationComment[];
@@ -186,6 +192,9 @@ export const postCoordinationComment = async ({
 		{
 			content,
 		},
+		{
+			withCredentials: true, //쿠키 전송 추가
+		},
 	);
 	return response.data.content;
 };
@@ -193,6 +202,9 @@ export const postCoordinationComment = async ({
 export const postCopyCoordination = async (coordinationId: string) => {
 	const response = await client.post(
 		`/api/coordinations/${coordinationId}/copy`,
+		{
+			withCredentials: true, //쿠키 전송 추가
+		},
 	);
 	return response.data.content as CopeidCoordination;
 };
@@ -206,7 +218,9 @@ export const deleteCloth = async (closetClothesId: number) => {
 };
 
 export const deleteCoordination = async (coordinationId: number) => {
-	const response = await client.delete(`/api/coordinations/${coordinationId}`);
+	const response = await client.delete(`/api/coordinations/${coordinationId}`, {
+		withCredentials: true, //쿠키 전송 추가
+	});
 	return response.data;
 };
 
@@ -219,6 +233,9 @@ export const deleteCoordinationComment = async ({
 }) => {
 	const response = await client.delete(
 		`/api/coordinations/${coordinationId}/comments/${commentId}`,
+		{
+			withCredentials: true, //쿠키 전송 추가
+		},
 	);
 	return response.data;
 };
@@ -231,7 +248,9 @@ export const fetchFriendProfile = async (
 };
 
 export const fetchRecommendedToFriend = async (memberId: number) => {
-	const response = await client.get(`/api/coordinations/friends/${memberId}`);
+	const response = await client.get(`/api/coordinations/friends/${memberId}`, {
+		withCredentials: true, //쿠키 전송 추가
+	});
 	return response.data.content as CoordinationItem[];
 };
 
@@ -275,8 +294,14 @@ export const updateCodiPublicStatus = async (
 	coordinationId: number,
 	isPublic: boolean,
 ) => {
-	const response = await client.patch(`/api/coordinations/${coordinationId}`, {
-		isPublic,
-	});
+	const response = await client.patch(
+		`/api/coordinations/${coordinationId}`,
+		{
+			isPublic,
+		},
+		{
+			withCredentials: true, //쿠키 전송 추가
+		},
+	);
 	return response.data;
 };
