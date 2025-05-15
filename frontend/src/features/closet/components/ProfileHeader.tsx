@@ -13,6 +13,7 @@ interface ProfileHeaderProps {
 	statusMessage?: string;
 	isMe?: boolean;
 	memberId?: number;
+	handleModalOpen?: () => void;
 }
 
 const backgroundImages = [
@@ -29,6 +30,7 @@ const ProfileHeader = ({
 	statusMessage,
 	isMe,
 	memberId,
+	handleModalOpen,
 }: ProfileHeaderProps) => {
 	const isGuest = useAuthStore((state) => state.isGuest);
 	const selectedBackgroundImage = useMemo(() => {
@@ -155,7 +157,13 @@ const ProfileHeader = ({
 								<PrimaryBtn
 									size='medium'
 									name='코디 추천하기'
-									onClick={handleRecommendClick}
+									onClick={() => {
+										if (!isGuest) {
+											handleRecommendClick();
+										} else {
+											handleModalOpen?.();
+										}
+									}}
 									color='white'
 								/>
 							)}
