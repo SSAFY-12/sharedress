@@ -1,3 +1,1 @@
-export const GoogleAnalytics = () => {
-	return null;
-};
+export const GoogleAnalytics = () => null;
