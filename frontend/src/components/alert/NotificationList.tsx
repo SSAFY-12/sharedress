@@ -42,21 +42,21 @@ const NotificationList: FC = () => {
 		readNotification({ notificationId: notification.id });
 		switch (notification.notificationType) {
 			case 1: // 친구 요청
-			case 2: // 친구 수락
 				navigate('/social/request');
+				break;
+			case 2: // 친구 수락
+				navigate('/social');
 				break;
 			case 5: // 코디 복사
 			case 6: // 코디 댓글
-				navigate('/codi');
+			case 7: // AI 관련
+				navigate('/mypage');
 				break;
 			case 3: // 코디 요청
 				navigate('/social/codi-request');
 				break;
 			case 4: // 코디 추천
 				navigate('/social');
-				break;
-			case 7: // AI 관련
-				navigate('/cloth');
 				break;
 			default:
 				break;
