@@ -40,9 +40,15 @@ client.interceptors.response.use(
 		const { isGuest } = useAuthStore.getState();
 
 		if (error.response?.status === 401) {
-			// 게스트인 경우 401 에러를 그대로 반환
+			console.log('401 에러 발생:', {
+				url: originalRequest.url,
+				isGuest,
+				isRetry: originalRequest._retry,
+			});
+
+			// 게스트인 경우 401 에러를 그대로 반환하고 리다이렉트하지 않음
 			if (isGuest) {
-				console.log('게스트 사용자 401 에러:', originalRequest.url);
+				console.log('게스트 사용자 401 에러 처리:', originalRequest.url);
 				return Promise.reject(error);
 			}
 
@@ -59,9 +65,10 @@ client.interceptors.response.use(
 					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 					return client(originalRequest);
 				} catch (refreshError) {
+					console.log('토큰 리프레시 실패, 게스트로 전환');
+					useAuthStore.getState().setIsGuest(true);
 					useAuthStore.getState().clearAuth();
-					window.location.href = '/auth';
-					return Promise.reject(refreshError);
+					return Promise.reject(error);
 				}
 			}
 		}
