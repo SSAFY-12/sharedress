@@ -6,7 +6,7 @@ import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSect
 import { useProfileStore } from '@/store/useProfileStore';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import CodiEditBottomAccordion from '../components/CodiEditBottomAccordion';
+import CodiEditBottomAccordion from '@/features/codi/components/CodiEditBottomAccordion';
 
 const CATEGORIES = [
 	{ id: 'all', label: '전체' },
