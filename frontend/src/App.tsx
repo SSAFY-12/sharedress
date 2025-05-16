@@ -5,15 +5,17 @@ import { MobileLayout } from '@/components/layouts/MobileLayout';
 import { ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
-import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
+	const navigate = useNavigate();
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
@@ -33,10 +35,14 @@ export const App = () => {
 	useEffect(() => {
 		console.log('FCM Token:', useFcmStore.getState().token);
 	}, []);
-	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 
-	// FCM 초기화
-	useFcmInitialization();
+	useEffect(() => {
+		if (!useFcmStore.getState().token) {
+			toast.info('알림을 받으시려면 [설정] 페이지에서 알림을 활성화해 주세요.');
+			navigate('/setting');
+		}
+	}, [navigate]);
+	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 
 	// 앱 시작 시 토큰 초기화
 	useEffect(() => {

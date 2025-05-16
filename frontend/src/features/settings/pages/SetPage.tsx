@@ -10,11 +10,15 @@ import {
 import { InstallGuideModal } from '@/features/settings/components/InstallGuideModal';
 import { MainModal } from '@/components/modals/main-modal';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
+import { requestNotificationPermission } from '@/utils/firebase';
+import useFcmStore from '@/store/useFcmStore';
+import fcmApi from '@/features/alert/api/fcmapi';
 // PWA 설치 이벤트를 저장할 변수
 let deferredPrompt: any = null;
 
 export const SetPage = () => {
-	const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+	const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+	const [notificationLocked, setNotificationLocked] = useState(false);
 	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 	const [isIosGuideModalOpen, setIsIosGuideModalOpen] = useState(false);
 	const [isAndroidGuideModalOpen, setIsAndroidGuideModalOpen] = useState(false);
@@ -37,6 +41,50 @@ export const SetPage = () => {
 			);
 		};
 	}, []);
+
+	// 알림 스위치 토글 핸들러
+	const handleNotificationToggle = async () => {
+		if (notificationsEnabled || notificationLocked) return;
+		// FCM 권한 요청 및 토큰 저장
+		const token = await requestNotificationPermission();
+		if (token) {
+			try {
+				await fcmApi.saveFcmToken(token);
+				useFcmStore.getState().setToken(token);
+				setNotificationsEnabled(true);
+				setNotificationLocked(true);
+				// serviceWorker로 알림 안내
+				if ('serviceWorker' in navigator && 'Notification' in window) {
+					const registration = await navigator.serviceWorker.ready;
+					await registration.showNotification('알림 안내', {
+						body: '알림이 활성화되었습니다!',
+						icon: '/android-chrome-192x192.png',
+						badge: '/favicon-32x32.png',
+					});
+				}
+			} catch (error) {
+				// 실패 시 안내
+				if ('serviceWorker' in navigator && 'Notification' in window) {
+					const registration = await navigator.serviceWorker.ready;
+					await registration.showNotification('알림 안내', {
+						body: '알림 토큰 저장에 실패했습니다.',
+						icon: '/android-chrome-192x192.png',
+						badge: '/favicon-32x32.png',
+					});
+				}
+			}
+		} else {
+			// 권한 거부 시 안내
+			if ('serviceWorker' in navigator && 'Notification' in window) {
+				const registration = await navigator.serviceWorker.ready;
+				await registration.showNotification('알림 안내', {
+					body: '브라우저 알림 권한이 허용되지 않았습니다.',
+					icon: '/android-chrome-192x192.png',
+					badge: '/favicon-32x32.png',
+				});
+			}
+		}
+	};
 
 	// 안드로이드 설치 팝업 표시
 	const handleInstallClick = async () => {
@@ -79,7 +127,10 @@ export const SetPage = () => {
 							</div>
 							<SwitchToggle
 								checked={notificationsEnabled}
-								onToggle={() => setNotificationsEnabled(!notificationsEnabled)}
+								onToggle={handleNotificationToggle}
+								className={
+									notificationLocked ? 'opacity-50 pointer-events-none' : ''
+								}
 							/>
 						</div>
 						<div className='h-px bg-gray-100' />
