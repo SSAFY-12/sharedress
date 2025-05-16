@@ -1,5 +1,6 @@
 package com.ssafy.sharedress.adapter.clothes.out.persistence;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,13 +72,37 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 			condition.and(clothes.id.lt(cursorId));
 		}
 
-		// 키워드 필터 (상품명 or 브랜드명)
 		if (keyword != null && !keyword.isBlank()) {
-			condition.andAnyOf(
-				clothes.name.containsIgnoreCase(keyword),
-				brand.nameEn.containsIgnoreCase(keyword),
-				brand.nameKr.containsIgnoreCase(keyword)
-			);
+			String[] tokens = keyword.trim().split("\\s+");
+			BooleanBuilder keywordCondition = new BooleanBuilder();
+
+			for (int i = 0; i < tokens.length; i++) {
+				String brandToken = tokens[i];
+				List<String> productTokens = new ArrayList<>();
+
+				for (int j = 0; j < tokens.length; j++) {
+					if (j != i) {
+						productTokens.add(tokens[j]);
+					}
+				}
+
+				BooleanBuilder candidate = new BooleanBuilder();
+
+				// 브랜드 조건
+				candidate.andAnyOf(
+					brand.nameKr.equalsIgnoreCase(brandToken),
+					brand.nameEn.equalsIgnoreCase(brandToken)
+				);
+
+				// 상품명 조건
+				for (String productToken : productTokens) {
+					candidate.and(clothes.name.containsIgnoreCase(productToken));
+				}
+
+				keywordCondition.or(candidate);
+			}
+
+			condition.and(keywordCondition);
 		}
 
 		List<ClothesSearchResponse> fetched = queryFactory
