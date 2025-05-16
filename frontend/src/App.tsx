@@ -78,9 +78,9 @@ export const App = () => {
 
 			{/* Toastify 컨테이너 */}
 			<ToastContainer
-				className='py-6 px-4'
-				toastClassName='rounded-xl bg-black bg-opacity-50 text-white text-default mb-2'
-				position='top-right'
+				className='py-6 px-4 '
+				toastClassName='py-2  rounded-xl bg-black bg-opacity-50 text-white text-description mb-2'
+				position='top-center'
 				transition={Slide}
 				autoClose={1500}
 				hideProgressBar={true}
@@ -90,6 +90,33 @@ export const App = () => {
 				pauseOnFocusLoss
 				draggable={false}
 				pauseOnHover
+				toastStyle={{
+					height: 'fit-content',
+					minHeight: 'unset',
+					padding: '16px 16px',
+					display: 'flex',
+					alignItems: 'center',
+				}}
+				closeButton={({ closeToast }) => (
+					<button
+						onClick={closeToast}
+						style={{
+							position: 'absolute',
+							right: '16px',
+							color: 'white',
+							opacity: 0.5,
+							fontSize: '14px',
+							padding: '0',
+							background: 'none',
+							border: 'none',
+							cursor: 'pointer',
+							width: '20px',
+							height: '20px',
+						}}
+					>
+						×
+					</button>
+				)}
 			/>
 
 			<AlertModal

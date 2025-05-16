@@ -16,6 +16,8 @@ export const getErrorMessage = (status: number): string => {
 			return '접근 권한이 없습니다.';
 		case 404:
 			return '요청한 리소스를 찾을 수 없습니다.';
+		case 409:
+			return '아이디 또는 패스워드를 확인하세요.';
 		case 500:
 			return '서버 오류가 발생했습니다.';
 		default:
