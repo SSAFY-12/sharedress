@@ -15,6 +15,7 @@ export const useGetCloth = () => {
 	useEffect(() => {
 		if (isSuccess) {
 			setCloset(data.content);
+			console.log('hooks: Success settingCloset', data.content);
 		}
 	}, [isSuccess, data, setCloset]);
 	return { data, isLoading, isSuccess };
