@@ -9,7 +9,7 @@ import { useClothDetail } from '@/features/closet/hooks/useClothDetail';
 import { updateCloth } from '@/features/closet/api/closetApi';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
 import { useBrandSearch } from '@/features/closet/hooks/useBrandSearch';
-import { useColorList } from '@/features/closet/hooks/useColorList';
+// import { useColorList } from '@/features/closet/hooks/useColorList';
 import { useCategoryList } from '@/features/closet/hooks/useCategoryList';
 
 const ClothEditPage = () => {
@@ -21,8 +21,8 @@ const ClothEditPage = () => {
 	const [name, setName] = useState('');
 	const [category, setCategory] = useState('');
 	const [brand, setBrand] = useState('');
-	const [colorName, setColorName] = useState('');
-	const [colorHexCode, setColorHexCode] = useState('');
+	// const [colorName, setColorName] = useState('');
+	// const [colorHexCode, setColorHexCode] = useState('');
 	const [isPublic, setIsPublic] = useState(true);
 
 	const [inputQuery, setInputQuery] = useState('');
@@ -30,7 +30,7 @@ const ClothEditPage = () => {
 	const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
 		null,
 	);
-	const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+	// const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
 	const [debouncedQuery, setDebouncedQuery] = useState('');
 	const deferredQuery = useDeferredValue(debouncedQuery);
 
@@ -44,11 +44,11 @@ const ClothEditPage = () => {
 
 	const [isCategorySheetOpen, setIsCategorySheetOpen] = useState(false);
 	const [isBrandSheetOpen, setIsBrandSheetOpen] = useState(false);
-	const [isColorSheetOpen, setIsColorSheetOpen] = useState(false);
+	// const [isColorSheetOpen, setIsColorSheetOpen] = useState(false);
 
 	const { data: brandResults = [], isLoading: isBrandLoading } =
 		useBrandSearch(deferredQuery);
-	const { data: colorList = [], isLoading: isColorLoading } = useColorList();
+	// const { data: colorList = [], isLoading: isColorLoading } = useColorList();
 	const { data: categoryList = [], isLoading: isCategoryLoading } =
 		useCategoryList();
 
@@ -59,27 +59,22 @@ const ClothEditPage = () => {
 			setSelectedCategoryId(cloth.category.id);
 			setBrand(cloth.brand.name);
 			setSelectedBrandId(cloth.brand.id);
-			setColorName(cloth.color.name);
-			setColorHexCode(cloth.color.hexCode);
-			setSelectedColorId(cloth.color.id);
+			// setColorName(cloth.color.name);
+			// setColorHexCode(cloth.color.hexCode);
+			// setSelectedColorId(cloth.color.id);
 			setIsPublic(cloth.isPublic);
 		}
 	}, [cloth]);
 
 	const handleDone = async () => {
 		try {
-			console.log(selectedColorId);
 			const payload = {
 				name,
 				brandId: selectedBrandId ?? cloth?.brand.id ?? 0,
 				categoryId: selectedCategoryId ?? cloth?.category.id ?? 0,
-				colorId: selectedColorId ?? cloth?.color.id ?? 0,
+				// colorId: selectedColorId ?? cloth?.color.id ?? 0,
 				isPublic,
 			};
-
-			console.log(cloth?.color.id);
-			console.log(selectedColorId);
-			console.log(payload);
 
 			await updateCloth(clothId, payload);
 			alert('수정이 완료되었습니다.');
@@ -142,7 +137,7 @@ const ClothEditPage = () => {
 								/>
 							</div>
 
-							<div className='flex flex-col gap-2 items-start'>
+							{/* <div className='flex flex-col gap-2 items-start'>
 								<label htmlFor='color' className='text-description text-low'>
 									색상
 								</label>
@@ -152,7 +147,7 @@ const ClothEditPage = () => {
 									hexCode={colorHexCode}
 									onClick={() => setIsColorSheetOpen(true)}
 								/>
-							</div>
+							</div> */}
 
 							<div className='flex items-center justify-between pt-2'>
 								<span className='text-default text-regular'>
@@ -253,7 +248,7 @@ const ClothEditPage = () => {
 			</BottomSheet>
 
 			{/* 색상 BottomSheet */}
-			<BottomSheet
+			{/* <BottomSheet
 				isOpen={isColorSheetOpen}
 				onClose={() => setIsColorSheetOpen(false)}
 				snapPoints={[1]}
@@ -287,7 +282,7 @@ const ClothEditPage = () => {
 						</div>
 					)}
 				</div>
-			</BottomSheet>
+			</BottomSheet> */}
 		</div>
 	);
 };

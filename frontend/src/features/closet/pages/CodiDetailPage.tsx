@@ -23,6 +23,7 @@ const CodiDetailPage = () => {
 	const { id } = useParams();
 	const isMe = location.state?.isMe ?? false;
 	const source = location.state?.source ?? 'my';
+	console.log(source);
 	const ownerId = location.state?.ownerId ?? 0;
 	const isGuest = useAuthStore((state) => state.isGuest);
 

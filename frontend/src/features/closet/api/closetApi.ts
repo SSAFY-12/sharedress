@@ -125,7 +125,7 @@ interface UpdateClothRequest {
 	name: string;
 	brandId: number;
 	categoryId: number;
-	colorId: number;
+	colorId?: number;
 	isPublic: boolean;
 }
 
