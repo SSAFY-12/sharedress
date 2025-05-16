@@ -5,6 +5,8 @@ import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSection';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useCloset } from '@/features/closet/hooks/useCloset';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import CodiEditBottomAccordion from '../components/CodiEditBottomAccordion';
 
 const CATEGORIES = [
 	{ id: 'all', label: '전체' },
@@ -20,6 +22,7 @@ const CodiEditPage = () => {
 	const location = useLocation();
 	const mode = location.state?.mode ?? 'my';
 	const targetMemberId = location.state?.targetMemberId ?? 0;
+	const isWeb = useMediaQuery('(min-width: 640px)');
 
 	const isRecommendedMode = mode === 'recommended';
 	const memberId = isRecommendedMode
@@ -142,8 +145,8 @@ const CodiEditPage = () => {
 	return (
 		<div className='w-full h-screen flex flex-col bg-white overflow-hidden'>
 			<Header {...headerProps} />
-			<div className='flex-1 flex flex-col overflow-hidden'>
-				<div className='flex-shrink-0 md:h-[400px]'>
+			<div className='flex-1 flex flex-col overflow-hidden bg-gray-50 relative z-0 h-screen'>
+				<div className='flex-shrink-0'>
 					<CodiCanvas
 						items={canvasItems}
 						isEditable={true}
@@ -153,32 +156,61 @@ const CodiEditPage = () => {
 						setMaxZIndex={setMaxZIndex}
 					/>
 				</div>
-				<CodiEditBottomSection
-					categories={CATEGORIES}
-					activeCategory={activeCategory}
-					filteredProducts={(
-						products?.pages.flatMap((page) => page.content) || []
-					)
-						.filter((item) => {
-							if (isRecommendedMode) return item.isPublic;
-							return true;
-						})
-						.map((item) => ({
-							id: item.id,
-							imageUrl: item.image,
-							name: item.name,
-							image: item.image,
-							brand: item.brandName,
-							category:
-								activeCategory === 'all'
-									? '전체'
-									: CATEGORIES.find((cat) => cat.id === activeCategory)
-											?.label || '전체',
-							isPublic: item.isPublic,
-						}))}
-					onCategoryChange={setActiveCategory}
-					onItemClick={addItemToCanvas}
-				/>
+				{isWeb ? (
+					<CodiEditBottomAccordion
+						categories={CATEGORIES}
+						activeCategory={activeCategory}
+						filteredProducts={(
+							products?.pages.flatMap((page) => page.content) || []
+						)
+							.filter((item) => {
+								if (isRecommendedMode) return item.isPublic;
+								return true;
+							})
+							.map((item) => ({
+								id: item.id,
+								imageUrl: item.image,
+								name: item.name,
+								image: item.image,
+								brand: item.brandName,
+								category:
+									activeCategory === 'all'
+										? '전체'
+										: CATEGORIES.find((cat) => cat.id === activeCategory)
+												?.label || '전체',
+								isPublic: item.isPublic,
+							}))}
+						onCategoryChange={setActiveCategory}
+						onItemClick={addItemToCanvas}
+					/>
+				) : (
+					<CodiEditBottomSection
+						categories={CATEGORIES}
+						activeCategory={activeCategory}
+						filteredProducts={(
+							products?.pages.flatMap((page) => page.content) || []
+						)
+							.filter((item) => {
+								if (isRecommendedMode) return item.isPublic;
+								return true;
+							})
+							.map((item) => ({
+								id: item.id,
+								imageUrl: item.image,
+								name: item.name,
+								image: item.image,
+								brand: item.brandName,
+								category:
+									activeCategory === 'all'
+										? '전체'
+										: CATEGORIES.find((cat) => cat.id === activeCategory)
+												?.label || '전체',
+								isPublic: item.isPublic,
+							}))}
+						onCategoryChange={setActiveCategory}
+						onItemClick={addItemToCanvas}
+					/>
+				)}
 			</div>
 		</div>
 	);

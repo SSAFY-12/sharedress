@@ -30,8 +30,8 @@ const CodiEditBottomSection = ({
 				onCategoryChange={onCategoryChange}
 			/>
 		</div>
-		<div className='flex-1 overflow-y-auto scrollbar-hide'>
-			<div className='p-4'>
+		<div className='flex-1 overflow-y-auto scrollbar-hide border-t border-gray-200 mx-4'>
+			<div className='px-0 py-4'>
 				{filteredProducts.length > 0 ? (
 					<ClothListContainer
 						items={filteredProducts}
