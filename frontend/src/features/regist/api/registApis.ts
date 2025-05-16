@@ -59,6 +59,7 @@ export const LibraryApis = {
 
 		return response.data;
 	},
+	// --------------------라이브러리 옷 삭제------------------------
 	deleteCloth: async (closetClothesId: number) => {
 		const response = await client.delete(
 			`/api/closet/clothes/${closetClothesId}`,
