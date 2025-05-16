@@ -79,11 +79,11 @@ const ClothDetailPage = () => {
 						<ClothDetailItem label='상품명' value={cloth.name} />
 						<ClothDetailItem label='카테고리' value={cloth.category.name} />
 						<ClothDetailItem label='브랜드' value={cloth.brand.name} />
-						<ClothDetailItem
+						{/* <ClothDetailItem
 							label='색깔'
 							value={cloth.color.name}
 							hexCode={cloth.color.hexCode}
-						/>
+						/> */}
 						{isMe && (
 							<ClothDetailItem
 								label='공개 여부'

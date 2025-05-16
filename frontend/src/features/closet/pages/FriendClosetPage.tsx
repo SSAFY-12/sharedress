@@ -7,8 +7,8 @@ import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 import { categoryConfig } from '@/constants/categoryConfig';
 
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
-import FriendCodiTab from '@/features/closet/components/FriendCodiTab';
 import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
+import UnifiedCodiTab from '@/features/closet/components/UnifiedCodiTab';
 import { GuestModal } from '@/features/closet/components/GuestModal';
 
 const closetTab = ['옷장', '코디'];
@@ -110,10 +110,10 @@ const FriendClosetPage = () => {
 						isMe={false}
 					/>
 				) : (
-					<FriendCodiTab
+					<UnifiedCodiTab
 						memberId={memberId}
 						activeSubTab={activeSubTab}
-						setActiveSubTab={setActiveSubTab}
+						isMe={false}
 					/>
 				)}
 			</div>

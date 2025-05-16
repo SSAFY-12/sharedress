@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import ProfileHeader from '@/features/closet/components/ProfileHeader';
 import ClosetTab from '@/features/closet/components/ClosetTab';
-import CodiTab from '@/features/closet/components/CodiTab';
 import { useMyProfile } from '@/features/closet/hooks/useMyProfile';
 import { useLocation } from 'react-router-dom';
 import SelectMenu from '@/components/menu/two-selection-menu/SelectMenu';
 import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 import { categoryConfig } from '@/constants/categoryConfig';
-
+import UnifiedCodiTab from '@/features/closet/components/UnifiedCodiTab';
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 
 const closetTab = ['옷장', '코디'];
@@ -17,7 +16,7 @@ const CodiTabs = [
 		label: '나의 코디',
 	},
 	{
-		id: 'friends' as const,
+		id: 'friendspick' as const,
 		label: '친구의 추천',
 	},
 ];
@@ -34,7 +33,7 @@ const MyClosetPage = () => {
 		(typeof closetTab)[number]
 	>(initialTab ?? '옷장');
 	const [selectedCategory, setSelectedCategory] = useState(categoryConfig[0]);
-	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friends'>(
+	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friendspick'>(
 		initialSubTab,
 	);
 
@@ -43,6 +42,12 @@ const MyClosetPage = () => {
 			setActiveSubTab(initialSubTab);
 		}
 	}, [initialTab, initialSubTab]);
+
+	useEffect(() => {
+		if (activeMainTab === '옷장') {
+			setSelectedCategory(categoryConfig[0]);
+		}
+	}, [activeMainTab]);
 
 	const { data: profile } = useMyProfile();
 
@@ -102,10 +107,10 @@ const MyClosetPage = () => {
 						isMe={true}
 					/>
 				) : (
-					<CodiTab
+					<UnifiedCodiTab
 						memberId={profile?.id ?? 0}
 						activeSubTab={activeSubTab}
-						setActiveSubTab={setActiveSubTab}
+						isMe={true}
 					/>
 				)}
 			</div>
