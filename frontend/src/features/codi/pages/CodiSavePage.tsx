@@ -49,11 +49,9 @@ const CodiSavePage = () => {
 	}, []);
 
 	const handleBackClick = () => {
-		if (window.history.length > 1) {
-			navigate(-1);
-		} else {
-			navigate('/');
-		}
+		navigate('/codi/edit', {
+			state: { ...location.state, from: 'save' },
+		});
 	};
 
 	const handleComplete = async () => {
@@ -108,10 +106,12 @@ const CodiSavePage = () => {
 			});
 
 			if (mode === 'my') {
+				localStorage.removeItem('codiItems');
 				navigate('/mypage', {
 					state: { initialTab: '코디' },
 				});
 			} else {
+				localStorage.removeItem('codiItems');
 				navigate(`/friend/${targetMemberId}`, {
 					state: { initialTab: '코디', initialSubTab: 'recommended' },
 				});

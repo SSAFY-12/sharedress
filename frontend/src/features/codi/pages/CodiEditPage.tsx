@@ -144,6 +144,22 @@ const CodiEditPage = () => {
 		onBadgeClick: handleNextClick,
 	};
 
+	useEffect(() => {
+		if (location.state?.from === 'save') {
+			const savedItems = localStorage.getItem('codiItems');
+			if (savedItems) {
+				try {
+					const parsedItems = JSON.parse(savedItems);
+					if (Array.isArray(parsedItems)) {
+						setCanvasItems(parsedItems);
+					}
+				} catch (error) {
+					console.error('코디 아이템 복구 실패', error);
+				}
+			}
+		}
+	}, [location.state?.from]);
+
 	return (
 		<div className='w-full h-screen flex flex-col bg-white overflow-hidden'>
 			<Header {...headerProps} />
