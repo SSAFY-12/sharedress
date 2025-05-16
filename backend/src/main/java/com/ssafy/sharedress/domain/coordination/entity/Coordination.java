@@ -8,6 +8,7 @@ import com.ssafy.sharedress.domain.guest.entity.Guest;
 import com.ssafy.sharedress.domain.member.entity.Member;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -40,6 +41,9 @@ public class Coordination extends BaseTimeEntity {
 	private Boolean isTemplate;
 
 	private String thumbnail;
+
+	@Column(name = "is_copied", nullable = false)
+	private Boolean isCopied = false;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "creator_id")
@@ -203,5 +207,9 @@ public class Coordination extends BaseTimeEntity {
 
 	public void updateIsPublic(Boolean isPublic) {
 		this.isPublic = isPublic;
+	}
+
+	public void updateIsCopied(Boolean isCopied) {
+		this.isCopied = isCopied;
 	}
 }

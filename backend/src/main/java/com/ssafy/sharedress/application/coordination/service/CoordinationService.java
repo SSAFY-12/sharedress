@@ -119,6 +119,10 @@ public class CoordinationService implements CoordinationUseCase {
 			ExceptionUtil.throwException(CoordinationErrorCode.COORDINATION_ALREADY_MINE);
 		}
 
+		if (coordination.getIsCopied()) {
+			ExceptionUtil.throwException(CoordinationErrorCode.COORDINATION_ALREADY_COPIED);
+		}
+
 		Member member = memberRepository.getReferenceById(myId);
 
 		Coordination copyCoordination = Coordination.copyCoordination(
@@ -132,6 +136,9 @@ public class CoordinationService implements CoordinationUseCase {
 			member,
 			coordination.getOriginCreatorGuest()
 		);
+
+		// 복사 완료 후 원본 isCopied = true
+		coordination.updateIsCopied(true);
 
 		// deep copy 필요
 		for (CoordinationClothes clothes : coordination.getCoordinationClothes()) {
