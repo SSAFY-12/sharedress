@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.ssafy.sharedress.global.exception.BaseException;
 import com.ssafy.sharedress.global.response.ResponseCode;
@@ -62,6 +63,26 @@ public class GlobalExceptionHandler {
 			@Override
 			public String getMessage() {
 				return "DB에 존재하지 않는 데이터를 요청했습니다.";
+			}
+
+			@Override
+			public HttpStatus getHttpStatus() {
+				return HttpStatus.BAD_REQUEST;
+			}
+		}, null);
+	}
+
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public ResponseEntity<ResponseWrapper<Void>> handleMaxSizeException(MaxUploadSizeExceededException exc) {
+		return ResponseWrapperFactory.toResponseEntity(new ResponseCode() {
+			@Override
+			public String getCode() {
+				return "400";
+			}
+
+			@Override
+			public String getMessage() {
+				return "파일 크기가 너무 큽니다.";
 			}
 
 			@Override
