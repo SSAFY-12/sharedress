@@ -214,28 +214,6 @@ export const SetPage = () => {
 					</div>
 				</div>
 			</div>
-
-			{/* 하단 탭바 */}
-			<div className='sticky bottom-0 border-t bg-white shadow-sm'>
-				<div className='flex justify-around p-3'>
-					<button className='flex flex-col items-center justify-center w-1/5'>
-						<span className='text-xs mt-1'>전체</span>
-					</button>
-					<button className='flex flex-col items-center justify-center w-1/5'>
-						<span className='text-xs mt-1'>아우터</span>
-					</button>
-					<button className='flex flex-col items-center justify-center w-1/5'>
-						<span className='text-xs mt-1'>상의</span>
-					</button>
-					<button className='flex flex-col items-center justify-center w-1/5'>
-						<span className='text-xs mt-1'>하의</span>
-					</button>
-					<button className='flex flex-col items-center justify-center w-1/5'>
-						<span className='text-xs mt-1'>기타</span>
-					</button>
-				</div>
-			</div>
-
 			{/* 로그아웃 모달 */}
 			<MainModal
 				isOpen={isLogoutModalOpen}
