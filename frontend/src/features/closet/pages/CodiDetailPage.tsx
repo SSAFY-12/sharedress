@@ -196,9 +196,9 @@ const CodiDetailPage = () => {
 				navigate('/mypage', {
 					state: { initialTab: '코디' },
 				});
-			} else if (source === 'friends') {
+			} else if (source === 'friendspick') {
 				navigate(`/mypage`, {
-					state: { initialTab: '코디', initialSubTab: 'friends' },
+					state: { initialTab: '코디', initialSubTab: 'friendspick' },
 				});
 			}
 		} else {
