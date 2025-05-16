@@ -12,7 +12,8 @@ const CATEGORIES = [
 	{ id: 'all', label: '전체' },
 	{ id: '2', label: '아우터' },
 	{ id: '1', label: '상의' },
-	{ id: '3', label: '하의' },
+	{ id: '3', label: '바지' },
+	{ id: '6', label: '스커트' },
 	{ id: '4', label: '신발' },
 	{ id: '5', label: '기타' },
 ];
