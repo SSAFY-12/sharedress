@@ -10,7 +10,8 @@ import fcmApi from '@/features/alert/api/fcmapi';
 // content 내부에서 refreshToken, accessToken 저장
 // 구글 자체의 토큰이 아닌, 백엔드에서 제공하는 Token 사용
 const useAuth = () => {
-	const { setAccessToken } = useAuthStore(); // store에서 필요한 값들을 가져옵니다
+	const { setAccessToken, clearAuth } = useAuthStore();
+	const { clearToken } = useFcmStore();
 	const navigate = useNavigate();
 
 	const mutation = useMutation({
@@ -44,8 +45,20 @@ const useAuth = () => {
 		},
 	});
 
+	const logout = async () => {
+		try {
+			await authApi.logout();
+		} catch (e) {
+			// 서버 에러 무시
+		}
+		clearAuth?.();
+		clearToken?.();
+		navigate('/');
+	};
+
 	return {
 		mutation,
+		logout,
 	};
 };
 

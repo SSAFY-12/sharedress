@@ -15,6 +15,7 @@ import CodiPublicEditPage from '@/features/closet/pages/CodiPublicEditPage';
 import ExternalUserPage from '@/pages/ExternalUserPage';
 import MyPage from '@/pages/MyPage';
 import FriendClosetLayoutPage from '@/features/closet/pages/FriendClosetLayoutPage';
+import SettingPage from '@/pages/SettingPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -114,6 +115,14 @@ export const router = createBrowserRouter([
 			{
 				path: '*',
 				element: <Navigate to='/' replace />,
+			},
+			{
+				path: 'setting',
+				element: (
+					<ProtectedRoute>
+						<SettingPage />
+					</ProtectedRoute>
+				),
 			},
 		],
 	},
