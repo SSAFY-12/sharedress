@@ -76,6 +76,7 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 			String[] tokens = keyword.trim().split("\\s+");
 			BooleanBuilder keywordCondition = new BooleanBuilder();
 
+			// 브랜드-상품 조합 조건
 			for (int i = 0; i < tokens.length; i++) {
 				String brandToken = tokens[i];
 				List<String> productTokens = new ArrayList<>();
@@ -101,6 +102,12 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 
 				keywordCondition.or(candidate);
 			}
+
+			BooleanBuilder nameOnly = new BooleanBuilder();
+			for (String token : tokens) {
+				nameOnly.and(clothes.name.containsIgnoreCase(token));
+			}
+			keywordCondition.or(nameOnly);
 
 			condition.and(keywordCondition);
 		}
