@@ -48,10 +48,14 @@ export const FriendRequestsPage = () => {
 									/>
 									<div className='ml-3 flex-1'>
 										<h3 className='font-medium text-button'>
-											{request.requester.nickname}
+											{request.requester.nickname.length > 7
+												? request.requester.nickname.slice(0, 7) + '...'
+												: request.requester.nickname}
 										</h3>
 										<p className='text-sm text-gray-500 text-description'>
-											{request.message}
+											{request.message.length > 7
+												? request.message.slice(0, 7) + '...'
+												: request.message}
 										</p>
 									</div>
 								</div>
