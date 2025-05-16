@@ -2,11 +2,13 @@ package com.ssafy.sharedress.application.shoppingmall.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ssafy.sharedress.adapter.shoppingmall.out.cm29.Login29cmClient;
 import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaClient;
 import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.MusinsaPurchaseClient;
 import com.ssafy.sharedress.application.closet.service.ClosetClothesService;
@@ -17,6 +19,7 @@ import com.ssafy.sharedress.application.shoppingmall.usecase.PurchaseUseCase;
 import com.ssafy.sharedress.domain.shoppingmall.error.ShoppingMallErrorCode;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
+import feign.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PurchaseService implements PurchaseUseCase {
 	private final LoginMusinsaClient loginMusinsaClient;
 	private final MusinsaPurchaseClient musinsaPurchaseClient;
+	private final Login29cmClient login29cmClient;
 	private final ClosetClothesService closetClothesService;
 
 	@Override
@@ -93,5 +97,20 @@ public class PurchaseService implements PurchaseUseCase {
 				.toList()
 		);
 		closetClothesService.registerClothesFromPurchase(request, memberId);
+	}
+
+	@Override
+	public void login29CM(String id, String password) {
+		// 🔸 로그인 요청 후 응답 받기
+		Response response = login29cmClient.login(new Login29cmClient.LoginRequest(id, password));
+
+		// 🔸 Set-Cookie 헤더에서 `_ftwuid` 추출
+		Optional<String> ftwuidCookie = response.headers()
+			.getOrDefault("Set-Cookie", List.of())
+			.stream()
+			.filter(cookie -> cookie.startsWith("_ftwuid"))
+			.findFirst();
+
+		log.info("ftwuidCookie: {}", ftwuidCookie);
 	}
 }

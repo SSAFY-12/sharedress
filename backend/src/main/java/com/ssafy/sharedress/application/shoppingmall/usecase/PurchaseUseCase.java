@@ -14,4 +14,9 @@ public interface PurchaseUseCase {
 		String appRtk,
 		String rootOrderNo
 	);
+
+	void login29CM(
+		String id,
+		String password
+	);
 }

@@ -39,9 +39,14 @@ public class ShoppingMallController {
 		@CurrentMember Member member,
 		@RequestBody LoginMusinsaClient.LoginRequest request
 	) {
-		LoginMusinsaClient.Tokens tokens = purchaseUseCase.loginMusinsa(request).tokens();
-		purchaseUseCase.getMusinsaPurchaseHistory(member.getId(), request.shopId(), tokens.app_atk(), tokens.app_rtk(),
-			null);
+		if (request.shopId() == 2) {
+			purchaseUseCase.login29CM(request.id(), request.password());
+		} else {
+			LoginMusinsaClient.Tokens tokens = purchaseUseCase.loginMusinsa(request).tokens();
+			purchaseUseCase.getMusinsaPurchaseHistory(member.getId(), request.shopId(), tokens.app_atk(),
+				tokens.app_rtk(),
+				null);
+		}
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, null);
 	}
