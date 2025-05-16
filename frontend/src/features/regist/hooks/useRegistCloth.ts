@@ -21,6 +21,7 @@ export const useRegistCloth = (id: number) => {
 			});
 		},
 		onError: async (error: any) => {
+			console.log(error);
 			toast.error('옷장 추가에 실패했습니다.', {
 				icon: Icons.error,
 			});

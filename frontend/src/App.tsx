@@ -2,7 +2,7 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
-import { Bounce, Flip, Slide, ToastContainer, Zoom } from 'react-toastify';
+import { Slide, ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import useFcmStore from '@/store/useFcmStore';
