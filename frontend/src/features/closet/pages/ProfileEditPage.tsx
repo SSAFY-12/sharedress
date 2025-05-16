@@ -7,6 +7,7 @@ import { useModifyProfileImage } from '@/features/social/hooks/useModifyProfileI
 import { useForm, Controller } from 'react-hook-form';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 interface ProfileEditForm {
 	nickname: string;
 	oneLiner: string;
@@ -85,21 +86,42 @@ const ProfileEditPage = () => {
 			{
 				onSuccess: () => {
 					if (selectedFile) {
+						// 프로필 수정하기
 						modifyProfileImage(selectedFile, {
 							onSuccess: () => {
+								toast.success('프로필 수정이 완료되었습니다.', {
+									icon: () => (
+										<img
+											src='/icons/toast_profile.svg'
+											alt='icon'
+											style={{ width: '20px', height: '20px' }}
+										/>
+									),
+								});
 								setTimeout(() => {
 									navigate('/mypage');
-								}, 100);
+								}, 10);
 							},
 							onError: (error) => {
+								toast.error('프로필 수정이 실패했습니다.');
 								console.error('프로필 이미지 수정 실패:', error);
 							},
 						});
 					} else {
 						// 이미지 변경이 없으면 바로 페이지 이동
+						toast.success('프로필 수정이 완료되었습니다.', {
+							icon: () => (
+								<img
+									src='/icons/toast_profile.svg'
+									alt='icon'
+									style={{ width: '20px', height: '20px' }}
+								/>
+							),
+						});
+						console.log('프로필 수정이 완료되었습니다.');
 						setTimeout(() => {
 							navigate('/mypage');
-						}, 100);
+						}, 10);
 					}
 				},
 				onError: (error) => {
