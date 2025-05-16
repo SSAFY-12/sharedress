@@ -38,7 +38,8 @@ export const App = () => {
 	}, []);
 
 	useEffect(() => {
-		if (!useFcmStore.getState().token) {
+		const hideFcmAlert = localStorage.getItem('hideFcmAlert');
+		if (!hideFcmAlert && !useFcmStore.getState().token) {
 			setShowFcmModal(true);
 		}
 	}, [navigate]);
@@ -95,6 +96,10 @@ export const App = () => {
 				onConfirm={() => {
 					setShowFcmModal(false);
 					navigate('/setting');
+				}}
+				onHide={() => {
+					localStorage.setItem('hideFcmAlert', 'true');
+					setShowFcmModal(false);
 				}}
 			/>
 		</>
