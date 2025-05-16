@@ -76,9 +76,7 @@ export interface MyClosetResponse {
 export const ClosetApis = {
 	// --------------------옷장 옷 조회------------------------
 	getMyCloset: async (): Promise<MyClosetResponse> => {
-		console.log('옷장 api 호출');
 		const response = await client.get('/api/closet/my');
-		console.log(response, 'APIresponse');
 		return response.data;
 	},
 };
