@@ -49,7 +49,7 @@ public class CoordinationCommentPersistenceAdapter implements CoordinationCommen
 			.leftJoin(cc.member, mem).fetchJoin()
 			.leftJoin(cc.parent, pcc).fetchJoin()
 			.where(condition)
-			.orderBy(cc.createdAt.desc())
+			.orderBy(cc.createdAt.asc())
 			.fetch();
 	}
 }
