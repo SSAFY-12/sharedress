@@ -10,8 +10,8 @@ import Header from '@/components/layouts/Header';
 import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSection';
 import { base64ToFile } from '@/features/codi/utils/base64ToFile';
-import LoadingOverlay from '@/features/codi/components/LoadingOverlay';
 import { captureCanvasImageWithRetry } from '@/features/codi/utils/captureCanvasImageWithRetry';
+import LoadingOverlay from '@/components/etc/LoadingOverlay';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
@@ -77,6 +77,8 @@ const CodiSavePage = () => {
 				...(mode === 'my' ? { isPublic } : {}),
 			};
 
+			console.log('[DEBUG] payload:', payload);
+
 			const container = document.getElementById('codi-canvas');
 			if (!container) throw new Error('코디 캔버스를 찾을 수 없습니다.');
 
@@ -131,7 +133,7 @@ const CodiSavePage = () => {
 
 	return (
 		<div className='w-full h-screen flex flex-col bg-white'>
-			{isSubmitting && <LoadingOverlay />}
+			{isSubmitting && <LoadingOverlay message='코디 저장 중이에요...' />}
 			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-auto'>
 				{isLoading ? (
