@@ -71,7 +71,7 @@ const ClothDetailPage = () => {
 		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
 
 	return (
-		<div className='flex flex-col bg-white w-full'>
+		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
 			<Header showBack={true} onBackClick={handleBackClick} />
 			<div className='flex-1 overflow-auto pb-20'>
 				<ImageDetailView

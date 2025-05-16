@@ -292,12 +292,12 @@ const CodiCanvas = ({
 		<div
 			ref={canvasRef}
 			id='codi-canvas'
-			className='relative w-full aspect-[10/11] bg-gray-50 overflow-hidden touch-pan-x'
+			className='canvas-item relative w-full aspect-[10/11] bg-gray-50 overflow-hidden touch-pan-x'
 			onClick={isEditable ? handleCanvasClick : undefined}
 			onTouchEnd={isEditable ? handleCanvasClick : undefined}
 		>
 			{items.length === 0 && (
-				<div className='absolute inset-0 flex items-center justify-center text-low'>
+				<div className='canvas-item absolute inset-0 flex items-center justify-center text-low'>
 					{isEditable
 						? '아이템을 선택하여 코디를 만들어보세요'
 						: '선택된 아이템이 없습니다'}
@@ -308,7 +308,7 @@ const CodiCanvas = ({
 				<div
 					id={item.canvasId}
 					key={item.canvasId}
-					className={`absolute ${
+					className={`canvas-item absolute ${
 						isEditable && activeItem === item.canvasId
 							? 'outline-1 outline-dashed outline-gray-400'
 							: ''
@@ -331,7 +331,9 @@ const CodiCanvas = ({
 				>
 					{/* 아이템 이미지 */}
 					<div
-						className={isEditable ? 'relative cursor-move' : 'relative'}
+						className={
+							isEditable ? 'relative cursor-move canvas-item' : 'relative'
+						}
 						onMouseDown={
 							isEditable ? (e) => handleMoveStart(e, item) : undefined
 						}
@@ -342,12 +344,13 @@ const CodiCanvas = ({
 						<img
 							src={item.imageUrl || 'https://picsum.photos/200'}
 							alt={item.name}
-							className='object-contain select-none'
+							className='object-contain select-none canvas-item'
 							style={{
 								width: item.initialWidth ? `${item.initialWidth}px` : 'auto',
 								height: item.initialHeight ? `${item.initialHeight}px` : 'auto',
 								minWidth: '40px',
 								minHeight: '40px',
+								pointerEvents: 'auto',
 							}}
 							draggable={false}
 							onLoad={isEditable ? (e) => handleImageLoad(e, item) : undefined}
@@ -359,7 +362,7 @@ const CodiCanvas = ({
 						<>
 							{/* 회전 및 확대축소 핸들 */}
 							<div
-								className='absolute -bottom-2 -right-2 w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center cursor-move border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+								className='canvas-item absolute -bottom-2 -right-2 w-5 h-5 bg-white rounded-full shadow-md flex items-center justify-center cursor-move border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 								onMouseDown={(e) => handleTransformStart(e, item)}
 								onTouchStart={(e) => handleTransformStart(e, item)}
 							>
@@ -368,7 +371,7 @@ const CodiCanvas = ({
 
 							{/* 삭제 버튼 */}
 							<div
-								className='absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full shadow-md flex items-center justify-center cursor-pointer hover:bg-red-600 active:bg-red-700'
+								className='canvas-item absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full shadow-md flex items-center justify-center cursor-pointer hover:bg-red-600 active:bg-red-700'
 								onClick={(e) => handleDelete(e, item.canvasId)}
 								onTouchStart={(e) => handleDelete(e, item.canvasId)}
 							>
