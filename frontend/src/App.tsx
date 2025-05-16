@@ -5,17 +5,18 @@ import { MobileLayout } from '@/components/layouts/MobileLayout';
 import { Bounce, Flip, Slide, ToastContainer, Zoom } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
-import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
+import { useNavigate } from 'react-router-dom';
+import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
 // import * as Sentry from '@sentry/react';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
-	const screenWidth = window.innerWidth;
-
+	const navigate = useNavigate();
+	const [showFcmModal, setShowFcmModal] = useState(false);
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
@@ -35,10 +36,14 @@ export const App = () => {
 	useEffect(() => {
 		console.log('FCM Token:', useFcmStore.getState().token);
 	}, []);
-	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 
-	// FCM 초기화
-	useFcmInitialization();
+	useEffect(() => {
+		const hideFcmAlert = localStorage.getItem('hideFcmAlert');
+		if (!hideFcmAlert && !useFcmStore.getState().token) {
+			setShowFcmModal(true);
+		}
+	}, [navigate]);
+	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 
 	// 앱 시작 시 토큰 초기화
 	useEffect(() => {
@@ -49,18 +54,6 @@ export const App = () => {
 		init();
 	}, [initializeAuth]);
 
-	// const handleManualError = () => {
-	// 	try {
-	// 		console.log('수동 에러 발생 시도');
-	// 		const error = new Error('수동으로 발생시킨 에러');
-	// 		console.error('에러 발생:', error);
-	// 		Sentry.captureException(error);
-	// 		console.log('Sentry에 에러 전송 완료');
-	// 	} catch (error) {
-	// 		console.error('에러 처리 중 오류 발생:', error);
-	// 	}
-	// };
-
 	if (isLoading || !isInitialized) {
 		return <div>Loading...</div>;
 	}
@@ -68,27 +61,6 @@ export const App = () => {
 	return (
 		<>
 			<GoogleAnalytics />
-			{/* Sentry 테스트 버튼 */}
-			{/* <div className='fixed top-4 right-4 flex flex-col gap-2'> */}
-			{/* 자동 에러 테스트 */}
-			{/* <button
-				onClick={() => {
-					console.log('자동 에러 발생 시도');
-					throw new Error('자동으로 발생시킨 에러!');
-				}}
-				className='bg-red-500 text-white px-4 py-2 rounded'
-			>
-				자동 에러 발생
-			</button> */}
-
-			{/* 수동 에러 테스트 */}
-			{/* <button
-				onClick={handleManualError}
-				className='bg-blue-500 text-white px-4 py-2 rounded'
-			>
-				수동 에러 발생
-			</button>
-		</div> */}
 
 			{/* 모바일 레이아웃 */}
 			<div className='block sm:hidden min-h-screen bg-white'>
@@ -145,6 +117,19 @@ export const App = () => {
 						×
 					</button>
 				)}
+			/>
+
+			<AlertModal
+				isOpen={showFcmModal}
+				onClose={() => setShowFcmModal(false)}
+				onConfirm={() => {
+					setShowFcmModal(false);
+					navigate('/setting');
+				}}
+				onHide={() => {
+					localStorage.setItem('hideFcmAlert', 'true');
+					setShowFcmModal(false);
+				}}
 			/>
 		</>
 	);

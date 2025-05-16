@@ -26,6 +26,12 @@ export const useAuthStore = create<AuthState>()(
 			clearAuth: () => {
 				console.log('인증 정보 초기화');
 				set({ accessToken: null, isGuest: false });
+				// localStorage에서 모든 관련 key 삭제
+				localStorage.removeItem('auth-store');
+				localStorage.removeItem('fcm-store');
+				localStorage.removeItem('profile-storage');
+				localStorage.removeItem('codiItems');
+				localStorage.removeItem('closet-storage');
 			},
 			initializeAuth: async () => {
 				try {

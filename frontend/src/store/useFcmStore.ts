@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 
 interface FcmStore {
 	token: string | null;
+	setToken: (token: string | null) => void;
+	clearToken: () => void;
 }
 
 const useFcmStore = create<FcmStore>()(
