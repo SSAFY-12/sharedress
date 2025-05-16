@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LibraryApis } from '@/features/regist/api/registApis';
 import { useClosetStore } from '@/store/useClosetStore';
-import { toast, Icons } from 'react-toastify';
+import { toast } from 'react-toastify';
+import iconImage from '/icons/_acceehlortt.svg';
 
 export const useRegistCloth = (id: number) => {
 	const qc = useQueryClient();
@@ -16,14 +17,18 @@ export const useRegistCloth = (id: number) => {
 		onSuccess: async (response) => {
 			addCloset({ id: response.content, libraryId: id });
 			qc.invalidateQueries({ queryKey: ['closet'] });
-			toast.success('옷장에 추가되었습니다!', {
-				icon: Icons.success,
+			toast.success('옷장에 추가되었습니다', {
+				icon: () => (
+					<img
+						src='/icons/toast_cloth.svg'
+						alt='icon'
+						style={{ width: '20px', height: '20px' }}
+					/>
+				),
 			});
 		},
 		onError: async (error: any) => {
-			toast.error('옷장 추가에 실패했습니다.', {
-				icon: Icons.error,
-			});
+			toast.error('옷 추가에 실패했습니다.');
 		},
 	});
 };
@@ -43,15 +48,21 @@ export const useDeleteCloth = (id: number | undefined) => {
 		onSuccess: async () => {
 			removeCloset(id ?? 0);
 			qc.invalidateQueries({ queryKey: ['closet'] });
-			toast.success('옷장에서 삭제되었습니다!');
+			toast.success('옷장에서 삭제되었습니다', {
+				icon: () => (
+					<img
+						src='/icons/toast_delete.svg'
+						alt='icon'
+						style={{ width: '20px', height: '20px' }}
+					/>
+				),
+			});
 		},
 		onError: async (error: any) => {
 			if (error?.response?.status === 404) {
 				return;
 			}
-			toast.error('옷장 삭제에 실패했습니다.', {
-				icon: Icons.error,
-			});
+			toast.error('옷 삭제에 실패했습니다.');
 		},
 	});
 };
