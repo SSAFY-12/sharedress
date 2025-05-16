@@ -17,12 +17,16 @@ export const ExternalShareModal = ({
 	onClose,
 }: ExternalShareModalProps) => {
 	const isPublic = useProfileStore((state) => state.isPublic);
+	const nickname = useProfileStore((state) => state.nickname);
+	const oneLiner = useProfileStore((state) => state.oneLiner);
 	const { mutate: modifyProfile } = useModifyProfile();
 	const { publicLink } = usePublicLink();
 
 	const handleToggle = () => {
 		const newValue = !isPublic;
 		modifyProfile({
+			nickname: nickname ?? ' ',
+			oneLiner: oneLiner ?? ' ',
 			isPublic: newValue,
 		});
 	};

@@ -2,18 +2,21 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
-import { ToastContainer } from 'react-toastify';
+import { Slide, ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
-import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
-// import * as Sentry from '@sentry/react';
+import { useNavigate } from 'react-router-dom';
+import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
+	const navigate = useNavigate();
+	const [showFcmModal, setShowFcmModal] = useState(false);
+
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
@@ -33,10 +36,14 @@ export const App = () => {
 	useEffect(() => {
 		console.log('FCM Token:', useFcmStore.getState().token);
 	}, []);
-	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 
-	// FCM 초기화
-	useFcmInitialization();
+	useEffect(() => {
+		const hideFcmAlert = localStorage.getItem('hideFcmAlert');
+		if (!hideFcmAlert && !useFcmStore.getState().token) {
+			setShowFcmModal(true);
+		}
+	}, [navigate]);
+	// 토큰 유효성 검사 Hook은 항상 최상위에서 호출
 
 	// 앱 시작 시 토큰 초기화
 	useEffect(() => {
@@ -47,18 +54,6 @@ export const App = () => {
 		init();
 	}, [initializeAuth]);
 
-	// const handleManualError = () => {
-	// 	try {
-	// 		console.log('수동 에러 발생 시도');
-	// 		const error = new Error('수동으로 발생시킨 에러');
-	// 		console.error('에러 발생:', error);
-	// 		Sentry.captureException(error);
-	// 		console.log('Sentry에 에러 전송 완료');
-	// 	} catch (error) {
-	// 		console.error('에러 처리 중 오류 발생:', error);
-	// 	}
-	// };
-
 	if (isLoading || !isInitialized) {
 		return <div>Loading...</div>;
 	}
@@ -66,27 +61,20 @@ export const App = () => {
 	return (
 		<>
 			<GoogleAnalytics />
-			{/* Sentry 테스트 버튼 */}
-			{/* <div className='fixed top-4 right-4 flex flex-col gap-2'> */}
-			{/* 자동 에러 테스트 */}
-			{/* <button
-				onClick={() => {
-					console.log('자동 에러 발생 시도');
-					throw new Error('자동으로 발생시킨 에러!');
-				}}
-				className='bg-red-500 text-white px-4 py-2 rounded'
-			>
-				자동 에러 발생
-			</button> */}
 
-			{/* 수동 에러 테스트 */}
-			{/* <button
-				onClick={handleManualError}
-				className='bg-blue-500 text-white px-4 py-2 rounded'
-			>
-				수동 에러 발생
-			</button>
-		</div> */}
+			{/* 개발 환경에서만 보이는 Sentry 테스트 버튼 */}
+			{import.meta.env.DEV && (
+				<div className='fixed bottom-4 right-4 z-50'>
+					<button
+						onClick={() => {
+							throw new Error('This is your first error!');
+						}}
+						className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg'
+					>
+						Break the world
+					</button>
+				</div>
+			)}
 
 			{/* 모바일 레이아웃 */}
 			<div className='block sm:hidden min-h-screen bg-white'>
@@ -104,8 +92,11 @@ export const App = () => {
 
 			{/* Toastify 컨테이너 */}
 			<ToastContainer
-				position='top-right'
-				autoClose={3000}
+				className='py-6 px-4'
+				toastClassName='py-2 rounded-xl bg-black bg-opacity-50 text-white text-description mb-2'
+				position='top-center'
+				transition={Slide}
+				autoClose={1500}
 				hideProgressBar={true}
 				newestOnTop={false}
 				closeOnClick
@@ -113,7 +104,46 @@ export const App = () => {
 				pauseOnFocusLoss
 				draggable={false}
 				pauseOnHover
-				theme='light'
+				toastStyle={{
+					height: 'fit-content',
+					minHeight: 'unset',
+					padding: '16px 16px',
+					display: 'flex',
+					alignItems: 'center',
+				}}
+				closeButton={({ closeToast }) => (
+					<button
+						onClick={closeToast}
+						style={{
+							position: 'absolute',
+							right: '16px',
+							color: 'white',
+							opacity: 0.5,
+							fontSize: '14px',
+							padding: '0',
+							background: 'none',
+							border: 'none',
+							cursor: 'pointer',
+							width: '20px',
+							height: '20px',
+						}}
+					>
+						×
+					</button>
+				)}
+			/>
+
+			<AlertModal
+				isOpen={showFcmModal}
+				onClose={() => setShowFcmModal(false)}
+				onConfirm={() => {
+					setShowFcmModal(false);
+					navigate('/setting');
+				}}
+				onHide={() => {
+					localStorage.setItem('hideFcmAlert', 'true');
+					setShowFcmModal(false);
+				}}
 			/>
 		</>
 	);

@@ -1668,25 +1668,29 @@ if (permission === 'granted') {
 
 <<<<<<< HEAD
 
-
-
 ### [트러블슈팅] 웹앱의 모든 Toast 알림을 FCM(브라우저/OS 푸시 알림)으로 전환(2025/05/14-안주민)
 
 ---
 
 ### 문제상황
-- 기존에는 react-toastify의 Toast 알림(화면 우측 상단 팝업)으로 사용자에게 안내 메시지를 보여줬음.
-- 하지만, Toast는 웹앱이 포그라운드(열려있는 상태)일 때만 보이고, 사용자가 탭을 닫거나 백그라운드에 있으면 알림을 받을 수 없음.
+
+- 기존에는 react-toastify의 Toast 알림(화면 우측 상단 팝업)으로 사용자에게 안내
+  메시지를 보여줬음.
+- 하지만, Toast는 웹앱이 포그라운드(열려있는 상태)일 때만 보이고, 사용자가 탭을
+  닫거나 백그라운드에 있으면 알림을 받을 수 없음.
 
 ---
 
 ### 원인 분석
+
 - Toast는 UI 컴포넌트이기 때문에, 브라우저/OS의 알림 시스템과는 별개로 동작함.
-- 중요한 알림(예: 등록 성공, 실패, 복사 완료, 로그아웃 등)을 사용자가 앱을 보고 있지 않아도 받을 수 있도록 하려면, FCM(푸시 알림)으로 전환이 필요함.
+- 중요한 알림(예: 등록 성공, 실패, 복사 완료, 로그아웃 등)을 사용자가 앱을 보고
+  있지 않아도 받을 수 있도록 하려면, FCM(푸시 알림)으로 전환이 필요함.
 
 ---
 
 ### 해결방법
+
 1. **Toast 알림 코드(react-toastify의 toast.XXX) 전체 검색**
 2. 각 알림 위치에서 toast 호출을 FCM의 `showNotification`으로 변경
    - `serviceWorker`와 `Notification` API를 활용하여 브라우저/OS 알림을 띄움
@@ -1698,6 +1702,7 @@ if (permission === 'granted') {
 ### 예시
 
 #### (1) 기존 코드
+
 ```typescript
 import { toast } from 'react-toastify';
 
@@ -1708,16 +1713,18 @@ toast.info('로그아웃되었습니다.');
 ```
 
 #### (2) 변경 후 코드
+
 ```typescript
 if ('serviceWorker' in navigator && 'Notification' in window) {
-  const registration = await navigator.serviceWorker.ready;
-  await registration.showNotification('알림 제목', {
-    body: '알림 내용',
-    icon: '/android-chrome-192x192.png',
-    badge: '/favicon-32x32.png',
-  });
+	const registration = await navigator.serviceWorker.ready;
+	await registration.showNotification('알림 제목', {
+		body: '알림 내용',
+		icon: '/android-chrome-192x192.png',
+		badge: '/favicon-32x32.png',
+	});
 }
 ```
+
 - 예시: 옷 등록 성공 → `'옷을 등록했어요 👚'`라는 푸시 알림이 브라우저/OS에 뜸
 
 ---
@@ -1725,9 +1732,10 @@ if ('serviceWorker' in navigator && 'Notification' in window) {
 ### 결론 및 정리
 
 - **이제 모든 안내 메시지는 Toast 대신 FCM 푸시 알림으로 노출됨**
-  - 사용자가 웹앱을 보고 있지 않아도(탭이 닫혀있거나 백그라운드여도) 알림을 받을 수 있음
+  - 사용자가 웹앱을 보고 있지 않아도(탭이 닫혀있거나 백그라운드여도) 알림을 받을
+    수 있음
   - 알림 권한이 필요하므로, 사용자가 권한을 허용해야 정상적으로 동작함
-- 적용 파일:  
+- 적용 파일:
   - `useRegistCloth.ts` (옷 등록/삭제 성공/실패)
   - `ExternalShareModal.tsx` (복사 완료)
   - `useAuthStore.ts` (로그아웃)
@@ -1736,8 +1744,8 @@ if ('serviceWorker' in navigator && 'Notification' in window) {
 
 ---
 
-추가로 궁금한 점이나, 더 보고 싶은 예시가 있으면 언제든 말씀해 주세요!
-=======
+# 추가로 궁금한 점이나, 더 보고 싶은 예시가 있으면 언제든 말씀해 주세요!
+
 ## [트러블슈팅] Guest Token 인증 처리 문제 해결(2025/05/15-안주민)
 
 ### 문제상황
@@ -1983,4 +1991,67 @@ client.interceptors.response.use(
    - guestToken이 있는 경우에도 일부 API는 접근 제한 필요
    - guestToken 만료 시 적절한 처리 필요
    - 서버와의 협의를 통한 guestToken 권한 범위 설정 필요
->>>>>>> 3186cb4fb37114ee3bf8bf037ffc3908c60e4457
+     > > > > > > > 3186cb4fb37114ee3bf8bf037ffc3908c60e4457
+
+#### [트러블 슈팅] 배포 환경에서만 deleteMutation onSuccess가 실행되지 않은 이슈 (김현래/ 2025-05-16)
+
+#### 문제상황
+
+로컬(dev) : 옷 삭제 버튼 → 정상 동작배포(prod) : 첫 클릭 — UI 변동 없음두 번째
+클릭 — 403 Forbidden 응답동일한 코드-경로인 등록(register) 은 배포에서도 정상
+
+#### 원인 분석
+
+단계 관찰 해석 ① API 호출 서버는 200 OK → 실제 삭제 완료 요청 자체는 성공 ②
+React-Query onSuccess 알림 권한 거부 / 브라우저 미지원 → showNotification()
+Promise reject mutation 내부에서 예외 발생 → React-Query가 상태를 “실패”로 뒤집
+고 onSuccess(override) 미호출 ③ 컴포넌트 상태 regState (기등록 여부) 가 업데이트
+되지 않음 UI는 여전히 “등록됨” 으로 표시 ④ 사용자 재클릭 이미 삭제된 자원에 재요
+청 → 403 증상 확인 ※ 등록 로직이 정상인 이유 등록은 addCloset() 로 전역 상태를
+선변경한 뒤 알림을 호출함 → 예외가 UI에 영향 X
+
+#### 해결방법
+
+알림 호출을 안전 래퍼로 분리 (safe-notify)
+
+Notification.permission === 'granted' & 지원 여부 선체크
+
+try / catch 로 예외를 삼켜 mutation 상태 보존
+
+상태 변경을 알림 호출 앞으로 이동
+
+알림 대신 Toast 등 클라이언트 전용 피드백으로 교체(선택)
+
+#### 예시 (코드)
+
+// utils/notify.ts export const safeNotify = async ( title: string, options:
+NotificationOptions ) => { try { if ( 'serviceWorker' in navigator &&
+'Notification' in window && Notification.permission === 'granted' ) { const reg
+= await navigator.serviceWorker.ready; await reg.showNotification(title,
+options); } } catch (e) { console.warn('notification failed', e); } };
+
+// hooks/useDeleteCloth.ts export const useDeleteCloth = (id?: number) => {
+const qc = useQueryClient(); const removeCloset = useClosetStore(s =>
+s.removeCloset);
+
+return useMutation({ mutationFn: () => { if (!id) throw new Error('no id');
+return LibraryApis.deleteCloth(id); }, retry: false, onSuccess: () => {
+removeCloset(id!); // ① 상태 먼저 safeNotify('옷 삭제', { body: '옷을 삭제했어요
+🗑️' }); // ② 실패해도 UI 영향 X qc.invalidateQueries({ queryKey: ['closet'] });
+}, }); }; 등록 훅도 동일하게 safeNotify 적용.
+
+#### 결론 및 정리
+
+증상 : 배포 환경에서 삭제 버튼이 동작하지 않고 403 재요청이 발생.
+
+근본 원인 : onSuccess 내부의 showNotification() reject → mutation 실패로 전환 →
+UI 상태 미반영.
+
+교훈 :
+
+외부 API(알림·클립보드 등)는 항상 권한/지원 여부를 확인하고 try/catch 로 감싸기.
+
+상태 변경 로직을 부수 효과보다 앞에 두기.
+
+React-Query onSuccess 안에서 발생한 모든 예외는 mutation 상태를 실패로 바꾼다는
+점을 기억하자.

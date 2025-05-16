@@ -117,7 +117,7 @@ client.interceptors.response.use(
 
 		// 전역 에러 처리
 		if (error.response) {
-			const { status } = error.response;
+			const { status } = error.response.data.status;
 			const serverMessage = error.response.data?.message;
 			handleGlobalError(status, serverMessage);
 		} else {

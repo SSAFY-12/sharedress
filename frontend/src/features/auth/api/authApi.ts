@@ -39,8 +39,6 @@ export const authApi = {
 	logout: async () => {
 		try {
 			await client.delete('/api/auth/logout');
-
-			localStorage.removeItem('accessToken');
 		} catch (error) {
 			console.error('로그아웃 실패', error);
 		}

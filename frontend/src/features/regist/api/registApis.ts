@@ -59,6 +59,7 @@ export const LibraryApis = {
 
 		return response.data;
 	},
+	// --------------------라이브러리 옷 삭제------------------------
 	deleteCloth: async (closetClothesId: number) => {
 		const response = await client.delete(
 			`/api/closet/clothes/${closetClothesId}`,
@@ -76,9 +77,7 @@ export interface MyClosetResponse {
 export const ClosetApis = {
 	// --------------------옷장 옷 조회------------------------
 	getMyCloset: async (): Promise<MyClosetResponse> => {
-		console.log('옷장 api 호출');
 		const response = await client.get('/api/closet/my');
-		console.log(response, 'APIresponse');
 		return response.data;
 	},
 };
