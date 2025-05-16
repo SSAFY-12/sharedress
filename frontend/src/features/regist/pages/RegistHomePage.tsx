@@ -3,8 +3,9 @@ import SelectRegistBlock from '@/features/regist/components/SelectRegistBlock';
 import { useGetCloth } from '@/features/regist/hooks/useGetCloth';
 
 const RegistHomePage = () => {
-	// eslint-disable-next-line
 	const { data } = useGetCloth();
+	console.log(data, 'data');
+
 	return (
 		<div className='flex-1 w-full h-full flex flex-col justify-center items-center px-4 pb-36 gap-5'>
 			<div className='flex w-full text-title font-bold justify-start px-2.5'>
