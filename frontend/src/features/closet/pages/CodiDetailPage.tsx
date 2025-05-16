@@ -16,6 +16,7 @@ import { useDeleteCoordinationComment } from '@/features/closet/hooks/useDeleteC
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
 import { useAuthStore } from '@/store/useAuthStore';
+import { toast } from 'react-toastify';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
@@ -78,7 +79,15 @@ const CodiDetailPage = () => {
 
 		deleteCoordination(coordinationId, {
 			onSuccess: () => {
-				alert('코디가 삭제되었습니다.');
+				toast.success('삭제되었습니다.', {
+					icon: () => (
+						<img
+							src='/icons/toast_delete.svg'
+							alt='icon'
+							style={{ width: '20px', height: '20px' }}
+						/>
+					),
+				});
 				navigate('/mypage', {
 					state: {
 						initialTab: '코디',
@@ -86,7 +95,7 @@ const CodiDetailPage = () => {
 				});
 			},
 			onError: () => {
-				alert('코디 삭제에 실패했습니다. 다시 시도해주세요.');
+				toast.error('삭제에 실패했습니다. 다시 시도해주세요.');
 			},
 		});
 
@@ -105,9 +114,18 @@ const CodiDetailPage = () => {
 				onSuccess: () => {
 					setCommentText('');
 					setIsCommentFocused(false);
+					toast.success('댓글이 작성되었습니다.', {
+						icon: () => (
+							<img
+								src='/icons/toast_comment.svg'
+								alt='icon'
+								style={{ width: '20px', height: '20px' }}
+							/>
+						),
+					});
 				},
 				onError: () => {
-					alert('댓글 작성에 실패했습니다. 다시 시도해주세요.');
+					toast.error('댓글 작성에 실패했습니다. 다시 시도해주세요.');
 				},
 			});
 		}
@@ -121,7 +139,15 @@ const CodiDetailPage = () => {
 	const handleAddToMyCloset = () => {
 		copyCoordination(coordinationId.toString(), {
 			onSuccess: () => {
-				alert('코디가 내 코디에 추가되었습니다.');
+				toast.success('코디가 내 옷장에 추가되었습니다.', {
+					icon: () => (
+						<img
+							src='/icons/toast_codi.svg'
+							alt='icon'
+							style={{ width: '20px', height: '20px' }}
+						/>
+					),
+				});
 				navigate(`/mypage`, {
 					state: {
 						initialTab: '코디',
@@ -129,7 +155,7 @@ const CodiDetailPage = () => {
 				});
 			},
 			onError: () => {
-				alert('코디 추가에 실패했습니다.');
+				toast.error('코디 추가에 실패했습니다.');
 			},
 		});
 	};
@@ -142,9 +168,18 @@ const CodiDetailPage = () => {
 		deleteComment(selectedComment.id, {
 			onSuccess: () => {
 				setIsCommentMenuOpen(false);
+				toast.success('댓글이 삭제되었습니다.', {
+					icon: () => (
+						<img
+							src='/icons/toast_delete.svg'
+							alt='icon'
+							style={{ width: '20px', height: '20px' }}
+						/>
+					),
+				});
 			},
 			onError: () => {
-				alert('댓글 삭제에 실패했습니다. 다시 시도해주세요.');
+				toast.error('댓글 삭제에 실패했습니다. 다시 시도해주세요.');
 			},
 		});
 	};
@@ -318,14 +353,15 @@ const CodiDetailPage = () => {
 				) : (
 					<div className='p-4 space-y-4'>
 						<button
-							className='w-full py-3 flex items-center justify-center gap-2 font-medium text-center text-[#c5a687]'
+							className='w-full py-3 flex items-center justify-center gap-2.5 font-medium text-center text-[#c5a687]'
 							onClick={handleAddToMyCloset}
 						>
-							<span className='text-xl'>🧥</span> 내 코디에 넣기
+							<img src='/icons/modal_closet_add.svg' alt='icon' />
+							<span className='text-button text-low'>내 코디에 넣기</span>
 						</button>
 						<div className='border-t border-gray-200'></div>
 						<button
-							className='w-full py-3 text-red-500 font-medium text-center'
+							className='w-full py-3 text-delete text-button text-center'
 							onClick={handleDelete}
 						>
 							삭제하기
