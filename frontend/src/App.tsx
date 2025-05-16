@@ -2,7 +2,7 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
-import { Bounce, Flip, Slide, ToastContainer, Zoom } from 'react-toastify';
+import { Slide, ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import useFcmStore from '@/store/useFcmStore';
@@ -15,8 +15,12 @@ export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
+<<<<<<< Updated upstream
 	const navigate = useNavigate();
 	const [showFcmModal, setShowFcmModal] = useState(false);
+=======
+
+>>>>>>> Stashed changes
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
@@ -78,8 +82,8 @@ export const App = () => {
 
 			{/* Toastify 컨테이너 */}
 			<ToastContainer
-				className='py-6 px-4 '
-				toastClassName='py-2  rounded-xl bg-black bg-opacity-50 text-white text-description mb-2'
+				className='py-6 px-4'
+				toastClassName='py-2 rounded-xl bg-black bg-opacity-50 text-white text-description mb-2'
 				position='top-center'
 				transition={Slide}
 				autoClose={1500}

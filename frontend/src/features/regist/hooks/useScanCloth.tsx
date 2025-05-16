@@ -45,11 +45,9 @@ export const useScanCloth = () => {
 				{
 					autoClose: 10000,
 					icon: () => (
-						<img
-							src='/icons/toast_bell.png'
-							alt='icon'
-							style={{ width: '35px', height: '28px' }}
-						/>
+						<div className='flex items-center justify-center w-7 h-7'>
+							<img src='/icons/toast_bell.png' alt='icon' />
+						</div>
 					),
 				},
 			);
