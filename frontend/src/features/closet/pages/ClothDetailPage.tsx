@@ -6,6 +6,7 @@ import { BottomSheet } from '@/components/modals/bottom-sheet';
 import { useDeleteCloth } from '@/features/closet/hooks/useDeleteCloth';
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
+import { toast } from 'react-toastify';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
@@ -48,11 +49,19 @@ const ClothDetailPage = () => {
 
 		deleteCloth(clothId, {
 			onSuccess: () => {
-				alert('삭제되었습니다.');
+				toast.success('삭제되었습니다.', {
+					icon: () => (
+						<img
+							src='/icons/toast_delete.svg'
+							alt='icon'
+							style={{ width: '20px', height: '20px' }}
+						/>
+					),
+				});
 				navigate('/mypage');
 			},
 			onError: () => {
-				alert('삭제에 실패했습니다. 다시 시도해주세요.');
+				toast.error('삭제에 실패했습니다. 다시 시도해주세요.');
 			},
 		});
 	};
