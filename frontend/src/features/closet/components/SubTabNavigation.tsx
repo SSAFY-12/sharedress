@@ -17,8 +17,8 @@ const SubTabNavigation = <T extends string>({
 				key={tab.id}
 				className={`flex-1 py-2 px-3.5 rounded-full ${
 					activeTab === tab.id
-						? 'border border-regular text-regular'
-						: 'border border-light text-low'
+						? 'border border-regular text-regular text-categoryButton'
+						: 'border border-light text-low text-categoryButton'
 				}`}
 				onClick={() => onTabChange(tab.id)}
 			>
