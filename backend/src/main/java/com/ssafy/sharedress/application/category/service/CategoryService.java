@@ -19,6 +19,7 @@ public class CategoryService implements CategoryUseCase {
 	@Override
 	public List<CategoryResponse> getAllCategories() {
 		return categoryRepository.findAllByOrderByIdAsc().stream()
+			.filter(category -> !category.getId().equals(-1L)) // category_id = -1 제외
 			.map(CategoryResponse::from)
 			.toList();
 	}
