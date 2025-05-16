@@ -54,6 +54,7 @@ export const useDeleteCloth = (id: number | undefined) => {
 
 	return useMutation({
 		mutationFn: () => {
+			console.log('hooks 삭제요청', id);
 			if (!id) {
 				throw new Error('삭제할 옷의 ID가 없습니다.');
 			}

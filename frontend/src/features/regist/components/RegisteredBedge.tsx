@@ -48,6 +48,8 @@ export const RegisteredBedge = ({ libraryId }: { libraryId: number }) => {
 	};
 
 	const handleDelete = (e: React.MouseEvent) => {
+		console.log(regState, 'closetId');
+		console.log(libraryId, 'libraryId');
 		e.stopPropagation();
 		if (busy || !regState.isRegistered || !regState.closetId) return;
 
