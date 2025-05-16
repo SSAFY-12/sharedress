@@ -4,7 +4,7 @@ import { SearchBar } from '@/components/inputs/search-bar';
 import { FriendRequestMsgModal } from '@/features/social/components/FriendRequestMsgModal';
 import { FriendRequestActionModal } from '@/features/social/components/FriendRequestActionModal';
 import { RelationStatus } from '@/features/social/types/social';
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 import useSearchUser from '@/features/social/hooks/useSearchUser';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
@@ -90,13 +90,27 @@ export const FriendSearchResultPage = () => {
 		}
 	};
 
+	// 키보드 이벤트 처리
+	useEffect(() => {
+		const handleResize = () => {
+			const vh = window.innerHeight * 0.01;
+			document.documentElement.style.setProperty('--vh', `${vh}px`);
+		};
+
+		window.addEventListener('resize', handleResize);
+		handleResize();
+
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
 	return (
-		<div className='flex flex-col w-full h-full mx-auto bg-white gap-3.5 px-4 pt-2'>
+		<div className='flex flex-col w-full h-[calc(var(--vh,1vh)*100)] mx-auto bg-white gap-3.5 px-4 pt-2 overflow-y-auto'>
 			<SearchBar
 				placeholder='친구 ID'
 				value={searchValue}
 				onChange={handleSearchChange}
 				onKeyDown={handleSearch}
+				className='sticky top-0 z-10 bg-white'
 			/>
 
 			<div className='flex-1 px-4 sm:px-6 py-4'>
@@ -114,7 +128,17 @@ export const FriendSearchResultPage = () => {
 								/>
 								<h2 className='font-bold mb-1'>{user.nickname}</h2>
 
-								{user.relationStatus === 0 || user.relationStatus === 3 ? (
+								{user.relationStatus === 0 ? (
+									<PrimaryBtn
+										size='compact'
+										name='친구'
+										color='gray'
+										activate={false}
+										// eslint-disable-next-line @typescript-eslint/no-empty-function
+										onClick={() => {}}
+										className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
+									/>
+								) : user.relationStatus === 3 ? (
 									<PrimaryBtn
 										size='compact'
 										name='친구 신청'

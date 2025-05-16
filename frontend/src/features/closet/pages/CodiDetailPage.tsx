@@ -15,7 +15,7 @@ import { useDeleteCoordination } from '@/features/closet/hooks/useDeleteCoordina
 import { useDeleteCoordinationComment } from '@/features/closet/hooks/useDeleteCoordinationComment';
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
-import { useProfileStore } from '@/store/useProfileStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
@@ -24,7 +24,7 @@ const CodiDetailPage = () => {
 	const isMe = location.state?.isMe ?? false;
 	const source = location.state?.source ?? 'my';
 	const ownerId = location.state?.ownerId ?? 0;
-	const isGuest = useProfileStore((state) => state.isGuest);
+	const isGuest = useAuthStore((state) => state.isGuest);
 
 	const coordinationId = Number(id);
 
@@ -119,7 +119,7 @@ const CodiDetailPage = () => {
 	};
 
 	const handleAddToMyCloset = () => {
-		copyCoordination(id!, {
+		copyCoordination(coordinationId.toString(), {
 			onSuccess: () => {
 				alert('코디가 내 코디에 추가되었습니다.');
 				navigate(`/mypage`, {

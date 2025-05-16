@@ -9,7 +9,7 @@ const INITIAL_CHECK_DELAY = 3000; // 초기 체크 지연 시간 (3초)
 const CHECK_INTERVAL = 30000; // 주기적 체크 간격 (30초)
 
 export const useTokenValidation = () => {
-	const { accessToken, isInitialized } = useAuthStore();
+	const { accessToken, isInitialized, isGuest } = useAuthStore();
 	const { mutateAsync: refreshAsync } = useRefresh();
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -34,20 +34,16 @@ export const useTokenValidation = () => {
 
 	// 토큰 검증 함수
 	const validateToken = useCallback(async () => {
-		const hasRefreshToken = document.cookie.includes('refreshToken');
-		const currentToken = useAuthStore.getState().accessToken;
+		// 게스트인 경우 토큰 검증 완전히 건너뛰기
+		if (isGuest) {
+			console.log('게스트 사용자, 토큰 검증 스킵');
+			return true;
+		}
 
-		console.log('🔍 토큰 검증 시작:', {
-			토큰존재: !!currentToken,
-			리프레시토큰존재: hasRefreshToken,
-			시간: new Date().toLocaleString('ko-KR'),
-		});
+		const currentToken = useAuthStore.getState().accessToken;
 
 		if (!currentToken) {
 			console.log('⚠️ 액세스 토큰 없음');
-			if (hasRefreshToken) {
-				return await handleTokenRefresh();
-			}
 			navigate('/auth', { replace: true });
 			return false;
 		}
@@ -62,9 +58,6 @@ export const useTokenValidation = () => {
 
 		if (!expirationTime) {
 			console.log('⚠️ 토큰 만료 시간 없음');
-			if (hasRefreshToken) {
-				return await handleTokenRefresh();
-			}
 			navigate('/auth', { replace: true });
 			return false;
 		}
@@ -78,26 +71,15 @@ export const useTokenValidation = () => {
 		});
 
 		if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER) {
-			console.debug(
-				'[토큰검증] 🔄 토큰 갱신 시도 (만료까지 남은 시간:',
-				Math.floor(timeUntilExpiration / 1000),
-				'초)',
-			);
-			const refreshResult = await handleTokenRefresh();
-			if (refreshResult) {
-				console.debug('[토큰검증] ✅ 토큰 재갱신 성공');
-			} else {
-				console.debug('[토큰검증] ❌ 토큰 재갱신 실패');
-			}
-			return refreshResult;
+			return await handleTokenRefresh();
 		}
 
-		console.log('✅ 토큰 유효');
 		return true;
-	}, [handleTokenRefresh, navigate]);
+	}, [handleTokenRefresh, navigate, isGuest]);
 
 	useEffect(() => {
-		if (!isInitialized) return;
+		// 게스트이거나 초기화되지 않은 경우 검증 건너뛰기
+		if (!isInitialized || isGuest) return;
 
 		// 인증 관련 페이지 체크
 		if (
@@ -105,7 +87,8 @@ export const useTokenValidation = () => {
 			location.pathname === '/auth/google/callback' ||
 			location.pathname === '/oauth/google/callback' ||
 			location.pathname.startsWith('/link/') ||
-			location.pathname.startsWith('/friend/')
+			location.pathname.startsWith('/friend/') ||
+			location.pathname.startsWith('/coordinations/friends/')
 		) {
 			return;
 		}
@@ -124,5 +107,12 @@ export const useTokenValidation = () => {
 			clearTimeout(initialCheckTimeout);
 			clearInterval(intervalId);
 		};
-	}, [accessToken, isInitialized, navigate, location.pathname, validateToken]);
+	}, [
+		accessToken,
+		isInitialized,
+		navigate,
+		location.pathname,
+		validateToken,
+		isGuest,
+	]);
 };

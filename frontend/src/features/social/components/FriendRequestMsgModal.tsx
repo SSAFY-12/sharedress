@@ -34,18 +34,20 @@ export const FriendRequestMsgModal = ({
 	>
 		<MainModal.Header>
 			<MainModal.Body>
-				<div className='flex flex-col items-center'>
+				<div className='flex flex-col items-center mt-4'>
 					<UserMiniAvatar
 						src={getOptimizedImageUrl(friend.profileImage)}
 						size='lg'
-						className='mb-3'
+						className='mb-2.5'
 					/>
-					<h2 className='font-bold mb-1'>{friend.nickname}</h2>
-					<label className='mt-4 mb-2 text-sm text-left'>
-						친구 요청 메시지(10자 제한)
+					<h2 className='text-smallButton text-regular mb-6'>
+						{friend.nickname}
+					</h2>
+					<label className='w-full mb-2.5 text-regular text-description text-left'>
+						친구 요청 메시지
 					</label>
 					<input
-						className='w-full border rounded px-3 py-2 mb-4'
+						className='mb-6 text-default text-regular placeholder:text-descriptionColor text-left flex justify-between items-center px-4 py-2.5 bg-background h-12 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-light disabled:bg-background'
 						placeholder='메시지 입력'
 						value={message}
 						onChange={(e) => {
@@ -55,10 +57,9 @@ export const FriendRequestMsgModal = ({
 						}}
 					/>
 					<PrimaryBtn
-						size='compact'
+						size='medium'
 						name='친구 요청'
-						color='black'
-						className='w-full bg-[#3A3636] text-white mt-2'
+						color='primary'
 						onClick={onConfirm}
 					/>
 				</div>

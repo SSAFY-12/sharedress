@@ -143,7 +143,7 @@ const CodiEditPage = () => {
 		<div className='w-full h-screen flex flex-col bg-white overflow-hidden'>
 			<Header {...headerProps} />
 			<div className='flex-1 flex flex-col overflow-hidden'>
-				<div className='flex-shrink-0'>
+				<div className='flex-shrink-0 md:h-[400px]'>
 					<CodiCanvas
 						items={canvasItems}
 						isEditable={true}
@@ -156,7 +156,9 @@ const CodiEditPage = () => {
 				<CodiEditBottomSection
 					categories={CATEGORIES}
 					activeCategory={activeCategory}
-					filteredProducts={(products || [])
+					filteredProducts={(
+						products?.pages.flatMap((page) => page.content) || []
+					)
 						.filter((item) => {
 							if (isRecommendedMode) return item.isPublic;
 							return true;

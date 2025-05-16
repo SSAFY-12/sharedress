@@ -1,9 +1,8 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
 import { authApi } from '@/features/auth/api/authApi';
-import { useProfileStore } from '@/store/useProfileStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface ProfileHeaderProps {
@@ -13,6 +12,7 @@ interface ProfileHeaderProps {
 	statusMessage?: string;
 	isMe?: boolean;
 	memberId?: number;
+	handleModalOpen?: () => void;
 }
 
 const backgroundImages = [
@@ -20,6 +20,16 @@ const backgroundImages = [
 	'/images/backgrounds/2.jpg',
 	'/images/backgrounds/3.jpg',
 	'/images/backgrounds/4.jpg',
+	'/images/backgrounds/5.jpg',
+	'/images/backgrounds/6.jpg',
+	'/images/backgrounds/7.jpg',
+	'/images/backgrounds/8.jpg',
+	'/images/backgrounds/9.jpg',
+	'/images/backgrounds/10.jpg',
+	'/images/backgrounds/11.jpg',
+	'/images/backgrounds/12.jpg',
+	'/images/backgrounds/13.jpg',
+	'/images/backgrounds/14.jpg',
 ];
 
 const ProfileHeader = ({
@@ -29,12 +39,9 @@ const ProfileHeader = ({
 	statusMessage,
 	isMe,
 	memberId,
+	handleModalOpen,
 }: ProfileHeaderProps) => {
-	const isGuest = useProfileStore((state) => state.isGuest);
-	const selectedBackgroundImage = useMemo(() => {
-		const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-		return backgroundImages[randomIndex];
-	}, []);
+	const isGuest = useAuthStore((state) => state.isGuest);
 	const navigate = useNavigate();
 
 	const handleRecommendClick = () => {
@@ -75,7 +82,9 @@ const ProfileHeader = ({
 				<div
 					className='absolute inset-0'
 					style={{
-						backgroundImage: `url(${selectedBackgroundImage})`,
+						backgroundImage: isMe
+							? `url(${backgroundImages[2]})`
+							: `url(${backgroundImages[1]})`,
 						backgroundSize: 'cover',
 						backgroundPosition: 'center',
 						filter: 'blur(2px)',
@@ -90,16 +99,16 @@ const ProfileHeader = ({
 			<div className='relative z-10'>
 				{isMe ? (
 					<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
-						<img src='/icons/logo_black.svg' alt='쉐어드레스' />
+						<img src='/icons/logo_white.svg' alt='쉐어드레스' />
 						<div className='flex gap-4'>
 							<img
-								src='/icons/logout_black.svg'
+								src='/icons/logout_white.svg'
 								alt='로그아웃'
 								onClick={handleLogoutClick}
 								className='cursor-pointer'
 							/>
 							<img
-								src='/icons/notification_black.svg'
+								src='/icons/notification_white.svg'
 								alt='알림'
 								onClick={handleNotificationClick}
 								className='cursor-pointer'
@@ -116,6 +125,7 @@ const ProfileHeader = ({
 					<Header
 						showBack={true}
 						onBackClick={handleBackClick}
+						closet={true}
 						onBadgeClick={handleNotificationClick}
 					/>
 				)}
@@ -139,9 +149,9 @@ const ProfileHeader = ({
 				{/* 프로필 카드 */}
 				<div className='bg-white/70 backdrop-blur-sm rounded-xl pt-16 pb-6 shadow-sm border-white border-2'>
 					<div className='flex flex-col items-center'>
-						<h2 className='text-title font-bold mb-1 text-center'>
-							<span className='text-regular'>{nickname}</span>
-							<span className='text-low'>#{code}</span>
+						<h2 className='mb-1 text-center'>
+							<span className=' text-title text-regular'>{nickname}</span>
+							<span className='text-titleThin text-low'>#{code}</span>
 						</h2>
 						<p className='text-description text-regular mb-4 text-center mt-2.5'>
 							{statusMessage}
@@ -149,16 +159,22 @@ const ProfileHeader = ({
 						<div className='w-full px-4'>
 							{isMe ? (
 								<PrimaryBtn
-									size='full'
+									size='medium'
 									name='프로필 수정하기'
 									onClick={() => handleProfileEditClick()}
 									color='white'
 								/>
 							) : (
 								<PrimaryBtn
-									size='full'
+									size='medium'
 									name='코디 추천하기'
-									onClick={handleRecommendClick}
+									onClick={() => {
+										if (!isGuest) {
+											handleRecommendClick();
+										} else {
+											handleModalOpen?.();
+										}
+									}}
 									color='white'
 								/>
 							)}

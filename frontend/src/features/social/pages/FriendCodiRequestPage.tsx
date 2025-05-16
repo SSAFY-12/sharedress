@@ -1,6 +1,6 @@
 import { SearchBar } from '@/components/inputs/search-bar';
 import { UserRowItem } from '@/containers/UserRowItem';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getOptimizedImageUrl } from '@/utils/imageUtils'; // 이미지 최적화
 import useFriendList from '@/features/social/hooks/useFriendList';
 import useSearchFriend from '@/features/social/hooks/useSearchFriend';
@@ -69,15 +69,27 @@ export const FriendCodiRequestPage = () => {
 		selectedFriend?.receiverId ?? 0,
 	);
 
-	// 친구 검색 이름 제한 20글자이내
+	// 키보드 이벤트 처리
+	useEffect(() => {
+		const handleResize = () => {
+			const vh = window.innerHeight * 0.01;
+			document.documentElement.style.setProperty('--vh', `${vh}px`);
+		};
+
+		window.addEventListener('resize', handleResize);
+		handleResize();
+
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
+
 	return (
-		<div className='flex flex-col w-full h-full mx-auto bg-white gap-3.5 px-4 pt-2'>
-			{/* 검색 영역 */}
+		<div className='flex flex-col w-full h-[calc(var(--vh,1vh)*100)] mx-auto bg-white gap-3.5 px-4 pt-2 overflow-y-auto'>
 			<SearchBar
 				placeholder='친구 검색'
 				value={searchValue}
 				onChange={handleSearchChange}
 				onKeyDown={handleSearch}
+				className='sticky top-0 z-10 bg-white'
 			/>
 
 			<button

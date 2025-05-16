@@ -57,28 +57,16 @@ export const FriendRequestsPage = () => {
 								</div>
 								<div className='flex gap-2'>
 									<PrimaryBtn
-										size='compact'
+										size='tiny'
 										name='친구 수락'
-										color='black'
+										color='brown'
 										onClick={() => handleActionClick('accept', request)}
-										className='
-									mt-3
-									w-[72px] h-[36px] text-[13px] rounded-[8px]
-									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
-									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
-								  '
 									/>
 									<PrimaryBtn
-										size='compact'
+										size='tiny'
 										name='친구 거절'
-										color='black'
+										color='background'
 										onClick={() => handleActionClick('reject', request)}
-										className='
-									mt-3
-									w-[72px] h-[36px] text-[13px] rounded-[8px]
-									sm:w-[82px] sm:h-[40px] sm:text-[14px] sm:rounded-[10px]
-									bg-[#584B4B] text-white font-normal flex items-center justify-center px-0 leading-none whitespace-nowrap
-								  '
 									/>
 								</div>
 							</div>

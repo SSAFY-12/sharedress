@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getMyLoginInfo } from '@/features/social/api/socialApi';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useEffect } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 /** 실제 응답 타입에 맞춰 정의 */
 interface LoginInfo {
@@ -11,7 +12,7 @@ interface LoginInfo {
 
 export const useLoginInfo = () => {
 	/** zustand state setters */
-	const setIsGuest = useProfileStore((s) => s.setIsGuest);
+	const setIsGuest = useAuthStore((s) => s.setIsGuest);
 	const setMyId = useProfileStore((s) => s.setMyId);
 
 	const { data, isLoading, error } = useQuery<LoginInfo>({

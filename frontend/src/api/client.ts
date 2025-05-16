@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
 import { getErrorMessage } from './errorHandler';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authApi } from '@/features/auth/api/authApi';
@@ -8,48 +7,62 @@ const baseURL = import.meta.env.VITE_API_URL || 'https://www.sharedress.co.kr';
 
 export const client = axios.create({
 	baseURL,
-	withCredentials: true, // 크로스 사이트 요청 시 쿠키 전송 필수
-	// 리프레시 토큰이 쿠키로 전송됨 -> 크로스 도메인 요청에서 쿠키 전송 허용
-	// 리프레시 토큰 자동 전송
+	withCredentials: true,
 	headers: {
 		'Content-Type': 'application/json',
 	},
 });
 
 // 전역 에러 처리 함수
-const handleGlobalError = (status: number, serverMessage?: string) => {
-	// 기본 에러 메시지 표시
-	const defaultMessage = getErrorMessage(status); // 에러 메시지 표시
-	toast.error(defaultMessage, {
-		// 토스트 메시지 표시
-		position: 'top-right', // 토스트 위치
-		autoClose: 3000, // 토스트 자동 닫기 시간
-	});
+const handleGlobalError = async (status: number, serverMessage?: string) => {
+	const errorMessage = serverMessage || getErrorMessage(status);
+	console.error(`API Error (${status}):`, errorMessage);
 
-	// 서버에서 추가 에러 메시지가 있다면 표시
-	if (serverMessage && typeof serverMessage === 'string') {
-		// 서버에서 추가 에러 메시지가 있다면 표시
-		toast.error(serverMessage, {
-			// 토스트 메시지 표시
-			position: 'top-right', // 토스트 위치
-			autoClose: 3000, // 토스트 자동 닫기 시간
-		});
+	try {
+		// FCM 메시징 서비스 워커에 메시지 전송
+		if ('serviceWorker' in navigator && 'Notification' in window) {
+			const registration = await navigator.serviceWorker.ready;
+			await registration.showNotification('오류 발생', {
+				body: errorMessage,
+				icon: '/android-chrome-192x192.png',
+				badge: '/favicon-32x32.png',
+				data: {
+					status: status.toString(),
+					message: serverMessage || '',
+				},
+			});
+
+			// 추가 에러 메시지가 있는 경우 별도 알림
+			if (serverMessage && typeof serverMessage === 'string') {
+				await registration.showNotification('추가 정보', {
+					body: serverMessage,
+					icon: '/android-chrome-192x192.png',
+					badge: '/favicon-32x32.png',
+				});
+			}
+		}
+	} catch (error) {
+		console.error('FCM 알림 전송 실패:', error);
 	}
 };
 
 // 요청 인터셉터
 client.interceptors.request.use(
 	(config) => {
-		const token = useAuthStore.getState().accessToken; // 토큰 가져오기
-		if (token) {
-			config.headers.Authorization = `Bearer ${token}`; // 토큰 헤더에 추가
+		const { accessToken, isGuest } = useAuthStore.getState();
+
+		// 액세스 토큰이 있으면 Bearer 토큰으로 전송
+		if (accessToken) {
+			config.headers.Authorization = `Bearer ${accessToken}`;
 		}
+		// 게스트인 경우 쿠키 전송
+		else if (isGuest) {
+			config.withCredentials = true;
+		}
+
 		return config;
 	},
-	(error) => {
-		console.error('❌ 요청 인터셉터 에러 발생 :', error);
-		return Promise.reject(error);
-	},
+	(error) => Promise.reject(error),
 );
 
 // 응답 인터셉터
@@ -57,33 +70,48 @@ client.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config;
+		const { isGuest } = useAuthStore.getState();
 
-		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도
-		if (
-			error.response?.status === 401 &&
-			!originalRequest._retry &&
-			!originalRequest.url?.includes('/auth/refresh')
-		) {
-			originalRequest._retry = true;
+		if (error.response?.status === 401) {
+			console.log('401 에러 발생:', {
+				url: originalRequest.url,
+				isGuest,
+				isRetry: originalRequest._retry,
+			});
 
-			try {
-				// 리프레시 토큰으로 새로운 액세스 토큰 요청
-				const { content } = await authApi.refresh();
-				const { accessToken } = content;
+			// 게스트인 경우 401 에러를 그대로 반환하고 리다이렉트하지 않음
+			if (isGuest) {
+				// 코디 관련 API는 게스트 사용자도 접근 가능하도록 처리
+				// ------------------------------- 코디 관련 API 처리 로직 추가 ----------------------------------
+				if (originalRequest.url?.includes('/coordinations')) {
+					console.log('게스트 사용자 코디 API 호출:', originalRequest.url);
+					// 원래 요청을 그대로 진행하되, 인증 헤더는 제거
+					delete originalRequest.headers.Authorization;
+					return client(originalRequest);
+				}
+				// ------------------------------- 코디 관련 API 처리 로직 추가 ----------------------------------
+				console.log('게스트 사용자 401 에러 처리:', originalRequest.url);
+				return Promise.reject(error);
+			}
 
-				useAuthStore.getState().setAccessToken(accessToken);
-
-				// 원래 요청 재시도
-				originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-				return client(originalRequest);
-			} catch (refreshError) {
-				// 리프레시 토큰 갱신 실패 시 로그아웃 처리
-				const { clearAuth } = useAuthStore.getState();
-				clearAuth();
-
-				// 로그아웃 후 /auth로 이동 (항상 이동)
-				window.location.href = '/auth';
-				return Promise.reject(refreshError);
+			// 게스트가 아닌 경우에만 리프레시 시도
+			if (
+				!originalRequest._retry &&
+				!originalRequest.url?.includes('/auth/refresh')
+			) {
+				originalRequest._retry = true;
+				try {
+					const { content } = await authApi.refresh();
+					const { accessToken } = content;
+					useAuthStore.getState().setAccessToken(accessToken);
+					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+					return client(originalRequest);
+				} catch (refreshError) {
+					console.log('토큰 리프레시 실패, 게스트로 전환');
+					useAuthStore.getState().setIsGuest(true);
+					useAuthStore.getState().clearAuth();
+					return Promise.reject(error);
+				}
 			}
 		}
 
@@ -99,5 +127,3 @@ client.interceptors.response.use(
 		return Promise.reject(error);
 	},
 );
-
-export default client;

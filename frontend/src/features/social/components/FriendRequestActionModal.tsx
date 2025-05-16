@@ -69,21 +69,21 @@ export const FriendRequestActionModal = ({
 		>
 			<MainModal.Header>
 				<MainModal.Body>
-					<div className='flex flex-col items-center gap-2 py-4'>
-						<UserMiniAvatar
-							src={getOptimizedImageUrl(friend.profileImage)}
-							size='lg'
-							className='mb-2'
-						/>
-						<h2 className='font-bold mb-1'>{friend.nickname}</h2>
-						<div className='mb-2 text-sm text-gray-600 w-full text-left'>
+					<div className='flex flex-col items-center gap-6 mt-4'>
+						<div className='flex flex-col items-center gap-2.5'>
+							<UserMiniAvatar
+								src={getOptimizedImageUrl(friend.profileImage)}
+								size='lg'
+							/>
+							<h2 className='font-bold'>{friend.nickname}</h2>
+						</div>
+						<div className=' text-sm text-low text-center'>
 							{friendRequest.message}
 						</div>
 						<PrimaryBtn
-							size='compact'
+							size='medium'
 							name={getActionButtonText()}
-							color='black'
-							className='w-full bg-[#3A3636] text-white mt-1'
+							color='primary'
 							onClick={handleAction}
 						/>
 					</div>

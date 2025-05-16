@@ -1665,3 +1665,322 @@ if (permission === 'granted') {
 - 푸시 알림이 누락되는 문제, 인증 상태 변화 시 FCM 토큰 미반영 문제를 해결
 - FCM 토큰 저장 타이밍을 명확히 하여, 안정적인 알림 서비스 제공이 가능해짐
 - 인증 상태 변화와 FCM 토큰 관리의 연동이 중요함을 확인한 사례
+
+<<<<<<< HEAD
+
+
+
+### [트러블슈팅] 웹앱의 모든 Toast 알림을 FCM(브라우저/OS 푸시 알림)으로 전환(2025/05/14-안주민)
+
+---
+
+### 문제상황
+- 기존에는 react-toastify의 Toast 알림(화면 우측 상단 팝업)으로 사용자에게 안내 메시지를 보여줬음.
+- 하지만, Toast는 웹앱이 포그라운드(열려있는 상태)일 때만 보이고, 사용자가 탭을 닫거나 백그라운드에 있으면 알림을 받을 수 없음.
+
+---
+
+### 원인 분석
+- Toast는 UI 컴포넌트이기 때문에, 브라우저/OS의 알림 시스템과는 별개로 동작함.
+- 중요한 알림(예: 등록 성공, 실패, 복사 완료, 로그아웃 등)을 사용자가 앱을 보고 있지 않아도 받을 수 있도록 하려면, FCM(푸시 알림)으로 전환이 필요함.
+
+---
+
+### 해결방법
+1. **Toast 알림 코드(react-toastify의 toast.XXX) 전체 검색**
+2. 각 알림 위치에서 toast 호출을 FCM의 `showNotification`으로 변경
+   - `serviceWorker`와 `Notification` API를 활용하여 브라우저/OS 알림을 띄움
+3. 기존 ToastContainer 등 Toast 관련 코드 제거(또는 미사용 처리)
+4. 알림 메시지, 아이콘 등은 기존 Toast와 동일하게 유지
+
+---
+
+### 예시
+
+#### (1) 기존 코드
+```typescript
+import { toast } from 'react-toastify';
+
+toast.success('옷을 등록했어요 👚');
+toast.error('삭제 실패 😥');
+toast.info('내 옷장 주소가 복사됐어요');
+toast.info('로그아웃되었습니다.');
+```
+
+#### (2) 변경 후 코드
+```typescript
+if ('serviceWorker' in navigator && 'Notification' in window) {
+  const registration = await navigator.serviceWorker.ready;
+  await registration.showNotification('알림 제목', {
+    body: '알림 내용',
+    icon: '/android-chrome-192x192.png',
+    badge: '/favicon-32x32.png',
+  });
+}
+```
+- 예시: 옷 등록 성공 → `'옷을 등록했어요 👚'`라는 푸시 알림이 브라우저/OS에 뜸
+
+---
+
+### 결론 및 정리
+
+- **이제 모든 안내 메시지는 Toast 대신 FCM 푸시 알림으로 노출됨**
+  - 사용자가 웹앱을 보고 있지 않아도(탭이 닫혀있거나 백그라운드여도) 알림을 받을 수 있음
+  - 알림 권한이 필요하므로, 사용자가 권한을 허용해야 정상적으로 동작함
+- 적용 파일:  
+  - `useRegistCloth.ts` (옷 등록/삭제 성공/실패)
+  - `ExternalShareModal.tsx` (복사 완료)
+  - `useAuthStore.ts` (로그아웃)
+  - `useFcmInitialization.ts` (알림 권한 안내 등)
+- **중요한 알림을 더 확실하게 사용자에게 전달할 수 있게 됨**
+
+---
+
+추가로 궁금한 점이나, 더 보고 싶은 예시가 있으면 언제든 말씀해 주세요!
+=======
+## [트러블슈팅] Guest Token 인증 처리 문제 해결(2025/05/15-안주민)
+
+### 문제상황
+
+- 비회원(게스트)이 coordinations API에 접근할 때 401 Unauthorized 에러 발생
+- guestToken이 쿠키에 존재함에도 불구하고 인증 실패
+- 페이지 이동 시 불필요하게 auth 페이지로 리다이렉트되는 문제 발생
+- 특히 `/coordinations/friends/1` API 호출 시 401 에러가 발생하는 문제
+
+### 원인 분석
+
+1. **인증 처리 로직의 문제**
+
+   - guestToken이 있음에도 불필요한 인증 체크 수행
+   - 401 에러 발생 시 빈 배열을 반환하여 UI 깨짐
+   - 리프레시 토큰 시도 조건이 불완전
+   - guestToken이 있더라도 accessToken이 없으면 인증 실패로 처리
+
+2. **토큰 검증 로직의 문제**
+
+   - guestToken 존재 여부 확인 로직 부재
+   - 불필요한 토큰 갱신 시도
+   - guestToken으로도 접근 가능한 API에 대한 예외 처리 부재
+
+3. **API 클라이언트 인터셉터의 문제**
+   - 401 에러 발생 시 무조건 리프레시 토큰 시도
+   - guestToken이 있는 경우에 대한 예외 처리 부재
+   - 원래 요청 재시도 로직 미흡
+
+### 해결방법
+
+#### 1. useTokenValidation.ts 수정
+
+**초기 코드:**
+
+```typescript
+const validateToken = useCallback(async () => {
+	const hasRefreshToken = document.cookie.includes('refreshToken');
+	const hasGuestToken = document.cookie.includes('guestToken');
+	const currentToken = useAuthStore.getState().accessToken;
+
+	if (!currentToken) {
+		if (hasRefreshToken) {
+			return await handleTokenRefresh();
+		}
+		// guestToken만 있을 때는 그냥 통과
+		if (hasGuestToken) {
+			console.log('게스트 토큰만 존재, 토큰 검증/갱신 스킵');
+			return true;
+		}
+		navigate('/auth', { replace: true });
+		return false;
+	}
+	return true;
+}, [handleTokenRefresh, navigate]);
+```
+
+**변경된 코드:**
+
+```typescript
+const validateToken = useCallback(async () => {
+	const hasRefreshToken = document.cookie.includes('refreshToken');
+	const hasGuestToken = document.cookie.includes('guestToken');
+	const currentToken = useAuthStore.getState().accessToken;
+
+	console.log('🔍 토큰 검증:', {
+		accessToken: !!currentToken,
+		refreshToken: hasRefreshToken,
+		guestToken: hasGuestToken,
+		시간: new Date().toLocaleString('ko-KR'),
+	});
+
+	if (!currentToken) {
+		if (hasRefreshToken) {
+			return await handleTokenRefresh();
+		}
+		// guestToken만 있을 때는 그냥 통과
+		if (hasGuestToken) {
+			console.log('게스트 토큰만 존재, 토큰 검증/갱신 스킵');
+			return true;
+		}
+		navigate('/auth', { replace: true });
+		return false;
+	}
+	return true;
+}, [handleTokenRefresh, navigate]);
+```
+
+**주요 변경점:**
+
+1. guestToken 존재 여부 확인 로직 추가
+2. guestToken만 있을 때는 토큰 검증/갱신 스킵
+3. 디버깅을 위한 로깅 추가
+4. 인증 실패 시 리다이렉트 조건 강화
+
+#### 2. client.ts 수정
+
+**초기 코드:**
+
+```typescript
+client.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		const originalRequest = error.config;
+		const { isGuest } = useAuthStore.getState();
+
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			try {
+				const response = await authApi.refresh();
+				const newToken = response.content.accessToken;
+				useAuthStore.getState().setAccessToken(newToken);
+				originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+				return axios(originalRequest);
+			} catch (refreshError) {
+				useAuthStore.getState().logout();
+				window.location.href = '/auth';
+				return Promise.reject(refreshError);
+			}
+		}
+		return Promise.reject(error);
+	},
+);
+```
+
+**변경된 코드:**
+
+```typescript
+client.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		const originalRequest = error.config;
+		const { isGuest } = useAuthStore.getState();
+		const hasGuestToken = document.cookie.includes('guestToken');
+
+		console.log('🔍 API 응답 에러:', {
+			status: error.response?.status,
+			url: originalRequest.url,
+			guestToken: hasGuestToken,
+			시간: new Date().toLocaleString('ko-KR'),
+		});
+
+		// guestToken이 있는 경우 401 에러를 무시하고 원래 요청을 재시도
+		if (error.response?.status === 401 && hasGuestToken) {
+			console.log('게스트 토큰 존재, 원래 요청 재시도');
+			return client(originalRequest);
+		}
+
+		// 401 에러가 발생했고, 리프레시 토큰 요청이 아닌 경우에만 리프레시 시도
+		if (
+			error.response?.status === 401 &&
+			!originalRequest._retry &&
+			!originalRequest.url?.includes('/auth/refresh') &&
+			!isGuest && // 게스트가 아닌 경우에만 리프레시 시도
+			!hasGuestToken // guestToken이 없는 경우에만 리프레시 시도
+		) {
+			try {
+				const response = await authApi.refresh();
+				const newToken = response.content.accessToken;
+				useAuthStore.getState().setAccessToken(newToken);
+				originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+				return axios(originalRequest);
+			} catch (refreshError) {
+				useAuthStore.getState().logout();
+				window.location.href = '/auth';
+				return Promise.reject(refreshError);
+			}
+		}
+		return Promise.reject(error);
+	},
+);
+```
+
+**주요 변경점:**
+
+1. guestToken 존재 여부 확인 로직 추가
+2. guestToken이 있을 때 401 에러 무시 및 원래 요청 재시도
+3. 리프레시 토큰 시도 조건 강화 (guestToken 체크 추가)
+4. 디버깅을 위한 로깅 추가
+
+### 변경사항 상세 설명
+
+#### 1. useTokenValidation.ts 변경점
+
+- **추가된 기능**
+
+  - guestToken 존재 여부 확인
+  - guestToken만 있을 때 토큰 검증/갱신 스킵
+  - 디버깅을 위한 로깅 추가
+  - 인증 실패 시 리다이렉트 조건 강화
+
+- **변경 이유**
+  - 불필요한 인증 체크 방지
+  - guestToken이 있을 때 정상적인 페이지 접근 보장
+  - 디버깅 용이성 향상
+  - 인증 실패 시 사용자 경험 개선
+
+#### 2. client.ts 변경점
+
+- **추가된 기능**
+
+  - guestToken 존재 시 401 에러 무시
+  - 원래 요청 재시도 로직
+  - 리프레시 토큰 시도 조건 강화
+  - 디버깅을 위한 로깅 추가
+
+- **변경 이유**
+  - guestToken으로 정상적인 API 호출 보장
+  - 불필요한 auth 페이지 리다이렉트 방지
+  - 불필요한 리프레시 토큰 시도 방지
+  - 문제 발생 시 디버깅 용이성 향상
+
+### 결론 및 정리
+
+1. **해결된 문제**
+
+   - guestToken으로 coordinations API 접근 가능
+   - 불필요한 auth 페이지 리다이렉트 제거
+   - 비회원의 코디/옷장 페이지 접근 가능
+   - 401 에러 발생 시 적절한 처리
+
+2. **개선된 점**
+
+   - 인증 처리 로직 개선
+   - 토큰 검증 로직 강화
+   - 에러 처리 방식 개선
+   - 디버깅 용이성 향상
+
+3. **추가 확인사항**
+
+   - 서버의 guestToken 인식 여부
+   - guestToken의 만료 시간
+   - 서버 로그의 guestToken 관련 에러
+   - API 응답 상태 코드 확인
+
+4. **테스트 필요 사항**
+
+   - 비회원 시나리오 테스트
+   - 페이지 이동 시 guestToken 유지
+   - API 호출 정상 동작 확인
+   - 에러 발생 시 적절한 처리 확인
+
+5. **주의사항**
+   - guestToken이 있는 경우에도 일부 API는 접근 제한 필요
+   - guestToken 만료 시 적절한 처리 필요
+   - 서버와의 협의를 통한 guestToken 권한 범위 설정 필요
+>>>>>>> 3186cb4fb37114ee3bf8bf037ffc3908c60e4457

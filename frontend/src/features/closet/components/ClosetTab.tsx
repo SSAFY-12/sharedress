@@ -2,6 +2,8 @@ import { ClothItem } from '@/components/cards/cloth-card';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '@/features/closet/hooks/useCloset';
+import { useEffect, useRef } from 'react';
+import { ClosetItem } from '@/features/closet/api/closetApi';
 
 interface ClosetTabProps {
 	memberId: number;
@@ -24,10 +26,34 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const categoryId =
 		selectedCategory === '전체' ? undefined : CATEGORY_ID_MAP[selectedCategory];
 
-	const { data: closetItems } = useCloset(memberId, categoryId);
+	const {
+		data,
+		isFetchingNextPage,
+		hasNextPage,
+		fetchNextPage,
+		isFetching,
+		isLoading,
+	} = useCloset(memberId, categoryId);
 
-	const visibleItems = (closetItems ?? []).filter(
-		(item) => isMe || item.isPublic,
+	const sentinel = useRef<HTMLDivElement | null>(null);
+
+	useEffect(() => {
+		if (!sentinel.current) return;
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+					fetchNextPage();
+				}
+			},
+			{ root: null, threshold: 0.1 },
+		);
+		io.observe(sentinel.current);
+		return () => io.disconnect();
+	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+	const allItems = data?.pages.flatMap((page) => page.content) ?? [];
+	const visibleItems = allItems.filter(
+		(item: ClosetItem) => isMe || item.isPublic,
 	);
 
 	const handleItemClick = (item: ClothItem) => {
@@ -38,27 +64,29 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 
 	return (
 		<div className='flex flex-col h-full'>
-			{(closetItems?.length ?? 0) === 0 ? (
+			{(visibleItems.length ?? 0) === 0 ? (
 				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor'>
 					저장한 옷이 없습니다.
 				</div>
 			) : (
 				<div className='flex-1 px-4'>
 					<ClothListContainer
-						items={
-							visibleItems.map((item) => ({
-								id: item.id,
-								category: selectedCategory,
-								imageUrl: item.image,
-								name: item.name,
-								brand: item.brandName,
-								isPublic: item.isPublic,
-							})) ?? []
-						}
+						items={visibleItems.map((item: ClosetItem) => ({
+							id: item.id,
+							category: selectedCategory,
+							imageUrl: item.image,
+							name: item.name,
+							brand: item.brandName,
+							isPublic: item.isPublic,
+						}))}
 						onItemClick={handleItemClick}
 						columns={3}
 						className='mt-1'
 						type='cloth'
+						scrollRef={sentinel}
+						isLoading={isLoading}
+						isFetching={isFetching}
+						isFetchingNextPage={isFetchingNextPage}
 					/>
 				</div>
 			)}

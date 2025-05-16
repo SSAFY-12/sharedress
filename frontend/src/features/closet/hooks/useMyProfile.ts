@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMyProfile } from '@/features/closet/api/closetApi';
 import { useProfileStore } from '@/store/useProfileStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export const useMyProfile = () => {
 	const setMyId = useProfileStore((state) => state.setMyId);
 	const setIsPublic = useProfileStore((state) => state.setIsPublic);
-	const setIsGuest = useProfileStore((state) => state.setIsGuest);
+	const setIsGuest = useAuthStore((state) => state.setIsGuest);
 
 	return useQuery({
 		queryKey: ['myProfile'],

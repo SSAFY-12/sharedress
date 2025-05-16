@@ -20,7 +20,7 @@ export const RegisteredBedge = ({ libraryId }: { libraryId: number }) => {
 		const found = itemList.find((item) => item.libraryId === libraryId);
 		if (found) {
 			setTimeout(() => {
-				setRegState({ isRegistered: true, closetId: found.closetId });
+				setRegState({ isRegistered: true, closetId: found.id });
 			}, 0);
 		}
 	}, [itemList, libraryId]);

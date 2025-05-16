@@ -44,8 +44,9 @@ const GoogleAuthPage = () => {
 		const params = new URLSearchParams({
 			response_type: 'token',
 			client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-			// redirect_uri: `https://www.sharedress.co.kr/oauth/google/callback`,
-			redirect_uri: `https://localhost:5173/oauth/google/callback`,
+			redirect_uri: `https://www.sharedress.co.kr/oauth/google/callback`,
+			// redirect_uri: `https://localhost:5173/oauth/google/callback`,
+
 			scope: 'openid profile email',
 		});
 		// console.log(params.toString(), 'test');

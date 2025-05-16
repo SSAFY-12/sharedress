@@ -12,7 +12,6 @@ import {
 } from '@/features/regist/api/registApis';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
-
 const LibraryContainer = () => {
 	const [selectedCategory, setSelectedCategory] = useState<
 		(typeof categoryConfig)[number]
@@ -76,10 +75,6 @@ const LibraryContainer = () => {
 		setSelectedCategory(category as (typeof categoryConfig)[number]);
 	};
 
-	const handleItemClick = (item: ClothItem) => {
-		console.log('선택된 아이템:', item);
-	};
-
 	const sentinel = useRef<HTMLDivElement | null>(null);
 
 	useEffect(() => {
@@ -126,7 +121,6 @@ const LibraryContainer = () => {
 				<ClothListContainer
 					isForRegist={true}
 					items={allItems as ClothItem[]}
-					onItemClick={handleItemClick}
 					className='flex flex-col w-full gap-4'
 					scrollRef={sentinel}
 					isLoading={isLoading}

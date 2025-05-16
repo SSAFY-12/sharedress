@@ -12,8 +12,8 @@ export const categoryMapping: {
 	[key in (typeof categoryConfig)[number]]: number;
 } = {
 	전체: 0,
-	아우터: 1,
-	상의: 2,
+	아우터: 2,
+	상의: 1,
 	하의: 3,
 	신발: 4,
 	기타: 5,

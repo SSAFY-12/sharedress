@@ -56,17 +56,51 @@ export const LibraryApis = {
 		const response = await client.post('/api/closet/clothes/library', {
 			itemId: itemId,
 		});
-		console.log(itemId, 'request');
-		console.log(response.data, 'response');
+
+		return response.data;
+	},
+	deleteCloth: async (closetClothesId: number) => {
+		const response = await client.delete(
+			`/api/closet/clothes/${closetClothesId}`,
+		);
 		return response.data;
 	},
 };
 
+import { MyClosetContent } from '@/store/useClosetStore';
+export interface MyClosetResponse {
+	status: Status;
+	content: MyClosetContent[];
+}
+
 export const ClosetApis = {
 	// --------------------옷장 옷 조회------------------------
-	deleteCloth: async (closetClothesId: number) => {
-		const response = await client.delete(
-			`/api/closet/clothes/${closetClothesId}`,
+	getMyCloset: async (): Promise<MyClosetResponse> => {
+		console.log('옷장 api 호출');
+		const response = await client.get('/api/closet/my');
+		console.log(response, 'APIresponse');
+		return response.data;
+	},
+};
+
+interface PurchaseHistoryRequest {
+	shopId: number;
+	id: string;
+	password: string;
+}
+
+interface PurchaseHistoryResponse {
+	status: Status;
+}
+
+export const ScanApis = {
+	// --------------------무신사 옷 등록------------------------
+	getPurchaseHistory: async (
+		data: PurchaseHistoryRequest,
+	): Promise<PurchaseHistoryResponse> => {
+		const response = await client.post(
+			'/api/closet/clothes/purchase-history',
+			data,
 		);
 		return response.data;
 	},
