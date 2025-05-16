@@ -58,7 +58,7 @@ const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 								{toRelativeTime(comment.createdAt)}
 							</span>
 						</div>
-						<p className='mt-1.5 text-default text-regular'>
+						<p className='mt-1.5 text-default text-regular text-left'>
 							{comment.content}
 						</p>
 					</div>
