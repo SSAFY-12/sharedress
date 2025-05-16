@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useScanCloth } from '@/features/regist/hooks/useScanCloth';
+import LoadingOverlay from '@/components/etc/LodaingOverlay';
 
 interface MusinsaForm {
 	id: string;
@@ -24,6 +25,7 @@ const RegistScanMusinsaPage = () => {
 
 	return (
 		<div className='flex-1 w-full h-full flex flex-col justify-start items-center py-5 px-4 gap-4'>
+			{isPending && <LoadingOverlay />}
 			<h1 className='text-black text-2xl text-semibold mb-2'>MUSINSA</h1>
 			<form
 				onSubmit={handleSubmit(onSubmit)}

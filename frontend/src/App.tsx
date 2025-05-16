@@ -9,7 +9,6 @@ import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { useNavigate } from 'react-router-dom';
 import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
-// import * as Sentry from '@sentry/react';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
@@ -17,6 +16,7 @@ export const App = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
 	const [showFcmModal, setShowFcmModal] = useState(false);
+
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
@@ -62,6 +62,20 @@ export const App = () => {
 		<>
 			<GoogleAnalytics />
 
+			{/* 개발 환경에서만 보이는 Sentry 테스트 버튼 */}
+			{import.meta.env.DEV && (
+				<div className='fixed bottom-4 right-4 z-50'>
+					<button
+						onClick={() => {
+							throw new Error('This is your first error!');
+						}}
+						className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg'
+					>
+						Break the world
+					</button>
+				</div>
+			)}
+
 			{/* 모바일 레이아웃 */}
 			<div className='block sm:hidden min-h-screen bg-white'>
 				<MobileLayout />
@@ -79,8 +93,8 @@ export const App = () => {
 			{/* Toastify 컨테이너 */}
 			<ToastContainer
 				className='py-6 px-4'
-				toastClassName='rounded-xl bg-black bg-opacity-50 text-white text-default mb-2'
-				position='top-right'
+				toastClassName='py-2 rounded-xl bg-black bg-opacity-50 text-white text-description mb-2'
+				position='top-center'
 				transition={Slide}
 				autoClose={1500}
 				hideProgressBar={true}
@@ -90,6 +104,33 @@ export const App = () => {
 				pauseOnFocusLoss
 				draggable={false}
 				pauseOnHover
+				toastStyle={{
+					height: 'fit-content',
+					minHeight: 'unset',
+					padding: '16px 16px',
+					display: 'flex',
+					alignItems: 'center',
+				}}
+				closeButton={({ closeToast }) => (
+					<button
+						onClick={closeToast}
+						style={{
+							position: 'absolute',
+							right: '16px',
+							color: 'white',
+							opacity: 0.5,
+							fontSize: '14px',
+							padding: '0',
+							background: 'none',
+							border: 'none',
+							cursor: 'pointer',
+							width: '20px',
+							height: '20px',
+						}}
+					>
+						×
+					</button>
+				)}
 			/>
 
 			<AlertModal
