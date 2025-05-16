@@ -9,7 +9,6 @@ import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { useNavigate } from 'react-router-dom';
 import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
-// import * as Sentry from '@sentry/react';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
@@ -62,6 +61,20 @@ export const App = () => {
 	return (
 		<>
 			<GoogleAnalytics />
+
+			{/* 개발 환경에서만 보이는 Sentry 테스트 버튼 */}
+			{import.meta.env.DEV && (
+				<div className='fixed bottom-4 right-4 z-50'>
+					<button
+						onClick={() => {
+							throw new Error('This is your first error!');
+						}}
+						className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg'
+					>
+						Break the world
+					</button>
+				</div>
+			)}
 
 			{/* 모바일 레이아웃 */}
 			<div className='block sm:hidden min-h-screen bg-white'>
