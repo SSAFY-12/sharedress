@@ -13,6 +13,7 @@ import { SwitchToggle } from '@/components/buttons/switch-toggle';
 import { requestNotificationPermission } from '@/utils/firebase';
 import useFcmStore from '@/store/useFcmStore';
 import fcmApi from '@/features/alert/api/fcmapi';
+import useAuth from '@/features/auth/hooks/useAuth';
 // PWA 설치 이벤트를 저장할 변수
 let deferredPrompt: any = null;
 
@@ -22,6 +23,7 @@ export const SetPage = () => {
 	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 	const [isIosGuideModalOpen, setIsIosGuideModalOpen] = useState(false);
 	const [isAndroidGuideModalOpen, setIsAndroidGuideModalOpen] = useState(false);
+	const { logout } = useAuth();
 
 	// PWA 설치 이벤트 감지
 	useEffect(() => {
@@ -138,7 +140,7 @@ export const SetPage = () => {
 						{/* 로그아웃 */}
 						<button
 							className='w-full flex items-center justify-between p-4 text-left'
-							onClick={() => setIsLogoutModalOpen(true)}
+							onClick={logout}
 						>
 							<div className='flex items-center'>
 								<LogOut className='w-5 h-5 text-gray-500 mr-3' />

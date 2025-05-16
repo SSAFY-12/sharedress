@@ -87,11 +87,11 @@ export const InstallGuideModal = ({
 				<p className='text-center text-sm text-gray-600'>{description}</p>
 
 				<div className='space-y-8'>
-					{steps.map((step, index) => (
-						<div key={index} className='mb-4'>
+					{steps.map((step) => (
+						<div key={step.title} className='mb-4'>
 							<div className='flex items-center gap-2 mb-1'>
 								<div className='bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-base font-semibold'>
-									{index + 1}
+									{steps.findIndex((s) => s.title === step.title) + 1}
 								</div>
 								<span className='font-semibold text-base text-left break-words'>
 									{step.title}
