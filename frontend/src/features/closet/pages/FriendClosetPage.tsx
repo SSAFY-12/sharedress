@@ -8,7 +8,7 @@ import { categoryConfig } from '@/constants/categoryConfig';
 
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
-import UnifiedCodiTab from '../components/UnifiedCodiTab';
+import UnifiedCodiTab from '@/features/closet/components/UnifiedCodiTab';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [

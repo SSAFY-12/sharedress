@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useCoordinationList } from '../hooks/useCoordinationList';
+import { useCoordinationList } from '@/features/closet/hooks/useCoordinationList';
 import { ClothItem } from '@/components/cards/cloth-card';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 
