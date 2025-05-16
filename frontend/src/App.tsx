@@ -2,7 +2,7 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
-import { ToastContainer } from 'react-toastify';
+import { Bounce, Flip, Slide, ToastContainer, Zoom } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import useFcmStore from '@/store/useFcmStore';
@@ -78,8 +78,11 @@ export const App = () => {
 
 			{/* Toastify 컨테이너 */}
 			<ToastContainer
+				className='py-6 px-4'
+				toastClassName='rounded-xl bg-black bg-opacity-50 text-white text-default mb-2'
 				position='top-right'
-				autoClose={3000}
+				transition={Slide}
+				autoClose={1500}
 				hideProgressBar={true}
 				newestOnTop={false}
 				closeOnClick
@@ -87,7 +90,6 @@ export const App = () => {
 				pauseOnFocusLoss
 				draggable={false}
 				pauseOnHover
-				theme='light'
 			/>
 
 			<AlertModal
