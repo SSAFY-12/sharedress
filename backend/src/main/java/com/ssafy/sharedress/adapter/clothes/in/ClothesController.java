@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.sharedress.application.ai.usecase.AiTaskUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AiCompleteRequest;
 import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class ClothesController {
 
 	private final ClothesUseCase clothesUseCase;
+	private final AiTaskUseCase aiTaskUseCase;
 
 	@GetMapping("/clothes")
 	public ResponseEntity<ResponseWrapper<List<ClothesSearchResponse>>> getClothes(
@@ -42,6 +44,7 @@ public class ClothesController {
 	@PostMapping("/clothes/ai-complete")
 	public ResponseEntity<ResponseWrapper<Void>> completeClothesPreprocessing(@RequestBody AiCompleteRequest request) {
 		clothesUseCase.markClothesAsAiCompleted(request.memberId(), request.successClothes(), request.failClothes());
+		aiTaskUseCase.updateCompletedAiTask(request.taskId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 }

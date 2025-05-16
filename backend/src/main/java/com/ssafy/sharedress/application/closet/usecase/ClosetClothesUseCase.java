@@ -1,5 +1,6 @@
 package com.ssafy.sharedress.application.closet.usecase;
 
+import com.ssafy.sharedress.application.ai.dto.AiTaskResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
@@ -15,5 +16,5 @@ public interface ClosetClothesUseCase {
 
 	Long addLibraryClothesToCloset(Long clothesId, Long memberId);
 
-	void registerClothesFromPurchase(PurchaseHistoryRequest request, Long memberId);
+	AiTaskResponse registerClothesFromPurchase(PurchaseHistoryRequest request, Long memberId);
 }
