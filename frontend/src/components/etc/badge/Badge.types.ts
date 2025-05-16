@@ -17,4 +17,5 @@ export type Icon =
 	| 'error'
 	| 'profile'
 	| 'add'
-	| 'signUp';
+	| 'signUp'
+	| 'more';

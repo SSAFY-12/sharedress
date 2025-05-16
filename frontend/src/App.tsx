@@ -63,7 +63,7 @@ export const App = () => {
 			<GoogleAnalytics />
 
 			{/* 개발 환경에서만 보이는 Sentry 테스트 버튼 */}
-			{import.meta.env.DEV && (
+			{/* {import.meta.env.DEV && (
 				<div className='fixed bottom-4 right-4 z-50'>
 					<button
 						onClick={() => {
@@ -74,7 +74,7 @@ export const App = () => {
 						Break the world
 					</button>
 				</div>
-			)}
+			)} */}
 
 			{/* 모바일 레이아웃 */}
 			<div className='block sm:hidden min-h-screen bg-white'>

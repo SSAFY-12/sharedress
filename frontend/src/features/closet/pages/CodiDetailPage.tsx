@@ -63,9 +63,9 @@ const CodiDetailPage = () => {
 	const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
 	const [isCommentMenuOpen, setIsCommentMenuOpen] = useState(false);
 
-	const handleMenuClick = () => {
-		setIsMenuOpen(true);
-	};
+	// const handleMenuClick = () => {
+	// 	setIsMenuOpen(true);
+	// };
 
 	const handleMenuClose = () => {
 		setIsMenuOpen(false);
@@ -279,8 +279,8 @@ const CodiDetailPage = () => {
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
 				<ImageDetailView
 					item={item}
-					showMoreButton={isMe}
-					onMoreButtonClick={handleMenuClick}
+					// showMoreButton={isMe}
+					// onMoreButtonClick={handleMenuClick}
 					recommender={recommender}
 				>
 					<div className='px-4'>
