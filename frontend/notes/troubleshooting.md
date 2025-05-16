@@ -1666,8 +1666,6 @@ if (permission === 'granted') {
 - FCM 토큰 저장 타이밍을 명확히 하여, 안정적인 알림 서비스 제공이 가능해짐
 - 인증 상태 변화와 FCM 토큰 관리의 연동이 중요함을 확인한 사례
 
-<<<<<<< HEAD
-
 ### [트러블슈팅] 웹앱의 모든 Toast 알림을 FCM(브라우저/OS 푸시 알림)으로 전환(2025/05/14-안주민)
 
 ---
@@ -1997,18 +1995,18 @@ client.interceptors.response.use(
 
 #### 문제상황
 
-로컬(dev) : 옷 삭제 버튼 → 정상 동작배포(prod) : 첫 클릭 — UI 변동 없음두 번째
-클릭 — 403 Forbidden 응답동일한 코드-경로인 등록(register) 은 배포에서도 정상
+로컬(dev) : 옷 삭제 버튼 → 정상 동작배포(prod) : 첫 클릭 — UI 변동 없음두 번째클
+릭 — 403 Forbidden 응답동일한 코드-경로인 등록(register) 은 배포에서도 정상
 
 #### 원인 분석
 
 단계 관찰 해석 ① API 호출 서버는 200 OK → 실제 삭제 완료 요청 자체는 성공 ②
 React-Query onSuccess 알림 권한 거부 / 브라우저 미지원 → showNotification()
-Promise reject mutation 내부에서 예외 발생 → React-Query가 상태를 “실패”로 뒤집
+Promise reject mutation 내부에서 예외 발생 → React-Query가 상태를 "실패"로 뒤집
 고 onSuccess(override) 미호출 ③ 컴포넌트 상태 regState (기등록 여부) 가 업데이트
-되지 않음 UI는 여전히 “등록됨” 으로 표시 ④ 사용자 재클릭 이미 삭제된 자원에 재요
-청 → 403 증상 확인 ※ 등록 로직이 정상인 이유 등록은 addCloset() 로 전역 상태를
-선변경한 뒤 알림을 호출함 → 예외가 UI에 영향 X
+되지 않음 UI는 여전히 "등록됨" 으로 표시 ④ 사용자 재클릭 이미 삭제된 자원에 재요
+청 → 403 증상 확인 ※ 등록 로직이 정상인 이유 등록은 addCloset() 로 전역 상태를선
+변경한 뒤 알림을 호출함 → 예외가 UI에 영향 X
 
 #### 해결방법
 
@@ -2055,3 +2053,157 @@ UI 상태 미반영.
 
 React-Query onSuccess 안에서 발생한 모든 예외는 mutation 상태를 실패로 바꾼다는
 점을 기억하자.
+
+네! 요청하신 양식에 맞춰서 **서비스워커(PWA/FCM/토큰 동기화) 통합 문제**를 정리
+해드리겠습니다.
+
+---
+
+## [트러블슈팅]PWA/FCM/웹 환경에서 서비스워커 및 FCM 토큰 동기화 문제와 통합 해결(2025/05/16-안주민)
+
+### - 문제상황
+
+- 웹과 PWA(모바일 설치 앱)에서 로그인, 알림, 토큰 등이 따로 놀고 동기화가 안 됨
+- 서비스워커 파일이 여러 개(`sw.js`, `firebase-messaging-sw.js`,
+  `dev-dist/sw.js` 등)
+- 알림이 한쪽에서만 오거나, 토큰이 갱신될 때마다 로그인이 풀리는 등 불안정
+- dev-dist 등 개발용 임시 파일이 혼란을 가중
+
+---
+
+### - 원인 분석
+
+#### 1. 서비스워커 중복 등록/생성
+
+- 개발용(dev-sw.js), FCM용(firebase-messaging-sw.js), PWA용(sw.js) 등 여러 서비
+  스워커가 동시에 등록/생성되고 있었음.
+- 브라우저는 "가장 마지막에 등록된 서비스워커"만 활성화하지만, 경로(scope)가 다
+  르면 여러 서비스워커가 공존할 수도 있음.
+- 각 서비스워커는 서로 다른 캐시, 서로 다른 푸시, 서로 다른 동작을 하게 됨.
+
+#### 2. 중복 서비스워커의 문제점
+
+- **동기화가 안 됨:** 예를 들어, FCM 알림은 `firebase-messaging-sw.js`에서 받고,
+  PWA 캐시는 `sw.js`에서 관리하면, 알림/캐시/토큰이 따로 놀게 됨.
+- **예상치 못한 버그:** 어떤 환경에서는 알림이 오고, 어떤 환경에서는 안 오고, 어
+  떤 환경에서는 캐시가 갱신되고, 어떤 환경에서는 안 됨.
+- **토큰/알림/오프라인 기능이 분리되어 사용자 경험이 불안정**
+- **dev-dist 등 임시 파일이 실제 서비스와 혼동을 유발**
+
+#### 3. 왜 이렇게 처음에 세팅하게 되었나?
+
+- 개발/운영 환경 분리, FCM과 PWA 기능을 따로 개발하다 보니 각각의 목적에 맞는 서
+  비스워커를 따로 만들고 등록
+- Vite, Workbox, Firebase 등 각종 툴/플러그인이 자동으로 서비스워커를 생성/등록
+  하는 경우가 많음
+- 결과적으로 중복 서비스워커가 생기고, 관리가 어려워짐
+
+---
+
+### - 해결방법
+
+1. **서비스워커 파일을 하나로 통합**
+   - `public/firebase-messaging-sw.js`에 PWA, FCM, 오프라인 기능 모두 포함
+2. **등록 로직도 하나로 통일**
+   - `src/utils/serviceWorker.ts`에서 서비스워커 등록 및 FCM 환경변수 전달
+   - `main.tsx`에서 한 번만 호출
+3. **dev-dist, sw.js 등 불필요한 파일 삭제/무시**
+4. **FCM 토큰은 main thread(앱 코드)에서 발급/갱신/서버 저장**
+   - 서비스워커는 푸시 수신/표시만 담당
+5. **site.webmanifest는 앱 정보만 관리(서비스워커와 직접적 연관 없음)**
+
+---
+
+### - 예시
+
+```typescript
+// main.tsx
+import { registerServiceWorker } from './utils/serviceWorker';
+registerServiceWorker();
+```
+
+```typescript
+// serviceWorker.ts
+export const registerServiceWorker = () => {
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker
+			.register('/firebase-messaging-sw.js')
+			.then((registration) => {
+				registration.active?.postMessage({
+					type: 'FCM_CONFIG',
+					config: {
+						apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+						// ...생략
+					},
+				});
+			});
+	}
+};
+```
+
+```js
+// firebase-messaging-sw.js (서비스워커)
+importScripts(
+	'https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js',
+);
+importScripts(
+	'https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js',
+);
+self.addEventListener('message', (event) => {
+	if (event.data && event.data.type === 'FCM_CONFIG') {
+		firebase.initializeApp(event.data.config);
+		// ...생략
+	}
+});
+```
+
+---
+
+### - 결론 및 정리
+
+#### 1. 구조적으로 어떻게 바뀌었나?
+
+- **서비스워커 파일:**  
+  `public/firebase-messaging-sw.js`  
+  → PWA, FCM, 오프라인 기능 모두 통합
+- **등록 로직:**  
+  `src/utils/serviceWorker.ts`  
+  → 환경변수로 FCM 설정 전달
+- **앱 진입점:**  
+  `src/main.tsx`  
+  → `registerServiceWorker()` 호출로 자동 등록
+- **dev-dist, sw.js 등:**  
+  → 무시/삭제해도 됨 (실제 서비스와 무관)
+- **site.webmanifest:**  
+  → 앱 이름, 아이콘, 테마 등만 관리(서비스워커와 직접적 연관 없음)
+
+#### 2. 왜 이렇게 바꿔야 하는가?
+
+- **중복 서비스워커는 동기화/버그/관리 문제의 근본 원인**
+- **하나의 서비스워커, 하나의 등록 로직**으로 통합해야 웹/PWA/모바일 환경에서 토
+  큰, 알림, 오프라인 기능이 모두 동기화됨
+- **FCM 토큰은 main thread에서 서버에 저장** (서비스워커는 푸시 수신/표시만 담당
+  , 인증/토큰 관리가 더 안전)
+
+#### 3. 실제로 어떻게 동작하는가?
+
+- **웹(PWA 설치 전)과 모바일(PWA 설치 후) 모두 동일한 서비스워커와 등록 로직 사
+  용**
+- **토큰, 알림, 기타 서비스워커 관련 요소들이 모두 동일하게 동작**
+- **동일한 코드, 동일한 타이밍, 동일한 동작** (단, 브라우저 정책 차이만 예외)
+
+#### 4. 앞으로 관리 방법
+
+- **dev-dist 폴더 삭제**
+- **public/firebase-messaging-sw.js**만 서비스워커로 사용
+- **src/utils/serviceWorker.ts**만 등록로직으로 사용
+- **main.tsx**에서 한 번만 호출
+- **site.webmanifest**는 앱 정보만 관리
+
+---
+
+### ✅ 요약
+
+- 서비스워커/등록로직/토큰/알림/오프라인 기능 모두 "하나"로 통합
+- 중복/충돌/동기화 문제 해결
+- 실제로 앱을 실행해 정상 동작만 확인하면 됨

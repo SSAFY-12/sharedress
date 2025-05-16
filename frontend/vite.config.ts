@@ -52,29 +52,64 @@ export default defineConfig(({ mode }) => {
 			'https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js',
 		);
 
-		firebase.initializeApp({
-			apiKey: '${env.VITE_FIREBASE_API_KEY}',
-			authDomain: '${env.VITE_FIREBASE_AUTH_DOMAIN}',
-			projectId: '${env.VITE_FIREBASE_PROJECT_ID}',
-			storageBucket: '${env.VITE_FIREBASE_STORAGE_BUCKET}',
-			messagingSenderId: '${env.VITE_FIREBASE_MESSAGING_SENDER_ID}',
-			appId: '${env.VITE_FIREBASE_APP_ID}',
+		// FCM 초기화 및 메시지 처리
+		self.addEventListener('message', (event) => {
+			if (event.data && event.data.type === 'FCM_CONFIG') {
+				const config = event.data.config;
+				firebase.initializeApp(config);
+				const messaging = firebase.messaging();
+
+				messaging.onBackgroundMessage((payload) => {
+					console.log('백그라운드 메시지 수신:', payload);
+
+					const notificationTitle = payload.notification.title;
+					const notificationOptions = {
+						body: payload.notification.body,
+						icon: '/android-chrome-192x192.png',
+						badge: '/favicon-32x32.png',
+						data: payload.data,
+					};
+
+					self.registration.showNotification(notificationTitle, notificationOptions);
+				});
+			}
 		});
 
-		const messaging = firebase.messaging();
+		// PWA 설치 및 활성화
+		self.addEventListener('install', (event) => {
+			self.skipWaiting();
+		});
 
-		messaging.onBackgroundMessage((payload) => {
-			console.log('백그라운드 메시지 수신:', payload);
+		self.addEventListener('activate', (event) => {
+			event.waitUntil(self.clients.claim());
+		});
 
-			const notificationTitle = payload.notification.title;
-			const notificationOptions = {
-				body: payload.notification.body,
-				icon: '/android-chrome-192x192.png',
-				badge: '/favicon-32x32.png',
-				data: payload.data,
-			};
+		// 네트워크 요청 처리
+		self.addEventListener('fetch', (event) => {
+			// OAuth 콜백이나 인증 관련 요청은 완전히 무시
+			if (
+				event.request.url.includes('/oauth/') ||
+				event.request.url.includes('access_token') ||
+				event.request.url.includes('auth')
+			) {
+				return;
+			}
 
-			self.registration.showNotification(notificationTitle, notificationOptions);
+			// 다른 요청은 네트워크로 전달
+			event.respondWith(
+				fetch(event.request)
+					.then((response) => response)
+					.catch(() => {
+						// 네트워크 요청 실패 시 기본 응답 반환
+						return new Response('Network error', {
+							status: 503,
+							statusText: 'Service Unavailable',
+							headers: new Headers({
+								'Content-Type': 'text/plain',
+							}),
+						});
+					}),
+			);
 		});
 	`;
 
@@ -132,6 +167,8 @@ export default defineConfig(({ mode }) => {
 					clientsClaim: true,
 					skipWaiting: true,
 					globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'],
+					swDest: 'firebase-messaging-sw.js',
+					importScripts: [],
 				},
 			}),
 			checker({
