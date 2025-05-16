@@ -15,12 +15,9 @@ export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
-<<<<<<< Updated upstream
 	const navigate = useNavigate();
 	const [showFcmModal, setShowFcmModal] = useState(false);
-=======
 
->>>>>>> Stashed changes
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
