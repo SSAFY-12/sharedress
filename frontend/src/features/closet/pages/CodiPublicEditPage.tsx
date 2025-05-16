@@ -6,6 +6,7 @@ import Header from '@/components/layouts/Header';
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
 import { updateCodiPublicStatus } from '@/features/closet/api/closetApi';
+import { toast } from 'react-toastify';
 
 const CodiPublicEditPage = () => {
 	const navigate = useNavigate();
@@ -24,11 +25,19 @@ const CodiPublicEditPage = () => {
 	const handleDone = async () => {
 		try {
 			await updateCodiPublicStatus(coordinationId, isPublic);
-			alert('공개 여부가 수정되었습니다.');
+			toast.success('공개 여부가 수정되었습니다', {
+				icon: () => (
+					<img
+						src='/icons/toast_codi.svg'
+						alt='icon'
+						style={{ width: '20px', height: '20px' }}
+					/>
+				),
+			});
 			navigate(`/codi/${coordinationId}`, { state: { isMe: true } });
 		} catch (error) {
 			console.error('수정 실패:', error);
-			alert('수정에 실패했습니다. 다시 시도해주세요.');
+			toast.error('수정에 실패했습니다. 다시 시도해주세요.');
 		}
 	};
 
