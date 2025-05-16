@@ -39,4 +39,8 @@ public class AiTask {
 		this.member = member;
 		this.type = type;
 	}
+
+	public void updateCompleted() {
+		this.isCompleted = true;
+	}
 }
