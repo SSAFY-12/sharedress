@@ -19,23 +19,16 @@ Sentry.init({
 		Sentry.browserTracingIntegration(),
 		Sentry.replayIntegration(),
 	],
-	// 성능 모니터링을 위한 설정
-	tracesSampleRate: 1.0,
+	tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
 	tracePropagationTargets: ['localhost', /^https:\/\/yourserver\.io\/api/],
-
-	// 디버그 모드 활성화
-	debug: true,
-
-	// 환경 설정
+	debug: !import.meta.env.PROD,
 	environment: import.meta.env.MODE,
-
-	// Replay 설정
-	replaysSessionSampleRate: 1.0,
+	replaysSessionSampleRate: import.meta.env.PROD ? 0.01 : 1.0,
 	replaysOnErrorSampleRate: 1.0,
-
-	// 이벤트 전송 전 로깅
 	beforeSend: (event) => {
-		console.log('Sentry 이벤트 전송:', event);
+		if (!import.meta.env.PROD) {
+			console.log('Sentry 이벤트 전송:', event);
+		}
 		return event;
 	},
 });
