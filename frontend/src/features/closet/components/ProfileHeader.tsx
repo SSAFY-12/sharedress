@@ -72,6 +72,10 @@ const ProfileHeader = ({
 		navigate('/auth');
 	};
 
+	const handleBackClick = () => {
+		navigate('/social');
+	};
+
 	return (
 		<div className='relative w-full min-h-[37.5vh]'>
 			<div className='absolute inset-0 overflow-hidden'>
@@ -120,9 +124,8 @@ const ProfileHeader = ({
 				) : (
 					<Header
 						showBack={true}
-						badgeIcon='bell'
+						onBackClick={handleBackClick}
 						closet={true}
-						onBackClick={() => navigate(-1)}
 						onBadgeClick={handleNotificationClick}
 					/>
 				)}

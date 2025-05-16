@@ -186,6 +186,7 @@ const CodiDetailPage = () => {
 		return <div className='p-4'>코디 정보를 불러오지 못했습니다.</div>;
 
 	const isMyCodi = coordination.creator.id === coordination.owner.id;
+	const isCodiSourceMy = source === 'my';
 
 	console.log(source);
 
@@ -195,9 +196,9 @@ const CodiDetailPage = () => {
 				navigate('/mypage', {
 					state: { initialTab: '코디' },
 				});
-			} else if (source === 'friends') {
+			} else if (source === 'friendspick') {
 				navigate(`/mypage`, {
-					state: { initialTab: '코디', initialSubTab: 'friends' },
+					state: { initialTab: '코디', initialSubTab: 'friendspick' },
 				});
 			}
 		} else {
@@ -298,7 +299,7 @@ const CodiDetailPage = () => {
 				snapPoints={[1]}
 				initialSnap={0}
 			>
-				{isMyCodi ? (
+				{isCodiSourceMy ? (
 					<div className='p-4 space-y-4'>
 						<button
 							className='w-full py-3 text-blue-500 font-medium text-center'

@@ -76,7 +76,7 @@ export const captureCanvasImage = async (
 
 	const canvas = await html2canvas(element, {
 		useCORS: true,
-		scale: 1,
+		scale: 4,
 	});
 
 	const base64 = canvas.toDataURL('image/png');
