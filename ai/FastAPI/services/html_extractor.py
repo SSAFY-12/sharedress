@@ -53,38 +53,58 @@ class HTMLExtractor:
             product_id = url.split('/')[-1]
             logger.info(f"상품 ID: {product_id}")
 
-            # 상품 정보 추출
-            result = {}
-
-            # 1. HTML 콘텐츠 가져오기 (셀레니움 사용하지 않을 경우를 위한 백업)
-            html = ""
-            soup = None
+            # 먼저 기본 HTML 방식으로 카테고리 추출 시도
             try:
                 response = requests.get(url, headers=self.headers)
                 response.raise_for_status()
                 html = response.text
                 soup = BeautifulSoup(html, 'html.parser')
                 logger.info(f"HTML 크기: {len(html)} 바이트")
+
+                # 카테고리 추출
+                category_text = self._extract_category(soup)
+
+                # 지원하지 않는 카테고리인지 확인
+                valid_categories = ["상의", "하의", "아우터", "신발", "악세사리", "액세서리"]
+                if category_text not in valid_categories:
+                    # 지원하지 않는 카테고리면 바로 결과 반환 (셀레니움 실행하지 않음)
+                    logger.warning(f"카테고리 '{category_text}'는 지원하지 않음. 셀레니움 실행 없이 처리 중단")
+                    return {
+                        'category_text': category_text,
+                        'image_urls': [],
+                        'error': f"지원하지 않는 카테고리: {category_text}"
+                    }
             except Exception as e:
                 logger.warning(f"requests로 HTML 가져오기 실패: {e}")
+                category_text = "상의"  # 기본값
 
-            # 2. 카테고리 추출 (BeautifulSoup으로 가능)
-            if soup:
-                result['category_text'] = self._extract_category(soup)
-            else:
-                result['category_text'] = "상의"  # 기본값
+            # 여기까지 왔다면 지원하는 카테고리이므로 셀레니움으로 이미지 추출
+            result = {'category_text': category_text}
 
-            # 3. Selenium으로 이미지 URL 추출
+            # Selenium으로 이미지 URL 추출
             if self.use_selenium:
                 try:
                     selenium_urls = self._extract_images_with_selenium(url)
-                    logger.info(f"Selenium으로 {len(selenium_urls)}개 이미지 URL 추출 성공")
-                    result['image_urls'] = selenium_urls
-                    return result
+                    if selenium_urls:  # 이미지가 추출된 경우만
+                        logger.info(f"Selenium으로 {len(selenium_urls)}개 이미지 URL 추출 성공")
+                        result['image_urls'] = selenium_urls
+                        return result
+                    else:
+                        # 셀레니움으로 이미지 추출 실패 시 빈 배열 반환
+                        logger.warning(f"Selenium으로 이미지 추출 실패 (이미지 없음)")
+                        result['image_urls'] = []
+                        return result
                 except Exception as e:
-                    logger.error(f"Selenium 이미지 추출 실패: {e}, 기존 방식으로 대체")
+                    if "유효하지 않은 상품" in str(e):
+                        # 유효하지 않은 상품이면 기존 방식으로 대체하지 않고 빈 배열 반환
+                        logger.error(f"유효하지 않은 상품: {e}")
+                        result['image_urls'] = []
+                        result['error'] = "유효하지 않은 상품"
+                        return result
+                    else:
+                        logger.error(f"Selenium 이미지 추출 실패: {e}")
 
-            # 4. 셀레니움 실패 시 기존 방식으로 대체
+            # 셀레니움 실패 시 기존 방식으로 추출 시도 (기본 이미지라도 있으면 좋으니)
             if soup:
                 result['image_urls'] = self._extract_image_urls(url, soup, desired_color)
             else:
@@ -93,10 +113,10 @@ class HTMLExtractor:
             return result
         except Exception as e:
             logger.error(f"URL {url}에서 정보 추출 실패: {e}")
-            return {"error": str(e)}
+            return {"error": str(e), "category_text": "상의", "image_urls": []}
 
     def _extract_images_with_selenium(self, url: str) -> List[str]:
-        """Selenium을 사용하여 JavaScript로 로딩된 이미지 추출 (최대 5개만)"""
+        """Selenium을 사용하여 JavaScript로 로딩된 이미지 추출"""
         logger.info(f"Selenium으로 이미지 추출 시작: {url}")
 
         options = Options()
@@ -108,13 +128,19 @@ class HTMLExtractor:
         image_urls = []
 
         try:
+            # 알림 처리 설정
+            driver.execute_script("window.alert = function(message) { window.lastAlert = message; }")
+
             # 페이지 로드
             driver.get(url)
+
+            # 알림 확인 (유효하지 않은 상품인지)
+            alert_message = driver.execute_script("return window.lastAlert")
+            if alert_message and "유효하지 않은 상품" in alert_message:
+                raise Exception(f"Alert Text: {alert_message}")
+
             WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "img")))
             time.sleep(2)  # JavaScript가 로딩될 시간
-
-            # 상품 ID 추출
-            product_id = url.split('/')[-1]
 
             # 다양한 선택자 시도
             selectors = [
@@ -128,7 +154,7 @@ class HTMLExtractor:
                 '.product_thumb img'
             ]
 
-            # 최대 5개 이미지만 추출
+            image_count = 0
             for selector in selectors:
                 elements = driver.find_elements(By.CSS_SELECTOR, selector)
                 if elements:
@@ -141,41 +167,44 @@ class HTMLExtractor:
                             if "_500.jpg" in src:
                                 src = src.replace("_500.jpg", "_big.jpg?w=1200")
                             image_urls.append(src)
+                            image_count += 1
 
-                            # 5개 이미지를 찾으면 중단
-                            if len(image_urls) >= 3:
+                            # 5개 이미지 찾으면 중단
+                            if image_count >= 5:
                                 logger.info(f"5개 이미지 찾음, 검색 중단")
-                                return image_urls
+                                break
+
+                # 5개 이미지 찾으면 다음 선택자 시도하지 않음
+                if image_count >= 5:
+                    break
 
             # 특정 선택자로 이미지를 못 찾았다면 모든 이미지에서 무신사 패턴 찾기
-            if not image_urls or len(image_urls) < 3:
-                logger.info("특정 선택자로 충분한 이미지를 찾지 못해 모든 이미지 검색")
+            if not image_urls:
+                logger.info("특정 선택자로 이미지를 찾지 못해 모든 이미지 검색")
                 all_images = driver.find_elements(By.TAG_NAME, 'img')
                 for element in all_images:
                     src = element.get_attribute('src')
                     if src and src not in image_urls:
                         # 무신사 이미지 URL 패턴 확인
                         if any(pattern in src for pattern in ['goods_img', 'prd_img', 'image.msscdn.net']):
+                            # 공유 이미지나 로고 제외
+                            if "share_musinsa.png" in src or "logo" in src:
+                                continue
+
                             # 고품질 이미지 URL로 변환
                             if "_500.jpg" in src:
                                 src = src.replace("_500.jpg", "_big.jpg?w=1200")
                             image_urls.append(src)
+                            image_count += 1
 
-                            # 5개 이미지를 찾으면 중단
-                            if len(image_urls) >= 3:
-                                logger.info(f"5개 이미지 찾음, 검색 중단")
+                            # 5개 이미지 찾으면 중단
+                            if image_count >= 5:
                                 break
-
-            # 중복 URL 제거
-            image_urls = list(dict.fromkeys(image_urls))[:3]  # 최대 5개로 제한
-
-            logger.info(f"Selenium으로 {len(image_urls)}개 이미지 URL 추출됨")
 
             return image_urls
 
         finally:
             driver.quit()
-
     def _extract_category(self, soup: BeautifulSoup) -> str:
         """카테고리 정보 추출"""
         try:

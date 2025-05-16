@@ -265,12 +265,12 @@ class ImageProcessor:
         if not urls:
             return None
 
-        # 제품 스코어 임계값 설정 - 이 값보다 높으면 무조건 제품 이미지로 간주
+        # 제품 스코어 임계값 설정 - 이 값보다 높으면 제품 이미지로 간주
         PRODUCT_SCORE_THRESHOLD = 0.060  # 조정 가능한 값
 
         # ① 후보 수집: '사람 없는' 이미지 전부 + 스코어가 높은 이미지
-        no_person: list[Tuple[BytesIO, Image.Image, float]] = []
-        high_score_images: list[Tuple[BytesIO, Image.Image, float]] = []
+        no_person: list[Tuple[BytesIO, Image.Image, float, int]] = []  # 인덱스 추가
+        high_score_images: list[Tuple[BytesIO, Image.Image, float, int]] = []  # 인덱스 추가
 
         for i, u in enumerate(urls):
             try:
@@ -283,13 +283,13 @@ class ImageProcessor:
 
                 # 스코어가 임계값보다 높으면 높은 스코어 후보에 추가
                 if score >= PRODUCT_SCORE_THRESHOLD:
-                    high_score_images.append((buf, img, score))
+                    high_score_images.append((buf, img, score, i))  # 인덱스 저장
                     logger.info(f"높은 스코어 이미지 추가: {score} >= {PRODUCT_SCORE_THRESHOLD}")
                     self._save_image_to_log(img, f"high_score_{len(high_score_images)}_{category}.png")
 
                 # 사람이 없는 이미지는 기존처럼 수집
                 if not has_person:
-                    no_person.append((buf, img, score))
+                    no_person.append((buf, img, score, i))  # 인덱스 저장
                     self._save_image_to_log(img, f"no_person_{len(no_person)}_{category}.png")
 
             except Exception as e:
@@ -312,17 +312,21 @@ class ImageProcessor:
         except Exception as e:
             logger.warning(f"모델 이미지 로깅 중 오류: {e}")
 
-        # ② 높은 스코어 이미지가 있으면 우선 사용 (새로운 우선순위)
+        # ② 높은 스코어 이미지가 있으면 우선 사용 (인덱스 순서 우선)
         if high_score_images:
-            buf, img, score = max(high_score_images, key=lambda x: x[2])
-            logger.info(f"높은 스코어 이미지 선택됨 (카테고리: {category}, 스코어: {score})")
+            # 기준치를 넘는 이미지들이 있으면, 인덱스 순으로 정렬 (오름차순)
+            high_score_images.sort(key=lambda x: x[3])
+            buf, img, score, idx = high_score_images[0]  # 첫 번째 (원래 순서가 가장 빠른) 이미지 선택
+            logger.info(f"높은 스코어 이미지 선택됨 (카테고리: {category}, 스코어: {score}, 원래 순서: {idx+1})")
             self._save_image_to_log(img, f"selected_high_score_{category}.png")
             return self.remove_background(buf)
 
-        # ③ 사람이 없는 이미지가 있으면 다음 우선순위로 사용
+        # ③ 사람이 없는 이미지가 있으면 다음 우선순위로 사용 (인덱스 순서 우선)
         if no_person:
-            buf, img, score = max(no_person, key=lambda x: x[2])
-            logger.info(f"사람 없는 이미지 선택됨 (카테고리: {category}, 스코어: {score})")
+            # 사람 없는 이미지들도 인덱스 순으로 정렬 (오름차순)
+            no_person.sort(key=lambda x: x[3])
+            buf, img, score, idx = no_person[0]  # 첫 번째 (원래 순서가 가장 빠른) 이미지 선택
+            logger.info(f"사람 없는 이미지 선택됨 (카테고리: {category}, 스코어: {score}, 원래 순서: {idx+1})")
             self._save_image_to_log(img, f"selected_no_person_{category}.png")
             return self.remove_background(buf)
 
