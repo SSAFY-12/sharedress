@@ -14,6 +14,8 @@ export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
+	const screenWidth = window.innerWidth;
+
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
@@ -104,9 +106,9 @@ export const App = () => {
 
 			{/* Toastify 컨테이너 */}
 			<ToastContainer
-				className='py-6 px-4'
-				toastClassName='py-2 rounded-xl bg-black bg-opacity-50 text-white text-description mb-2'
-				position='top-right'
+				className='py-6 px-4 '
+				toastClassName='py-2  rounded-xl bg-black bg-opacity-50 text-white text-description mb-2'
+				position='top-center'
 				transition={Slide}
 				autoClose={1500}
 				hideProgressBar={true}

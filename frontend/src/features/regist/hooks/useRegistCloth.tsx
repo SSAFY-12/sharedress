@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LibraryApis } from '@/features/regist/api/registApis';
 import { useClosetStore } from '@/store/useClosetStore';
 import { toast } from 'react-toastify';
-import iconImage from '/icons/_acceehlortt.svg';
 
 export const useRegistCloth = (id: number) => {
 	const qc = useQueryClient();
