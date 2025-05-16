@@ -117,6 +117,9 @@ dependencies {
 
 	// json
 	implementation 'org.json:json:20250107'
+
+	// validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

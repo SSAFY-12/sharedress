@@ -40,6 +40,7 @@ import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -102,7 +103,7 @@ public class MemberController {
 
 	@PatchMapping("/members/profile")
 	public ResponseEntity<ResponseWrapper<MyProfileResponse>> updateMyProfile(
-		@RequestBody UpdateProfileRequest request,
+		@Valid @RequestBody UpdateProfileRequest request,
 		@CurrentMember Member member
 	) {
 		MyProfileResponse result = memberUseCase.updateProfile(request, member.getId());
