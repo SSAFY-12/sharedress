@@ -22,8 +22,9 @@ const CodiDetailPage = () => {
 	const location = useLocation();
 	const { id } = useParams();
 	const isMe = location.state?.isMe ?? false;
+	console.log('isMe:', isMe);
 	const source = location.state?.source ?? 'my';
-	console.log(source);
+	console.log('source:', source);
 	const ownerId = location.state?.ownerId ?? 0;
 	const isGuest = useAuthStore((state) => state.isGuest);
 
@@ -198,6 +199,7 @@ const CodiDetailPage = () => {
 					state: { initialTab: '코디' },
 				});
 			} else if (source === 'friendspick') {
+				console.log('안녕!!!!!!');
 				navigate(`/mypage`, {
 					state: { initialTab: '코디', initialSubTab: 'friendspick' },
 				});
