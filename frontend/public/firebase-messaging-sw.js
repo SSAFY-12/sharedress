@@ -4,6 +4,15 @@ importScripts(
 importScripts(
 	'https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js',
 );
+importScripts('https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js');
+
+const DB_NAME = 'my-app-db';
+const FCM_STORE = 'fcm-token';
+
+async function getFcmTokenFromDb() {
+	const db = await idb.openDB(DB_NAME, 1);
+	return db.get(FCM_STORE, 'token');
+}
 
 // FCM 초기화 및 메시지 처리
 self.addEventListener('message', (event) => {
@@ -29,6 +38,12 @@ self.addEventListener('message', (event) => {
 			);
 		});
 	}
+});
+
+// 예시: 푸시 알림 수신 시 토큰 활용
+self.addEventListener('push', async (event) => {
+	const token = await getFcmTokenFromDb();
+	// token을 활용한 로직...
 });
 
 // PWA 설치 및 활성화

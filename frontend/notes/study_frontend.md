@@ -163,8 +163,8 @@
 
 - PWA와 웹은 **같은 서비스워커, 같은 도메인, 같은 저장소**를 사용할 때만 상태가
   동기화됨
-- 서비스워커가 다르거나, 도메인이 다르거나, 저장소(로컬스토리지 등)가 분리되면
-  각각 따로 동작
+- 서비스워커가 다르거나, 도메인이 다르거나, 저장소(로컬스토리지 등)가 분리되면각
+  각 따로 동작
 - FCM(알림) 토큰, 로그인 토큰 등은 **환경별로 따로 관리**될 수 있음
 
 ### 3. 세부 동작 과정
@@ -172,8 +172,8 @@
 1. 서비스워커 파일이 여러 개이거나, 등록 경로가 다르면 각각 따로 동작
 2. PWA와 웹이 서로 다른 도메인/포트/프로토콜에서 실행되면 저장소가 분리됨
 3. 토큰을 localStorage에만 저장하면 서비스워커와 동기화가 안 됨
-4. FCM 토큰이 환경별로 다르게 관리되어 알림이 한쪽에서만 오거나, 토큰이 갱신될
-   때마다 로그인이 풀릴 수 있음
+4. FCM 토큰이 환경별로 다르게 관리되어 알림이 한쪽에서만 오거나, 토큰이 갱신될때
+   마다 로그인이 풀릴 수 있음
 
 ### 4. 고려사항/특이사항
 
@@ -188,3 +188,196 @@
 - **서비스워커 파일 통일, 도메인 일치, 토큰 동기화**가 핵심
 - 위 세 가지가 맞지 않으면 PWA와 웹이 완전히 분리되어 동작할 수밖에 없음
 - 구조를 점검하고, 필요한 부분은 코드/설정 수정이 필요
+
+---
+
+## [웹/모바일/PWA 환경에서 FCM 토큰(또는 인증 토큰) 완전 동기화를 위한 IndexedDB 활용법]
+
+- 웹, PWA, 서비스워커, 여러 탭 등 모든 환경에서 FCM 토큰을 완전히 동기화하는 구
+  조와 실전 적용법
+
+### 1. 동작 목적/배경
+
+- **왜 필요한가?**
+  - FCM(푸시 알림) 토큰, 인증 토큰 등은 웹, PWA, 서비스워커, 여러 탭에서 **동일
+    하게** 관리되어야 함
+  - 기존 localStorage는 서비스워커/여러 탭/PWA 환경에서 완벽하게 동기화되지 않음
+  - **IndexedDB**는 모든 환경(메인 스레드, 서비스워커, 여러 탭)에서 접근 가능하
+    고, 대용량 데이터도 안전하게 저장할 수 있음
+  - 토큰이 분리/불일치/유실되면 알림이 안 오거나, 인증이 풀리는 등 치명적 문제발
+    생
+
+### 2. 동작 구조/원리
+
+- **Zustand(혹은 전역 상태) + IndexedDB** 조합으로 토큰을 관리
+- 토큰을 저장/갱신할 때마다 IndexedDB에도 저장
+- 앱 시작 시 IndexedDB에서 토큰을 읽어와 전역 상태에 반영
+- 서비스워커, 여러 탭, PWA 등 모든 환경에서 IndexedDB를 통해 토큰을 공유/동기화
+
+### 3. 세부 동작 과정
+
+1. **앱 시작**
+   - IndexedDB에서 토큰을 읽어와 전역 상태(Zustand 등)에 반영
+2. **토큰 발급/갱신/로그인**
+   - setToken 등으로 전역 상태와 IndexedDB에 모두 저장
+3. **로그아웃/토큰 만료**
+   - clearToken 등으로 전역 상태와 IndexedDB에서 모두 삭제
+4. **서비스워커/여러 탭/PWA**
+   - 필요할 때 IndexedDB에서 토큰을 읽어와 활용
+5. **(선택) BroadcastChannel 등으로 실시간 동기화도 가능**
+
+### 4. 고려사항/특이사항
+
+- **IndexedDB는 비동기 API**이므로, 항상 await/Promise로 처리해야 함
+- 서비스워커에서는 importScripts로 idb 라이브러리 사용
+- 앱 시작 시 반드시 IndexedDB에서 토큰을 읽어와 전역 상태에 반영해야 함
+- localStorage만 쓸 경우 서비스워커/여러 탭/PWA와 완벽히 동기화되지 않음
+- 토큰이 여러 곳에 분산 저장되면 동기화/유실/불일치 문제 발생
+- IndexedDB는 브라우저 지원이 매우 넓음(모던 브라우저 대부분 지원)
+
+### 5. 결론/의견
+
+- **IndexedDB를 활용하면 웹, PWA, 서비스워커, 여러 탭에서 토큰을 완벽하게 동기화
+  할 수 있다**
+- localStorage persist만으로는 한계가 있으니, 반드시 IndexedDB를 병행할 것
+- 앱 시작 시 IndexedDB에서 토큰을 읽어와 전역 상태에 반영하는 것이 핵심
+- 서비스워커에서도 IndexedDB를 통해 토큰을 안전하게 활용 가능
+- 실무에서 토큰, 사용자 설정, 캐시 등 다양한 데이터 동기화에 적극 활용할 것
+
+---
+
+## [실전 적용 예시 및 시행착오/지침서]
+
+### 1. IndexedDB 유틸리티 작성
+
+```typescript
+// src/utils/indexedDb.ts
+import { openDB } from 'idb';
+
+const DB_NAME = 'my-app-db';
+const FCM_STORE = 'fcm-token';
+
+export const saveFcmTokenToDb = async (token: string) => {
+	const db = await openDB(DB_NAME, 1, {
+		upgrade(db) {
+			if (!db.objectStoreNames.contains(FCM_STORE))
+				db.createObjectStore(FCM_STORE);
+		},
+	});
+	await db.put(FCM_STORE, token, 'token');
+};
+
+export const getFcmTokenFromDb = async () => {
+	const db = await openDB(DB_NAME, 1);
+	return db.get(FCM_STORE, 'token');
+};
+```
+
+---
+
+### 2. Zustand Store와 연동
+
+```typescript
+// src/store/useFcmStore.ts
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import { saveFcmTokenToDb, getFcmTokenFromDb } from '@/utils/indexedDb';
+
+interface FcmStore {
+	token: string | null;
+	setToken: (token: string | null) => void;
+	clearToken: () => void;
+	syncFromIndexedDb: () => Promise<void>;
+}
+
+const useFcmStore = create<FcmStore>()(
+	persist(
+		(set) => ({
+			token: null,
+			setToken: (token) => {
+				set({ token });
+				if (token) saveFcmTokenToDb(token);
+			},
+			clearToken: () => {
+				set({ token: null });
+				saveFcmTokenToDb('');
+			},
+			syncFromIndexedDb: async () => {
+				const token = await getFcmTokenFromDb();
+				set({ token: token || null });
+			},
+		}),
+		{ name: 'fcm-store' },
+	),
+);
+
+export default useFcmStore;
+```
+
+---
+
+### 3. 앱 시작 시 동기화
+
+```typescript
+// src/main.tsx
+import useFcmStore from './store/useFcmStore';
+import { useEffect } from 'react';
+
+useEffect(() => {
+	useFcmStore.getState().syncFromIndexedDb();
+}, []);
+```
+
+---
+
+### 4. 서비스워커에서 토큰 활용
+
+```js
+// public/firebase-messaging-sw.js
+importScripts('https://cdn.jsdelivr.net/npm/idb@7/build/iife/index-min.js');
+
+const DB_NAME = 'my-app-db';
+const FCM_STORE = 'fcm-token';
+
+async function getFcmTokenFromDb() {
+	const db = await idb.openDB(DB_NAME, 1);
+	return db.get(FCM_STORE, 'token');
+}
+
+self.addEventListener('push', async (event) => {
+	const token = await getFcmTokenFromDb();
+	// token을 활용한 로직...
+});
+```
+
+---
+
+### 5. 시행착오/주의사항
+
+- **localStorage만 썼을 때:**  
+  서비스워커, 여러 탭, PWA에서 토큰이 불일치/유실되는 문제 발생
+- **IndexedDB를 안 썼을 때:**  
+  푸시 알림이 안 오거나, 인증이 풀리는 등 치명적 버그 발생
+- **IndexedDB를 썼더니:**  
+  모든 환경에서 토큰이 완벽하게 동기화되고, 알림/인증이 안정적으로 동작
+
+---
+
+### 6. 실무 지침/팁
+
+- **앱 시작 시 반드시 IndexedDB에서 토큰을 읽어와 전역 상태에 반영**
+- **토큰 저장/갱신/삭제 시 IndexedDB에도 항상 반영**
+- **서비스워커/여러 탭/PWA 등 모든 환경에서 IndexedDB를 통해 토큰을 공유**
+- **idb 라이브러리 사용 추천(Promise 기반, 사용법 간단)**
+- **토큰 외에도 사용자 설정, 캐시 등 다양한 데이터 동기화에 활용 가능**
+
+---
+
+### 7. 결론
+
+- **IndexedDB를 활용하면 웹, PWA, 서비스워커, 여러 탭에서 토큰을 완벽하게 동기화
+  할 수 있다**
+- 실무에서 반드시 적용할 것!
+- 시행착오를 줄이고, 안정적인 푸시/인증/데이터 동기화 구조를 만들 수 있다
+
+---

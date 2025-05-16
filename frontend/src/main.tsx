@@ -2,7 +2,7 @@
 import { createRoot } from 'react-dom/client';
 import { router } from '@/routes';
 import * as Sentry from '@sentry/react';
-// import { useEffect } from 'react';
+import { useEffect } from 'react';
 import './index.css';
 import {
 	RouterProvider,
@@ -11,6 +11,7 @@ import {
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { registerServiceWorker } from './utils/serviceWorker';
+import useFcmStore from './store/useFcmStore';
 // import { createRoutesFromChildren, matchRoutes } from 'react-router';
 
 // Sentry 초기화
@@ -35,6 +36,11 @@ Sentry.init({
 });
 
 const queryClient = new QueryClient();
+
+// 앱 시작 시 FCM 토큰을 IndexedDB에서 Zustand로 동기화
+useEffect(() => {
+	useFcmStore.getState().syncFromIndexedDb();
+}, []);
 
 registerServiceWorker();
 
