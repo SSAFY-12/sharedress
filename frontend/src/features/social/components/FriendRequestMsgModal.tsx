@@ -44,7 +44,7 @@ export const FriendRequestMsgModal = ({
 						{friend.nickname}
 					</h2>
 					<label className='w-full mb-2.5 text-regular text-description text-left'>
-						친구 요청 메시지
+						친구 요청 메시지(10자 이하)
 					</label>
 					<input
 						className='mb-6 text-default text-regular placeholder:text-descriptionColor text-left flex justify-between items-center px-4 py-2.5 bg-background h-12 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-light disabled:bg-background'
