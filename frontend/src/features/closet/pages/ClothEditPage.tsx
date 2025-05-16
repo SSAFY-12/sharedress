@@ -11,6 +11,7 @@ import { SwitchToggle } from '@/components/buttons/switch-toggle';
 import { useBrandSearch } from '@/features/closet/hooks/useBrandSearch';
 // import { useColorList } from '@/features/closet/hooks/useColorList';
 import { useCategoryList } from '@/features/closet/hooks/useCategoryList';
+import { toast } from 'react-toastify';
 
 const ClothEditPage = () => {
 	const navigate = useNavigate();
@@ -77,11 +78,19 @@ const ClothEditPage = () => {
 			};
 
 			await updateCloth(clothId, payload);
-			alert('수정이 완료되었습니다.');
+			toast.success('수정이 완료되었습니다.', {
+				icon: () => (
+					<img
+						src='/icons/toast_cloth.svg'
+						alt='icon'
+						style={{ width: '20px', height: '20px' }}
+					/>
+				),
+			});
 			navigate(`/cloth/${clothId}`, { state: { isMe: true } });
 		} catch (error) {
 			console.error('수정 실패:', error);
-			alert('수정에 실패했습니다. 다시 시도해주세요.');
+			toast.error('수정에 실패했습니다. 다시 시도해주세요.');
 		}
 	};
 

@@ -7,6 +7,7 @@ import { useProfileStore } from '@/store/useProfileStore';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import CodiEditBottomAccordion from '@/features/codi/components/CodiEditBottomAccordion';
+import { toast } from 'react-toastify';
 
 const CATEGORIES = [
 	{ id: 'all', label: '전체' },
@@ -116,7 +117,7 @@ const CodiEditPage = () => {
 
 	const handleNextClick = () => {
 		if (canvasItems.length === 0) {
-			alert('최소 하나 이상의 옷을 코디에 담아야 합니다.');
+			toast.error('최소 하나 이상의 옷을 코디에 담아야 합니다.');
 			return;
 		}
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));

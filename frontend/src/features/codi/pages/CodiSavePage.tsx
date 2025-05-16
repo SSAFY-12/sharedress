@@ -12,6 +12,7 @@ import CodiSaveBottomSection from '@/features/codi/components/CodiSaveBottomSect
 import { base64ToFile } from '@/features/codi/utils/base64ToFile';
 import { captureCanvasImageWithRetry } from '@/features/codi/utils/captureCanvasImageWithRetry';
 import LoadingOverlay from '@/components/etc/LoadingOverlay';
+import { toast } from 'react-toastify';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
@@ -96,7 +97,16 @@ const CodiSavePage = () => {
 			const result = await uploadCodiThumbnail(coordinationId, file);
 			console.log('[DEBUG] 썸네일 업로드 응답:', result);
 
-			alert('코디가 저장되었습니다!');
+			toast.success('코디가 저장되었습니다', {
+				icon: () => (
+					<img
+						src='/icons/toast_codi.svg'
+						alt='icon'
+						style={{ width: '20px', height: '20px' }}
+					/>
+				),
+			});
+
 			if (mode === 'my') {
 				navigate('/mypage', {
 					state: { initialTab: '코디' },
@@ -108,7 +118,7 @@ const CodiSavePage = () => {
 			}
 		} catch (error) {
 			console.error('코디 저장 실패:', error);
-			alert('코디 저장 실패');
+			toast.error('코디 저장 실패');
 		} finally {
 			setIsSubmitting(false);
 		}
