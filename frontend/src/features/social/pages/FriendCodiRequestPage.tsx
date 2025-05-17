@@ -1,12 +1,13 @@
 import { SearchBar } from '@/components/inputs/search-bar';
 import { UserRowItem } from '@/containers/UserRowItem';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getOptimizedImageUrl } from '@/utils/imageUtils'; // 이미지 최적화
 import useFriendList from '@/features/social/hooks/useFriendList';
 import useSearchFriend from '@/features/social/hooks/useSearchFriend';
 import { CodiRequestMsgModal } from '@/features/social/components/CodiRequestMsgModal';
 import { useCodiRequest } from '@/features/social/hooks/useCodiRequest';
 import { ExternalShareModal } from '@/features/social/components/ExternalShareModal';
+import { UserRowItemEmpty } from '@/containers/UserRowItemEmpty';
 
 export interface Friend {
 	nickname: string;
@@ -20,25 +21,30 @@ type ModalState = 'friend' | 'external' | null;
 export const FriendCodiRequestPage = () => {
 	const [searchValue, setSearchValue] = useState(''); // 검색어 입력값(현재 검색어 저장)
 	const [keyword, setKeyword] = useState(''); // 실제 검색에 사용될 키워드 === 검색 API 호출시 사용되는 최종 검색어
+	const [isWriting, setIsWriting] = useState(false);
 	const { data: friends } = useFriendList(); // 친구 목록 데이터
-	const { searchMyFriend } = useSearchFriend(keyword); // 검색 결과 목록 데이터
+	const { searchMyFriend, isFetchingMyFriend } =
+		useSearchFriend(keyword); // 검색 결과 목록 데이터
 
-	// 친구 검색 전송 이벤트
-	const handleSearch = (e: any) => {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			setKeyword(searchValue);
-		}
-	};
-
-	// 친구 검색 이름 제한 20글자이내
-	const handleSearchChange = ({
-		target: { value },
-	}: React.ChangeEvent<HTMLInputElement>) => {
-		if (value.length <= 20) {
-			setSearchValue(value);
-		}
-	};
+	const handleSearchChange = useCallback(
+		({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
+			if (value.length <= 20) {
+				setSearchValue(value);
+				setIsWriting(true);
+				const timer = setTimeout(() => {
+					setKeyword(value);
+				}, 700);
+				const timer2 = setTimeout(() => {
+					setIsWriting(false);
+				}, 1000);
+				return () => {
+					clearTimeout(timer);
+					clearTimeout(timer2);
+				};
+			}
+		},
+		[],
+	);
 
 	// 모달 state 관리
 	const [isRequestModalOpen, setIsRequestModalOpen] =
@@ -88,7 +94,6 @@ export const FriendCodiRequestPage = () => {
 				placeholder='친구 검색'
 				value={searchValue}
 				onChange={handleSearchChange}
-				onKeyDown={handleSearch}
 				className='sticky top-0 z-10 bg-white'
 			/>
 
@@ -123,8 +128,14 @@ export const FriendCodiRequestPage = () => {
 			) : (
 				// 검색 결과 목록
 				<div>
-					{Array.isArray(searchMyFriend) && searchMyFriend.length > 0 ? (
-						searchMyFriend.map((friend) => (
+					{isFetchingMyFriend ? (
+						<div>
+							<UserRowItemEmpty />
+							<UserRowItemEmpty />
+							<UserRowItemEmpty />
+						</div>
+					) : (
+						searchMyFriend?.map((friend) => (
 							<UserRowItem
 								key={friend.id}
 								userId={friend.id}
@@ -138,9 +149,15 @@ export const FriendCodiRequestPage = () => {
 								}
 							/>
 						))
-					) : (
-						<p>검색 결과가 없습니다.</p>
 					)}
+					{keyword &&
+						!isFetchingMyFriend &&
+						(!searchMyFriend || searchMyFriend.length === 0) &&
+						!isWriting && (
+							<p className='text-center text-default text-low mt-10'>
+								검색 결과가 없습니다.
+							</p>
+						)}
 				</div>
 			)}
 			{isRequestModalOpen === 'friend' && selectedFriend && (

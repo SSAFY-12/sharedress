@@ -11,11 +11,19 @@ interface SearchFriendResponse {
 	content: SearchFriend['content']; //실제 데이터 응답구조 -> 키 값
 }
 
+interface UseSearchFriendReturn {
+	searchMyFriend: SearchFriend['content'] | undefined;
+	isLoadingMyFriend: boolean;
+	isFetchingMyFriend: boolean;
+	errorMyFriend: Error | null;
+}
+
 // 친구 검색
-const useSearchFriend = (keyword: string) => {
+const useSearchFriend = (keyword: string): UseSearchFriendReturn => {
 	const {
 		data: searchMyFriend, // 내 친구리스트 검색
 		isLoading: isLoadingMyFriend, // 내 친구리스트 검색 로딩
+		isFetching: isFetchingMyFriend, // 내 친구리스트 검색 로딩
 		error: errorMyFriend, // 내 친구리스트 검색 에러
 	} = useQuery<SearchFriendResponse>({
 		// 내 친구리스트 검색
@@ -27,6 +35,7 @@ const useSearchFriend = (keyword: string) => {
 	return {
 		searchMyFriend: searchMyFriend?.content,
 		isLoadingMyFriend,
+		isFetchingMyFriend,
 		errorMyFriend,
 	}; //data에 원하는 값 반환
 };
