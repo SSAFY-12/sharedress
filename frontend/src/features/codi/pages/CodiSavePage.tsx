@@ -203,19 +203,35 @@ const CodiSavePage = () => {
 						pointerEvents: 'none',
 						opacity: 0,
 						zIndex: 0,
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
 					}}
 				>
-					<CodiCanvas
-						items={codiItems}
-						isEditable={false}
-						updateItem={EMPTY_FN}
-						removeItem={EMPTY_FN}
-						maxZIndex={0}
-						setMaxZIndex={EMPTY_FN}
-						id='codi-canvas-capture'
-						width={canvasSize.width}
-						height={canvasSize.height}
-					/>
+					<div
+						style={{
+							background: '#f8fafc',
+							boxSizing: 'border-box',
+							width: canvasSize.width,
+							height: canvasSize.height,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							pointerEvents: 'none',
+						}}
+					>
+						<CodiCanvas
+							items={codiItems}
+							isEditable={false}
+							updateItem={EMPTY_FN}
+							removeItem={EMPTY_FN}
+							maxZIndex={0}
+							setMaxZIndex={EMPTY_FN}
+							id='codi-canvas-capture'
+							width={canvasSize.width}
+							height={canvasSize.height}
+						/>
+					</div>
 				</div>,
 				document.body,
 			)}

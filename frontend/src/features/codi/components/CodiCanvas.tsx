@@ -301,12 +301,13 @@ const CodiCanvas = ({
 		<div
 			ref={canvasRef}
 			id={id}
-			className={`canvas-item relative bg-gray-50 overflow-hidden touch-pan-x${
-				width && height ? '' : ' w-full aspect-[10/11]'
-			}`}
+			className={
+				'canvas-item w-full h-full aspect-[10/11] bg-gray-50 flex items-center justify-center overflow-hidden relative touch-pan-x'
+			}
 			style={{
 				width: width ? `${width}px` : undefined,
 				height: height ? `${height}px` : undefined,
+				boxSizing: 'border-box',
 			}}
 			onClick={isEditable ? handleCanvasClick : undefined}
 			onTouchEnd={isEditable ? handleCanvasClick : undefined}
