@@ -91,8 +91,8 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 
 				// 브랜드 조건
 				candidate.andAnyOf(
-					brand.nameKr.equalsIgnoreCase(brandToken),
-					brand.nameEn.equalsIgnoreCase(brandToken)
+					brand.nameKr.containsIgnoreCase(brandToken),
+					brand.nameEn.containsIgnoreCase(brandToken)
 				);
 
 				// 상품명 조건
