@@ -13,7 +13,7 @@ import {
 import useNotification from '@/features/alert/hooks/useNotification';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 /**
  * NotificationList 컴포넌트
@@ -36,31 +36,31 @@ const typeIconMap: Record<number, any> = {
 
 const NotificationList: FC = () => {
 	const { data, isLoading, error, readNotification } = useNotification();
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	const handleNotificationClick = (notification: any) => {
 		readNotification({ notificationId: notification.id });
-		switch (notification.notificationType) {
-			case 1: // 친구 요청
-				navigate('/social/request');
-				break;
-			case 2: // 친구 수락
-				navigate('/social');
-				break;
-			case 5: // 코디 복사
-			case 6: // 코디 댓글
-			case 7: // AI 관련
-				navigate('/mypage');
-				break;
-			case 3: // 코디 요청
-				navigate('/social/codi-request');
-				break;
-			case 4: // 코디 추천
-				navigate('/social');
-				break;
-			default:
-				break;
-		}
+		// switch (notification.notificationType) {
+		// 	case 1: // 친구 요청
+		// 		navigate('/social/request');
+		// 		break;
+		// 	case 2: // 친구 수락
+		// 		navigate('/social');
+		// 		break;
+		// 	case 5: // 코디 복사
+		// 	case 6: // 코디 댓글
+		// 	case 7: // AI 관련
+		// 		navigate('/mypage');
+		// 		break;
+		// 	case 3: // 코디 요청
+		// 		navigate('/social/codi-request');
+		// 		break;
+		// 	case 4: // 코디 추천
+		// 		navigate('/social');
+		// 		break;
+		// 	default:
+		// 		break;
+		// }
 	};
 
 	if (error) {
