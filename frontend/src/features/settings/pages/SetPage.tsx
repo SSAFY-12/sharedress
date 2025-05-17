@@ -110,29 +110,27 @@ export const SetPage = () => {
 	};
 
 	return (
-		<div className='flex flex-col min-h-screen '>
+		<div className='flex flex-col min-h-screen mt-4 '>
 			{/* 헤더 */}
 
 			{/* 설정 목록 */}
-			<div className='flex-1 px-4 pb-4 space-y-4'>
-				<div className='space-y-2'>
-					<h3 className='text-sm font-medium text-gray-500 px-2 py-1 text-left'>
+			<div className='flex-1 px-4 pb-4 flex flex-col gap-5'>
+				<div className='flex flex-col space-y-2'>
+					<h3 className='text-smallButton text-regular px-2 py-1 text-left'>
 						앱 설정
 					</h3>
 
 					{/* 알림 설정 */}
 					<div className='bg-white rounded-lg shadow-sm'>
-						<div className='flex items-center justify-between p-4'>
+						<div className='flex items-center justify-between p-4 pt-1'>
 							<div className='flex items-center'>
-								<Bell className='w-5 h-5 text-gray-500 mr-3' />
-								<span className='text-sm'>알림 설정</span>
+								<Bell className='w-5 h-5 text-low mr-3' />
+								<span className='text-default text-regular'>알림 설정</span>
 							</div>
 							<SwitchToggle
 								checked={notificationsEnabled}
 								onToggle={handleNotificationToggle}
-								className={
-									notificationLocked ? 'opacity-50 pointer-events-none' : ''
-								}
+								variant='primary'
 							/>
 						</div>
 						<div className='h-px bg-gray-100' />
@@ -143,36 +141,38 @@ export const SetPage = () => {
 							onClick={logout}
 						>
 							<div className='flex items-center'>
-								<LogOut className='w-5 h-5 text-gray-500 mr-3' />
-								<span className='text-sm'>로그아웃</span>
+								<LogOut className='w-5 h-5 text-low mr-3' />
+								<span className='text-default text-regular'>로그아웃</span>
 							</div>
-							<ChevronRight className='w-5 h-5 text-gray-400' />
+							<ChevronRight className='w-5 h-5 text-low' />
 						</button>
 					</div>
 				</div>
 
 				{/* PWA 설치 가이드 */}
-				<div className='space-y-2'>
-					<h3 className='text-sm font-medium text-gray-500 px-2 py-1 text-left'>
+				<div className='flex flex-col space-y-2'>
+					<h3 className='text-smallButton text-regular px-2 py-1 text-left'>
 						앱 설치 가이드
 					</h3>
 
 					<div className='bg-white rounded-lg shadow-sm'>
 						{/* 아이폰 설치 가이드 */}
 						<button
-							className='w-full flex items-center justify-between p-4 text-left'
+							className='w-full flex items-center justify-between p-4 pt-1 text-left'
 							onClick={() => setIsIosGuideModalOpen(true)}
 						>
 							<div className='flex items-center'>
-								<Smartphone className='w-5 h-5 text-gray-500 mr-3' />
+								<Smartphone className='w-5 h-5 text-low mr-4' />
 								<div>
-									<span className='text-sm'>아이폰에서 설치하기</span>
-									<p className='text-xs text-gray-500 mt-0.5'>
+									<span className='text-default text-regular'>
+										아이폰에서 설치하기
+									</span>
+									<p className='text-smallDescription text-low'>
 										홈 화면에 추가하기
 									</p>
 								</div>
 							</div>
-							<ChevronRight className='w-5 h-5 text-gray-400' />
+							<ChevronRight className='w-5 h-5 text-low' />
 						</button>
 						<div className='h-px bg-gray-100' />
 
@@ -182,34 +182,34 @@ export const SetPage = () => {
 							onClick={handleInstallClick}
 						>
 							<div className='flex items-center'>
-								<Download className='w-5 h-5 text-gray-500 mr-3' />
+								<Download className='w-5 h-5 text-low mr-4' />
 								<div>
-									<span className='text-sm'>
+									<span className='text-default text-regular'>
 										갤럭시/안드로이드에서 설치하기
 									</span>
-									<p className='text-xs text-gray-500 mt-0.5'>
+									<p className='text-smallDescription text-low'>
 										앱 다운로드 방법
 									</p>
 								</div>
 							</div>
-							<ChevronRight className='w-5 h-5 text-gray-400' />
+							<ChevronRight className='w-5 h-5 text-low' />
 						</button>
 					</div>
 				</div>
 
 				{/* 기타 정보 */}
-				<div className='space-y-2'>
-					<h3 className='text-sm font-medium text-gray-500 px-2 py-1 text-left'>
+				<div className='space-y-2 flex flex-col'>
+					<h3 className='text-smallButton text-regular px-2 py-1 text-left'>
 						정보
 					</h3>
 
 					<div className='bg-white rounded-lg shadow-sm'>
-						<div className='flex items-center justify-between p-4'>
+						<div className='flex items-center justify-between p-4 pt-1'>
 							<div className='flex items-center'>
-								<Info className='w-5 h-5 text-gray-500 mr-3' />
-								<span className='text-sm'>앱 버전</span>
+								<Info className='w-5 h-5 text-low mr-4' />
+								<span className='text-default text-regular'>앱 버전</span>
 							</div>
-							<span className='text-sm text-gray-500'>1.0.0</span>
+							<span className='text-smallDescription text-low'>1.0.0</span>
 						</div>
 					</div>
 				</div>

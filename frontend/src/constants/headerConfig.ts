@@ -68,4 +68,8 @@ export const headerConfig: HeaderConfig = {
 		showBack: true,
 		subtitle: '구매내역 스캔',
 	},
+	'/setting': {
+		showBack: true,
+		subtitle: '설정',
+	},
 } as const;

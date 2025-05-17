@@ -26,7 +26,7 @@ const MyClosetPage = () => {
 	const initialTab =
 		(location.state?.initialTab as (typeof closetTab)[number]) ?? '옷장';
 	const initialSubTab =
-		(location.state?.initialSubTab as (typeof CodiTabs)[number])?.id ?? 'my';
+		(location.state?.initialSubTab as 'my' | 'friendspick') ?? 'my';
 
 	// 상태 관리
 	const [activeMainTab, setActiveMainTab] = useState<
@@ -36,6 +36,8 @@ const MyClosetPage = () => {
 	const [activeSubTab, setActiveSubTab] = useState<'my' | 'friendspick'>(
 		initialSubTab,
 	);
+
+	console.log('activeSubTab:', activeSubTab);
 
 	useEffect(() => {
 		if (initialTab === '코디') {

@@ -39,7 +39,7 @@ const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 
 	return (
 		<div className='flex items-start justify-between'>
-			<div className='flex items-center'>
+			<div className='flex items-start'>
 				<img
 					src={
 						getOptimizedImageUrl(comment.author.imageUrl) ||

@@ -2,7 +2,8 @@ export const categoryConfig = [
 	'전체',
 	'아우터',
 	'상의',
-	'하의',
+	'바지',
+	'스커트',
 	'신발',
 	'기타',
 ];
@@ -17,4 +18,5 @@ export const categoryMapping: {
 	하의: 3,
 	신발: 4,
 	기타: 5,
+	스커트: 6,
 };

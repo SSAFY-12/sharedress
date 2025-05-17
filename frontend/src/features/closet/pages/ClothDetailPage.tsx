@@ -71,8 +71,18 @@ const ClothDetailPage = () => {
 		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
 
 	return (
-		<div className='flex flex-col bg-white w-full'>
-			<Header showBack={true} onBackClick={handleBackClick} />
+		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
+			{isMe ? (
+				<Header
+					showBack={true}
+					onBackClick={handleBackClick}
+					badgeIcon='more'
+					onBadgeClick={handleMenuClick}
+				/>
+			) : (
+				<Header showBack={true} onBackClick={handleBackClick} />
+			)}
+
 			<div className='flex-1 overflow-auto pb-20'>
 				<ImageDetailView
 					item={{
@@ -81,8 +91,6 @@ const ClothDetailPage = () => {
 						imageUrl: cloth.image,
 						category: cloth.category.name,
 					}}
-					showMoreButton={isMe}
-					onMoreButtonClick={handleMenuClick}
 				>
 					<div className='px-4 flex flex-col gap-6'>
 						<ClothDetailItem label='상품명' value={cloth.name} />

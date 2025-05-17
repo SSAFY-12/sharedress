@@ -13,7 +13,7 @@ export const SwitchToggle = ({
 			checked
 				? variant === 'primary'
 					? 'bg-regular'
-					: 'bg-gray-600'
+					: 'bg-regular'
 				: 'bg-light'
 		} ${className}`}
 		role='switch'

@@ -23,7 +23,9 @@ const CodiDetailPage = () => {
 	const location = useLocation();
 	const { id } = useParams();
 	const isMe = location.state?.isMe ?? false;
+	console.log('isMe:', isMe);
 	const source = location.state?.source ?? 'my';
+	console.log('source:', source);
 	const ownerId = location.state?.ownerId ?? 0;
 	const isGuest = useAuthStore((state) => state.isGuest);
 
@@ -154,8 +156,14 @@ const CodiDetailPage = () => {
 					},
 				});
 			},
-			onError: () => {
-				toast.error('코디 추가에 실패했습니다.');
+			onError: (error: any) => {
+				if (error.status === 409) {
+					toast.error('이미 옷장에 추가된 코디입니다.', {
+						icon: () => <img src='/icons/toast_closet.svg' alt='icon' />,
+					});
+				} else {
+					toast.error('코디 추가에 실패했습니다.');
+				}
 			},
 		});
 	};
@@ -232,6 +240,7 @@ const CodiDetailPage = () => {
 					state: { initialTab: '코디' },
 				});
 			} else if (source === 'friendspick') {
+				console.log('안녕!!!!!!');
 				navigate(`/mypage`, {
 					state: { initialTab: '코디', initialSubTab: 'friendspick' },
 				});
@@ -271,15 +280,19 @@ const CodiDetailPage = () => {
 
 	return (
 		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
-			<Header showBack={true} onBackClick={handleBackClick} />
+			{isMe ? (
+				<Header
+					showBack={true}
+					onBackClick={handleBackClick}
+					badgeIcon='more'
+					onBadgeClick={handleMenuClick}
+				/>
+			) : (
+				<Header showBack={true} onBackClick={handleBackClick} />
+			)}
 			{/* 메인 콘텐츠 */}
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
-				<ImageDetailView
-					item={item}
-					showMoreButton={isMe}
-					onMoreButtonClick={handleMenuClick}
-					recommender={recommender}
-				>
+				<ImageDetailView item={item} recommender={recommender}>
 					<div className='px-4'>
 						<div className='flex flex-col items-start gap-3'>
 							<p className='text-regular text-default'>
