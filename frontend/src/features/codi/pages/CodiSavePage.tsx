@@ -38,7 +38,6 @@ const CodiSavePage = () => {
 	const [isPublic, setIsPublic] = useState(true);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const previewCanvasRef = useRef<HTMLDivElement>(null);
-	const [canvasSize, setCanvasSize] = useState({ width: 400, height: 440 });
 
 	useEffect(() => {
 		const savedItems = localStorage.getItem('codiItems');
@@ -48,8 +47,9 @@ const CodiSavePage = () => {
 
 	useLayoutEffect(() => {
 		if (previewCanvasRef.current) {
-			const rect = previewCanvasRef.current.getBoundingClientRect();
-			setCanvasSize({ width: rect.width, height: rect.height });
+			// const setCanvasSize = (size: { width: number; height: number }) => {
+			// 	setCanvasSize(size);
+			// };
 		}
 	}, [isLoading]);
 
@@ -209,15 +209,16 @@ const CodiSavePage = () => {
 					}}
 				>
 					<div
+						className='bg-gray-50 flex items-center justify-center overflow-hidden w-[400px] h-[440px]'
 						style={{
 							background: '#f8fafc',
 							boxSizing: 'border-box',
-							width: canvasSize.width,
-							height: canvasSize.height,
+							width: 400,
+							height: 440,
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							pointerEvents: 'none',
+							border: '2px solid blue',
 						}}
 					>
 						<CodiCanvas
@@ -228,46 +229,97 @@ const CodiSavePage = () => {
 							maxZIndex={0}
 							setMaxZIndex={EMPTY_FN}
 							id='codi-canvas-capture'
-							width={canvasSize.width}
-							height={canvasSize.height}
+							width={400}
+							height={440}
 						/>
 					</div>
 				</div>,
 				document.body,
 			)}
-			<div className='w-full h-screen flex flex-col bg-white'>
-				{isSubmitting && <LoadingOverlay message='코디 저장 중이에요...' />}
-				<Header {...headerProps} />
-				<div className='flex-1 flex flex-col overflow-auto'>
-					{isLoading ? (
-						<div className='flex-1 flex items-center justify-center'>
-							<p className='text-description'>로딩 중...</p>
-						</div>
-					) : (
-						<>
-							<div className='bg-gray-50' ref={previewCanvasRef}>
-								<CodiCanvas
-									items={codiItems}
-									isEditable={false}
-									updateItem={EMPTY_FN}
-									removeItem={EMPTY_FN}
-									maxZIndex={0}
-									setMaxZIndex={EMPTY_FN}
-									id='codi-canvas'
-									width={canvasSize.width}
-									height={canvasSize.height}
-								/>
+
+			{/* 모바일 레이아웃 */}
+			<div className='block sm:hidden min-h-screen bg-white w-full'>
+				<div className='w-full h-screen flex flex-col bg-white'>
+					{isSubmitting && <LoadingOverlay message='코디 저장 중이에요...' />}
+					<Header {...headerProps} />
+					<div className='flex-1 flex flex-col overflow-auto'>
+						{isLoading ? (
+							<div className='flex-1 flex items-center justify-center'>
+								<p className='text-description'>로딩 중...</p>
 							</div>
-							<CodiSaveBottomSection
-								description={description}
-								isPublic={isPublic}
-								isLoading={isLoading}
-								onDescriptionChange={handleDescriptionChange}
-								onPublicToggle={handlePublicToggle}
-								mode={mode}
-							/>
-						</>
-					)}
+						) : (
+							<>
+								<div
+									className='bg-gray-50 flex items-center justify-center overflow-hidden w-full h-[352px]'
+									ref={previewCanvasRef}
+									style={{ boxSizing: 'border-box' }}
+								>
+									<CodiCanvas
+										items={codiItems}
+										isEditable={false}
+										updateItem={EMPTY_FN}
+										removeItem={EMPTY_FN}
+										maxZIndex={0}
+										setMaxZIndex={EMPTY_FN}
+										id='codi-canvas'
+										width={320}
+										height={352}
+									/>
+								</div>
+								<CodiSaveBottomSection
+									description={description}
+									isPublic={isPublic}
+									isLoading={isLoading}
+									onDescriptionChange={handleDescriptionChange}
+									onPublicToggle={handlePublicToggle}
+									mode={mode}
+								/>
+							</>
+						)}
+					</div>
+				</div>
+			</div>
+
+			{/* 웹 레이아웃 - 모바일 에뮬레이션 */}
+			<div className='hidden sm:flex min-h-screen items-center justify-center bg-neutral-900'>
+				<div className='w-[560px] h-screen bg-white rounded-xl overflow-hidden shadow-xl flex flex-col'>
+					{isSubmitting && <LoadingOverlay message='코디 저장 중이에요...' />}
+					<Header {...headerProps} />
+					<div className='flex-1 flex flex-col overflow-auto'>
+						{isLoading ? (
+							<div className='flex-1 flex items-center justify-center'>
+								<p className='text-description'>로딩 중...</p>
+							</div>
+						) : (
+							<>
+								<div
+									className='bg-gray-50 flex items-center justify-center overflow-hidden w-[400px] h-[440px] self-center rounded-lg border border-gray-200'
+									ref={previewCanvasRef}
+									style={{ boxSizing: 'border-box' }}
+								>
+									<CodiCanvas
+										items={codiItems}
+										isEditable={false}
+										updateItem={EMPTY_FN}
+										removeItem={EMPTY_FN}
+										maxZIndex={0}
+										setMaxZIndex={EMPTY_FN}
+										id='codi-canvas'
+										width={400}
+										height={440}
+									/>
+								</div>
+								<CodiSaveBottomSection
+									description={description}
+									isPublic={isPublic}
+									isLoading={isLoading}
+									onDescriptionChange={handleDescriptionChange}
+									onPublicToggle={handlePublicToggle}
+									mode={mode}
+								/>
+							</>
+						)}
+					</div>
 				</div>
 			</div>
 		</>

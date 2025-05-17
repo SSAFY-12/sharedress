@@ -5,8 +5,6 @@ import CodiCanvas from '@/features/codi/components/CodiCanvas';
 import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSection';
 import { useProfileStore } from '@/store/useProfileStore';
 import { useCloset } from '@/features/closet/hooks/useCloset';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import CodiEditBottomAccordion from '@/features/codi/components/CodiEditBottomAccordion';
 import { toast } from 'react-toastify';
 
 // [코디 만들기/수정 페이지]
@@ -39,11 +37,10 @@ const CodiEditPage = () => {
 	// 모드/멤버 정보 세팅
 	const mode = location.state?.mode ?? 'my';
 	const targetMemberId = location.state?.targetMemberId ?? 0;
-	const isWeb = useMediaQuery('(min-width: 640px)');
-	const isRecommendedMode = mode === 'recommended';
-	const memberId = isRecommendedMode
-		? targetMemberId
-		: useProfileStore((state) => state.getMyId()) ?? 0;
+	const memberId =
+		mode === 'recommended'
+			? targetMemberId
+			: useProfileStore((state) => state.getMyId()) ?? 0;
 
 	// 카테고리 상태
 	const [activeCategory, setActiveCategory] = useState('all');
@@ -120,9 +117,9 @@ const CodiEditPage = () => {
 			return;
 		}
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
-		if (isRecommendedMode) {
+		if (mode === 'recommended') {
 			navigate('/codi/save', {
-				state: { mode: 'recommended', targetMemberId: memberId },
+				state: { mode: 'recommended', targetMemberId: targetMemberId },
 			});
 		} else {
 			navigate('/codi/save', { state: { mode: 'my' } });
@@ -153,87 +150,97 @@ const CodiEditPage = () => {
 	// [렌더링 구조]
 	// - 전체 화면: 상단 헤더, 중간(코디 캔버스), 하단(아이템 목록)
 	return (
-		<div className='w-full h-screen flex flex-col bg-white overflow-hidden'>
-			{/* [상단 헤더] - 뒤로가기/다음 버튼 등 전달 */}
-			<Header {...headerProps} />
-			<div className='flex-1 flex flex-col overflow-hidden bg-gray-50 relative z-0 h-screen'>
-				<div className='flex-shrink-0'>
-					{/* [코디 캔버스] - 실제 코디 아이템(옷 등)들이 배치되는 영역
-						- 드래그/회전/삭제 등 편집 가능
-						- props로 현재 아이템, 수정/삭제 핸들러, zIndex 관리 등 전달 */}
-					<CodiCanvas
-						items={canvasItems} // 현재 올려진 아이템들
-						isEditable={true} // 편집 가능
-						updateItem={updateCanvasItem} // 아이템 수정 핸들러
-						removeItem={removeFromCanvas} // 아이템 삭제 핸들러
-						maxZIndex={maxZIndex} // z-index 관리
-						setMaxZIndex={setMaxZIndex} // z-index setter
-					/>
+		<>
+			{/* 모바일 레이아웃 */}
+			<div className='block sm:hidden min-h-screen bg-white w-full'>
+				<div className='w-full h-screen flex flex-col bg-white'>
+					<Header {...headerProps} />
+					<div className='flex-1 flex flex-col overflow-hidden bg-gray-50 relative z-0 h-screen'>
+						<div className='flex-shrink-0'>
+							<CodiCanvas
+								items={canvasItems}
+								isEditable={true}
+								updateItem={updateCanvasItem}
+								removeItem={removeFromCanvas}
+								maxZIndex={maxZIndex}
+								setMaxZIndex={setMaxZIndex}
+							/>
+						</div>
+						<CodiEditBottomSection
+							categories={CATEGORIES}
+							activeCategory={activeCategory}
+							filteredProducts={(
+								products?.pages.flatMap((page) => page.content) || []
+							)
+								.filter((item) => {
+									if (mode === 'recommended') return item.isPublic;
+									return true;
+								})
+								.map((item) => ({
+									id: item.id,
+									imageUrl: item.image,
+									name: item.name,
+									image: item.image,
+									brand: item.brandName,
+									category:
+										activeCategory === 'all'
+											? '전체'
+											: CATEGORIES.find((cat) => cat.id === activeCategory)
+													?.label || '전체',
+									isPublic: item.isPublic,
+								}))}
+							onCategoryChange={(category) => setActiveCategory(category)}
+							onItemClick={addItemToCanvas}
+						/>
+					</div>
 				</div>
-				{/* [하단: 웹/모바일 분기] - 카테고리별 아이템 목록 UI
-					- isWeb: true면 웹(아코디언), false면 모바일(섹션)
-					- 각 아이템 클릭 시 addItemToCanvas로 캔버스에 추가 */}
-				{isWeb ? (
-					// [웹] 아코디언 형태의 카테고리/아이템 목록
-					<CodiEditBottomAccordion
-						categories={CATEGORIES} // 카테고리 목록
-						activeCategory={activeCategory} // 현재 선택 카테고리
-						filteredProducts={(
-							products?.pages.flatMap((page) => page.content) || []
-						)
-							// 추천 모드면 공개 아이템만, 아니면 전체
-							.filter((item) => {
-								if (isRecommendedMode) return item.isPublic;
-								return true;
-							})
-							// 아이템 정보(카테고리명, 브랜드 등) 가공
-							.map((item) => ({
-								id: item.id,
-								imageUrl: item.image,
-								name: item.name,
-								image: item.image,
-								brand: item.brandName,
-								category:
-									activeCategory === 'all'
-										? '전체'
-										: CATEGORIES.find((cat) => cat.id === activeCategory)
-												?.label || '전체',
-								isPublic: item.isPublic,
-							}))}
-						onCategoryChange={setActiveCategory} // 카테고리 변경 핸들러
-						onItemClick={addItemToCanvas} // 아이템 클릭 시 캔버스에 추가
-					/>
-				) : (
-					// [모바일] 하단 섹션 형태의 카테고리/아이템 목록
-					<CodiEditBottomSection
-						categories={CATEGORIES}
-						activeCategory={activeCategory}
-						filteredProducts={(
-							products?.pages.flatMap((page) => page.content) || []
-						)
-							.filter((item) => {
-								if (isRecommendedMode) return item.isPublic;
-								return true;
-							})
-							.map((item) => ({
-								id: item.id,
-								imageUrl: item.image,
-								name: item.name,
-								image: item.image,
-								brand: item.brandName,
-								category:
-									activeCategory === 'all'
-										? '전체'
-										: CATEGORIES.find((cat) => cat.id === activeCategory)
-												?.label || '전체',
-								isPublic: item.isPublic,
-							}))}
-						onCategoryChange={setActiveCategory}
-						onItemClick={addItemToCanvas}
-					/>
-				)}
 			</div>
-		</div>
+
+			{/* 웹 레이아웃 - 모바일 에뮬레이션 */}
+			<div className='hidden sm:flex min-h-screen items-center justify-center bg-neutral-900'>
+				<div className='w-[560px] h-screen bg-white rounded-xl overflow-hidden shadow-xl flex flex-col'>
+					<Header {...headerProps} />
+					<div className='flex-1 flex flex-col overflow-hidden bg-gray-50 relative z-0 h-screen'>
+						<div className='flex-shrink-0 w-[400px] h-[440px] self-center rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden mt-4'>
+							<CodiCanvas
+								items={canvasItems}
+								isEditable={true}
+								updateItem={updateCanvasItem}
+								removeItem={removeFromCanvas}
+								maxZIndex={maxZIndex}
+								setMaxZIndex={setMaxZIndex}
+							/>
+						</div>
+						<CodiEditBottomSection
+							categories={CATEGORIES}
+							activeCategory={activeCategory}
+							filteredProducts={(
+								products?.pages.flatMap((page) => page.content) || []
+							)
+								.filter((item) => {
+									if (mode === 'recommended') return item.isPublic;
+									return true;
+								})
+								.map((item) => ({
+									id: item.id,
+									imageUrl: item.image,
+									name: item.name,
+									image: item.image,
+									brand: item.brandName,
+									category:
+										activeCategory === 'all'
+											? '전체'
+											: CATEGORIES.find((cat) => cat.id === activeCategory)
+													?.label || '전체',
+									isPublic: item.isPublic,
+								}))}
+							onCategoryChange={(category) => setActiveCategory(category)}
+							onItemClick={addItemToCanvas}
+						/>
+					</div>
+				</div>
+			</div>
+		</>
 	);
 };
 
