@@ -8,7 +8,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 import useSearchUser from '@/features/social/hooks/useSearchUser';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
-import { FriendRequestCancelModal } from '../components/FriendRequestCancelModal';
+import { FriendRequestCancelModal } from '@/features/social/components/FriendRequestCancelModal';
 
 export const FriendSearchResultPage = () => {
 	const [searchValue, setSearchValue] = useState('');
