@@ -137,7 +137,11 @@ const ProfileEditPage = () => {
 				<div className='flex flex-col w-full justify-center items-center gap-1 pb-1'>
 					<div className='w-20 h-20 rounded-full overflow-hidden'>
 						<img
-							src={previewUrl ?? profile?.profileImage}
+							src={
+								previewUrl ??
+								profile?.profileImage ??
+								'/images/default_profile.png'
+							}
 							alt={`프로필 이미지`}
 							className='w-full h-full object-cover'
 						/>
