@@ -22,6 +22,7 @@ import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,7 +36,7 @@ public class FriendController {
 	@PostMapping("/friends/request")
 	public ResponseEntity<ResponseWrapper<Void>> sendFriendRequest(
 		@CurrentMember Member member,
-		@RequestBody FriendRequestDto request
+		@Valid @RequestBody FriendRequestDto request
 	) {
 		Long myId = member.getId();
 		friendRequestUseCase.sendFriendRequest(myId, request);
