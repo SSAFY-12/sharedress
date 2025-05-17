@@ -112,9 +112,11 @@ public class PurchaseService implements PurchaseUseCase {
 	}
 
 	@Override
-	public Login29cmClient.LoginResponse login29CM(String id, String password) {
+	public Login29cmClient.LoginResponse login29CM(ShoppingMallLoginRequest request) {
 		// 🔸 로그인 요청 후 응답 받기
-		try (Response response = login29cmClient.login(new Login29cmClient.LoginRequest(id, password))) {
+		try (Response response = login29cmClient.login(
+			new Login29cmClient.LoginRequest(request.id(), request.password())
+		)) {
 			// 🔸 Set-Cookie 헤더에서 `_ftwuid` 추출
 			Optional<String> ftwuidCookie = response.headers()
 				.getOrDefault("Set-Cookie", List.of())
@@ -123,7 +125,11 @@ public class PurchaseService implements PurchaseUseCase {
 				.findFirst();
 
 			return ftwuidCookie
-				.map(Login29cmClient.LoginResponse::new)
+				.map(cookie -> {
+					String[] parts = cookie.split(";");
+					String token = parts[0].split("=")[1].substring(1);
+					return new Login29cmClient.LoginResponse(token);
+				})
 				.orElseThrow(ExceptionUtil.exceptionSupplier(ShoppingMallErrorCode.SHOPPING_MALL_TOKEN_NOT_FOUND));
 		} catch (ResponseStatusException e) {
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -131,11 +137,11 @@ public class PurchaseService implements PurchaseUseCase {
 			} else if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
 				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_BLOCKED);
 			} else {
-				throw new RuntimeException("무신사 로그인 서버 오류 발생");
+				throw new RuntimeException("29CM 로그인 서버 오류 발생");
 			}
 		} catch (Exception e) {
 			log.error("29CM Openfeign error: {}", e.getMessage());
-			throw new RuntimeException("무신사 로그인 서버 오류 발생");
+			throw new RuntimeException("29CM 로그인 서버 오류 발생");
 		}
 		return null;
 	}

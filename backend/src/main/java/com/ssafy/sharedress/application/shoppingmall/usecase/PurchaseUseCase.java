@@ -16,8 +16,5 @@ public interface PurchaseUseCase {
 		String rootOrderNo
 	);
 
-	Login29cmClient.LoginResponse login29CM(
-		String id,
-		String password
-	);
+	Login29cmClient.LoginResponse login29CM(ShoppingMallLoginRequest request);
 }

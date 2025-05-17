@@ -54,7 +54,8 @@ public class ShoppingMallController {
 		}
 
 		if (request.shopId() == 3) {
-
+			String token = purchaseUseCase.login29CM(request).token();
+			log.info("29CM token: {}", token);
 		}
 		return null;
 	}
