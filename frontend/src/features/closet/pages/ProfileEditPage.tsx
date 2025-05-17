@@ -8,6 +8,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Info } from 'lucide-react';
 interface ProfileEditForm {
 	nickname: string;
 	oneLiner: string;
@@ -174,6 +175,19 @@ const ProfileEditPage = () => {
 								}
 							}}
 						/>
+						<div className='flex justify-between items-center w-full text-xs'>
+							{watch('nickname').length === 10 ? (
+								<span className='flex gap-1.5 items-center text-delete text-smallDescription'>
+									<Info size={14} />
+									10자까지 입력 가능합니다
+								</span>
+							) : (
+								<span />
+							)}
+							<span className='text-descriptionColor'>
+								{watch('nickname').length} / 10
+							</span>
+						</div>
 					</div>
 					<div className='flex flex-col gap-2'>
 						<span className='text-low text-description text-left'>소개</span>
@@ -187,6 +201,19 @@ const ProfileEditPage = () => {
 								}
 							}}
 						/>
+						<div className='flex justify-between items-center w-full text-xs mb-1'>
+							{watch('oneLiner').length === 20 ? (
+								<span className='flex items-center text-red-500'>
+									<Info className='w-3.5 h-3.5 mr-1 shrink-0' />
+									20자까지 입력 가능합니다
+								</span>
+							) : (
+								<span />
+							)}
+							<span className='text-descriptionColor'>
+								{watch('oneLiner').length} / 20
+							</span>
+						</div>
 					</div>
 					<div className='flex justify-between items-center w-full p-2.5'>
 						<span className='text-regular text-default'>프로필 공개</span>
