@@ -1,8 +1,8 @@
 // frontend/src/features/regist/pages/RegistSearchPage.tsx
 import LibraryContainer from '@/features/regist/components/LibraryContainer';
-import { ScrollToTopButton } from '../components/ScrollToTopButton';
+import { ScrollToTopButton } from '@/features/regist/components/ScrollToTopButton';
 import { useRef } from 'react';
-import { getScrollableParent } from '../utils/getScrollableParent';
+import { getScrollableParent } from '@/features/regist/utils/getScrollableParent';
 
 const RegistSearchPage = () => {
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null);
