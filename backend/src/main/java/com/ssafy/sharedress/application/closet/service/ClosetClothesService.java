@@ -148,7 +148,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
 		String taskId = UUID.randomUUID().toString();
-		AiTask aiTask = new AiTask(taskId, false, member, TaskType.PURCHASE_HISTORY);
+		AiTask aiTask = new AiTask(taskId, false, member, shoppingMall, TaskType.PURCHASE_HISTORY);
 
 		List<AiProcessMessageRequest.ItemInfo> itemsToProcess = new ArrayList<>();
 
@@ -233,7 +233,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		} else {
 			aiTask.updateCompleted();
 		}
-		return AiTaskResponse.from(aiTaskRepository.save(aiTask));
+		return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());
 	}
 
 	private static <T> List<List<T>> batchList(List<T> list, int batchSize) {

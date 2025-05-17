@@ -8,4 +8,6 @@ public interface AiTaskRepository {
 	AiTask save(AiTask aiTask);
 
 	Optional<AiTask> findById(String id);
+
+	Optional<AiTask> findByIdAndShopId(String id, Long shopId);
 }

@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.ai.dto.AiTaskCompletedResponse;
@@ -24,8 +25,12 @@ public class AiTaskController {
 	@GetMapping("closet/clothes/purchase-history/task/{taskId}")
 	public ResponseEntity<ResponseWrapper<AiTaskCompletedResponse>> updateCompletedAiTask(
 		@CurrentMember Member member,
-		@PathVariable("taskId") String taskId
+		@PathVariable("taskId") String taskId,
+		@RequestParam Long shopId
 	) {
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, aiTaskUseCase.getAiTaskCompleted(taskId));
+		return ResponseWrapperFactory.toResponseEntity(
+			HttpStatus.OK,
+			aiTaskUseCase.getAiTaskCompleted(taskId, shopId)
+		);
 	}
 }

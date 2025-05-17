@@ -41,9 +41,13 @@ public class ShoppingMallController {
 		@RequestBody LoginMusinsaClient.LoginRequest request
 	) {
 		LoginMusinsaClient.Tokens tokens = purchaseUseCase.loginMusinsa(request).tokens();
-		AiTaskResponse result = purchaseUseCase.getMusinsaPurchaseHistory(member.getId(),
-			request.shopId(), tokens.app_atk(), tokens.app_rtk(),
-			null);
+		AiTaskResponse result = purchaseUseCase.getMusinsaPurchaseHistory(
+			member.getId(),
+			request.shopId(),
+			tokens.app_atk(),
+			tokens.app_rtk(),
+			null
+		);
 
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, result);
 	}
