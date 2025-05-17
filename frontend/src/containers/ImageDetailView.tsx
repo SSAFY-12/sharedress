@@ -9,8 +9,6 @@ interface ImageDetailViewProps {
 	onImageClick?: () => void;
 	children: React.ReactNode;
 	className?: string;
-	// showMoreButton?: boolean;
-	// onMoreButtonClick?: () => void;
 	recommender?: Recommender | null;
 }
 
@@ -20,8 +18,6 @@ export const ImageDetailView = ({
 	onImageClick,
 	children,
 	className = '',
-	// showMoreButton = false,
-	// onMoreButtonClick,
 	recommender = null,
 }: ImageDetailViewProps) => (
 	<div className={`w-full max-w-3xl mx-auto ${className}`}>
@@ -30,8 +26,6 @@ export const ImageDetailView = ({
 				item={item}
 				editable={editable}
 				onClick={onImageClick}
-				// showMoreButton={showMoreButton}
-				// onMoreButtonClick={onMoreButtonClick}
 				recommender={recommender}
 			/>
 		</div>

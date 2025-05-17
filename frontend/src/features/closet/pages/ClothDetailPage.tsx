@@ -91,8 +91,6 @@ const ClothDetailPage = () => {
 						imageUrl: cloth.image,
 						category: cloth.category.name,
 					}}
-					// showMoreButton={isMe}
-					// onMoreButtonClick={handleMenuClick}
 				>
 					<div className='px-4 flex flex-col gap-6'>
 						<ClothDetailItem label='상품명' value={cloth.name} />
