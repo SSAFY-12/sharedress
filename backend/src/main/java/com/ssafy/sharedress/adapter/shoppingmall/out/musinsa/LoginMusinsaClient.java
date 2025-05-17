@@ -14,7 +14,7 @@ import com.ssafy.sharedress.config.MusinsaFeignConfig;
 public interface LoginMusinsaClient {
 
 	@PostMapping("/login")
-	MusinsaResponse login(@RequestBody LoginRequest request);
+	LoginResponse login(@RequestBody LoginRequest request);
 
 	record LoginRequest(
 		Long shopId,
@@ -23,13 +23,13 @@ public interface LoginMusinsaClient {
 	) {
 	}
 
-	record MusinsaResponse(
+	record LoginResponse(
 		String message,
-		Tokens tokens
+		LoginTokens tokens
 	) {
 	}
 
-	record Tokens(
+	record LoginTokens(
 		String app_atk,
 		String app_rtk
 	) {

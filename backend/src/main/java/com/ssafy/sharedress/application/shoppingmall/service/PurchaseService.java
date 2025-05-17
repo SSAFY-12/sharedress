@@ -16,6 +16,7 @@ import com.ssafy.sharedress.application.closet.service.ClosetClothesService;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryItem;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.application.shoppingmall.dto.MusinsaOrderResponse;
+import com.ssafy.sharedress.application.shoppingmall.dto.ShoppingMallLoginRequest;
 import com.ssafy.sharedress.application.shoppingmall.usecase.PurchaseUseCase;
 import com.ssafy.sharedress.domain.shoppingmall.error.ShoppingMallErrorCode;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
@@ -34,10 +35,14 @@ public class PurchaseService implements PurchaseUseCase {
 	private final ClosetClothesService closetClothesService;
 
 	@Override
-	public LoginMusinsaClient.MusinsaResponse loginMusinsa(LoginMusinsaClient.LoginRequest request) {
+	public LoginMusinsaClient.LoginResponse loginMusinsa(ShoppingMallLoginRequest request) {
 		try {
-			return loginMusinsaClient.login(new LoginMusinsaClient.LoginRequest(request.shopId(), request.id(),
-				request.password()));
+			return loginMusinsaClient.login(
+				new LoginMusinsaClient.LoginRequest(
+					request.shopId(),
+					request.id(),
+					request.password())
+			);
 		} catch (ResponseStatusException e) {
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_ID_PW_NOT_MATCH);
@@ -52,8 +57,13 @@ public class PurchaseService implements PurchaseUseCase {
 	}
 
 	@Override
-	public AiTaskResponse getMusinsaPurchaseHistory(Long memberId, Long shopId, String appAtk, String appRtk,
-		String rootOrderNo) {
+	public AiTaskResponse getMusinsaPurchaseHistory(
+		Long memberId,
+		Long shopId,
+		String appAtk,
+		String appRtk,
+		String rootOrderNo
+	) {
 		List<MusinsaOrderResponse.OrderOption> allOrders = new ArrayList<>();
 		String onlineOffset = null;
 		boolean hasMore = true;
@@ -101,7 +111,7 @@ public class PurchaseService implements PurchaseUseCase {
 	}
 
 	@Override
-	public void login29CM(String id, String password) {
+	public Login29cmClient.LoginResponse login29CM(String id, String password) {
 		// 🔸 로그인 요청 후 응답 받기
 		Response response = login29cmClient.login(new Login29cmClient.LoginRequest(id, password));
 
@@ -112,6 +122,8 @@ public class PurchaseService implements PurchaseUseCase {
 			.filter(cookie -> cookie.startsWith("_ftwuid"))
 			.findFirst();
 
-		log.info("ftwuidCookie: {}", ftwuidCookie);
+		return ftwuidCookie
+			.map(Login29cmClient.LoginResponse::new)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ShoppingMallErrorCode.SHOPPING_MALL_TOKEN_NOT_FOUND));
 	}
 }

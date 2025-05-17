@@ -22,6 +22,10 @@ public interface Login29cmClient {
 		String user_id,
 		String user_password
 	) {
+	}
 
+	record LoginResponse(
+		String token
+	) {
 	}
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaClient;
 import com.ssafy.sharedress.application.ai.dto.AiTaskResponse;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.application.shoppingmall.dto.ShoppingMallLoginRequest;
 import com.ssafy.sharedress.application.shoppingmall.dto.ShoppingMallResponse;
 import com.ssafy.sharedress.application.shoppingmall.usecase.PurchaseUseCase;
 import com.ssafy.sharedress.application.shoppingmall.usecase.ShoppingMallUseCase;
@@ -38,16 +39,23 @@ public class ShoppingMallController {
 	@PostMapping("closet/clothes/purchase-history")
 	public ResponseEntity<ResponseWrapper<AiTaskResponse>> purchaseClothes(
 		@CurrentMember Member member,
-		@RequestBody LoginMusinsaClient.LoginRequest request
+		@RequestBody ShoppingMallLoginRequest request
 	) {
-		LoginMusinsaClient.Tokens tokens = purchaseUseCase.loginMusinsa(request).tokens();
-		AiTaskResponse result = purchaseUseCase.getMusinsaPurchaseHistory(
-			member.getId(),
-			request.shopId(),
-			tokens.app_atk(),
-			tokens.app_rtk(),
-			null
-		);
-		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, result);
+		if (request.shopId() == 1) {
+			LoginMusinsaClient.LoginTokens tokens = purchaseUseCase.loginMusinsa(request).tokens();
+			AiTaskResponse result = purchaseUseCase.getMusinsaPurchaseHistory(
+				member.getId(),
+				request.shopId(),
+				tokens.app_atk(),
+				tokens.app_rtk(),
+				null
+			);
+			return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, result);
+		}
+
+		if (request.shopId() == 3) {
+
+		}
+		return null;
 	}
 }
