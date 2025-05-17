@@ -42,4 +42,8 @@ public interface FriendRequestJpaRepository extends JpaRepository<FriendRequest,
 		+ "WHERE (fr.requester.id = :myId AND fr.receiver.id = :friendId) "
 		+ "OR (fr.requester.id = :friendId AND fr.receiver.id = :myId)")
 	Optional<FriendRequest> findByMemberId(Long myId, Long friendId);
+
+	@Query("SELECT CASE WHEN COUNT(fr) > 0 THEN TRUE ELSE FALSE END FROM FriendRequest fr "
+		+ "WHERE fr.receiver.id = :receiverId")
+	Boolean existsByReceiverId(Long receiverId);
 }
