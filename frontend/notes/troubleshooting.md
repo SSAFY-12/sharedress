@@ -1666,81 +1666,139 @@ if (permission === 'granted') {
 - FCM 토큰 저장 타이밍을 명확히 하여, 안정적인 알림 서비스 제공이 가능해짐
 - 인증 상태 변화와 FCM 토큰 관리의 연동이 중요함을 확인한 사례
 
-<<<<<<< HEAD
-
-### [트러블슈팅] 웹앱의 모든 Toast 알림을 FCM(브라우저/OS 푸시 알림)으로 전환(2025/05/14-안주민)
-
----
+## [트러블슈팅] 웹에서 CodiCanvas 썸네일 캡처가 실패하는 문제 (2024/06/XX-안주민)
 
 ### 문제상황
 
-- 기존에는 react-toastify의 Toast 알림(화면 우측 상단 팝업)으로 사용자에게 안내
-  메시지를 보여줬음.
-- 하지만, Toast는 웹앱이 포그라운드(열려있는 상태)일 때만 보이고, 사용자가 탭을
-  닫거나 백그라운드에 있으면 알림을 받을 수 없음.
+- 모바일(작은 화면)에서는 코디 저장 시 썸네일(캔버스) 캡처가 잘 됨.
+- **웹(PC)에서는 캡처가 항상 실패**하고, 콘솔에
+  `clientWidth / clientHeight: 0 0` `캔버스 요소가 렌더링되지 않았습니다.` 등의
+  에러가 남.
+- visually(눈으로) 캔버스는 잘 보이는데, 캡처 시점에만 크기가 0으로 나옴.
+- 여러 번 스타일 강제, rAF, 부모까지 스타일 지정 등 시도해도 해결되지 않음.
 
 ---
 
 ### 원인 분석
 
-- Toast는 UI 컴포넌트이기 때문에, 브라우저/OS의 알림 시스템과는 별개로 동작함.
-- 중요한 알림(예: 등록 성공, 실패, 복사 완료, 로그아웃 등)을 사용자가 앱을 보고
-  있지 않아도 받을 수 있도록 하려면, FCM(푸시 알림)으로 전환이 필요함.
+#### 1) 부모 레이아웃의 영향 (웹에서만 발생)
+
+- 캡처용 CodiCanvas를 CodiSavePage 내부에 렌더했음.
+- CodiSavePage의 부모/조상 div들이 flex, overflow-auto, height: 0, display: flex
+  등 다양한 Tailwind 레이아웃 속성을 가짐.
+- **이로 인해 자식(CodiCanvas)의 크기가 0이 되어버림** (브라우저는 부모가 0이면
+  자식도 0으로 계산).
+- 모바일은 레이아웃이 단순하고, 기본적으로 화면이 작아서 이런 문제가 잘 안 드러
+  남.
+
+#### 2) 렌더링 타이밍/React 비동기
+
+- 저장 버튼을 누르는 순간, React의 상태/렌더링이 비동기적으로 처리되어 캡처 시점
+  에 아직 DOM이 완전히 렌더되지 않았거나 레이아웃이 확정되지 않은 상태일 수 있음
+  .
+- 여러 번 rAF, 스타일 강제 적용, 부모까지 width/height 지정 등 모두 시도했으나,
+  부모 레이아웃의 영향(특히 웹에서)이 완전히 벗어나지 않음.
+
+#### 3) Portal이란 무엇인가? (원리 설명)
+
+- React Portal은 특정 컴포넌트를 "현재 컴포넌트 트리의 부모"가 아니라,
+  **document.body(HTML의 최상단)에 직접 렌더**하는 기술임.
+- 즉, Portal로 렌더된 컴포넌트는 부모의 flex/overflow/height 등 CSS 영향에서 완
+  전히 벗어나, 브라우저가 지정한 width/height대로 정확히 렌더됨.
+- Portal은 모달, 프린트, 임시 캡처 등 "부모 레이아웃 영향 없이 DOM만 필요"한 경
+  우에 표준적으로 사용됨.
 
 ---
 
 ### 해결방법
 
-1. **Toast 알림 코드(react-toastify의 toast.XXX) 전체 검색**
-2. 각 알림 위치에서 toast 호출을 FCM의 `showNotification`으로 변경
-   - `serviceWorker`와 `Notification` API를 활용하여 브라우저/OS 알림을 띄움
-3. 기존 ToastContainer 등 Toast 관련 코드 제거(또는 미사용 처리)
-4. 알림 메시지, 아이콘 등은 기존 Toast와 동일하게 유지
+#### A. React Portal(포털) 방식 적용
+
+- 캡처용 CodiCanvas를 document.body에 직접 렌더 (즉, 부모 레이아웃의 영향을 전혀
+  받지 않게 함)
+- React의 createPortal을 사용해서 캡처용 CodiCanvas를 body 바로 아래에 렌더.
+- 이렇게 하면, 어떤 부모의 flex/overflow/height 등 CSS 영향도 받지 않음.
+- 항상 지정한 width/height(400x440 등)로 정확히 렌더됨.
+- clientWidth/clientHeight가 0이 되는 일이 없음.
+
+#### B. (보조) 캡처 타이밍 보장
+
+- 필요하다면 setTimeout, rAF 등으로 렌더가 확실히 끝난 뒤 캡처 시도.
 
 ---
 
 ### 예시
 
-#### (1) 기존 코드
+#### 기존 코드(문제 발생)
 
-```typescript
-import { toast } from 'react-toastify';
-
-toast.success('옷을 등록했어요 👚');
-toast.error('삭제 실패 😥');
-toast.info('내 옷장 주소가 복사됐어요');
-toast.info('로그아웃되었습니다.');
+```jsx
+// CodiSavePage 내부에 직접 렌더
+<div style={{ width: '400px', height: '440px', ... }}>
+  <CodiCanvas id="codi-canvas-capture" ... />
+</div>
 ```
 
-#### (2) 변경 후 코드
+- 부모가 flex/overflow-auto 등일 때 크기가 0이 됨.
 
-```typescript
-if ('serviceWorker' in navigator && 'Notification' in window) {
-	const registration = await navigator.serviceWorker.ready;
-	await registration.showNotification('알림 제목', {
-		body: '알림 내용',
-		icon: '/android-chrome-192x192.png',
-		badge: '/favicon-32x32.png',
-	});
-}
+#### 수정 코드(Portal 적용)
+
+```jsx
+import { createPortal } from 'react-dom';
+
+{createPortal(
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '400px',
+    height: '440px',
+    pointerEvents: 'none',
+    opacity: 0,
+    zIndex: 9999,
+  }}>
+    <CodiCanvas id="codi-canvas-capture" ... />
+  </div>,
+  document.body
+)}
 ```
 
-- 예시: 옷 등록 성공 → `'옷을 등록했어요 👚'`라는 푸시 알림이 브라우저/OS에 뜸
+- 이제 어떤 부모 레이아웃 영향도 받지 않고, 항상 크기가 400x440으로 정확히 렌더
+  됨.
 
 ---
 
 ### 결론 및 정리
 
-- **이제 모든 안내 메시지는 Toast 대신 FCM 푸시 알림으로 노출됨**
-  - 사용자가 웹앱을 보고 있지 않아도(탭이 닫혀있거나 백그라운드여도) 알림을 받을
-    수 있음
-  - 알림 권한이 필요하므로, 사용자가 권한을 허용해야 정상적으로 동작함
-- 적용 파일:
-  - `useRegistCloth.ts` (옷 등록/삭제 성공/실패)
-  - `ExternalShareModal.tsx` (복사 완료)
-  - `useAuthStore.ts` (로그아웃)
-  - `useFcmInitialization.ts` (알림 권한 안내 등)
-- **중요한 알림을 더 확실하게 사용자에게 전달할 수 있게 됨**
+- **문제의 본질:**
+  - 캡처용 CodiCanvas가 부모 레이아웃의 영향(특히 flex/overflow/height 등)으로크
+    기가 0이 되어 캡처가 실패함.
+  - 모바일은 레이아웃이 단순하고, 기본적으로 화면이 작아서 이런 문제가 잘 안 드
+    러남.
+- **해결:**
+  - React Portal을 사용해 캡처용 CodiCanvas를 body에 직접 렌더.
+  - 부모 영향 없이 항상 정상 크기로 렌더됨.
+  - 캡처가 100% 성공.
+- **실무에서도 모달, 프린트, 임시 캡처 등은 항상 Portal로 body에 렌더하는 것이표
+  준.**
+
+#### 변경 전/후 요약
+
+| 변경 전                                     | 변경 후                             |
+| ------------------------------------------- | ----------------------------------- |
+| CodiSavePage 내부에 캡처용 CodiCanvas       | document.body에 Portal로 렌더       |
+| 부모 레이아웃 영향 받음 (flex, overflow 등) | 부모 영향 없음                      |
+| clientWidth/Height 0 → 캡처 실패            | clientWidth/Height 정상 → 캡처 성공 |
+
+---
+
+#### Portal의 역할(쉽게 설명)
+
+- Portal은 "부모의 레이아웃 영향(크기, 위치, 숨김 등)에서 완전히 벗어나서, 원하
+  는 위치(body 등)에 컴포넌트를 직접 렌더"하는 React의 기능임.
+- 모달, 프린트, 임시 캡처 등 "레이아웃 영향 없이 DOM만 필요"한 경우에 표준적으로
+  사용.
+- 이 패턴을 기억해두면, 모든 웹앱에서 "레이아웃 영향 없이 DOM만 필요"한 경우(모
+  달, 프린트, 캡처 등) 항상 Portal을 쓰면 됨!
 
 ---
 
@@ -1997,18 +2055,18 @@ client.interceptors.response.use(
 
 #### 문제상황
 
-로컬(dev) : 옷 삭제 버튼 → 정상 동작배포(prod) : 첫 클릭 — UI 변동 없음두 번째
-클릭 — 403 Forbidden 응답동일한 코드-경로인 등록(register) 은 배포에서도 정상
+로컬(dev) : 옷 삭제 버튼 → 정상 동작배포(prod) : 첫 클릭 — UI 변동 없음두 번째클
+릭 — 403 Forbidden 응답동일한 코드-경로인 등록(register) 은 배포에서도 정상
 
 #### 원인 분석
 
 단계 관찰 해석 ① API 호출 서버는 200 OK → 실제 삭제 완료 요청 자체는 성공 ②
 React-Query onSuccess 알림 권한 거부 / 브라우저 미지원 → showNotification()
-Promise reject mutation 내부에서 예외 발생 → React-Query가 상태를 “실패”로 뒤집
+Promise reject mutation 내부에서 예외 발생 → React-Query가 상태를 "실패"로 뒤집
 고 onSuccess(override) 미호출 ③ 컴포넌트 상태 regState (기등록 여부) 가 업데이트
-되지 않음 UI는 여전히 “등록됨” 으로 표시 ④ 사용자 재클릭 이미 삭제된 자원에 재요
-청 → 403 증상 확인 ※ 등록 로직이 정상인 이유 등록은 addCloset() 로 전역 상태를
-선변경한 뒤 알림을 호출함 → 예외가 UI에 영향 X
+되지 않음 UI는 여전히 "등록됨" 으로 표시 ④ 사용자 재클릭 이미 삭제된 자원에 재요
+청 → 403 증상 확인 ※ 등록 로직이 정상인 이유 등록은 addCloset() 로 전역 상태를선
+변경한 뒤 알림을 호출함 → 예외가 UI에 영향 X
 
 #### 해결방법
 
@@ -2055,3 +2113,349 @@ UI 상태 미반영.
 
 React-Query onSuccess 안에서 발생한 모든 예외는 mutation 상태를 실패로 바꾼다는
 점을 기억하자.
+
+## [트러블슈팅] CodiCanvas 썸네일 캡처 트러블슈팅 (2025/05/17-안주민)
+
+## 1. 문제 상황 요약
+
+- **모바일(작은 화면):**
+  - 코디 저장 시 썸네일(캔버스) 캡처가 잘 됨
+  - clientWidth/Height, base64 크기 모두 정상
+- **웹(PC, 큰 화면):**
+  - 캡처 시도 시 항상 실패 ("캔버스 이미지 캡처 재시도 실패")
+  - 콘솔: `element.clientWidth / clientHeight: 0 0`, base64 생성 안 됨
+  - visually(눈으로) 캔버스는 보이지만, 캡처 시점에 크기가 0
+
+---
+
+## 2. 원인 분석
+
+### A. 모바일/웹 환경 차이
+
+- **모바일:**
+  - 구조 단순, 캔버스/이미지 크기 작음, 렌더링/캡처 빠름
+- **웹:**
+  - 구조 복잡(부모가 flex, overflow, height: 0 등), 캔버스/이미지 크기 큼
+  - 캡처 시점에 DOM 크기가 0, 브라우저 한계로 캡처 실패
+
+### B. 캡처 시점의 DOM/CSS/React 타이밍 문제
+
+- 캡처 시점에 CodiCanvas의 부모(혹은 조상 div)가 display: none, height: 0,
+  overflow 등 CSS 영향으로 실제로는 크기가 0
+- 저장 버튼을 누르는 순간, React의 상태/렌더링이 비동기적으로 처리되어 캡처 시점
+  에 DOM이 완전히 렌더되지 않았거나, 이미 언마운트/숨겨진 상태
+- 콘솔로 찍으면 CodiCanvas 내부에서는 width/height가 정상인데, CodiSavePage에서
+  document.getElementById로 접근하면 0
+
+### C. base64(이미지) 크기/브라우저 한계
+
+- 모바일은 base64가 작아서 문제 없음
+- 웹은 캔버스/이미지 크기가 커서 base64가 2MB 이상, 브라우저가 감당 못함
+- html2canvas 등 라이브러리가 캡처에 실패하거나, 업로드가 중간에 끊김
+
+---
+
+## 3. 시행착오/디버깅 과정
+
+- border/background로 캔버스 실제 렌더링 여부 시각적 확인
+- 저장 버튼 클릭 시점에 크기(console.log) 찍기
+- requestAnimationFrame/setTimeout 등으로 캡처 타이밍 조정
+- 크롬 Elements 탭에서 DOM/부모 크기 직접 확인
+- html2canvas 옵션(width/height/scale)으로 해상도 제한 시도
+- base64 크기 체크 후 경고/업로드 차단 시도
+- 모두 효과 없었음: 캡처 시점에 DOM이 0이거나, 부모 영향에서 벗어나지 못함
+
+---
+
+## 4. 근본 원인
+
+- **웹에서는 캡처용 CodiCanvas가 부모 레이아웃(flex, overflow, height: 0 등)의영
+  향으로 캡처 시점에 크기가 0이 됨**
+- 모바일은 구조가 단순해서 이런 문제가 잘 안 드러남
+- React의 상태/렌더링 타이밍, CSS 레이아웃, DOM 배치가 복잡하게 얽혀 있음
+
+---
+
+## 5. 해결 방법: React Portal(포털) 적용
+
+### A. Portal이란?
+
+- React Portal은 특정 컴포넌트를 "현재 컴포넌트 트리의 부모"가 아니라,
+  **document.body(HTML의 최상단)에 직접 렌더**하는 기술
+- Portal로 렌더된 컴포넌트는 부모의 flex/overflow/height 등 CSS 영향에서 완전히
+  벗어나, 브라우저가 지정한 width/height대로 정확히 렌더됨
+- 모달, 프린트, 임시 캡처 등 "부모 레이아웃 영향 없이 DOM만 필요"한 경우에 표준
+  적으로 사용
+
+### B. Portal 적용 전/후 비교
+
+| 변경 전(문제)                         | 변경 후(Portal 적용)                |
+| ------------------------------------- | ----------------------------------- |
+| CodiSavePage 내부에 캡처용 CodiCanvas | document.body에 Portal로 렌더       |
+| 부모 레이아웃 영향 받음               | 부모 영향 없음                      |
+| clientWidth/Height 0 → 캡처 실패      | clientWidth/Height 정상 → 캡처 성공 |
+
+### C. 실제 코드 예시
+
+```jsx
+// Portal 적용 전(문제)
+<div style={{ width: '400px', height: '440px', ... }}>
+  <CodiCanvas id="codi-canvas-capture" ... />
+</div>
+
+// Portal 적용 후
+import { createPortal } from 'react-dom';
+
+{createPortal(
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '400px',
+    height: '440px',
+    pointerEvents: 'none',
+    opacity: 0,
+    zIndex: 9999,
+  }}>
+    <CodiCanvas id="codi-canvas-capture" ... />
+  </div>,
+  document.body
+)}
+```
+
+- 이제 어떤 부모 레이아웃 영향도 받지 않고, 항상 크기가 400x440으로 정확히 렌더
+  됨
+- clientWidth/clientHeight가 0이 되는 일이 없음
+
+---
+
+## 6. Portal의 원리와 역할
+
+- Portal은 "부모의 레이아웃 영향(크기, 위치, 숨김 등)에서 완전히 벗어나서, 원하
+  는 위치(body 등)에 컴포넌트를 직접 렌더"하는 React의 기능
+- 모달, 프린트, 임시 캡처 등 "레이아웃 영향 없이 DOM만 필요"한 경우에 표준적으로
+  사용
+- 이 패턴을 기억해두면, 모든 웹앱에서 "레이아웃 영향 없이 DOM만 필요"한 경우(모
+  달, 프린트, 캡처 등) 항상 Portal을 쓰면 됨!
+
+---
+
+## 7. 추가 개선/보조 방법
+
+- html2canvas 옵션(width/height/scale)으로 해상도 제한(모바일 기준)
+- base64 크기 체크 후 경고/업로드 차단
+- 웹에서는 화질 저하 안내 메시지 추가
+- requestAnimationFrame 등으로 캡처 타이밍 보장
+
+---
+
+## 8. 결론 및 정리
+
+- **문제의 본질:**
+  - 캡처용 CodiCanvas가 부모 레이아웃의 영향(특히 flex/overflow/height 등)으로크
+    기가 0이 되어 캡처가 실패함
+  - 모바일은 구조가 단순/작아서 문제 없음
+- **해결:**
+  - React Portal을 사용해 캡처용 CodiCanvas를 body에 직접 렌더
+  - 부모 영향 없이 항상 정상 크기로 렌더됨 → 캡처 100% 성공
+- **실무에서도 모달, 프린트, 임시 캡처 등은 항상 Portal로 body에 렌더하는 것이표
+  준**
+
+---
+
+## 9. 한 줄 요약
+
+> "웹에서 CodiCanvas 캡처가 실패하는 진짜 원인은 부모 레이아웃(CSS) 영향과 React
+> 렌더링 타이밍 때문이며, Portal로 body에 직접 렌더하면 100% 해결된다!"
+
+아주 구체적으로, 실제 코드/동작/브라우저 원리까지 곁들여서  
+README.md 스타일로 정리해드리겠습니다.
+
+---
+
+아주 구체적으로, **동작 원리**와 **브라우저의 실제 처리 방식**까지 곁들여 보완해
+드리겠습니다.  
+아래는 기존 troubleshooting.md 양식에 “동작/브라우저 원리”를 추가한 확장 버전입
+니다.
+
+---
+
+## [트러블슈팅] 코디 페이지(@codi) 모바일/웹 레이아웃 문제와 해결(2025/05/18-안주민)
+
+## 1. 문제 상황
+
+- **모바일/웹에서 코디 페이지의 UI가 깨짐**
+  - 캔버스(코디 영역)가 잘리거나, 아이템이 화면 밖으로 나감
+  - 저장/이벤트 동작이 불안정하게 발생함
+- **모바일:**
+  - 캔버스가 세로로 잘리거나, 하단 섹션이 너무 작음
+- **웹:**
+  - 하단 섹션이 너무 작거나, 중앙정렬이 안 됨
+
+---
+
+## 2. 원인 분석
+
+### 2-1. 환경별 렌더링 차이
+
+- **모바일과 웹은 뷰포트 크기, 입력 방식, 스크롤/오버플로우 처리 등 기본이 다
+  름**
+- **예시:**
+  - 모바일: 360px × 800px, 터치 입력, 스크롤이 많음
+  - 웹: 1440px × 900px, 마우스 입력, 스크롤이 적음
+
+### 2-2. 동일한 레이아웃/스타일의 한계
+
+- **고정 px, flex-1, min-h-0 등은 뷰포트 크기에 따라 다르게 동작**
+  - 모바일에서 flex-1은 화면을 꽉 채우지만, 웹에서는 너무 커지거나 작아질 수 있
+    음
+- **하위 컴포넌트(아코디언, 하단 섹션 등)도 모바일/웹 구분 없이 사용**
+  - 모바일 전용 UI가 웹에서 깨지거나, 반대로 웹 전용 UI가 모바일에서 깨짐
+
+### 2-3. 비율/크기 문제
+
+- **고정 px 단위(h-[352px] 등)는 모바일에서 화면을 넘치거나 잘리게 만듦**
+- **aspect-ratio, 100vw/100vh 등 비율 기반이 모바일에 적합**
+- **웹은 고정폭/고정높이, 중앙정렬, 라운드 등 데스크탑 친화적 스타일이 적합**
+
+---
+
+## 3. 해결 방법
+
+### 3-1. App.tsx처럼 모바일/웹 분기 레이아웃 적용
+
+```tsx
+// 모바일
+<div className='block sm:hidden ...'> ... </div>
+// 웹
+<div className='hidden sm:flex ...'> ... </div>
+```
+
+### 3-2. 각 레이아웃에 맞는 Tailwind 스타일 적용
+
+- **모바일:**
+  - 100vw/100vh, aspect-ratio, flex-1 등
+  - 예시:
+    ```tsx
+    <div className="w-full aspect-[10/11] ...">
+      <CodiCanvas width={window.innerWidth} height={window.innerWidth * 1.1} ... />
+    </div>
+    ```
+- **웹:**
+  - 고정폭(400~560px), 중앙정렬, 라운드, 그림자 등
+  - 예시:
+    ```tsx
+    <div className="w-[400px] h-[440px] rounded-lg ...">
+      <CodiCanvas width={400} height={440} ... />
+    </div>
+    ```
+
+### 3-3. 하위 컴포넌트도 모바일/웹에 맞게 스타일 보완
+
+- 하단 섹션, 카테고리 탭 등도 모바일/웹에서 각각 맞는 스타일 적용
+
+### 3-4. 불필요한 JS 분기, 디버그 코드, 중복 스타일 제거
+
+- isWeb, useMediaQuery, border: 1px solid red 등 제거
+
+### 3-5. Tailwind의 반응형 유틸리티(sm:) 적극 활용
+
+- `sm:rounded-lg` → sm(640px) 이상에서만 라운드 적용, 모바일에서는 적용 안 됨
+
+---
+
+## 4. 예시 코드
+
+```tsx
+// 모바일에서 캔버스 영역
+<div className="w-full aspect-[10/11] ...">
+  <CodiCanvas width={window.innerWidth} height={window.innerWidth * 1.1} ... />
+</div>
+
+// 웹에서 캔버스 영역
+<div className="w-[400px] h-[440px] rounded-lg ...">
+  <CodiCanvas width={400} height={440} ... />
+</div>
+```
+
+---
+
+## 5. 결론 및 정리
+
+- **웹/모바일에 적합한 레이아웃을 분기 적용하면**  
+  각 환경의 뷰포트, 입력, 스크롤, 오버플로우, 비율 등 특성에 맞게 UI가 자연스럽
+  게 동작함.
+- **동일한 레이아웃을 강제로 적용하면**  
+  한쪽(모바일/웹)에서는 정상, 다른 쪽에서는 깨짐/잘림/이벤트 꼬임 등 문제가 발생
+  .
+- **비율 기반(aspect-ratio)과 고정폭/고정높이의 조합**  
+  → 모바일에서는 화면에 꽉 차게, 웹에서는 중앙정렬/고정크기로 일관성 있게 보임.
+- **결국, 환경별로 맞는 레이아웃/스타일을 적용하는 것이  
+  UI/UX, 기능 안정성, 유지보수성 모두에서 가장 효과적임.**
+
+---
+
+## 6. 동작/브라우저 원리 (구체적 설명)
+
+### 6-1. 브라우저의 렌더링 방식 차이
+
+- **모바일 브라우저**
+
+  - 뷰포트가 작고, 스크롤이 많으며, 터치 입력이 기본
+  - CSS의 고정 px, flex-1 등은 화면을 넘치거나 잘릴 수 있음
+  - aspect-ratio, 100vw/100vh 등 비율 기반이 자연스러움
+  - 모바일 브라우저는 화면 크기에 맞춰 요소를 자동으로 리사이즈하지만, 고정 px는
+    예외
+
+- **데스크탑(웹) 브라우저**
+  - 뷰포트가 크고, 마우스 입력, 중앙정렬/고정폭이 자연스러움
+  - 고정폭/고정높이, 라운드, 그림자 등 데스크탑 친화적 스타일이 적합
+  - 데스크탑에서는 flex-1이 너무 커지거나, min-h-0이 의도와 다르게 동작할 수 있
+    음
+
+### 6-2. CSS 동작의 실제 차이
+
+- **flex-1, min-h-0, 고정 px**
+
+  - flex-1: 부모의 남은 공간을 모두 차지. 모바일에서는 꽉 차지만, 웹에서는 너무
+    커질 수 있음
+  - min-h-0: flex 컨테이너에서 자식의 최소 높이를 0으로 제한. 오버플로우가 발생
+    할 수 있음
+  - 고정 px: 모바일에서 화면을 넘치거나, 웹에서 너무 작게 보일 수 있음
+
+- **aspect-ratio, 100vw/100vh**
+
+  - aspect-ratio: 부모의 너비에 따라 자동으로 높이가 결정되어, 어떤 기기에서도
+    비율이 유지됨
+  - 100vw/100vh: 뷰포트 전체를 차지. 모바일에서 꽉 차는 레이아웃에 적합
+
+- **반응형 Tailwind(sm:)**
+  - sm:rounded-lg 등은 sm(640px) 이상에서만 스타일 적용. 모바일에서는 적용 안 됨
+
+### 6-3. 실제 동작 차이
+
+- **모바일에서 aspect-ratio 사용:**
+  - 어떤 기기에서도 세로로 잘리지 않고, 꽉 차게 보임
+  - 예: iPhone, Galaxy 등 다양한 해상도에서 동일한 비율 유지
+- **웹에서 고정폭/고정높이 사용:**
+  - 중앙정렬, 라운드, 그림자 등으로 데스크탑 UX에 최적화
+  - 예: 1440px 화면에서도 코디 캔버스가 항상 중앙에 고정
+
+### 6-4. 이벤트/저장 등 기능 안정성
+
+- **모바일/웹에서 레이아웃이 깨지면**
+  - 드래그, 저장, 클릭 등 이벤트가 엉뚱한 위치에서 발생하거나,  
+    캔버스가 잘려서 저장 이미지가 이상하게 나올 수 있음
+- **분기 적용 후**
+  - 모든 기기에서 이벤트/저장 등 기능이 일관되고 안정적으로 동작
+
+---
+
+## 7. 결론
+
+- **환경별로 맞는 레이아웃/스타일을 적용해야  
+  모든 기기에서 깨지지 않고,  
+  이벤트/저장 등 기능도 안정적으로 동작합니다!**
+- **App.tsx처럼 분기 구조를 적용하는 것이  
+  가장 쉽고, 확장성/유지보수성/안정성 모두에서 최적의 선택입니다.**
+- **이것이 바로 “웹/모바일 분기 레이아웃”이 필수적인 이유입니다.**
