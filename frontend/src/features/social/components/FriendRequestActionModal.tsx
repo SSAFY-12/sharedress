@@ -4,11 +4,10 @@ import useRequest from '@/features/social/hooks/useRequest';
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 
-interface FriendRequestActionModalProps {
+export interface FriendRequestActionModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	memberId: number; // 요청 조회를 위한 memberId
-	actionType: 'accept' | 'reject' | 'cancel';
 	friend: {
 		profileImage: string;
 		nickname: string;
@@ -20,42 +19,25 @@ export const FriendRequestActionModal = ({
 	isOpen,
 	onClose,
 	memberId,
-	actionType,
 	friend,
 }: FriendRequestActionModalProps) => {
-	const { friendRequest, acceptRequest, rejectRequest, cancelRequest } =
-		useRequest(isOpen ? memberId : undefined); // 모달이 열려있을 때만 요청 조회
+	const { friendRequest, acceptRequest, rejectRequest } = useRequest(
+		isOpen ? memberId : undefined,
+	); // 모달이 열려있을 때만 요청 조회
 
-	const handleAction = async () => {
+	const handleAction = async (type: 'accept' | 'reject') => {
 		if (!friendRequest) return;
 
 		try {
-			switch (actionType) {
-				case 'accept':
-					acceptRequest(friendRequest.id); // 친구 요청 수락
-					break;
-				case 'reject':
-					rejectRequest(friendRequest.id); // 친구 요청 거절
-					break;
-				case 'cancel':
-					cancelRequest(friendRequest.id); // 친구 요청 취소
-					break;
+			if (type === 'accept') {
+				acceptRequest(friendRequest.id);
+			} else {
+				rejectRequest(friendRequest.id);
 			}
 			onClose();
 		} catch (error) {
 			console.error('Failed to process friend request:', error);
 			// 에러 처리 로직 추가 가능
-		}
-	};
-
-	const getActionButtonText = () => {
-		switch (actionType) {
-			case 'accept':
-				return '요청 수락';
-			case 'reject':
-				return '요청 거절';
-			case 'cancel':
-				return '요청 취소';
 		}
 	};
 
@@ -80,12 +62,20 @@ export const FriendRequestActionModal = ({
 						<div className=' text-sm text-low text-center'>
 							{friendRequest.message}
 						</div>
-						<PrimaryBtn
-							size='medium'
-							name={getActionButtonText()}
-							color='primary'
-							onClick={handleAction}
-						/>
+						<div className='flex gap-4 w-full'>
+							<PrimaryBtn
+								size='medium'
+								name='수락하기'
+								color='primary'
+								onClick={() => handleAction('accept')}
+							/>
+							<PrimaryBtn
+								size='medium'
+								name='거절하기'
+								color='background'
+								onClick={() => handleAction('reject')}
+							/>
+						</div>
 					</div>
 				</MainModal.Body>
 			</MainModal.Header>

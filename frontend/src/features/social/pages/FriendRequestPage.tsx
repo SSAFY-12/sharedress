@@ -11,7 +11,6 @@ export const FriendRequestsPage = () => {
 
 	// 모달 관련 상태
 	const [actionModalOpen, setActionModalOpen] = useState(false);
-	const [actionType, setActionType] = useState<'accept' | 'reject'>('accept');
 	const [selectedRequest, setSelectedRequest] = useState<{
 		id: number;
 		profileImage: string;
@@ -27,16 +26,16 @@ export const FriendRequestsPage = () => {
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
-	const handleActionClick = (type: 'accept' | 'reject', request: any) => {
-		setActionType(type);
-		setSelectedRequest({
-			id: request.id,
-			profileImage: request.requester.profileImage,
-			nickname: request.requester.nickname,
-			memberId: request.requester.id,
-		});
-		setActionModalOpen(true);
-	};
+	// const handleActionClick = (type: 'accept' | 'reject', request: any) => {
+	// 	setActionType(type);
+	// 	setSelectedRequest({
+	// 		id: request.id,
+	// 		profileImage: request.requester.profileImage,
+	// 		nickname: request.requester.nickname,
+	// 		memberId: request.requester.id,
+	// 	});
+	// 	setActionModalOpen(true);
+	// };
 	console.log('friendRequests', friendRequests);
 	return (
 		<div className='w-full bg-white flex flex-col items-stretch'>
@@ -70,6 +69,22 @@ export const FriendRequestsPage = () => {
 								<div className='flex gap-2'>
 									<PrimaryBtn
 										size='tiny'
+										name='확인하기'
+										color='brown'
+										onClick={() => {
+											setSelectedRequest({
+												id: request.id,
+												profileImage:
+													request.requester.profileImage ??
+													'/images/default_profile.png',
+												nickname: request.requester.nickname,
+												memberId: request.requester.id,
+											});
+											setActionModalOpen(true);
+										}}
+									/>
+									{/* <PrimaryBtn
+										size='tiny'
 										name='친구 수락'
 										color='brown'
 										onClick={() => handleActionClick('accept', request)}
@@ -79,7 +94,7 @@ export const FriendRequestsPage = () => {
 										name='친구 거절'
 										color='background'
 										onClick={() => handleActionClick('reject', request)}
-									/>
+									/> */}
 								</div>
 							</div>
 						</div>
@@ -102,7 +117,7 @@ export const FriendRequestsPage = () => {
 						setSelectedRequest(null);
 					}}
 					memberId={selectedRequest.memberId}
-					actionType={actionType}
+					// actionType={actionType}
 					friend={{
 						profileImage: selectedRequest.profileImage,
 						nickname: selectedRequest.nickname,
