@@ -28,6 +28,9 @@ interface CodiCanvasProps {
 	removeItem: (id: string) => void;
 	maxZIndex: number;
 	setMaxZIndex: (value: number) => void;
+	id?: string;
+	width?: number;
+	height?: number;
 }
 
 // 카테고리별 기본 크기 설정
@@ -44,6 +47,9 @@ const CodiCanvas = ({
 	removeItem,
 	maxZIndex = 0,
 	setMaxZIndex,
+	id,
+	width,
+	height,
 }: CodiCanvasProps) => {
 	const [activeItem, setActiveItem] = useState<string | null>(null);
 	const [interactionMode, setInteractionMode] = useState<
@@ -291,8 +297,14 @@ const CodiCanvas = ({
 	return (
 		<div
 			ref={canvasRef}
-			id='codi-canvas'
-			className='canvas-item relative w-full aspect-[10/11] bg-gray-50 overflow-hidden touch-pan-x'
+			id={id}
+			className={`canvas-item relative bg-gray-50 overflow-hidden touch-pan-x${
+				width && height ? '' : ' w-full aspect-[10/11]'
+			}`}
+			style={{
+				width: width ? `${width}px` : undefined,
+				height: height ? `${height}px` : undefined,
+			}}
 			onClick={isEditable ? handleCanvasClick : undefined}
 			onTouchEnd={isEditable ? handleCanvasClick : undefined}
 		>

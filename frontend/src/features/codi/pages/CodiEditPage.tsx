@@ -167,6 +167,9 @@ const CodiEditPage = () => {
 		}
 		// 1. 현재 코디 아이템들을 localstorage에 저장
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
+		// [참고] 캡처/썸네일 생성은 CodiSavePage에서 requestAnimationFrame으로 처리됨
+		// ex)
+		// requestAnimationFrame(() => { ...capture code... });
 		if (isRecommendedMode) {
 			// 2. 추천 모드일 경우 멤버 아이디를 전달
 			navigate('/codi/save', {

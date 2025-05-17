@@ -13,6 +13,7 @@ import { base64ToFile } from '@/features/codi/utils/base64ToFile';
 import { captureCanvasImageWithRetry } from '@/features/codi/utils/captureCanvasImageWithRetry';
 import LoadingOverlay from '@/components/etc/LoadingOverlay';
 import { toast } from 'react-toastify';
+import { createPortal } from 'react-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
@@ -76,7 +77,6 @@ const CodiSavePage = () => {
 		setIsSubmitting(true); // 저장 중 오버레이 표시
 		try {
 			// (1) 코디 아이템 포맷 변환 (서버 전송용)
-			// - position, scale, rotation 등만 추림
 			const formattedItems = codiItems.map((item) => ({
 				id: Number(item.id),
 				position: {
@@ -89,71 +89,130 @@ const CodiSavePage = () => {
 			}));
 
 			const payload = {
-				title: '임시 제목', // 실제 서비스에서는 제목 입력받을 수도 있음
-				description, // 설명
-				isTemplate: false, // 템플릿 여부(고정)
-				items: formattedItems, // 코디 아이템 정보
-				...(mode === 'my' ? { isPublic } : {}), // 내 코디면 공개여부 포함
+				title: '임시 제목',
+				description,
+				isTemplate: false,
+				items: formattedItems,
+				...(mode === 'my' ? { isPublic } : {}),
 			};
 
 			console.log('[DEBUG] payload:', payload);
 
 			// (2) CodiCanvas DOM 찾기
-			// - 썸네일 생성을 위해 실제 DOM 요소를 찾음
-			const container = document.getElementById('codi-canvas');
-			// 캔버스 찾기 실패 시 예외
-			if (!container) throw new Error('코디 캔버스를 찾을 수 없습니다.');
+			const container = document.getElementById('codi-canvas-capture');
+			console.log('캡처용 container:', container);
+			if (container) {
+				console.log('container.id:', container.id);
+				console.log('container.className:', container.className);
+				console.log('container.clientWidth:', container.clientWidth);
+				console.log('container.clientHeight:', container.clientHeight);
+				console.log('container.outerHTML:', container.outerHTML);
+			}
+			if (!container) throw new Error('캡처용 캔버스를 찾을 수 없습니다.');
 
-			// (3) CodiCanvas를 이미지로 캡처 (썸네일 생성)
-			// - 내부적으로 렌더링/이미지 로딩 대기, html2canvas 등 활용
-			const base64 = await captureCanvasImageWithRetry(container, 2);
-			// 캔버스 이미지 캡처 => 내부적으로 시도하고, 실패하면 더 시도
-			console.log('base64:', base64);
+			// (3) 캡처 시점에만 고정 크기 부여 (모바일/웹 구분, 조상까지 적용)
+			const isMobile = window.innerWidth < 640;
+			const width = isMobile ? '320px' : '400px';
+			const height = isMobile ? '352px' : '440px';
 
-			// (4) base64 → File 변환
-			const file = base64ToFile(base64, 'codi.png', 'image/png');
-			console.log('[DEBUG] 변환된 File:', file);
-			console.log('[DEBUG] 파일 크기:', file.size);
+			// 캡처 시점에 CodiCanvas + 부모 + 조상까지 width/height 강제 지정
+			const elementsToFix: {
+				el: HTMLElement;
+				originalWidth: string;
+				originalHeight: string;
+			}[] = [];
+			let el: HTMLElement | null = container;
+			for (let i = 0; i < 3; i++) {
+				// 최대 3단계 조상까지
+				if (!el) break;
+				elementsToFix.push({
+					el,
+					originalWidth: el.style.width,
+					originalHeight: el.style.height,
+				});
+				el = el.parentElement as HTMLElement | null;
+			}
 
-			// (5) 코디 정보 저장 (썸네일 제외)
-			const saved = await saveCodi(payload);
-			const coordinationId = saved.content.id;
-			console.log('[DEBUG] 저장된 coordinationId:', coordinationId);
-
-			// (6) coordinationId와 썸네일 이미지 업로드
-			const result = await uploadCodiThumbnail(coordinationId, file);
-			// 썸네일 업로드 응답 => coordinationId와 썸네일 이미지 업로드
-			console.log('[DEBUG] 썸네일 업로드 응답:', result);
-
-			// (7) 성공 토스트 및 페이지 이동
-			toast.success('코디가 저장되었습니다', {
-				icon: () => (
-					<img
-						src='/icons/toast_codi.svg'
-						alt='icon'
-						style={{ width: '20px', height: '20px' }}
-					/>
-				),
+			// 스타일을 !important로 강제
+			const codiCanvas = container;
+			const originalClass = codiCanvas.className;
+			codiCanvas.style.setProperty('width', width, 'important');
+			codiCanvas.style.setProperty('height', height, 'important');
+			elementsToFix.forEach(({ el }) => {
+				el.style.setProperty('width', width, 'important');
+				el.style.setProperty('height', height, 'important');
 			});
 
-			// 저장 성공 시 localStorage에서 임시 데이터 삭제 및 페이지 이동
-			if (mode === 'my') {
-				localStorage.removeItem('codiItems');
-				navigate('/mypage', {
-					state: { initialTab: '코디' },
+			// 캡처 직전 실제 크기 로그
+			console.log('캡처 직전', codiCanvas.clientWidth, codiCanvas.clientHeight);
+			await new Promise((resolve, reject) => {
+				requestAnimationFrame(() => {
+					requestAnimationFrame(() => {
+						requestAnimationFrame(async () => {
+							try {
+								const base64 = await captureCanvasImageWithRetry(container, 2);
+
+								// (4) base64 → File 변환
+								const file = base64ToFile(base64, 'codi.png', 'image/png');
+
+								// (5) 코디 정보 저장 (썸네일 제외)
+								const saved = await saveCodi(payload);
+								const coordinationId = saved.content.id;
+
+								// (6) coordinationId와 썸네일 이미지 업로드
+								await uploadCodiThumbnail(coordinationId, file);
+
+								// (7) 성공 토스트 및 페이지 이동
+								toast.success('코디가 저장되었습니다', {
+									icon: () => (
+										<img
+											src='/icons/toast_codi.svg'
+											alt='icon'
+											style={{ width: '20px', height: '20px' }}
+										/>
+									),
+								});
+
+								// 저장 성공 시 localStorage에서 임시 데이터 삭제 및 페이지 이동
+								if (mode === 'my') {
+									localStorage.removeItem('codiItems');
+									navigate('/mypage', {
+										state: { initialTab: '코디' },
+									});
+								} else {
+									localStorage.removeItem('codiItems');
+									navigate(`/friend/${targetMemberId}`, {
+										state: { initialTab: '코디', initialSubTab: 'recommended' },
+									});
+								}
+								resolve(null);
+							} catch (error) {
+								reject(error);
+							} finally {
+								// (8) 캡처 후 원복
+								codiCanvas.className = originalClass;
+								codiCanvas.style.removeProperty('width');
+								codiCanvas.style.removeProperty('height');
+								elementsToFix.forEach(
+									({ el, originalWidth, originalHeight }) => {
+										if (typeof originalWidth === 'string')
+											el.style.width = originalWidth;
+										if (typeof originalHeight === 'string')
+											el.style.height = originalHeight;
+										el.style.removeProperty('width');
+										el.style.removeProperty('height');
+									},
+								);
+							}
+						});
+					});
 				});
-			} else {
-				localStorage.removeItem('codiItems');
-				navigate(`/friend/${targetMemberId}`, {
-					state: { initialTab: '코디', initialSubTab: 'recommended' },
-				});
-			}
+			});
 		} catch (error) {
-			// 예외 발생 시 에러 토스트 및 콘솔 출력
 			console.error('코디 저장 실패:', error);
 			toast.error('코디 저장 실패');
 		} finally {
-			setIsSubmitting(false); // 저장 중 오버레이 해제
+			setIsSubmitting(false);
 		}
 	};
 
@@ -182,43 +241,73 @@ const CodiSavePage = () => {
 	// [렌더링 구조]
 	// - 전체 화면: 상단 헤더, 중간(코디 캔버스), 하단(설명/공개여부 입력)
 	return (
-		<div className='w-full h-screen flex flex-col bg-white'>
-			{/* 저장 중 오버레이 */}
-			{isSubmitting && <LoadingOverlay message='코디 저장 중이에요...' />}
-			{/* 상단 헤더 */}
-			<Header {...headerProps} />
-			<div className='flex-1 flex flex-col overflow-auto'>
-				{isLoading ? (
-					// 로딩 중 표시
-					<div className='flex-1 flex items-center justify-center'>
-						<p className='text-description'>로딩 중...</p>
-					</div>
-				) : (
-					<>
-						<div className='bg-gray-50'>
-							{/* [코디 캔버스] - 코디 아이템 렌더링 (수정 불가, 미리보기 용) */}
-							<CodiCanvas
-								items={codiItems} // 캔버스에 올려진 아이템들
-								isEditable={false} // 편집 불가(저장 전 미리보기)
-								updateItem={EMPTY_FN} // 수정 불가
-								removeItem={EMPTY_FN} // 삭제 불가
-								maxZIndex={0}
-								setMaxZIndex={EMPTY_FN}
-							/>
+		<>
+			{createPortal(
+				<div
+					style={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						width: '400px',
+						height: '440px',
+						pointerEvents: 'none',
+						opacity: 0,
+						zIndex: 9999,
+					}}
+				>
+					<CodiCanvas
+						items={codiItems}
+						isEditable={false}
+						updateItem={EMPTY_FN}
+						removeItem={EMPTY_FN}
+						maxZIndex={0}
+						setMaxZIndex={EMPTY_FN}
+						id='codi-canvas-capture'
+						width={400}
+						height={440}
+					/>
+				</div>,
+				document.body,
+			)}
+			<div className='w-full h-screen flex flex-col bg-white'>
+				{/* 저장 중 오버레이 */}
+				{isSubmitting && <LoadingOverlay message='코디 저장 중이에요...' />}
+				{/* 상단 헤더 */}
+				<Header {...headerProps} />
+				<div className='flex-1 flex flex-col overflow-auto'>
+					{isLoading ? (
+						// 로딩 중 표시
+						<div className='flex-1 flex items-center justify-center'>
+							<p className='text-description'>로딩 중...</p>
 						</div>
-						{/* [하단 입력 영역] - 설명, 공개여부 등 입력 */}
-						<CodiSaveBottomSection
-							description={description}
-							isPublic={isPublic}
-							isLoading={isLoading}
-							onDescriptionChange={handleDescriptionChange}
-							onPublicToggle={handlePublicToggle}
-							mode={mode}
-						/>
-					</>
-				)}
+					) : (
+						<>
+							<div className='bg-gray-50'>
+								{/* [코디 캔버스] - 기존 미리보기 */}
+								<CodiCanvas
+									items={codiItems}
+									isEditable={false}
+									updateItem={EMPTY_FN}
+									removeItem={EMPTY_FN}
+									maxZIndex={0}
+									setMaxZIndex={EMPTY_FN}
+									id='codi-canvas'
+								/>
+							</div>
+							{/* [하단 입력 영역] - 설명, 공개여부 등 입력 */}
+							<CodiSaveBottomSection
+								description={description}
+								isPublic={isPublic}
+								isLoading={isLoading}
+								onDescriptionChange={handleDescriptionChange}
+								onPublicToggle={handlePublicToggle}
+								mode={mode}
+							/>
+						</>
+					)}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 
