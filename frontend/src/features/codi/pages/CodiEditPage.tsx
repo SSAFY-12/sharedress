@@ -156,7 +156,7 @@ const CodiEditPage = () => {
 				<div className='w-full h-screen flex flex-col bg-white'>
 					<Header {...headerProps} />
 					<div className='flex-1 flex flex-col overflow-hidden bg-gray-50 relative z-0 h-screen'>
-						<div className='flex-shrink-0'>
+						<div className='flex-shrink-0 w-full aspect-[10/11] bg-gray-50 flex items-center justify-center overflow-hidden'>
 							<CodiCanvas
 								items={canvasItems}
 								isEditable={true}
@@ -164,6 +164,8 @@ const CodiEditPage = () => {
 								removeItem={removeFromCanvas}
 								maxZIndex={maxZIndex}
 								setMaxZIndex={setMaxZIndex}
+								width={window.innerWidth}
+								height={window.innerWidth * 1.1}
 							/>
 						</div>
 						<CodiEditBottomSection

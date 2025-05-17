@@ -250,7 +250,7 @@ const CodiSavePage = () => {
 						) : (
 							<>
 								<div
-									className='bg-gray-50 flex items-center justify-center overflow-hidden w-full h-[352px]'
+									className='bg-gray-50 flex items-center justify-center overflow-hidden w-full aspect-[10/11]'
 									ref={previewCanvasRef}
 									style={{ boxSizing: 'border-box' }}
 								>
@@ -262,8 +262,8 @@ const CodiSavePage = () => {
 										maxZIndex={0}
 										setMaxZIndex={EMPTY_FN}
 										id='codi-canvas'
-										width={320}
-										height={352}
+										width={window.innerWidth}
+										height={window.innerWidth * 1.1}
 									/>
 								</div>
 								<CodiSaveBottomSection
