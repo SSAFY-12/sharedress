@@ -8,7 +8,10 @@ interface FriendListResponse {
 		code: string;
 		message: string;
 	};
-	content: FriendList['content']; //실제 데이터 응답구조 -> 키 값
+	content: {
+		items: FriendList['items']; //실제 데이터 응답구조 -> 키 값
+		hasRequest: boolean;
+	};
 }
 
 const useFriendList = () => {
@@ -16,7 +19,12 @@ const useFriendList = () => {
 		queryKey: ['friendList'], // 친구 목록리스트
 		queryFn: () => socialApi.getFriendList(), // 쿼리 함수
 	});
-	return { data: data?.content, isLoading, error }; //data에 원하는 값 반환
+	return {
+		data: data?.content.items,
+		hasRequest: data?.content.hasRequest,
+		isLoading,
+		error,
+	}; //data에 원하는 값 반환
 };
 
 export default useFriendList;

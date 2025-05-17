@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-
+import { useSocialStore } from '@/store/useSocialStore';
 interface SocialHeaderProps {
 	onProfileClick?: () => void;
 	onAddClick?: () => void;
@@ -7,6 +7,7 @@ interface SocialHeaderProps {
 
 const SocialHeader = ({ onProfileClick, onAddClick }: SocialHeaderProps) => {
 	const navigate = useNavigate();
+	const hasRequest = useSocialStore((state) => state.hasRequest);
 
 	const handleProfileClick = () => {
 		if (onProfileClick) {
@@ -29,7 +30,11 @@ const SocialHeader = ({ onProfileClick, onAddClick }: SocialHeaderProps) => {
 			<img src='/icons/logo_black.svg' alt='쉐어드레스' />
 			<div className='flex gap-4'>
 				<img
-					src='/icons/friend_request.svg'
+					src={
+						hasRequest
+							? '/icons/friend_request_unread.svg'
+							: '/icons/friend_request.svg'
+					}
 					alt='친구요청'
 					onClick={handleAddClick}
 					className='cursor-pointer'

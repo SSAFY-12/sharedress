@@ -24,7 +24,7 @@ const LibraryContainer = () => {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setDebouncedValue(value);
-		}, 200);
+		}, 300);
 
 		return () => clearTimeout(timer);
 	}, [value]);

@@ -1,12 +1,13 @@
 export interface FriendList {
 	//친구 리스트
-	content: {
+	items: {
 		id: number; //친구 고유 아이디
 		nickname: string; //닉네임
 		code: string; // 중복 방지 코드
 		profileImage: string; //프로필 이미지
 		oneLiner: string; //한줄 소개
 	}[]; //배열 리스트 === 친구 목록
+	hasRequest: boolean; //친구 요청 여부
 }
 
 export interface FriendRequestList {
