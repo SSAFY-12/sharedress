@@ -9,12 +9,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ssafy.sharedress.adapter.clothes.out.messaging.SqsMessageSender;
-import com.ssafy.sharedress.application.category.service.CategoryService;
+import com.ssafy.sharedress.application.ai.dto.AiTaskResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AiProcessMessageRequest;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
+import com.ssafy.sharedress.domain.ai.entity.AiTask;
+import com.ssafy.sharedress.domain.ai.entity.TaskType;
+import com.ssafy.sharedress.domain.ai.repository.AiTaskRepository;
 import com.ssafy.sharedress.domain.brand.entity.Brand;
 import com.ssafy.sharedress.domain.brand.repository.BrandRepository;
 import com.ssafy.sharedress.domain.category.entity.Category;
@@ -56,10 +59,11 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final ClosetRepository closetRepository;
 	private final ClothesRepository clothesRepository;
 	private final ShoppingMallRepository shoppingMallRepository;
+	private final AiTaskRepository aiTaskRepository;
+
 	private final SqsMessageSender sqsMessageSender;
 
 	private static final int MAX_ITEMS_PER_MESSAGE = 30;
-	private final CategoryService categoryService;
 
 	@Transactional
 	@Override
@@ -132,7 +136,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 	@Transactional
 	@Override
-	public void registerClothesFromPurchase(PurchaseHistoryRequest request, Long memberId) {
+	public AiTaskResponse registerClothesFromPurchase(PurchaseHistoryRequest request, Long memberId) {
 		Member member = memberRepository
 			.findById(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -143,61 +147,66 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		Closet closet = closetRepository.findByMemberId(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
+		String taskId = UUID.randomUUID().toString();
+		AiTask aiTask = new AiTask(taskId, false, member, shoppingMall, TaskType.PURCHASE_HISTORY);
+
 		List<AiProcessMessageRequest.ItemInfo> itemsToProcess = new ArrayList<>();
 
-		request.items().forEach(item -> {
+		request.items()
+			.stream()
+			.sorted((a, b) -> -1)
+			.forEach(item -> {
 
-			// 상품명 필수 체크
-			if (item.name() == null || item.name().isBlank()) {
-				log.warn("상품명이 비어있어 등록에서 제외됨: item={}", item);
-				return;
-			}
+				// 상품명 필수 체크
+				if (item.name() == null || item.name().isBlank()) {
+					log.warn("상품명이 비어있어 등록에서 제외됨: item={}", item);
+					return;
+				}
 
-			// 브랜드 조회 또는 저장
-			Brand brand = brandRepository.findByExactNameEnOrKr(item.brandNameEng(), item.brandNameKor())
-				.orElseGet(() -> brandRepository.save(new Brand(item.brandNameEng(), item.brandNameKor())));
+				// 브랜드 조회 또는 저장
+				Brand brand = brandRepository.findByExactNameEnOrKr(item.brandNameEng(), item.brandNameKor())
+					.orElseGet(() -> brandRepository.save(new Brand(item.brandNameEng(), item.brandNameKor())));
 
-			String normalizedName = RegexUtils.normalizeProductName(item.name());
+				String normalizedName = RegexUtils.normalizeProductName(item.name());
 
-			Category category = categoryRepository.getReferenceById(-1L);
-			Color color = colorRepository.getReferenceById(-1L);
+				Category category = categoryRepository.getReferenceById(-1L);
+				Color color = colorRepository.getReferenceById(-1L);
 
-			// 라이브러리 조회 (상품명 + 브랜드 ID 기준)
-			Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(normalizedName, brand.getId());
+				// 라이브러리 조회 (상품명 + 브랜드 ID 기준)
+				Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(normalizedName, brand.getId());
 
-			// Clothes 객체 (있으면 재사용, 없으면 생성 및 저장)
-			Clothes clothes = existing.orElseGet(() ->
-				clothesRepository.save(
-					new Clothes(normalizedName, brand, color, category, shoppingMall, item.linkUrl())
-				)
-			);
+				// Clothes 객체 (있으면 재사용, 없으면 생성 및 저장)
+				Clothes clothes = existing.orElseGet(() ->
+					clothesRepository.save(
+						new Clothes(normalizedName, brand, color, category, shoppingMall, item.linkUrl())
+					)
+				);
 
-			// 내 옷장에 이미 있는 옷인지 확인
-			boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
-				clothes.getId());
-			if (alreadyExists) {
-				log.info("중복된 옷: clothesId={}, closetId={}", clothes.getId(), closet.getId());
-				return; // 중복된 옷이면 해당 옷은 skip
-			}
+				// 내 옷장에 이미 있는 옷인지 확인
+				boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
+					clothes.getId());
+				if (alreadyExists) {
+					log.info("중복된 옷: clothesId={}, closetId={}", clothes.getId(), closet.getId());
+					return; // 중복된 옷이면 해당 옷은 skip
+				}
 
-			// 전처리 대상이면 AI 메시지큐 발행
-			if (existing.isEmpty()) {
-				itemsToProcess.add(new AiProcessMessageRequest.ItemInfo(clothes.getId(), item.linkUrl()));
-				log.info("AI 처리 요청 발행됨: clothesId={}, memberId={}", clothes.getId(), memberId);
-			}
+				// 전처리 대상이면 AI 메시지큐 발행
+				if (existing.isEmpty()) {
+					itemsToProcess.add(new AiProcessMessageRequest.ItemInfo(clothes.getId(), item.linkUrl()));
+					log.info("AI 처리 요청 발행됨: clothesId={}, memberId={}", clothes.getId(), memberId);
+				}
 
-			// 내 옷장에 등록
-			ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
-			if (existing.isPresent()) {
-				closetClothes.updateImgUrl(clothes.getImageUrl());
-			}
-			closetClothes.updateIsPublic(true); // 기본 공개
-			closetClothesRepository.save(closetClothes);
-			log.info("내 옷장 등록 완료: clothesId={}, closetId={}", clothes.getId(), closet.getId());
-		});
+				// 내 옷장에 등록
+				ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
+				if (existing.isPresent()) {
+					closetClothes.updateImgUrl(clothes.getImageUrl());
+				}
+				closetClothes.updateIsPublic(true); // 기본 공개
+				closetClothesRepository.save(closetClothes);
+				log.info("내 옷장 등록 완료: clothesId={}, closetId={}", clothes.getId(), closet.getId());
+			});
 
 		if (!itemsToProcess.isEmpty()) {
-			String taskId = UUID.randomUUID().toString();
 			List<List<AiProcessMessageRequest.ItemInfo>> batches = batchList(itemsToProcess, MAX_ITEMS_PER_MESSAGE);
 
 			for (int i = 0; i < batches.size(); i++) {
@@ -221,7 +230,10 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				}
 			}
 			log.info("SQS 메시지 전송 완료: taskId={}, 총 배치 수={}, 총 아이템 수={}", taskId, batches.size(), itemsToProcess.size());
+		} else {
+			aiTask.updateCompleted();
 		}
+		return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());
 	}
 
 	private static <T> List<List<T>> batchList(List<T> list, int batchSize) {

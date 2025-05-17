@@ -19,4 +19,6 @@ public interface FriendRequestRepository {
 	List<FriendRequest> findAllByReceiverId(Long receiverId);
 
 	Optional<FriendRequest> findByMemberId(Long myId, Long friendId);
+
+	Boolean existsByReceiverId(Long receiverId);
 }

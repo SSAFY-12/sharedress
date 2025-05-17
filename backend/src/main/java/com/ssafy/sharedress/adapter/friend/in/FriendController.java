@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.sharedress.application.friend.dto.FriendRequestDto;
 import com.ssafy.sharedress.application.friend.dto.FriendRequestResponse;
 import com.ssafy.sharedress.application.friend.dto.FriendResponse;
+import com.ssafy.sharedress.application.friend.dto.FriendsWithHasRequestResponse;
 import com.ssafy.sharedress.application.friend.usecase.FriendQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestQueryUseCase;
 import com.ssafy.sharedress.application.friend.usecase.FriendRequestUseCase;
@@ -22,6 +23,7 @@ import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -35,7 +37,7 @@ public class FriendController {
 	@PostMapping("/friends/request")
 	public ResponseEntity<ResponseWrapper<Void>> sendFriendRequest(
 		@CurrentMember Member member,
-		@RequestBody FriendRequestDto request
+		@Valid @RequestBody FriendRequestDto request
 	) {
 		Long myId = member.getId();
 		friendRequestUseCase.sendFriendRequest(myId, request);
@@ -82,12 +84,12 @@ public class FriendController {
 	}
 
 	@GetMapping("/friends")
-	public ResponseEntity<ResponseWrapper<List<FriendResponse>>> getFriendList(
+	public ResponseEntity<ResponseWrapper<FriendsWithHasRequestResponse>> getFriendList(
 		@CurrentMember Member member
 	) {
 		Long myId = member.getId();
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
-			friendQueryUseCase.getFriendList(myId));
+			friendQueryUseCase.getFriendsWithHasRequest(myId));
 	}
 
 	@GetMapping("/friends/search")

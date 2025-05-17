@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.ssafy.sharedress.adapter.shoppingmall.out.cm29.Login29cmClient;
 import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaClient;
 import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.MusinsaPurchaseClient;
+import com.ssafy.sharedress.application.ai.dto.AiTaskResponse;
 import com.ssafy.sharedress.application.closet.service.ClosetClothesService;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryItem;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
@@ -51,7 +52,7 @@ public class PurchaseService implements PurchaseUseCase {
 	}
 
 	@Override
-	public void getMusinsaPurchaseHistory(Long memberId, Long shopId, String appAtk, String appRtk,
+	public AiTaskResponse getMusinsaPurchaseHistory(Long memberId, Long shopId, String appAtk, String appRtk,
 		String rootOrderNo) {
 		List<MusinsaOrderResponse.OrderOption> allOrders = new ArrayList<>();
 		String onlineOffset = null;
@@ -96,7 +97,7 @@ public class PurchaseService implements PurchaseUseCase {
 				))
 				.toList()
 		);
-		closetClothesService.registerClothesFromPurchase(request, memberId);
+		return closetClothesService.registerClothesFromPurchase(request, memberId);
 	}
 
 	@Override
