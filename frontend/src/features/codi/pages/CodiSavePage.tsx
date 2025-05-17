@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import {
 	myCodiSaveApi,
 	recommendedCodiSaveApi,
@@ -37,12 +37,21 @@ const CodiSavePage = () => {
 	const [description, setDescription] = useState('');
 	const [isPublic, setIsPublic] = useState(true);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const previewCanvasRef = useRef<HTMLDivElement>(null);
+	const [canvasSize, setCanvasSize] = useState({ width: 400, height: 440 });
 
 	useEffect(() => {
 		const savedItems = localStorage.getItem('codiItems');
 		if (savedItems) setCodiItems(JSON.parse(savedItems));
 		setIsLoading(false);
 	}, []);
+
+	useLayoutEffect(() => {
+		if (previewCanvasRef.current) {
+			const rect = previewCanvasRef.current.getBoundingClientRect();
+			setCanvasSize({ width: rect.width, height: rect.height });
+		}
+	}, [isLoading]);
 
 	const handleBackClick = () => {
 		navigate('/codi/edit', {
@@ -182,35 +191,18 @@ const CodiSavePage = () => {
 
 	return (
 		<>
-			{/* [변경점: Portal 적용] 캡처용 CodiCanvas를 React Portal로 body에 직접 렌더합니다.
-			기존(Portal 적용 전)에는 아래와 같은 flex/overflow 구조의 부모 아래에 렌더되어,
-			<div className='w-full h-screen flex flex-col bg-white'>
-			  <div className='flex-1 flex flex-col overflow-auto'>
-				// 즉 여기의 overflow-auto가 캔버스의 크기를 조절할 수 없게 막아버림 : 캡처 크기 오류 발생
-				// 캡처 시점에 원하는 크기/위치로 제대로 렌더되지 않거나, 캡처가 실패하는 현상이 있었습니다.
-
-			    <div className='bg-gray-50'>
-			      <CodiCanvas ... />
-			    </div>
-			  </div>
-			</div>
-			이런 부모의 CSS(flex, overflow, 크기 0 등) 영향으로 캡처 시점에 원하는 크기/위치로 
-			제대로 렌더되지 않거나, 캡처가 실패하는 현상이 있었습니다.
-			Portal 적용 후에는 body에 직접 렌더되어 부모 영향 없이 항상 원하는 
-			크기/위치로 캡처가 100% 보장됩니다. (실제 사용자에게는 보이지 않음) */}
-
-			{/* 직접 렌더링 캔버스 - document.body에 렌더링, 부모의 영향에서 벗어남 */}
+			{/* [변경점: Portal 적용] 캡처용 CodiCanvas를 React Portal로 body에 직접 렌더합니다. */}
 			{createPortal(
 				<div
 					style={{
 						position: 'fixed',
 						top: 0,
 						left: 0,
-						width: '400px',
-						height: '440px',
+						width: '100vw',
+						height: '100vh',
 						pointerEvents: 'none',
 						opacity: 0,
-						zIndex: 9999,
+						zIndex: 0,
 					}}
 				>
 					<CodiCanvas
@@ -221,8 +213,8 @@ const CodiSavePage = () => {
 						maxZIndex={0}
 						setMaxZIndex={EMPTY_FN}
 						id='codi-canvas-capture'
-						width={400}
-						height={440}
+						width={canvasSize.width}
+						height={canvasSize.height}
 					/>
 				</div>,
 				document.body,
@@ -237,7 +229,7 @@ const CodiSavePage = () => {
 						</div>
 					) : (
 						<>
-							<div className='bg-gray-50'>
+							<div className='bg-gray-50' ref={previewCanvasRef}>
 								<CodiCanvas
 									items={codiItems}
 									isEditable={false}
@@ -246,6 +238,8 @@ const CodiSavePage = () => {
 									maxZIndex={0}
 									setMaxZIndex={EMPTY_FN}
 									id='codi-canvas'
+									width={canvasSize.width}
+									height={canvasSize.height}
 								/>
 							</div>
 							<CodiSaveBottomSection

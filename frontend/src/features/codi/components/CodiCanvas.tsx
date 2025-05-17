@@ -64,6 +64,9 @@ const CodiCanvas = ({
 	const canvasRef = useRef<HTMLDivElement>(null);
 	const imageRefs = useRef<Map<string, HTMLImageElement>>(new Map());
 
+	// const canvasW = width ?? 400;
+	// const canvasH = height ?? 440;
+
 	const handleImageLoad = (
 		e: React.SyntheticEvent<HTMLImageElement>,
 		item: CanvasItem,
@@ -326,13 +329,18 @@ const CodiCanvas = ({
 							: ''
 					}`}
 					style={{
-						left: `${item.position.x}px`,
-						top: `${item.position.y}px`,
-						transform: `rotate(${item.rotation}deg) scale(${item.scale})`,
+						left: '50%',
+						top: '50%',
+						transform: `
+							translate(-50%, -50%)
+							translate(${item.position.x}px, ${item.position.y}px)
+							rotate(${item.rotation}deg)
+							scale(${item.scale})
+						`,
 						transformOrigin: 'center',
 						zIndex: item.zIndex,
 						opacity: isEditable ? (item.isLoaded ? 1 : 0) : 1,
-						transition: isEditable ? 'opaticy 0.2s ease-in-out' : 'none',
+						transition: isEditable ? 'opacity 0.2s ease-in-out' : 'none',
 					}}
 					onClick={
 						isEditable ? (e) => handleItemSelect(e, item.canvasId) : undefined

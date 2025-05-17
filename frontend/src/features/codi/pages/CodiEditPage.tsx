@@ -66,7 +66,7 @@ const CodiEditPage = () => {
 		const newItem = {
 			...item,
 			canvasId: `canvas-${item.id}-${Date.now()}`,
-			position: { x: 100, y: 100 },
+			position: { x: 0, y: 0 },
 			rotation: 0,
 			scale: 1,
 			zIndex: newZIndex,
