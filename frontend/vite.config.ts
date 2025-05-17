@@ -167,8 +167,24 @@ export default defineConfig(({ mode }) => {
 					clientsClaim: true,
 					skipWaiting: true,
 					globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'],
-					swDest: 'firebase-messaging-sw.js',
-					importScripts: [],
+					swDest: 'sw.js',
+					importScripts: [
+						'https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js',
+						'https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js',
+					],
+					runtimeCaching: [
+						{
+							urlPattern: /^https:\/\/www\.gstatic\.com\/firebasejs\/.*/,
+							handler: 'CacheFirst',
+							options: {
+								cacheName: 'firebase-scripts',
+								expiration: {
+									maxEntries: 10,
+									maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+								},
+							},
+						},
+					],
 				},
 			}),
 			checker({

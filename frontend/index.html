@@ -38,23 +38,13 @@
 			if ('serviceWorker' in navigator) {
 				window.addEventListener('load', async () => {
 					try {
-						// PWA 서비스 워커 등록
-						const pwaRegistration = await navigator.serviceWorker.register(
+						const registration = await navigator.serviceWorker.register(
 							'/sw.js',
 							{
 								scope: '/',
 							},
 						);
-						console.log('PWA Service Worker registered:', pwaRegistration);
-
-						// FCM 서비스 워커 등록
-						const fcmRegistration = await navigator.serviceWorker.register(
-							'/firebase-messaging-sw.js',
-							{
-								scope: '/',
-							},
-						);
-						console.log('FCM Service Worker registered:', fcmRegistration);
+						console.log('Service Worker registered:', registration);
 					} catch (error) {
 						console.error('Service Worker registration failed:', error);
 					}

@@ -381,3 +381,123 @@ self.addEventListener('push', async (event) => {
 - 시행착오를 줄이고, 안정적인 푸시/인증/데이터 동기화 구조를 만들 수 있다
 
 ---
+
+## [PWA와 FCM 통합 설정 가이드]
+
+- PWA(Progressive Web App)와 FCM(Firebase Cloud Messaging)을 하나의 서비스 워커
+  로 통합하여 구현
+
+### 1. 동작 목적/배경
+
+- PWA와 FCM을 별도로 구현하면 서비스 워커가 중복되어 충돌 발생 가능
+- 브라우저/앱 환경에서 일관된 푸시 알림 경험 제공 필요
+- 오프라인 지원과 푸시 알림을 효율적으로 관리하기 위함
+
+### 2. 동작 구조/원리
+
+- 단일 서비스 워커(`sw.js`)로 PWA와 FCM 기능 통합
+- Firebase 초기화 및 메시지 처리를 서비스 워커에서 담당
+- Workbox를 통한 PWA 캐싱 전략 구현
+- 브라우저별 지원 여부에 따른 대체 구현 제공
+
+### 3. 세부 동작 과정
+
+1. **서비스 워커 등록**
+
+   ```typescript
+   // index.html
+   if ('serviceWorker' in navigator) {
+   	window.addEventListener('load', async () => {
+   		const registration = await navigator.serviceWorker.register('/sw.js');
+   	});
+   }
+   ```
+
+2. **PWA 설정**
+
+   ```typescript
+   // vite.config.ts
+   VitePWA({
+   	registerType: 'autoUpdate',
+   	manifest: {
+   		name: '쉐어드레스',
+   		short_name: '쉐어드레스',
+   		// ... PWA 설정
+   	},
+   	workbox: {
+   		swDest: 'sw.js',
+   		// ... 워크박스 설정
+   	},
+   });
+   ```
+
+3. **Firebase 초기화**
+
+   ```typescript
+   // firebase.ts
+   const app = initializeApp(firebaseConfig);
+   const messaging = getMessaging(app);
+   ```
+
+4. **FCM 설정 전달**
+
+   ```typescript
+   // firebase.ts
+   if ('serviceWorker' in navigator) {
+   	navigator.serviceWorker.ready.then((registration) => {
+   		registration.active?.postMessage({
+   			type: 'FCM_CONFIG',
+   			config: firebaseConfig,
+   		});
+   	});
+   }
+   ```
+
+5. **서비스 워커에서 메시지 처리**
+   ```typescript
+   // sw.js
+   self.addEventListener('message', (event) => {
+   	if (event.data?.type === 'FCM_CONFIG') {
+   		firebase.initializeApp(event.data.config);
+   		const messaging = firebase.messaging();
+   		// ... 메시지 처리
+   	}
+   });
+   ```
+
+### 4. 고려사항/특이사항
+
+- **브라우저 지원**
+
+  - Chrome, Edge, Firefox: 완벽 지원
+  - Safari: FCM 제한적 지원 (Web Push API 사용 필요)
+
+- **HTTPS 필수**
+
+  - 개발/프로덕션 환경 모두 HTTPS 필요
+  - 로컬 개발 시 mkcert 사용 권장
+
+- **토큰 관리**
+
+  - 동일한 FCM 토큰 사용 (브라우저/앱)
+  - 토큰 갱신 시 서버 동기화 필요
+
+- **캐시 전략**
+  - Workbox를 통한 효율적인 캐싱
+  - Firebase 스크립트 캐싱 전략 구현
+
+### 5. 결론/의견
+
+- 단일 서비스 워커로 PWA와 FCM을 통합하여 관리 효율성 향상
+- 브라우저별 지원 차이에 따른 대체 구현 필요
+- Safari 사용자를 위한 Web Push API 구현 고려
+- HTTPS 환경 구축이 필수적
+
+### 참고 문서
+
+1. [Firebase Cloud Messaging 문서](https://firebase.google.com/docs/cloud-messaging)
+2. [PWA 가이드](https://web.dev/progressive-web-apps/)
+3. [Workbox 문서](https://developers.google.com/web/tools/workbox)
+4. [Web Push API 문서](https://developer.mozilla.org/en-US/docs/Web/API/Push_API)
+
+---

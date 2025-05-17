@@ -30,6 +30,16 @@ const app = initializeApp(firebaseConfig);
 // 메시징 기능을 사용하기 위한 인스턴스
 const messaging = getMessaging(app);
 
+// 서비스 워커에 Firebase 설정 전달
+if ('serviceWorker' in navigator) {
+	navigator.serviceWorker.ready.then((registration) => {
+		registration.active?.postMessage({
+			type: 'FCM_CONFIG',
+			config: firebaseConfig,
+		});
+	});
+}
+
 // Firebase Analytics 인스턴스 생성
 // 사용자 행동 분석을 위한 인스턴스
 // const analytics = getAnalytics(app);
