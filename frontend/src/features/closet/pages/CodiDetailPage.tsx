@@ -274,15 +274,19 @@ const CodiDetailPage = () => {
 
 	return (
 		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>
-			<Header showBack={true} onBackClick={handleBackClick} />
+			{isMe ? (
+				<Header
+					showBack={true}
+					onBackClick={handleBackClick}
+					badgeIcon='more'
+					onBadgeClick={handleMenuClick}
+				/>
+			) : (
+				<Header showBack={true} onBackClick={handleBackClick} />
+			)}
 			{/* 메인 콘텐츠 */}
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
-				<ImageDetailView
-					item={item}
-					showMoreButton={isMe}
-					onMoreButtonClick={handleMenuClick}
-					recommender={recommender}
-				>
+				<ImageDetailView item={item} recommender={recommender}>
 					<div className='px-4'>
 						<div className='flex flex-col items-start gap-3'>
 							<p className='text-regular text-default'>

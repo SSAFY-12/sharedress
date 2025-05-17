@@ -10,6 +10,7 @@ import {
 	XCircle,
 	User,
 	UserPlus,
+	MoreHorizontal,
 } from 'lucide-react';
 
 export const Badge = ({ icon, onClick, text, className = '' }: BadgeProps) => {
@@ -36,6 +37,8 @@ export const Badge = ({ icon, onClick, text, className = '' }: BadgeProps) => {
 				return <User className='h-4 w-4' />;
 			case 'add':
 				return <UserPlus className='h-4 w-4' />;
+			case 'more':
+				return <MoreHorizontal className='h-4 w-4' />;
 			default:
 				return null;
 		}

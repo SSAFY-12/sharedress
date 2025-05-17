@@ -64,6 +64,10 @@ const Header = ({
 				<button onClick={onBadgeClick} aria-label='알림' className='p-0'>
 					<img src='/icons/notification_white.svg' alt='알림 아이콘' />
 				</button>
+			) : badgeIcon === 'more' ? (
+				<button onClick={onBadgeClick} aria-label='더보기' className='p-0'>
+					<img src='/icons/more.svg' alt='더보기 아이콘' />
+				</button>
 			) : badgeIcon || badgeText ? (
 				<Badge icon={badgeIcon} text={badgeText} onClick={onBadgeClick} />
 			) : null}
