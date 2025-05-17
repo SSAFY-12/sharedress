@@ -24,4 +24,9 @@ public class AiTaskPersistenceAdapter implements AiTaskRepository {
 	public Optional<AiTask> findById(String id) {
 		return aiTaskJpaRepository.findById(id);
 	}
+
+	@Override
+	public Optional<AiTask> findByIdAndShopId(String id, Long shopId) {
+		return aiTaskJpaRepository.findByIdAndShopId(id, shopId);
+	}
 }

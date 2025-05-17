@@ -28,8 +28,8 @@ public class AiTaskService implements AiTaskUseCase {
 
 	@Transactional(readOnly = true)
 	@Override
-	public AiTaskCompletedResponse getAiTaskCompleted(String taskId) {
-		return aiTaskRepository.findById(taskId)
+	public AiTaskCompletedResponse getAiTaskCompleted(String taskId, Long shopId) {
+		return aiTaskRepository.findByIdAndShopId(taskId, shopId)
 			.map(AiTaskCompletedResponse::from)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));
 	}
