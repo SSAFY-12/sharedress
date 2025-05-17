@@ -28,6 +28,9 @@ interface CodiCanvasProps {
 	removeItem: (id: string) => void;
 	maxZIndex: number;
 	setMaxZIndex: (value: number) => void;
+	id?: string;
+	width?: number;
+	height?: number;
 }
 
 // 카테고리별 기본 크기 설정
@@ -44,6 +47,9 @@ const CodiCanvas = ({
 	removeItem,
 	maxZIndex = 0,
 	setMaxZIndex,
+	id,
+	width,
+	height,
 }: CodiCanvasProps) => {
 	const [activeItem, setActiveItem] = useState<string | null>(null);
 	const [interactionMode, setInteractionMode] = useState<
@@ -57,6 +63,9 @@ const CodiCanvas = ({
 	});
 	const canvasRef = useRef<HTMLDivElement>(null);
 	const imageRefs = useRef<Map<string, HTMLImageElement>>(new Map());
+
+	// const canvasW = width ?? 400;
+	// const canvasH = height ?? 440;
 
 	const handleImageLoad = (
 		e: React.SyntheticEvent<HTMLImageElement>,
@@ -291,8 +300,15 @@ const CodiCanvas = ({
 	return (
 		<div
 			ref={canvasRef}
-			id='codi-canvas'
-			className='canvas-item relative w-full aspect-[10/11] bg-gray-50 overflow-hidden touch-pan-x'
+			id={id}
+			className={
+				'canvas-item w-full h-full aspect-[10/11] bg-gray-50 flex items-center justify-center overflow-hidden relative touch-pan-x'
+			}
+			style={{
+				width: width ? `${width}px` : undefined,
+				height: height ? `${height}px` : undefined,
+				boxSizing: 'border-box',
+			}}
 			onClick={isEditable ? handleCanvasClick : undefined}
 			onTouchEnd={isEditable ? handleCanvasClick : undefined}
 		>
@@ -314,13 +330,18 @@ const CodiCanvas = ({
 							: ''
 					}`}
 					style={{
-						left: `${item.position.x}px`,
-						top: `${item.position.y}px`,
-						transform: `rotate(${item.rotation}deg) scale(${item.scale})`,
+						left: '50%',
+						top: '50%',
+						transform: `
+							translate(-50%, -50%)
+							translate(${item.position.x}px, ${item.position.y}px)
+							rotate(${item.rotation}deg)
+							scale(${item.scale})
+						`,
 						transformOrigin: 'center',
 						zIndex: item.zIndex,
 						opacity: isEditable ? (item.isLoaded ? 1 : 0) : 1,
-						transition: isEditable ? 'opaticy 0.2s ease-in-out' : 'none',
+						transition: isEditable ? 'opacity 0.2s ease-in-out' : 'none',
 					}}
 					onClick={
 						isEditable ? (e) => handleItemSelect(e, item.canvasId) : undefined
