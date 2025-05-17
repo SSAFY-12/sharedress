@@ -5,6 +5,7 @@ import { useProfileStore } from '@/store/useProfileStore';
 import { useModifyProfile } from '@/features/social/hooks/useModifyProfile';
 import { usePublicLink } from '@/features/social/hooks/usePublicLink';
 import { shareLink } from '@/utils/share';
+import { toast } from 'react-toastify';
 
 interface ExternalShareModalProps {
 	// 외부 코디 요청 모달 컴포넌트의 타입 정의
@@ -31,13 +32,15 @@ export const ExternalShareModal = ({
 		});
 	};
 
-	const linkTitle = 'Sharedress - 내 옷장을 공유해요';
+	const linkTitle = '👗 Sharedress - 내 옷장을 꾸며줘!';
+
 	// const linkUrl = `https://sharedress.co.kr/link/${publicLink}`;
 	const isProd = import.meta.env.MODE === 'production';
 	const linkUrl = isProd
 		? `https://sharedress.co.kr/link/${publicLink}`
 		: `https://localhost:5173/link/${publicLink}`;
-	const linkText = '나의 옷장을 보고 코디를 만들어 줘!';
+	const linkText =
+		'친구야, 나의 옷장을 열어봤어?\n👀 너의 센스로 멋진 코디를 부탁해! ✨\n🧥(크롬 혹은 사파리리 접속을 권장합니다)👖';
 
 	const handleCopy = async () => {
 		if (!isPublic) return; // 비공개일 땐 막기
@@ -48,14 +51,9 @@ export const ExternalShareModal = ({
 		});
 
 		if (result === 'copied') {
-			if ('serviceWorker' in navigator && 'Notification' in window) {
-				const registration = await navigator.serviceWorker.ready;
-				await registration.showNotification('복사 완료', {
-					body: '내 옷장 주소가 복사됐어요',
-					icon: '/android-chrome-192x192.png',
-					badge: '/favicon-32x32.png',
-				});
-			}
+			toast.success('내 옷장 주소가 복사됐어요', {
+				icon: () => <img src='/icons/toast_closet.svg' alt='icon' />,
+			});
 		}
 	};
 

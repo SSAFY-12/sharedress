@@ -156,8 +156,14 @@ const CodiDetailPage = () => {
 					},
 				});
 			},
-			onError: () => {
-				toast.error('코디 추가에 실패했습니다.');
+			onError: (error: any) => {
+				if (error.status === 409) {
+					toast.error('이미 옷장에 추가된 코디입니다.', {
+						icon: () => <img src='/icons/toast_closet.svg' alt='icon' />,
+					});
+				} else {
+					toast.error('코디 추가에 실패했습니다.');
+				}
 			},
 		});
 	};
