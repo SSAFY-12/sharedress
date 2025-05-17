@@ -46,11 +46,13 @@ public class PurchaseService implements PurchaseUseCase {
 		} catch (ResponseStatusException e) {
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_ID_PW_NOT_MATCH);
+			} else if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
+				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_BLOCKED);
 			} else {
 				throw new RuntimeException("무신사 로그인 서버 오류 발생");
 			}
 		} catch (Exception e) {
-			log.error("Openfeign error: {}", e.getMessage());
+			log.error("Musinsa Openfeign error: {}", e.getMessage());
 			throw new RuntimeException("무신사 로그인 서버 오류 발생");
 		}
 		return null;
@@ -66,9 +68,8 @@ public class PurchaseService implements PurchaseUseCase {
 	) {
 		List<MusinsaOrderResponse.OrderOption> allOrders = new ArrayList<>();
 		String onlineOffset = null;
-		boolean hasMore = true;
 
-		while (hasMore) {
+		while (true) {
 			String cookieHeader = "app_atk=" + appAtk + "; app_rtk=" + appRtk;
 			MusinsaOrderResponse orderResponse = musinsaPurchaseClient.getOrderHistory(cookieHeader, onlineOffset);
 
@@ -88,7 +89,7 @@ public class PurchaseService implements PurchaseUseCase {
 
 			// 다음 요청이 필요한지 판단
 			String finalOnlineOffset = onlineOffset;
-			hasMore = orderResponse.data().stream()
+			boolean hasMore = orderResponse.data().stream()
 				.anyMatch(data -> data.rootOrderNo().equals(finalOnlineOffset));
 
 			if (!hasMore) {
@@ -113,17 +114,29 @@ public class PurchaseService implements PurchaseUseCase {
 	@Override
 	public Login29cmClient.LoginResponse login29CM(String id, String password) {
 		// 🔸 로그인 요청 후 응답 받기
-		Response response = login29cmClient.login(new Login29cmClient.LoginRequest(id, password));
+		try (Response response = login29cmClient.login(new Login29cmClient.LoginRequest(id, password))) {
+			// 🔸 Set-Cookie 헤더에서 `_ftwuid` 추출
+			Optional<String> ftwuidCookie = response.headers()
+				.getOrDefault("Set-Cookie", List.of())
+				.stream()
+				.filter(cookie -> cookie.startsWith("_ftwuid"))
+				.findFirst();
 
-		// 🔸 Set-Cookie 헤더에서 `_ftwuid` 추출
-		Optional<String> ftwuidCookie = response.headers()
-			.getOrDefault("Set-Cookie", List.of())
-			.stream()
-			.filter(cookie -> cookie.startsWith("_ftwuid"))
-			.findFirst();
-
-		return ftwuidCookie
-			.map(Login29cmClient.LoginResponse::new)
-			.orElseThrow(ExceptionUtil.exceptionSupplier(ShoppingMallErrorCode.SHOPPING_MALL_TOKEN_NOT_FOUND));
+			return ftwuidCookie
+				.map(Login29cmClient.LoginResponse::new)
+				.orElseThrow(ExceptionUtil.exceptionSupplier(ShoppingMallErrorCode.SHOPPING_MALL_TOKEN_NOT_FOUND));
+		} catch (ResponseStatusException e) {
+			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_ID_PW_NOT_MATCH);
+			} else if (e.getStatusCode() == HttpStatus.FORBIDDEN) {
+				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_BLOCKED);
+			} else {
+				throw new RuntimeException("무신사 로그인 서버 오류 발생");
+			}
+		} catch (Exception e) {
+			log.error("29CM Openfeign error: {}", e.getMessage());
+			throw new RuntimeException("무신사 로그인 서버 오류 발생");
+		}
+		return null;
 	}
 }

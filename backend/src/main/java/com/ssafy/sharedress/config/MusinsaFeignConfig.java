@@ -19,6 +19,8 @@ public class MusinsaFeignConfig {
 					return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Musinsa 로그인 인증 실패");
 				} else if (status == HttpStatus.INTERNAL_SERVER_ERROR) {
 					return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Musinsa 서버 오류 발생");
+				} else if (status == HttpStatus.FORBIDDEN) {
+					return new ResponseStatusException(HttpStatus.FORBIDDEN, "너무 잦은 Musinsa 요청으로 차단됨");
 				} else {
 					return new ResponseStatusException(status != null ? status : HttpStatus.INTERNAL_SERVER_ERROR,
 						"알 수 없는 오류 발생");

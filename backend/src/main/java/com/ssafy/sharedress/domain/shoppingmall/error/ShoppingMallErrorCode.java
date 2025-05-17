@@ -7,7 +7,8 @@ import com.ssafy.sharedress.global.response.ResponseCode;
 public enum ShoppingMallErrorCode implements ResponseCode {
 	SHOPPING_MALL_NOT_FOUND("404", "쇼핑몰을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 	SHOPPING_MALL_ID_PW_NOT_MATCH("409", "아이디와 비밀번호가 일치하지 않습니다.", HttpStatus.CONFLICT),
-	SHOPPING_MALL_TOKEN_NOT_FOUND("403", "쇼핑몰 토큰을 찾을 수 없습니다.", HttpStatus.FORBIDDEN);
+	SHOPPING_MALL_TOKEN_NOT_FOUND("403", "쇼핑몰 토큰을 찾을 수 없습니다.", HttpStatus.FORBIDDEN),
+	SHOPPING_MALL_BLOCKED("403", "너무 잦은 로그인 접속으로 차단 되었습니다.", HttpStatus.FORBIDDEN);
 
 	private final String code;
 	private final String message;
