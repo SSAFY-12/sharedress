@@ -182,6 +182,7 @@ const CodiSavePage = () => {
 
 	return (
 		<>
+			{/* [변경점: Portal 적용] 캡처용 CodiCanvas를 React Portal로 body에 직접 렌더합니다.\n    기존에는 컴포넌트 트리 내에 렌더되어 부모의 CSS(flex, overflow 등) 영향으로 캡처 실패/크기 오류가 발생할 수 있었으나,\n    Portal 적용으로 항상 원하는 크기/위치로 캡처가 100% 보장됩니다. (실제 사용자에게는 보이지 않음) */}
 			{createPortal(
 				<div
 					style={{
