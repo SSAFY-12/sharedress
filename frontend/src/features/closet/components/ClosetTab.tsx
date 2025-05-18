@@ -3,7 +3,8 @@ import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { useEffect, useRef } from 'react';
-import { ClosetItem } from '@/features/closet/api/closetApi';''
+import { ClosetItem } from '@/features/closet/api/closetApi';
+('');
 import { categoryMapping } from '@/constants/categoryConfig';
 
 interface ClosetTabProps {
@@ -11,8 +12,6 @@ interface ClosetTabProps {
 	selectedCategory: string;
 	isMe: boolean;
 }
-
-
 
 const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const navigate = useNavigate();
