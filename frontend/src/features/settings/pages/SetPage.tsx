@@ -24,6 +24,7 @@ export const SetPage = () => {
 	const [isIosGuideModalOpen, setIsIosGuideModalOpen] = useState(false);
 	const [isAndroidGuideModalOpen, setIsAndroidGuideModalOpen] = useState(false);
 	const { logout } = useAuth();
+	const fcmToken = useFcmStore((state) => state.token);
 
 	// PWA 설치 이벤트 감지
 	useEffect(() => {
@@ -44,9 +45,36 @@ export const SetPage = () => {
 		};
 	}, []);
 
+	useEffect(() => {
+		// fcm-store에 토큰이 있으면 스위치 ON
+		if (fcmToken) {
+			setNotificationsEnabled(true);
+			setNotificationLocked(true); // 이미 등록된 경우 비활성화
+		} else {
+			setNotificationsEnabled(false);
+			setNotificationLocked(false);
+		}
+	}, [fcmToken]);
+
 	// 알림 스위치 토글 핸들러
 	const handleNotificationToggle = async () => {
-		if (notificationsEnabled || notificationLocked) return;
+		if (notificationsEnabled || notificationLocked) {
+			// === 알림 ON 상태에서 OFF로 전환 ===
+			useFcmStore.getState().clearToken(); // 토큰 삭제
+			setNotificationsEnabled(false);
+			setNotificationLocked(false);
+			// 필요하다면 안내 알림
+			if ('serviceWorker' in navigator && 'Notification' in window) {
+				const registration = await navigator.serviceWorker.ready;
+				await registration.showNotification('알림 안내', {
+					body: '알림이 비활성화되었습니다.',
+					icon: '/new-android-chrome-192x192.png',
+					badge: '/new-favicon-32x32.png',
+				});
+			}
+			return;
+		}
+		// === 기존 ON 로직 ===
 		// FCM 권한 요청 및 토큰 저장
 		const token = await requestNotificationPermission();
 		if (token) {
