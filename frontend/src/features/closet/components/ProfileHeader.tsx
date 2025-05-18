@@ -38,8 +38,8 @@ const ProfileHeader = ({
 	statusMessage,
 	isMe,
 	memberId,
-	handleModalOpen,
-}: ProfileHeaderProps) => {
+}: // handleModalOpen,
+ProfileHeaderProps) => {
 	const isGuest = useAuthStore((state) => state.isGuest);
 	const navigate = useNavigate();
 
@@ -47,6 +47,16 @@ const ProfileHeader = ({
 		if (!memberId) return;
 
 		navigate('/codi/edit', {
+			state: {
+				mode: 'recommended',
+				targetMemberId: memberId.toString(),
+			},
+		});
+	};
+
+	const handleGuestRecommendClick = () => {
+		if (!memberId) return;
+		navigate('/link/codi/edit', {
 			state: {
 				mode: 'recommended',
 				targetMemberId: memberId.toString(),
@@ -170,7 +180,7 @@ const ProfileHeader = ({
 										if (!isGuest) {
 											handleRecommendClick();
 										} else {
-											handleModalOpen?.();
+											handleGuestRecommendClick();
 										}
 									}}
 									color='white'
