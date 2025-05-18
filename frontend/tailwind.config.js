@@ -38,6 +38,7 @@ export default {
 				modify: '#3B98DF',
 				delete: '#E36969',
 				success: '#2079FF',
+				semibrown: '#9D948F',
 			},
 		},
 	},

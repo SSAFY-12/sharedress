@@ -10,9 +10,10 @@ export const PrimaryBtn = ({
 }: PrimaryBtnProps) => {
 	const sizeClass = {
 		full: 'w-full px-4 py-4 text-button',
-		medium: 'w-full px-4 py-3.5 text-smallButton',
+		medium: 'w-full px-4 py-3 text-smallButton',
 		compact: 'py-2 px-3.5 rounded-xl transition text-description',
 		tiny: 'py-2 px-3 rounded-xl transition text-description',
+		double: 'w-full px-4 py-2.5 text-smallButton',
 	}[size];
 
 	const colorClass = {
@@ -22,6 +23,7 @@ export const PrimaryBtn = ({
 		white: 'bg-white hover:bg-gray-100 text-regular',
 		brown: 'bg-brownButton hover:bg-brownButton/80 text-white',
 		background: 'bg-background hover:bg-light text-regular',
+		semibrown: 'bg-semibrown hover:bg-semibrown/80 text-white',
 	}[color];
 
 	return (
