@@ -12,7 +12,7 @@ const SelectRegistBlock = ({
 	onClick,
 }: SelectRegistBlockProps) => (
 	<div
-		className='flex items-center justify-between bg-background w-full rounded-lg px-6 '
+		className='flex items-center justify-between bg-background w-full rounded-lg px-6 cursor-pointer'
 		onClick={onClick}
 	>
 		<div className='flex flex-col items-start justify-center gap-1.6 py-5'>
