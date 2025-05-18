@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import NotificationItem from './NotificationItem';
 import {
 	UserPlus, // 친구 요청
@@ -13,6 +13,7 @@ import {
 import useNotification from '@/features/alert/hooks/useNotification';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { useNotificationStore } from '@/store/useNotificationStore';
 // import { useNavigate } from 'react-router-dom';
 
 /**
@@ -36,6 +37,7 @@ const typeIconMap: Record<number, any> = {
 
 const NotificationList: FC = () => {
 	const { data, isLoading, error, readNotification } = useNotification();
+	const setHasUnread = useNotificationStore((s) => s.setHasUnread);
 	// const navigate = useNavigate();
 
 	const handleNotificationClick = (notification: any) => {
@@ -62,6 +64,14 @@ const NotificationList: FC = () => {
 		// 		break;
 		// }
 	};
+
+	useEffect(() => {
+		if (data?.content) {
+			// 읽지 않은 알림이 하나라도 있으면 true
+			const hasUnread = data.content.some((n) => !n.isRead);
+			setHasUnread(hasUnread);
+		}
+	}, [data, setHasUnread]);
 
 	if (error) {
 		return (
