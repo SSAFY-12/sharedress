@@ -7,6 +7,7 @@ import { useProfileStore } from '@/store/useProfileStore';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { toast } from 'react-toastify';
 import { ClosetResponse } from '@/features/closet/api/closetApi';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // [코디 만들기/수정 페이지]
 // - 사용자가 옷을 조합해서 코디를 만듦
@@ -42,6 +43,8 @@ const CodiEditPage = () => {
 		mode === 'recommended'
 			? targetMemberId
 			: useProfileStore((state) => state.getMyId()) ?? 0;
+
+	const isGuest = useAuthStore((state) => state.isGuest);
 
 	// 카테고리 상태
 	const [activeCategory, setActiveCategory] = useState('all');
@@ -112,8 +115,15 @@ const CodiEditPage = () => {
 	}, []);
 
 	const handleBackClick = () => {
-		if (window.history.length > 1) navigate(-1);
-		else navigate('/');
+		if (mode === 'my') {
+			navigate('/mypage');
+		} else {
+			if (isGuest) {
+				navigate(`/link/friend/${targetMemberId}`);
+			} else {
+				navigate(`/friend/${targetMemberId}`);
+			}
+		}
 	};
 
 	const handleNextClick = () => {
@@ -123,9 +133,15 @@ const CodiEditPage = () => {
 		}
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
 		if (mode === 'recommended') {
-			navigate('/codi/save', {
-				state: { mode: 'recommended', targetMemberId: targetMemberId },
-			});
+			if (isGuest) {
+				navigate('/link/codi/save', {
+					state: { mode: 'recommended', targetMemberId: targetMemberId },
+				});
+			} else {
+				navigate('/codi/save', {
+					state: { mode: 'recommended', targetMemberId: targetMemberId },
+				});
+			}
 		} else {
 			navigate('/codi/save', { state: { mode: 'my' } });
 		}
