@@ -144,7 +144,6 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 		ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
 		closetClothes.updateImgUrl(clothes.getImageUrl());
-		closetClothes.updateIsPublic(true);
 		return closetClothesRepository.save(closetClothes).getId();
 	}
 
@@ -222,7 +221,6 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				if (existing.isPresent()) {
 					closetClothes.updateImgUrl(clothes.getImageUrl());
 				}
-				closetClothes.updateIsPublic(true); // 기본 공개
 				closetClothesRepository.save(closetClothes);
 				log.info("내 옷장 등록 완료: clothesId={}, closetId={}", clothes.getId(), closet.getId());
 			});
