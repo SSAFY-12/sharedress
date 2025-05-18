@@ -84,7 +84,8 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 		return closetClothesJpaRepository.getReferenceById(id);
 	}
 
-	public Optional<ClosetClothes> findById(Long id) {
+	@Override
+	public Optional<ClosetClothes> findByIdAndImgNotNull(Long id) {
 		QClosetClothes cc = QClosetClothes.closetClothes;
 		QClothes cl = QClothes.clothes;
 
@@ -100,6 +101,22 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 				.leftJoin(cl.brand).fetchJoin()
 				.leftJoin(cl.category).fetchJoin()
 				.leftJoin(cl.shoppingMall).fetchJoin()
+				.where(condition)
+				.fetchOne()
+		);
+	}
+
+	@Override
+	public Optional<ClosetClothes> findById(Long id) {
+		QClosetClothes cc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		BooleanBuilder condition = new BooleanBuilder()
+			.and(cc.id.eq(id));
+
+		return Optional.ofNullable(
+			queryFactory.selectFrom(cc)
+				.leftJoin(cc.clothes, cl).fetchJoin()
 				.where(condition)
 				.fetchOne()
 		);

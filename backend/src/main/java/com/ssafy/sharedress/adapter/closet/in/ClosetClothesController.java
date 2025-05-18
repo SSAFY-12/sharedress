@@ -21,6 +21,8 @@ import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AddLibraryClothesToClosetRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailResponse;
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoUploadResponse;
 import com.ssafy.sharedress.application.guest.annotation.CurrentGuest;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
@@ -127,4 +129,14 @@ public class ClosetClothesController {
 		);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, result);
 	}
+
+	@PostMapping("/closet/clothes/photos/detail")
+	public ResponseEntity<ResponseWrapper<ClothesPhotoDetailResponse>> getClosetClothesDetailByPhoto(
+		@CurrentMember Member member,
+		@RequestBody List<ClothesPhotoDetailRequest> request
+	) {
+		ClothesPhotoDetailResponse result = closetClothesUseCase.registerClothesFromPhotos(member.getId(), request);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, result);
+	}
+
 }

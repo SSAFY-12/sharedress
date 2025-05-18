@@ -43,6 +43,7 @@ public class AiTask {
 		this.isCompleted = isCompleted;
 		this.member = member;
 		this.type = type;
+		this.shoppingMall = shoppingMall;
 	}
 
 	public void updateCompleted() {
