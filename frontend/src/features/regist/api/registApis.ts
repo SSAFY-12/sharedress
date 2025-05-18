@@ -90,6 +90,22 @@ interface PurchaseHistoryRequest {
 
 interface PurchaseHistoryResponse {
 	status: Status;
+	content: {
+		taskId: string;
+		shopId: number;
+	};
+}
+
+export interface RegistStatusRequest {
+	taskId: string;
+	shopId: number;
+}
+
+export interface RegistStatusResponse {
+	status: Status;
+	content: {
+		completed: boolean;
+	};
 }
 
 export const ScanApis = {
@@ -100,6 +116,20 @@ export const ScanApis = {
 		const response = await client.post(
 			'/api/closet/clothes/purchase-history',
 			data,
+		);
+		return response.data;
+	},
+	// --------------------옷 등록 완료여부 조회 ----------------
+	getClothRegistrationStatus: async (
+		data: RegistStatusRequest,
+	): Promise<RegistStatusResponse> => {
+		const response = await client.get(
+			`/api/closet/clothes/purchase-history/task/${data.taskId}`,
+			{
+				params: {
+					shopId: data.shopId,
+				},
+			},
 		);
 		return response.data;
 	},

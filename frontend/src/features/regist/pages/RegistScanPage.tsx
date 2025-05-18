@@ -4,7 +4,8 @@ import { useScanStore } from '@/store/useScanStore';
 
 const RegistScanPage = () => {
 	const navigate = useNavigate();
-	const isMusinsaScanning = useScanStore((state) => state.musinsa);
+	const isMusinsaScanning = useScanStore((state) => state.musinsa.isScan);
+	console.log(isMusinsaScanning, 'isMusinsaScanning');
 
 	return (
 		<div className='flex-1 w-full h-full flex flex-col justify-start items-center py-5 px-2 gap-1'>

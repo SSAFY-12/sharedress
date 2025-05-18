@@ -9,6 +9,8 @@ import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { useNavigate } from 'react-router-dom';
 import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
+import PolingProvider from '@/components/poling/PolingProvider';
+import { useScanStore } from '@/store/useScanStore';
 
 export const App = () => {
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
@@ -148,6 +150,11 @@ export const App = () => {
 					}}
 				/>
 			)}
+			{/* PolingProvider를 조건부로 렌더링 */}
+			{useScanStore.getState().musinsa.isScan ||
+			useScanStore.getState().cm29.isScan ? (
+				<PolingProvider />
+			) : null}
 		</>
 	);
 };
