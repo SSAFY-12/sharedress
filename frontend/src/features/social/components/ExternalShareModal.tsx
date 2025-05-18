@@ -32,7 +32,7 @@ export const ExternalShareModal = ({
 		});
 	};
 
-	const linkTitle = '👗 Sharedress - 내 옷장을 꾸며줘!';
+	const linkTitle = '👗 Sharedress - 내 옷장을 꾸며줘!\n';
 
 	// const linkUrl = `https://sharedress.co.kr/link/${publicLink}`;
 	const isProd = import.meta.env.MODE === 'production';
@@ -40,7 +40,7 @@ export const ExternalShareModal = ({
 		? `https://sharedress.co.kr/link/${publicLink}`
 		: `https://localhost:5173/link/${publicLink}`;
 	const linkText =
-		'친구야, 나의 옷장을 열어봤어?\n👀 너의 센스로 멋진 코디를 부탁해! ✨\n🧥(크롬 혹은 사파리리 접속을 권장합니다)👖';
+		'혹시 내 옷장을 열어봤어?\n👀 너의 센스로 멋진 코디를 부탁해! ✨\n\n🧥(크롬/사파리 접속을 권장합니다)👖';
 
 	const handleCopy = async () => {
 		if (!isPublic) return; // 비공개일 땐 막기
