@@ -38,8 +38,8 @@ const ProfileHeader = ({
 	statusMessage,
 	isMe,
 	memberId,
-}: // handleModalOpen,
-ProfileHeaderProps) => {
+	handleModalOpen,
+}: ProfileHeaderProps) => {
 	const isGuest = useAuthStore((state) => state.isGuest);
 	const navigate = useNavigate();
 
@@ -167,12 +167,11 @@ ProfileHeaderProps) => {
 									size='medium'
 									name='코디 추천하기'
 									onClick={() => {
-										handleRecommendClick();
-										// if (!isGuest) {
-										// 	handleRecommendClick();
-										// } else {
-										// 	handleModalOpen?.();
-										// }
+										if (!isGuest) {
+											handleRecommendClick();
+										} else {
+											handleModalOpen?.();
+										}
 									}}
 									color='white'
 								/>

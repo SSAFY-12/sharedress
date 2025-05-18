@@ -24,8 +24,8 @@ const handleGlobalError = async (status: number, serverMessage?: string) => {
 			const registration = await navigator.serviceWorker.ready;
 			await registration.showNotification('오류 발생', {
 				body: errorMessage,
-				icon: '/android-chrome-192x192.png',
-				badge: '/favicon-32x32.png',
+				icon: '/new-android-chrome-192x192.png',
+				badge: '/new-favicon-32x32.png',
 				data: {
 					status: status.toString(),
 					message: serverMessage || '',
@@ -36,8 +36,8 @@ const handleGlobalError = async (status: number, serverMessage?: string) => {
 			if (serverMessage && typeof serverMessage === 'string') {
 				await registration.showNotification('추가 정보', {
 					body: serverMessage,
-					icon: '/android-chrome-192x192.png',
-					badge: '/favicon-32x32.png',
+					icon: '/new-android-chrome-192x192.png',
+					badge: '/new-favicon-32x32.png',
 				});
 			}
 		}

@@ -23,8 +23,8 @@
 			const notificationTitle = payload.notification.title;
 			const notificationOptions = {
 				body: payload.notification.body,
-				icon: '/android-chrome-192x192.png',
-				badge: '/favicon-32x32.png',
+				icon: '/new-android-chrome-192x192.png',
+				badge: '/new-favicon-32x32.png',
 				data: payload.data,
 			};
 

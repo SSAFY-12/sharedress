@@ -51,6 +51,9 @@ const LibraryContainer = () => {
 				...request,
 				cursor: pageParam as number | undefined,
 			});
+			// console.log(request, 'request');
+			// console.log(categoryMapping[selectedCategory], 'categoryMapping');
+			// console.log(response, 'response');
 
 			return response;
 		},
