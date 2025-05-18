@@ -13,6 +13,7 @@ export const MobileLayout = () => {
 	useTokenValidation();
 	const location = useLocation();
 	const navigate = useNavigate();
+	const isLibrary = location.pathname.replace(/\/$/, '') === '/regist/search';
 	const isSocial = location.pathname.replace(/\/$/, '') === '/social';
 	const isMyPage = location.pathname.replace(/\/$/, '') === '/mypage';
 	const isClothEdit = matchPath('/cloth/:id/edit', location.pathname) !== null;
@@ -55,7 +56,8 @@ export const MobileLayout = () => {
 					isFriendPage ||
 					isClothDetail ||
 					isCodiDetail ||
-					isCodiPublicEdit ? null : isSocial ? (
+					isCodiPublicEdit ||
+					isLibrary ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
