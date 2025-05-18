@@ -6,6 +6,7 @@ import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSect
 import { useProfileStore } from '@/store/useProfileStore';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { toast } from 'react-toastify';
+import { ClosetResponse } from '@/features/closet/api/closetApi';
 
 // [코디 만들기/수정 페이지]
 // - 사용자가 옷을 조합해서 코디를 만듦
@@ -48,7 +49,11 @@ const CodiEditPage = () => {
 		activeCategory === 'all' ? undefined : Number(activeCategory);
 
 	// 옷장 데이터 조회
-	const { data: products } = useCloset(memberId, categoryId);
+	const {
+		data: products,
+		isFetchingNextPage,
+		fetchNextPage,
+	} = useCloset(memberId, categoryId);
 
 	// 코디에 올려진 아이템들 상태
 	const [canvasItems, setCanvasItems] = useState<any[]>([]);
@@ -172,7 +177,9 @@ const CodiEditPage = () => {
 							categories={CATEGORIES}
 							activeCategory={activeCategory}
 							filteredProducts={(
-								products?.pages.flatMap((page) => page.content) || []
+								products?.pages.flatMap(
+									(page: ClosetResponse) => page.content,
+								) || []
 							)
 								.filter((item) => {
 									if (mode === 'recommended') return item.isPublic;
@@ -193,6 +200,11 @@ const CodiEditPage = () => {
 								}))}
 							onCategoryChange={(category) => setActiveCategory(category)}
 							onItemClick={addItemToCanvas}
+							hasNextPage={
+								!!products?.pages[products.pages.length - 1]?.pagination.cursor
+							}
+							isFetchingNextPage={isFetchingNextPage}
+							fetchNextPage={fetchNextPage}
 						/>
 					</div>
 				</div>
@@ -217,7 +229,9 @@ const CodiEditPage = () => {
 							categories={CATEGORIES}
 							activeCategory={activeCategory}
 							filteredProducts={(
-								products?.pages.flatMap((page) => page.content) || []
+								products?.pages.flatMap(
+									(page: ClosetResponse) => page.content,
+								) || []
 							)
 								.filter((item) => {
 									if (mode === 'recommended') return item.isPublic;
@@ -238,6 +252,11 @@ const CodiEditPage = () => {
 								}))}
 							onCategoryChange={(category) => setActiveCategory(category)}
 							onItemClick={addItemToCanvas}
+							hasNextPage={
+								!!products?.pages[products.pages.length - 1]?.pagination.cursor
+							}
+							isFetchingNextPage={isFetchingNextPage}
+							fetchNextPage={fetchNextPage}
 						/>
 					</div>
 				</div>
