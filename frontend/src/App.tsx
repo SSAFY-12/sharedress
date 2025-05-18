@@ -16,6 +16,7 @@ export const App = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const navigate = useNavigate();
 	const [showFcmModal, setShowFcmModal] = useState(false);
+	const isGuest = useAuthStore((state) => state.isGuest);
 
 	// useTokenValidation();
 	// 공개 라우트 목록
@@ -133,18 +134,20 @@ export const App = () => {
 				)}
 			/>
 
-			<AlertModal
-				isOpen={showFcmModal}
-				onClose={() => setShowFcmModal(false)}
-				onConfirm={() => {
-					setShowFcmModal(false);
-					navigate('/setting');
-				}}
-				onHide={() => {
-					localStorage.setItem('hideFcmAlert', 'true');
-					setShowFcmModal(false);
-				}}
-			/>
+			{!isGuest && (
+				<AlertModal
+					isOpen={showFcmModal}
+					onClose={() => setShowFcmModal(false)}
+					onConfirm={() => {
+						setShowFcmModal(false);
+						navigate('/setting');
+					}}
+					onHide={() => {
+						localStorage.setItem('hideFcmAlert', 'true');
+						setShowFcmModal(false);
+					}}
+				/>
+			)}
 		</>
 	);
 };
