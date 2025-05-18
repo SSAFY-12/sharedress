@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.adapter.clothes.out.messaging.SqsMessageSender;
 import com.ssafy.sharedress.application.ai.dto.AiTaskResponse;
@@ -14,6 +16,7 @@ import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AiProcessMessageRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoUploadResponse;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.domain.ai.entity.AiTask;
 import com.ssafy.sharedress.domain.ai.entity.TaskType;
@@ -33,6 +36,7 @@ import com.ssafy.sharedress.domain.clothes.error.ClothesErrorCode;
 import com.ssafy.sharedress.domain.clothes.repository.ClothesRepository;
 import com.ssafy.sharedress.domain.color.entity.Color;
 import com.ssafy.sharedress.domain.color.repository.ColorRepository;
+import com.ssafy.sharedress.domain.common.port.ImageStoragePort;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.error.MemberErrorCode;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
@@ -51,6 +55,9 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class ClosetClothesService implements ClosetClothesUseCase {
 
+	@Value("${cloud.aws.s3.path.photo}")
+	private String photoPath;
+
 	private final CategoryRepository categoryRepository;
 	private final ColorRepository colorRepository;
 	private final BrandRepository brandRepository;
@@ -62,6 +69,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final AiTaskRepository aiTaskRepository;
 
 	private final SqsMessageSender sqsMessageSender;
+	private final ImageStoragePort imageStoragePort;
 
 	private static final int MAX_ITEMS_PER_MESSAGE = 30;
 
@@ -178,7 +186,14 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				// Clothes 객체 (있으면 재사용, 없으면 생성 및 저장)
 				Clothes clothes = existing.orElseGet(() ->
 					clothesRepository.save(
-						new Clothes(normalizedName, brand, color, category, shoppingMall, item.linkUrl())
+						Clothes.createByShoppingMall(
+							normalizedName,
+							item.linkUrl(),
+							brand,
+							color,
+							category,
+							shoppingMall
+						)
 					)
 				);
 
@@ -234,6 +249,34 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			aiTask.updateCompleted();
 		}
 		return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());
+	}
+
+	@Transactional
+	@Override
+	public List<ClothesPhotoUploadResponse> uploadClosetClothesPhotos(Long memberId, List<MultipartFile> photos) {
+		List<String> s3urls = imageStoragePort.upload(photoPath, photos);
+
+		Closet closet = closetRepository.findByMemberId(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
+
+		List<ClothesPhotoUploadResponse> result = new ArrayList<>();
+
+		for (String url : s3urls) {
+			Clothes clothes = clothesRepository.save(
+				Clothes.createByPhoto(
+					url,
+					brandRepository.getReferenceById(-1L),
+					colorRepository.getReferenceById(-1L),
+					categoryRepository.getReferenceById(-1L),
+					shoppingMallRepository.getReferenceById(-1L)
+				)
+			);
+
+			ClosetClothes closetClothes = closetClothesRepository.save(new ClosetClothes(closet, clothes));
+
+			result.add(ClothesPhotoUploadResponse.from(closetClothes, url));
+		}
+		return result;
 	}
 
 	private static <T> List<List<T>> batchList(List<T> list, int batchSize) {
