@@ -152,6 +152,7 @@ const CodiSavePage = () => {
 											state: {
 												initialTab: '코디',
 												initialSubTab: 'recommended',
+												from: 'codi-recommend',
 											},
 										});
 									} else {
