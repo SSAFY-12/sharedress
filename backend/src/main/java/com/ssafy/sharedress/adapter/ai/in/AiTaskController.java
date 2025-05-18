@@ -23,7 +23,7 @@ public class AiTaskController {
 	private final AiTaskUseCase aiTaskUseCase;
 
 	@GetMapping("/closet/clothes/purchase-history/task/{taskId}")
-	public ResponseEntity<ResponseWrapper<AiTaskCompletedResponse>> updateCompletedAiTask(
+	public ResponseEntity<ResponseWrapper<AiTaskCompletedResponse>> getAiTaskCompletedForPurchaseHistory(
 		@CurrentMember Member member,
 		@PathVariable("taskId") String taskId,
 		@RequestParam Long shopId
@@ -31,6 +31,17 @@ public class AiTaskController {
 		return ResponseWrapperFactory.toResponseEntity(
 			HttpStatus.OK,
 			aiTaskUseCase.getAiTaskCompleted(taskId, shopId)
+		);
+	}
+
+	@GetMapping("/closet/clothes/photos/task/{taskId}")
+	public ResponseEntity<ResponseWrapper<AiTaskCompletedResponse>> getAiTaskCompletedForPhoto(
+		@CurrentMember Member member,
+		@PathVariable("taskId") String taskId
+	) {
+		return ResponseWrapperFactory.toResponseEntity(
+			HttpStatus.OK,
+			aiTaskUseCase.getPhotoAiTaskCompleted(taskId)
 		);
 	}
 }
