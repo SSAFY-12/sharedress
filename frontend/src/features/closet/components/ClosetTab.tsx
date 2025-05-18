@@ -3,7 +3,8 @@ import { ClothListContainer } from '@/containers/ClothListContainer';
 import { useNavigate } from 'react-router-dom';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { useEffect, useRef } from 'react';
-import { ClosetItem } from '@/features/closet/api/closetApi';
+import { ClosetItem } from '@/features/closet/api/closetApi';''
+import { categoryMapping } from '@/constants/categoryConfig';
 
 interface ClosetTabProps {
 	memberId: number;
@@ -11,20 +12,13 @@ interface ClosetTabProps {
 	isMe: boolean;
 }
 
-// 카테고리 ID 매핑 (API 호출용)
-const CATEGORY_ID_MAP: { [key: string]: number } = {
-	아우터: 2,
-	상의: 1,
-	하의: 3,
-	신발: 4,
-	기타: 5,
-};
+
 
 const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const navigate = useNavigate();
 
 	const categoryId =
-		selectedCategory === '전체' ? undefined : CATEGORY_ID_MAP[selectedCategory];
+		selectedCategory === '전체' ? undefined : categoryMapping[selectedCategory];
 
 	const {
 		data,
