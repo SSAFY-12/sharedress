@@ -60,8 +60,8 @@ export const SetPage = () => {
 					const registration = await navigator.serviceWorker.ready;
 					await registration.showNotification('알림 안내', {
 						body: '알림이 활성화되었습니다!',
-						icon: '/android-chrome-192x192.png',
-						badge: '/favicon-32x32.png',
+						icon: '/new-android-chrome-192x192.png',
+						badge: '/new-favicon-32x32.png',
 					});
 				}
 			} catch (error) {
@@ -70,8 +70,8 @@ export const SetPage = () => {
 					const registration = await navigator.serviceWorker.ready;
 					await registration.showNotification('알림 안내', {
 						body: '알림 토큰 저장에 실패했습니다.',
-						icon: '/android-chrome-192x192.png',
-						badge: '/favicon-32x32.png',
+						icon: '/new-android-chrome-192x192.png',
+						badge: '/new-favicon-32x32.png',
 					});
 				}
 			}
@@ -81,8 +81,8 @@ export const SetPage = () => {
 				const registration = await navigator.serviceWorker.ready;
 				await registration.showNotification('알림 안내', {
 					body: '브라우저 알림 권한이 허용되지 않았습니다.',
-					icon: '/android-chrome-192x192.png',
-					badge: '/favicon-32x32.png',
+					icon: '/new-android-chrome-192x192.png',
+					badge: '/new-favicon-32x32.png',
 				});
 			}
 		}

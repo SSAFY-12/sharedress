@@ -27,8 +27,8 @@ const useFcmInitialization = () => {
 						const registration = await navigator.serviceWorker.ready;
 						await registration.showNotification('알림 안내', {
 							body: '알림을 받으시려면 알림 권한을 허용해주세요.',
-							icon: '/android-chrome-192x192.png',
-							badge: '/favicon-32x32.png',
+							icon: '/new-android-chrome-192x192.png',
+							badge: '/new-favicon-32x32.png',
 						});
 					}
 					const token = await requestNotificationPermission();
@@ -37,8 +37,8 @@ const useFcmInitialization = () => {
 							const registration = await navigator.serviceWorker.ready;
 							await registration.showNotification('알림 안내', {
 								body: '알림 권한이 허용되었습니다!',
-								icon: '/android-chrome-192x192.png',
-								badge: '/favicon-32x32.png',
+								icon: '/new-android-chrome-192x192.png',
+								badge: '/new-favicon-32x32.png',
 							});
 						}
 						useFcmStore.setState({ token });
@@ -89,8 +89,8 @@ const useFcmInitialization = () => {
 						const registration = await navigator.serviceWorker.ready;
 						await registration.showNotification('알림 안내', {
 							body: '알림 권한이 거부되었습니다. 브라우저 설정에서 알림을 허용해주세요.',
-							icon: '/android-chrome-192x192.png',
-							badge: '/favicon-32x32.png',
+							icon: '/new-android-chrome-192x192.png',
+							badge: '/new-favicon-32x32.png',
 						});
 					}
 				}
@@ -100,8 +100,8 @@ const useFcmInitialization = () => {
 					const registration = await navigator.serviceWorker.ready;
 					await registration.showNotification('알림 오류', {
 						body: '알림 설정 중 오류가 발생했습니다.',
-						icon: '/android-chrome-192x192.png',
-						badge: '/favicon-32x32.png',
+						icon: '/new-android-chrome-192x192.png',
+						badge: '/new-favicon-32x32.png',
 					});
 				}
 			}
