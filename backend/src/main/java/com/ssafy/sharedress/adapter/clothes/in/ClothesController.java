@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.ai.usecase.AiTaskUseCase;
-import com.ssafy.sharedress.application.clothes.dto.AiCompleteRequest;
+import com.ssafy.sharedress.application.clothes.dto.AiPhotoCompleteRequest;
+import com.ssafy.sharedress.application.clothes.dto.AiPurchaseCompleteRequest;
 import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
 import com.ssafy.sharedress.application.clothes.usecase.ClothesUseCase;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
@@ -42,8 +43,21 @@ public class ClothesController {
 	}
 
 	@PostMapping("/clothes/ai-complete")
-	public ResponseEntity<ResponseWrapper<Void>> completeClothesPreprocessing(@RequestBody AiCompleteRequest request) {
+	public ResponseEntity<ResponseWrapper<Void>> completeClothesPreprocessing(
+		@RequestBody AiPurchaseCompleteRequest request) {
 		clothesUseCase.markClothesAsAiCompleted(request.memberId(), request.successClothes(), request.failClothes());
+		aiTaskUseCase.updateCompletedAiTask(request.taskId());
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
+	}
+
+	@PostMapping("/photo/ai-complete")
+	public ResponseEntity<ResponseWrapper<Void>> completePhotoPreprocessing(
+		@RequestBody AiPhotoCompleteRequest request) {
+		clothesUseCase.markPhotoClothesAsAiCompleted(
+			request.memberId(),
+			request.successClosetClothes(),
+			request.failClosetClothes()
+		);
 		aiTaskUseCase.updateCompletedAiTask(request.taskId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}

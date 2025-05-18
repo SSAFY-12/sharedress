@@ -156,4 +156,19 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	public List<ClosetClothes> findAllByMemberId(Long myId) {
 		return closetClothesJpaRepository.findAllByMemberId(myId);
 	}
+
+	@Override
+	public List<ClosetClothes> findAllByIds(List<Long> closetClothesIds) {
+		QClosetClothes cc = QClosetClothes.closetClothes;
+		QClothes cl = QClothes.clothes;
+
+		BooleanBuilder condition = new BooleanBuilder()
+			.and(cc.id.in(closetClothesIds));
+
+		return queryFactory
+			.selectFrom(cc)
+			.leftJoin(cc.clothes, cl).fetchJoin()
+			.where(condition)
+			.fetch();
+	}
 }

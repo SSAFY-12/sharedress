@@ -16,4 +16,6 @@ public interface ClothesUseCase {
 	);
 
 	void markClothesAsAiCompleted(Long memberId, List<Long> successClothes, List<Long> failClothes);
+
+	void markPhotoClothesAsAiCompleted(Long memberId, List<Long> successClosetClothes, List<Long> failClosetClothes);
 }

@@ -22,7 +22,7 @@ public class AiTaskController {
 
 	private final AiTaskUseCase aiTaskUseCase;
 
-	@GetMapping("closet/clothes/purchase-history/task/{taskId}")
+	@GetMapping("/closet/clothes/purchase-history/task/{taskId}")
 	public ResponseEntity<ResponseWrapper<AiTaskCompletedResponse>> updateCompletedAiTask(
 		@CurrentMember Member member,
 		@PathVariable("taskId") String taskId,
