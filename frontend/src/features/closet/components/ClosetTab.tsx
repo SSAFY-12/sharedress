@@ -58,7 +58,7 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	return (
 		<div className='flex flex-col h-full'>
 			{(visibleItems.length ?? 0) === 0 ? (
-				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor'>
+				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor mt-10'>
 					저장한 옷이 없습니다.
 				</div>
 			) : (
