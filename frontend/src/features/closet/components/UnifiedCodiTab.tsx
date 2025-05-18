@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCoordinationList } from '@/features/closet/hooks/useCoordinationList';
 import { ClothItem } from '@/components/cards/cloth-card';
 import { ClothListContainer } from '@/containers/ClothListContainer';
+import LoadingSpinner from '@/components/etc/LoadingSpinner';
 
 interface UnifiedCodiTabProps {
 	memberId: number;
@@ -42,7 +43,11 @@ const UnifiedCodiTab = ({
 	const { scope, label, emptyMessage } = tabInfoMap[activeSubTab];
 
 	console.log(memberId, scope);
-	const { data: coordinationList = [] } = useCoordinationList(memberId, scope);
+	const {
+		data: coordinationList = [],
+		isLoading,
+		isFetching,
+	} = useCoordinationList(memberId, scope);
 
 	console.log(coordinationList);
 
@@ -68,7 +73,9 @@ const UnifiedCodiTab = ({
 
 	return (
 		<div className='px-4 flex flex-col flex-1'>
-			{items.length === 0 ? (
+			{isLoading ? (
+				<LoadingSpinner />
+			) : items.length === 0 && !isFetching ? (
 				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor'>
 					{emptyMessage}
 				</div>
