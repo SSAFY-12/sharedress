@@ -18,7 +18,6 @@ export const App = () => {
 	const [showFcmModal, setShowFcmModal] = useState(false);
 	const isGuest = useAuthStore((state) => state.isGuest);
 
-
 	// useTokenValidation();
 	// 공개 라우트 목록
 	// const isPublicRoute =
@@ -140,14 +139,14 @@ export const App = () => {
 					isOpen={showFcmModal}
 					onClose={() => setShowFcmModal(false)}
 					onConfirm={() => {
-					setShowFcmModal(false);
-					navigate('/setting');
-				}}
-				onHide={() => {
-					localStorage.setItem('hideFcmAlert', 'true');
-					setShowFcmModal(false);
-				}}
-			/>
+						setShowFcmModal(false);
+						navigate('/setting');
+					}}
+					onHide={() => {
+						localStorage.setItem('hideFcmAlert', 'true');
+						setShowFcmModal(false);
+					}}
+				/>
 			)}
 		</>
 	);
