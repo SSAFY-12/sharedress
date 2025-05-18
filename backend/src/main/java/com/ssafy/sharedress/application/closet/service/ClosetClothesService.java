@@ -5,22 +5,30 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.adapter.clothes.out.messaging.SqsMessageSender;
 import com.ssafy.sharedress.application.ai.dto.AiTaskResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
-import com.ssafy.sharedress.application.clothes.dto.AiProcessMessageRequest;
+import com.ssafy.sharedress.application.clothes.dto.AiProcessMessagePhotoRequest;
+import com.ssafy.sharedress.application.clothes.dto.AiProcessMessagePurchaseRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailResponse;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoUploadResponse;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
 import com.ssafy.sharedress.domain.ai.entity.AiTask;
 import com.ssafy.sharedress.domain.ai.entity.TaskType;
 import com.ssafy.sharedress.domain.ai.repository.AiTaskRepository;
 import com.ssafy.sharedress.domain.brand.entity.Brand;
+import com.ssafy.sharedress.domain.brand.error.BrandErrorCode;
 import com.ssafy.sharedress.domain.brand.repository.BrandRepository;
 import com.ssafy.sharedress.domain.category.entity.Category;
+import com.ssafy.sharedress.domain.category.error.CategoryErrorCode;
 import com.ssafy.sharedress.domain.category.repository.CategoryRepository;
 import com.ssafy.sharedress.domain.closet.entity.Closet;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
@@ -32,7 +40,9 @@ import com.ssafy.sharedress.domain.clothes.entity.Clothes;
 import com.ssafy.sharedress.domain.clothes.error.ClothesErrorCode;
 import com.ssafy.sharedress.domain.clothes.repository.ClothesRepository;
 import com.ssafy.sharedress.domain.color.entity.Color;
+import com.ssafy.sharedress.domain.color.error.ColorErrorCode;
 import com.ssafy.sharedress.domain.color.repository.ColorRepository;
+import com.ssafy.sharedress.domain.common.port.ImageStoragePort;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.member.error.MemberErrorCode;
 import com.ssafy.sharedress.domain.member.repository.MemberRepository;
@@ -51,6 +61,9 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional(readOnly = true)
 public class ClosetClothesService implements ClosetClothesUseCase {
 
+	@Value("${cloud.aws.s3.path.photo}")
+	private String photoPath;
+
 	private final CategoryRepository categoryRepository;
 	private final ColorRepository colorRepository;
 	private final BrandRepository brandRepository;
@@ -62,6 +75,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final AiTaskRepository aiTaskRepository;
 
 	private final SqsMessageSender sqsMessageSender;
+	private final ImageStoragePort imageStoragePort;
 
 	private static final int MAX_ITEMS_PER_MESSAGE = 30;
 
@@ -76,7 +90,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			ExceptionUtil.throwException(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_BELONG_TO_MEMBER);
 		}
 
-		ClosetClothes closetClothes = closetClothesRepository.findById(closetClothesId)
+		ClosetClothes closetClothes = closetClothesRepository.findByIdAndImgNotNull(closetClothesId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
 
 		if (request.name() != null) {
@@ -150,7 +164,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		String taskId = UUID.randomUUID().toString();
 		AiTask aiTask = new AiTask(taskId, false, member, shoppingMall, TaskType.PURCHASE_HISTORY);
 
-		List<AiProcessMessageRequest.ItemInfo> itemsToProcess = new ArrayList<>();
+		List<AiProcessMessagePurchaseRequest.ItemInfo> itemsToProcess = new ArrayList<>();
 
 		request.items()
 			.stream()
@@ -178,7 +192,14 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				// Clothes 객체 (있으면 재사용, 없으면 생성 및 저장)
 				Clothes clothes = existing.orElseGet(() ->
 					clothesRepository.save(
-						new Clothes(normalizedName, brand, color, category, shoppingMall, item.linkUrl())
+						Clothes.createByShoppingMall(
+							normalizedName,
+							item.linkUrl(),
+							brand,
+							color,
+							category,
+							shoppingMall
+						)
 					)
 				);
 
@@ -192,7 +213,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 				// 전처리 대상이면 AI 메시지큐 발행
 				if (existing.isEmpty()) {
-					itemsToProcess.add(new AiProcessMessageRequest.ItemInfo(clothes.getId(), item.linkUrl()));
+					itemsToProcess.add(new AiProcessMessagePurchaseRequest.ItemInfo(clothes.getId(), item.linkUrl()));
 					log.info("AI 처리 요청 발행됨: clothesId={}, memberId={}", clothes.getId(), memberId);
 				}
 
@@ -207,13 +228,14 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			});
 
 		if (!itemsToProcess.isEmpty()) {
-			List<List<AiProcessMessageRequest.ItemInfo>> batches = batchList(itemsToProcess, MAX_ITEMS_PER_MESSAGE);
+			List<List<AiProcessMessagePurchaseRequest.ItemInfo>> batches = batchList(itemsToProcess,
+				MAX_ITEMS_PER_MESSAGE);
 
 			for (int i = 0; i < batches.size(); i++) {
-				List<AiProcessMessageRequest.ItemInfo> batch = batches.get(i);
+				List<AiProcessMessagePurchaseRequest.ItemInfo> batch = batches.get(i);
 				boolean isLast = (i == batches.size() - 1);
 
-				AiProcessMessageRequest message = new AiProcessMessageRequest(
+				AiProcessMessagePurchaseRequest message = new AiProcessMessagePurchaseRequest(
 					taskId,
 					isLast,
 					memberId,
@@ -234,6 +256,97 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			aiTask.updateCompleted();
 		}
 		return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());
+	}
+
+	@Transactional
+	@Override
+	public List<ClothesPhotoUploadResponse> uploadClosetClothesPhotos(Long memberId, List<MultipartFile> photos) {
+		List<String> s3urls = imageStoragePort.upload(photoPath, photos);
+
+		Closet closet = closetRepository.findByMemberId(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
+
+		List<ClothesPhotoUploadResponse> result = new ArrayList<>();
+
+		for (String url : s3urls) {
+			Clothes clothes = clothesRepository.save(
+				Clothes.createByPhoto(
+					url,
+					brandRepository.getReferenceById(-1L),
+					colorRepository.getReferenceById(-1L),
+					categoryRepository.getReferenceById(-1L),
+					shoppingMallRepository.getReferenceById(-1L)
+				)
+			);
+
+			ClosetClothes closetClothes = closetClothesRepository.save(new ClosetClothes(closet, clothes));
+
+			result.add(ClothesPhotoUploadResponse.from(closetClothes, url));
+		}
+		return result;
+	}
+
+	@Transactional
+	@Override
+	public ClothesPhotoDetailResponse registerClothesFromPhotos(
+		Long memberId,
+		List<ClothesPhotoDetailRequest> request
+	) {
+
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		String taskId = UUID.randomUUID().toString();
+		AiTask aiTask = new AiTask(
+			taskId,
+			false,
+			member,
+			shoppingMallRepository.getReferenceById(-1L),
+			TaskType.PHOTO
+		);
+
+		List<AiProcessMessagePhotoRequest.ItemInfo> itemsToProcess = new ArrayList<>();
+
+		for (ClothesPhotoDetailRequest req : request) {
+			ClosetClothes closetClothes = closetClothesRepository.findById(req.id())
+				.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
+
+			closetClothes.updateCustomBrand(
+				brandRepository.findById(req.brandId())
+					.orElseThrow(ExceptionUtil.exceptionSupplier(BrandErrorCode.BRAND_NOT_FOUND))
+			);
+			closetClothes.updateCustomCategory(
+				categoryRepository.findById(req.categoryId())
+					.orElseThrow(ExceptionUtil.exceptionSupplier(CategoryErrorCode.CATEGORY_NOT_FOUND))
+			);
+			closetClothes.updateCustomColor(
+				colorRepository.findById(req.colorId())
+					.orElseThrow(ExceptionUtil.exceptionSupplier(ColorErrorCode.COLOR_NOT_FOUND))
+			);
+			closetClothes.updateCustomName(req.name());
+
+			itemsToProcess.add(
+				new AiProcessMessagePhotoRequest.ItemInfo(
+					closetClothes.getId(),
+					closetClothes.getClothes().getGoodsLinkUrl()
+				)
+			);
+		} // 업데이트 완료
+
+		// TODO[지윤]: 사진용 큐 url 생성되면 새로 생성된 url 로 바꾸고 주석 해제
+		// try {
+		// 	sqsMessageSender.send(
+		// 		new AiProcessMessagePhotoRequest(taskId, memberId, itemsToProcess)
+		// 	);
+		// 	log.debug("SQS 전송 성공: taskId={}", taskId);
+		// } catch (Exception e) {
+		// 	log.error("SQS 전송 중 예외 발생: {}", e.getMessage(), e);
+		// 	throw new RuntimeException("메시지 전송 실패", e);
+		// }
+
+		return ClothesPhotoDetailResponse.from(
+			aiTaskRepository.save(aiTask)
+		);
 	}
 
 	private static <T> List<List<T>> batchList(List<T> list, int batchSize) {

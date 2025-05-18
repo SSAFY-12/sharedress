@@ -57,4 +57,17 @@ public class ClothesService implements ClothesUseCase {
 			}
 		}
 	}
+
+	@Transactional
+	@Override
+	public void markPhotoClothesAsAiCompleted(Long memberId, List<Long> successClosetClothes,
+		List<Long> failClosetClothes) {
+		if (failClosetClothes != null && !failClosetClothes.isEmpty()) {
+			List<ClosetClothes> failedClosetClothes = closetClothesRepository.findAllByIds(failClosetClothes);
+			for (ClosetClothes closetClothes : failedClosetClothes) {
+				closetClothes.updateImgUrl(
+					closetClothes.getClothes().getImageUrl()); // 실패한 의류 삭제 X, 사용자가 업로드한 이미지 그대로 복사
+			}
+		}
+	}
 }

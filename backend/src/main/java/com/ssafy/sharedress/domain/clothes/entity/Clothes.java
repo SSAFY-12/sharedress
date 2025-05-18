@@ -70,15 +70,39 @@ public class Clothes extends BaseTimeEntity {
 	@OneToMany(mappedBy = "clothes", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<ClosetClothes> closetClothesList = new ArrayList<>();
 
-	public Clothes(String name, Brand brand, Color color, Category category, ShoppingMall shoppingMall,
-		String goodsLinkUrl) {
+	public Clothes(String name, ClothesSourceType type, String goodsLinkUrl, AiProcessStatus aiProcessStatus,
+		Brand brand,
+		Color color, Category category, ShoppingMall shoppingMall) {
 		this.name = name;
+		this.type = type;
+		this.goodsLinkUrl = goodsLinkUrl;
+		this.aiProcessStatus = aiProcessStatus;
 		this.brand = brand;
 		this.color = color;
 		this.category = category;
 		this.shoppingMall = shoppingMall;
-		this.goodsLinkUrl = goodsLinkUrl;
-		this.type = ClothesSourceType.SHOPPING_MALL;
-		this.aiProcessStatus = AiProcessStatus.NOT_PROCESSED;
+	}
+
+	public static Clothes createByShoppingMall(
+		String name,
+		String goodsLinkUrl,
+		Brand brand,
+		Color color,
+		Category category,
+		ShoppingMall shoppingMall
+	) {
+		return new Clothes(name, ClothesSourceType.SHOPPING_MALL, goodsLinkUrl,
+			AiProcessStatus.NOT_PROCESSED, brand, color, category, shoppingMall);
+	}
+
+	public static Clothes createByPhoto(
+		String goodsLinkUrl,
+		Brand brand,
+		Color color,
+		Category category,
+		ShoppingMall shoppingMall
+	) {
+		return new Clothes("", ClothesSourceType.PHOTO, goodsLinkUrl,
+			AiProcessStatus.NOT_PROCESSED, brand, color, category, shoppingMall);
 	}
 }

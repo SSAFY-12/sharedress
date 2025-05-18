@@ -33,4 +33,11 @@ public class AiTaskService implements AiTaskUseCase {
 			.map(AiTaskCompletedResponse::from)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));
 	}
+
+	@Override
+	public AiTaskCompletedResponse getPhotoAiTaskCompleted(String taskId) {
+		return aiTaskRepository.findById(taskId)
+			.map(AiTaskCompletedResponse::from)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));
+	}
 }

@@ -10,4 +10,6 @@ public interface ShoppingMallRepository {
 	List<ShoppingMall> findAllByOrderByIdAsc();
 
 	Optional<ShoppingMall> findById(Long id);
+
+	ShoppingMall getReferenceById(Long id);
 }

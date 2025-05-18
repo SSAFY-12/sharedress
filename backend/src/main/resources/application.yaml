@@ -67,6 +67,7 @@ cloud:
             path:
                 profile: profile
                 coordination: coordination
+                photo: photo
         stack:
             auto: false
 

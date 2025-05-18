@@ -25,4 +25,9 @@ public class ShoppingMallPersistenceAdapter implements ShoppingMallRepository {
 	public Optional<ShoppingMall> findById(Long id) {
 		return shoppingMallJpaRepository.findById(id);
 	}
+
+	@Override
+	public ShoppingMall getReferenceById(Long id) {
+		return shoppingMallJpaRepository.getReferenceById(id);
+	}
 }

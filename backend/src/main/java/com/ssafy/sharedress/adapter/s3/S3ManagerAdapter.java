@@ -2,6 +2,7 @@ package com.ssafy.sharedress.adapter.s3;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +53,13 @@ public class S3ManagerAdapter implements ImageStoragePort {
 			log.error("S3 업로드 실패", e);
 			throw new RuntimeException("S3 업로드 실패", e);
 		}
+	}
+
+	@Override
+	public List<String> upload(String path, List<MultipartFile> files) {
+		return files.stream()
+			.map(file -> upload(path, file))
+			.toList();
 	}
 
 	@Override
