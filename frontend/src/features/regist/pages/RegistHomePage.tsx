@@ -1,10 +1,25 @@
+import React from 'react';
 import { router } from '@/routes';
 import SelectRegistBlock from '@/features/regist/components/SelectRegistBlock';
 import { useGetCloth } from '@/features/regist/hooks/useGetCloth';
+import { useRef } from 'react';
+import { usePhotoClothStore } from '../stores/usePhotoClothStore';
 
 const RegistHomePage = () => {
 	const { data } = useGetCloth();
 	console.log(data, 'data');
+	const fileInputRef = useRef<HTMLInputElement>(null);
+
+	// 파일 선택 이벤트
+	const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { files } = e.target;
+		if (!files) return;
+
+		const fileList = Array.from(files).slice(0, 5);
+		usePhotoClothStore.getState().setItems(fileList);
+
+		router.navigate('/regist/camera');
+	};
 
 	return (
 		<div className='flex-1 w-full h-full flex flex-col justify-center items-center px-4 pb-36 gap-5'>
@@ -24,7 +39,22 @@ const RegistHomePage = () => {
 					image='search.png'
 					onClick={() => router.navigate('/regist/search')}
 				/>
-				<div className='flex items-center justify-between bg-background w-full rounded-lg px-6 relative'>
+				<SelectRegistBlock
+					title='사진으로 등록'
+					description='사진으로 직접 등록'
+					image='camera.png'
+					onClick={() => fileInputRef.current?.click()}
+				/>
+				{/* 갤러리 여는 것을 위한 숨겨진 input */}
+				<input
+					ref={fileInputRef}
+					type='file'
+					accept='image/*'
+					multiple={true}
+					className='hidden'
+					onChange={handleImageSelect}
+				/>
+				{/* <div className='flex items-center justify-between bg-background w-full rounded-lg px-6 relative'>
 					<div className='absolute inset-0 bg-black/30 rounded-lg z-10 flex items-center justify-center'>
 						<span className='text-white text-title w-full pr-4'>
 							{' '}
@@ -44,7 +74,7 @@ const RegistHomePage = () => {
 						alt='사진으로 등록'
 						className=' h-full object-cover'
 					/>
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);

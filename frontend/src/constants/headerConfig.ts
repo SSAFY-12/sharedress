@@ -45,11 +45,11 @@ export const headerConfig: HeaderConfig = {
 		subtitle: '옷 검색하기',
 		badgeText: '', // 추후에 설정 필요
 	},
-	'/regist/camera': {
-		showBack: true,
-		subtitle: '사진으로 등록',
-		badgeText: '',
-	},
+	// '/regist/camera': {
+	// 	showBack: true,
+	// 	subtitle: '사진으로 등록',
+	// 	badgeText: '',
+	// },
 	'/cloth/:id': {
 		showBack: true,
 	},

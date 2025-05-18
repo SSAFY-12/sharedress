@@ -22,6 +22,8 @@ export const MobileLayout = () => {
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
 	const isClothDetail = matchPath('/cloth/:id', location.pathname) !== null;
 	const isCodiDetail = matchPath('/codi/:id', location.pathname) !== null;
+	const isRegistCamera =
+		matchPath('/regist/camera', location.pathname) !== null;
 	const isCodiPublicEdit =
 		matchPath('/codi/:id/edit', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
@@ -56,7 +58,8 @@ export const MobileLayout = () => {
 					isFriendPage ||
 					isClothDetail ||
 					isCodiDetail ||
-					isCodiPublicEdit ? null : isSocial ? (
+					isCodiPublicEdit ||
+					isRegistCamera ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
@@ -71,7 +74,8 @@ export const MobileLayout = () => {
 						isFriendPage ||
 						isClothDetail ||
 						isCodiDetail ||
-						isCodiPublicEdit
+						isCodiPublicEdit ||
+						isRegistCamera
 							? ''
 							: 'mt-16'
 					} ${
