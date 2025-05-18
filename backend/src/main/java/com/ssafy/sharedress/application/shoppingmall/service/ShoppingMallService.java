@@ -20,6 +20,7 @@ public class ShoppingMallService implements ShoppingMallUseCase {
 	public List<ShoppingMallResponse> getAllShoppingMalls() {
 		return shoppingMallRepository.findAllByOrderByIdAsc()
 			.stream()
+			.filter(shoppingMall -> !shoppingMall.getId().equals(-1L))
 			.map(ShoppingMallResponse::from)
 			.toList();
 	}

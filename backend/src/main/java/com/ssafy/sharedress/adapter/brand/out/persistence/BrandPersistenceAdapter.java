@@ -70,6 +70,7 @@ public class BrandPersistenceAdapter implements BrandRepository {
 		// 커서 페이징 처리 (id 기준 오름차순)
 		if (cursorId != null) {
 			condition.and(brand.id.gt(cursorId));
+			condition.and(brand.id.gt(0L)); // id가 0보다 큰 경우만 필터링
 		}
 
 		List<BrandSearchResponse> fetched = queryFactory
