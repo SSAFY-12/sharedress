@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { uploadClothPhotos } from '../api/registApis';
+import { uploadClothPhotos } from '@/features/regist/api/registApis';
 import { toast } from 'react-toastify';
-import { registerClothDetails } from '../api/registApis';
-import { usePhotoClothStore } from '../stores/usePhotoClothStore';
+import { registerClothDetails } from '@/features/regist/api/registApis';
+import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore';
 import { useState } from 'react';
 
 const usePhotoCloth = () => {

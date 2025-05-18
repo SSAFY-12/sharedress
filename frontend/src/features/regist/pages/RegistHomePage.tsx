@@ -3,7 +3,7 @@ import { router } from '@/routes';
 import SelectRegistBlock from '@/features/regist/components/SelectRegistBlock';
 import { useGetCloth } from '@/features/regist/hooks/useGetCloth';
 import { useRef } from 'react';
-import { usePhotoClothStore } from '../stores/usePhotoClothStore';
+import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore';
 
 const RegistHomePage = () => {
 	const { data } = useGetCloth();

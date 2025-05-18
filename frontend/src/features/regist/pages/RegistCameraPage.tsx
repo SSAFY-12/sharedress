@@ -9,8 +9,8 @@ import { SearchBar } from '@/components/inputs/search-bar';
 import { useBrandSearch } from '@/features/closet/hooks/useBrandSearch';
 import { useCategoryList } from '@/features/closet/hooks/useCategoryList';
 import { useDeferredValue } from 'react';
-import { usePhotoClothStore } from '../stores/usePhotoClothStore';
-import usePhotoCloth from '../hooks/usePhotoCloth';
+import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore';
+import usePhotoCloth from '@/features/regist/hooks/usePhotoCloth';
 import LoadingOverlay from '@/components/etc/LoadingOverlay';
 
 const RegistCameraPage = () => {

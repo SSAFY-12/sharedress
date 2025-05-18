@@ -74,7 +74,7 @@ export const LibraryApis = {
 };
 
 import { MyClosetContent } from '@/store/useClosetStore';
-import { PhotoClothItem } from '../stores/usePhotoClothStore';
+import { PhotoClothItem } from '@/features/regist/stores/usePhotoClothStore';
 export interface MyClosetResponse {
 	status: Status;
 	content: MyClosetContent[];
