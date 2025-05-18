@@ -40,7 +40,7 @@ export const ExternalShareModal = ({
 		? `https://sharedress.co.kr/link/${publicLink}`
 		: `https://localhost:5173/link/${publicLink}`;
 	const linkText =
-		'친구야, 나의 옷장을 열어봤어?\n👀 너의 센스로 멋진 코디를 부탁해! ✨\n\n🧥(크롬/사파리 접속을 권장합니다)👖';
+		'혹시 내 옷장을 열어봤어?\n👀 너의 센스로 멋진 코디를 부탁해! ✨\n\n🧥(크롬/사파리 접속을 권장합니다)👖';
 
 	const handleCopy = async () => {
 		if (!isPublic) return; // 비공개일 땐 막기
