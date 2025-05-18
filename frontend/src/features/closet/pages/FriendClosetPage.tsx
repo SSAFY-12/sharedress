@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProfileHeader from '@/features/closet/components/ProfileHeader';
 import ClosetTab from '@/features/closet/components/ClosetTab';
 import { useLocation, useParams } from 'react-router-dom';
@@ -29,6 +29,7 @@ const FriendClosetPage = () => {
 		(location.state?.initialTab as (typeof closetTab)[number]) ?? '옷장';
 	const initialSubTab =
 		(location.state?.initialSubTab as 'friends' | 'recommended') ?? 'friends';
+	const from = location.state?.from;
 
 	// 상태 관리
 	const [activeMainTab, setActiveMainTab] = useState<
@@ -46,6 +47,14 @@ const FriendClosetPage = () => {
 		setIsModalOpen(true);
 		console.log('모달 열림');
 	};
+
+	useEffect(() => {
+		if (from === 'codi-recommend') {
+			setIsModalOpen(true);
+
+			history.replaceState({}, document.title);
+		}
+	}, [from]);
 
 	const { id } = useParams();
 	const memberId = Number(id);
