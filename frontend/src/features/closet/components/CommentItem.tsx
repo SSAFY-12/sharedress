@@ -43,7 +43,7 @@ const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 				<img
 					src={
 						getOptimizedImageUrl(comment.author.imageUrl) ||
-						'https://picsum.photos/200'
+						'/images/default_profile.png'
 					}
 					alt={comment.author.name}
 					className='w-11 h-11 rounded-full mr-4'

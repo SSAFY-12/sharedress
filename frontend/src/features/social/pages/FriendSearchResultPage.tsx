@@ -8,6 +8,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import useRequest from '@/features/social/hooks/useRequest';
 import useSearchUser from '@/features/social/hooks/useSearchUser';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
+import { FriendRequestCancelModal } from '@/features/social/components/FriendRequestCancelModal';
 
 export const FriendSearchResultPage = () => {
 	const [searchValue, setSearchValue] = useState('');
@@ -24,7 +25,6 @@ export const FriendSearchResultPage = () => {
 	} | null>(null);
 	// 친구 요청 취소/수락 모달
 	const [actionModalOpen, setActionModalOpen] = useState(false); // 친구 요청 취소/수락 모달
-	const [actionType, setActionType] = useState<'accept' | 'cancel'>('accept'); //수락 디폴트
 
 	const { searchUsers, fetchNextPage, hasNextPage, isFetchingNextPage } =
 		useSearchUser(resultValue); // 검색 결과 목록 영역(무한 스크롤 구현)
@@ -166,7 +166,6 @@ export const FriendSearchResultPage = () => {
 												relationStatus: user.relationStatus,
 												memberId: user.memberId,
 											});
-											setActionType('cancel');
 											setActionModalOpen(true);
 										}}
 										className='mt-3 w-[88px] h-[37px] bg-[#A7A5A4] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
@@ -174,7 +173,7 @@ export const FriendSearchResultPage = () => {
 								) : user.relationStatus === 2 ? (
 									<PrimaryBtn
 										size='compact'
-										name='친구 수락'
+										name='확인하기'
 										color='primary'
 										onClick={() => {
 											setSelectedFriend({
@@ -183,7 +182,6 @@ export const FriendSearchResultPage = () => {
 												relationStatus: user.relationStatus,
 												memberId: user.memberId,
 											});
-											setActionType('accept');
 											setActionModalOpen(true);
 										}}
 										className='mt-3 w-[88px] h-[37px] bg-[#584B4B] text-white font-normal text-[14px] flex items-center justify-center rounded-[10px] px-0 leading-none whitespace-nowrap'
@@ -225,15 +223,30 @@ export const FriendSearchResultPage = () => {
 				/>
 			)}
 
-			{/* 친구 요청 수락/취소 모달 */}
-			{selectedFriend && (
+			{/* 친구 요청 확인 모달 */}
+			{selectedFriend && selectedFriend.relationStatus === 2 && (
 				<FriendRequestActionModal
 					isOpen={actionModalOpen}
 					onClose={() => {
 						setActionModalOpen(false);
 					}}
 					memberId={selectedFriend.memberId}
-					actionType={actionType}
+					friend={{
+						profileImage: selectedFriend.profileImage,
+						nickname: selectedFriend.nickname,
+						memberId: selectedFriend.memberId,
+					}}
+				/>
+			)}
+
+			{/* 친구 요청 취소 모달 */}
+			{selectedFriend && selectedFriend.relationStatus === 1 && (
+				<FriendRequestCancelModal
+					isOpen={actionModalOpen}
+					onClose={() => {
+						setActionModalOpen(false);
+					}}
+					memberId={selectedFriend.memberId}
 					friend={{
 						profileImage: selectedFriend.profileImage,
 						nickname: selectedFriend.nickname,

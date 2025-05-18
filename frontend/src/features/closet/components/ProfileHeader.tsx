@@ -137,7 +137,7 @@ ProfileHeaderProps) => {
 						<img
 							src={
 								getOptimizedImageUrl(profileImage) ||
-								'https://picsum.photos/200'
+								'/images/default_profile.png'
 							}
 							alt={`${nickname}#${code}의 프로필 이미지`}
 							className='w-full h-full object-cover'
