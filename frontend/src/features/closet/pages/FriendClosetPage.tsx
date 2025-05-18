@@ -9,7 +9,7 @@ import { categoryConfig } from '@/constants/categoryConfig';
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
 import UnifiedCodiTab from '@/features/closet/components/UnifiedCodiTab';
-// import { GuestModal } from '@/features/closet/components/GuestModal';
+import { GuestModal } from '@/features/closet/components/GuestModal';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [
@@ -40,12 +40,12 @@ const FriendClosetPage = () => {
 	);
 
 	// 모달 state 관리
-	// const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	// 모달여는 함수
-	// const handleModalOpen = () => {
-	// 	setIsModalOpen(true);
-	// 	console.log('모달 열림');
-	// };
+	const handleModalOpen = () => {
+		setIsModalOpen(true);
+		console.log('모달 열림');
+	};
 
 	const { id } = useParams();
 	const memberId = Number(id);
@@ -62,7 +62,7 @@ const FriendClosetPage = () => {
 					statusMessage={profile?.oneLiner}
 					isMe={false}
 					memberId={memberId}
-					// handleModalOpen={handleModalOpen}
+					handleModalOpen={handleModalOpen}
 				/>
 				{/* 자연스러운 그라데이션 효과 */}
 				<div
@@ -117,12 +117,12 @@ const FriendClosetPage = () => {
 					/>
 				)}
 			</div>
-			{/* {isModalOpen && (
+			{isModalOpen && (
 				<GuestModal
 					isOpen={isModalOpen}
 					onClose={() => setIsModalOpen(false)}
 				/>
-			)} */}
+			)}
 		</div>
 	);
 };
