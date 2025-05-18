@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { useEffect, useRef } from 'react';
 import { ClosetItem } from '@/features/closet/api/closetApi';
+('');
+import { categoryMapping } from '@/constants/categoryConfig';
 
 interface ClosetTabProps {
 	memberId: number;
@@ -11,20 +13,11 @@ interface ClosetTabProps {
 	isMe: boolean;
 }
 
-// 카테고리 ID 매핑 (API 호출용)
-const CATEGORY_ID_MAP: { [key: string]: number } = {
-	아우터: 2,
-	상의: 1,
-	하의: 3,
-	신발: 4,
-	기타: 5,
-};
-
 const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const navigate = useNavigate();
 
 	const categoryId =
-		selectedCategory === '전체' ? undefined : CATEGORY_ID_MAP[selectedCategory];
+		selectedCategory === '전체' ? undefined : categoryMapping[selectedCategory];
 
 	const {
 		data,
@@ -65,7 +58,7 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	return (
 		<div className='flex flex-col h-full'>
 			{(visibleItems.length ?? 0) === 0 ? (
-				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor'>
+				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor mt-10'>
 					저장한 옷이 없습니다.
 				</div>
 			) : (
