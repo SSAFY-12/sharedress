@@ -56,7 +56,11 @@ const UnifiedCodiTab = ({
 	const { scope, label, emptyMessage } = tabInfoMap[activeSubTab];
 
 	console.log(memberId, scope);
-	const { data: coordinationList = [] } = useCoordinationList(memberId, scope);
+	const {
+		data: coordinationList = [],
+		isLoading,
+		isFetching,
+	} = useCoordinationList(memberId, scope);
 
 	console.log(coordinationList);
 
@@ -108,7 +112,7 @@ const UnifiedCodiTab = ({
 					/>
 				</button>
 			)}
-			{items.length === 0 ? (
+			{items.length === 0 && !isFetching ? (
 				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor mt-12'>
 					{emptyMessage}
 				</div>
@@ -119,6 +123,8 @@ const UnifiedCodiTab = ({
 						onItemClick={handleItemClick}
 						columns={2}
 						type='codi'
+						isLoading={isLoading}
+						isFetching={isFetching}
 					/>
 				</>
 			)}

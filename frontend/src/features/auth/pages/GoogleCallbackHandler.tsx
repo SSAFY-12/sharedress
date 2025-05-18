@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import useAuth from '@/features/auth/hooks/useAuth';
+import LoadingOverlay from '@/components/etc/LoadingOverlay';
 
 const GoogleCallbackHandler = () => {
 	const { mutation } = useAuth();
@@ -24,12 +25,12 @@ const GoogleCallbackHandler = () => {
 	}, [mutation]);
 
 	if (mutation.isPending) {
-		return <div>구글 로그인 중입니다... (잠시만 기다려주세요)</div>;
+		return <LoadingOverlay message='구글 로그인 중입니다...' />;
 	}
 	if (mutation.isError) {
 		return <div>로그인 실패! 다시 시도해주세요.</div>;
 	}
-	return <div>구글 로그인 중입니다...</div>;
+	return <LoadingOverlay message='구글 로그인 중입니다...' />;
 };
 
 export default GoogleCallbackHandler;
