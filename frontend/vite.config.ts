@@ -69,8 +69,8 @@ export default defineConfig(({ mode }) => {
 			const notificationTitle = payload.notification.title;
 			const notificationOptions = {
 				body: payload.notification.body,
-				icon: '/android-chrome-192x192.png',
-				badge: '/favicon-32x32.png',
+				icon: '/new-android-chrome-192x192.png',
+				badge: '/new-favicon-32x32.png',
 				data: payload.data,
 			};
 
@@ -95,12 +95,12 @@ export default defineConfig(({ mode }) => {
 				injectRegister: false,
 				devOptions: { enabled: true, type: 'module' },
 				includeAssets: [
-					'favicon.ico',
-					'apple-touch-icon.png',
-					'favicon-16x16.png',
-					'favicon-32x32.png',
-					'android-chrome-192x192.png',
-					'android-chrome-512x512.png',
+					'new-favicon.ico',
+					'new-apple-touch-icon.png',
+					'new-favicon-16x16.png',
+					'new-favicon-32x32.png',
+					'new-android-chrome-192x192.png',
+					'new-android-chrome-512x512.png',
 				],
 				manifest: {
 					name: '쉐어드레스',
@@ -114,13 +114,13 @@ export default defineConfig(({ mode }) => {
 					scope: '/',
 					icons: [
 						{
-							src: '/android-chrome-192x192.png',
+							src: '/new-android-chrome-192x192.png',
 							sizes: '192x192',
 							type: 'image/png',
 							purpose: 'any maskable',
 						},
 						{
-							src: '/android-chrome-512x512.png',
+							src: '/new-android-chrome-512x512.png',
 							sizes: '512x512',
 							type: 'image/png',
 							purpose: 'any maskable',
