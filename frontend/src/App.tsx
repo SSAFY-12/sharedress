@@ -9,8 +9,11 @@ import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { useNavigate } from 'react-router-dom';
 import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
+import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 
 export const App = () => {
+	useFcmInitialization();
+
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
