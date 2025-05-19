@@ -14,6 +14,7 @@ import { requestNotificationPermission } from '@/utils/firebase';
 import useFcmStore from '@/store/useFcmStore';
 import fcmApi from '@/features/alert/api/fcmapi';
 import useAuth from '@/features/auth/hooks/useAuth';
+import { toast } from 'react-toastify';
 // PWA 설치 이벤트를 저장할 변수
 let deferredPrompt: any = null;
 
@@ -63,15 +64,17 @@ export const SetPage = () => {
 			useFcmStore.getState().clearToken(); // 토큰 삭제
 			setNotificationsEnabled(false);
 			setNotificationLocked(false);
+
 			// 필요하다면 안내 알림
-			if ('serviceWorker' in navigator && 'Notification' in window) {
-				const registration = await navigator.serviceWorker.ready;
-				await registration.showNotification('알림 안내', {
-					body: '알림이 비활성화되었습니다.',
-					icon: '/new-android-chrome-192x192.png',
-					badge: '/new-favicon-32x32.png',
-				});
-			}
+			toast.success('알림이 비활성화되었습니다', {
+				icon: () => (
+					<img
+						src='/icons/notification_white.svg'
+						alt='icon'
+						style={{ width: '20px', height: '20px' }}
+					/>
+				),
+			});
 			return;
 		}
 		// === 기존 ON 로직 ===
@@ -84,35 +87,22 @@ export const SetPage = () => {
 				setNotificationsEnabled(true);
 				setNotificationLocked(true);
 				// serviceWorker로 알림 안내
-				if ('serviceWorker' in navigator && 'Notification' in window) {
-					const registration = await navigator.serviceWorker.ready;
-					await registration.showNotification('알림 안내', {
-						body: '알림이 활성화되었습니다!',
-						icon: '/new-android-chrome-192x192.png',
-						badge: '/new-favicon-32x32.png',
-					});
-				}
+				toast.success('알림이 활성화 되었습니다', {
+					icon: () => (
+						<img
+							src='/icons/toast_bell.png'
+							alt='icon'
+							style={{ width: '20px', height: '20px' }}
+						/>
+					),
+				});
 			} catch (error) {
 				// 실패 시 안내
-				if ('serviceWorker' in navigator && 'Notification' in window) {
-					const registration = await navigator.serviceWorker.ready;
-					await registration.showNotification('알림 안내', {
-						body: '알림 토큰 저장에 실패했습니다.',
-						icon: '/new-android-chrome-192x192.png',
-						badge: '/new-favicon-32x32.png',
-					});
-				}
+				toast.error('알림 토큰 저장에 실패했습니다');
 			}
 		} else {
 			// 권한 거부 시 안내
-			if ('serviceWorker' in navigator && 'Notification' in window) {
-				const registration = await navigator.serviceWorker.ready;
-				await registration.showNotification('알림 안내', {
-					body: '브라우저 알림 권한이 허용되지 않았습니다.',
-					icon: '/new-android-chrome-192x192.png',
-					badge: '/new-favicon-32x32.png',
-				});
-			}
+			toast.error('브라우저 알림 권한이 허용되지 않았습니다');
 		}
 	};
 
