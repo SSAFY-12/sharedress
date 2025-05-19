@@ -7,7 +7,7 @@ import {
 import { useScanStore } from '@/store/useScanStore';
 import { toast } from 'react-toastify';
 
-export const useRegistStatus = (
+export const useRegistScanStatus = (
 	data: RegistStatusRequest,
 	enabled: boolean,
 ): UseQueryResult<RegistStatusResponse> => {

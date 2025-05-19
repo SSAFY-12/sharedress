@@ -184,6 +184,21 @@ export const uploadClothPhotos = async (items: PhotoClothItem[]) => {
 	return response.data.content;
 };
 
+interface CameraStatusResponse {
+	status: Status;
+	content: {
+		completed: boolean;
+	};
+}
+export const getCameraStatus = async (
+	taskId: string,
+): Promise<CameraStatusResponse> => {
+	const response = await client.get<CameraStatusResponse>(
+		`/api/closet/clothes/photos/task/${taskId}`,
+	);
+	return response.data;
+};
+
 interface RegisterClothDetailsResponse {
 	status: Status;
 	content: {
@@ -207,7 +222,9 @@ export const registerClothDetails = async (
 		};
 	});
 
-	return await client.post('/api/closet/clothes/photos/detail', body);
+	const response = await client.post('/api/closet/clothes/photos/detail', body);
+
+	return response.data;
 };
 
 export const fetchRemainingPhotoCount = async (): Promise<number> => {

@@ -4,11 +4,12 @@ import { toast } from 'react-toastify';
 import { registerClothDetails } from '@/features/regist/api/registApis';
 import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore';
 import { useState } from 'react';
+import { useCameraStore } from '@/store/useCameraStore';
 
 const usePhotoCloth = () => {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
-
+	const setCamera = useCameraStore((state) => state.setCamera);
 	const handleRegister = async () => {
 		try {
 			setIsLoading(true);
@@ -22,6 +23,8 @@ const usePhotoCloth = () => {
 
 			const res = await registerClothDetails(uploaded, items);
 			console.log('res: ', res);
+			// 주스탄드에 상태 저장
+			setCamera({ isScan: true, taskId: res.content.taskId });
 			toast.success(
 				<div className='flex flex-col justify-center items-start'>
 					<div className='text-smallButton text-left'>사진 변환 중</div>
@@ -38,6 +41,7 @@ const usePhotoCloth = () => {
 					),
 				},
 			);
+
 			reset();
 			navigate('/mypage');
 		} catch (error) {
