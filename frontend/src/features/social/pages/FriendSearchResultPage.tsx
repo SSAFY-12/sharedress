@@ -110,7 +110,7 @@ export const FriendSearchResultPage = () => {
 				value={searchValue}
 				onChange={handleSearchChange}
 				onKeyDown={handleSearch}
-				className='sticky top-0 z-10 bg-white'
+				className=' bg-white'
 			/>
 
 			<div className='flex-1 px-4 sm:px-6 py-4'>

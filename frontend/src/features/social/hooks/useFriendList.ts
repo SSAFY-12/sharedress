@@ -1,6 +1,8 @@
 import { socialApi } from '@/features/social/api/socialApi';
 import { useQuery } from '@tanstack/react-query';
 import { FriendList } from '@/features/social/types/social';
+import { useSocialStore } from '@/store/useSocialStore';
+import { useEffect } from 'react';
 
 interface FriendListResponse {
 	//실제 데이터 응답구조
@@ -15,10 +17,16 @@ interface FriendListResponse {
 }
 
 const useFriendList = () => {
+	const { setHasRequest } = useSocialStore();
 	const { data, isLoading, error } = useQuery<FriendListResponse>({
 		queryKey: ['friendList'], // 친구 목록리스트
 		queryFn: () => socialApi.getFriendList(), // 쿼리 함수
 	});
+	useEffect(() => {
+		if (data?.content.hasRequest) {
+			setHasRequest(true);
+		}
+	}, [data, setHasRequest]);
 	return {
 		data: data?.content.items,
 		hasRequest: data?.content.hasRequest,

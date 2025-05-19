@@ -55,7 +55,7 @@ export const FriendsListPage = () => {
 				placeholder='친구 검색'
 				value={searchValue}
 				onChange={handleSearchChange}
-				className='sticky top-0 z-10 bg-white'
+				className=' bg-white'
 			/>
 
 			{/* 친구 목록 영역 */}
