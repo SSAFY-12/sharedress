@@ -334,7 +334,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				new AiProcessMessagePhotoRequest.ItemInfo(
 					closetClothes.getId(),
 					closetClothes.getClothes().getGoodsLinkUrl(),
-					closetClothes.getClothes().getCategory().getId()
+					req.categoryId()
 				)
 			);
 		}
