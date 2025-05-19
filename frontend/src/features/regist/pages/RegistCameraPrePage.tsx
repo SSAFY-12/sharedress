@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchRemainingPhotoCount } from '../api/registApis';
+import { fetchRemainingPhotoCount } from '@/features/regist/api/registApis';
 import { toast } from 'react-toastify';
-import { usePhotoClothStore } from '../stores/usePhotoClothStore';
+import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore';
 import Header from '@/components/layouts/Header';
 
 const RegistCameraPrePage = () => {
