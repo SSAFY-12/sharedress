@@ -101,14 +101,6 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: 'codi/:id/*',
-				element: (
-					<ProtectedRoute>
-						<CodiPage />
-					</ProtectedRoute>
-				),
-			},
-			{
 				path: 'codi/*',
 				element: (
 					<ProtectedRoute>
