@@ -93,14 +93,6 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: 'cloth/:id/*',
-				element: <ClothPage />,
-			},
-			{
-				path: 'codi/:id/*',
-				element: <CodiPage />,
-			},
-			{
 				path: 'cloth/*',
 				element: (
 					<ProtectedRoute>

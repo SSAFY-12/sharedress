@@ -88,9 +88,7 @@ export const useTokenValidation = () => {
 			location.pathname === '/oauth/google/callback' ||
 			location.pathname.startsWith('/link/') ||
 			location.pathname.startsWith('/friend/') ||
-			location.pathname.startsWith('/coordinations/friends/') ||
-			location.pathname.startsWith('/codi') ||
-			location.pathname.startsWith('/cloth')
+			location.pathname.startsWith('/coordinations/friends/')
 		) {
 			return;
 		}
