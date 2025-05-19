@@ -37,8 +37,10 @@ import com.ssafy.sharedress.domain.closet.error.ClosetErrorCode;
 import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
 import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
+import com.ssafy.sharedress.domain.clothes.entity.PhotoUploadLog;
 import com.ssafy.sharedress.domain.clothes.error.ClothesErrorCode;
 import com.ssafy.sharedress.domain.clothes.repository.ClothesRepository;
+import com.ssafy.sharedress.domain.clothes.repository.PhotoUploadLogRepository;
 import com.ssafy.sharedress.domain.color.entity.Color;
 import com.ssafy.sharedress.domain.color.error.ColorErrorCode;
 import com.ssafy.sharedress.domain.color.repository.ColorRepository;
@@ -73,6 +75,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final ClothesRepository clothesRepository;
 	private final ShoppingMallRepository shoppingMallRepository;
 	private final AiTaskRepository aiTaskRepository;
+	private final PhotoUploadLogRepository photoUploadLogRepository;
 
 	private final SqsMessageSender sqsMessageSender;
 	private final ImageStoragePort imageStoragePort;
@@ -324,6 +327,8 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			);
 			closetClothes.updateCustomName(req.name());
 			closetClothes.updateIsPublic(req.isPublic());
+
+			photoUploadLogRepository.save(new PhotoUploadLog(member));
 
 			itemsToProcess.add(
 				new AiProcessMessagePhotoRequest.ItemInfo(

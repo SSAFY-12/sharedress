@@ -24,6 +24,7 @@ import com.ssafy.sharedress.application.clothes.dto.AddLibraryClothesToClosetReq
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailRequest;
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailResponse;
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoUploadResponse;
+import com.ssafy.sharedress.application.clothes.dto.RemainingPhotoCountResponse;
 import com.ssafy.sharedress.application.guest.annotation.CurrentGuest;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
 import com.ssafy.sharedress.domain.common.context.UserContext;
@@ -139,4 +140,11 @@ public class ClosetClothesController {
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, result);
 	}
 
+	@GetMapping("/closet/clothes/photos/remaining-count")
+	public ResponseEntity<ResponseWrapper<RemainingPhotoCountResponse>> getRemainingPhotoCount(
+		@CurrentMember Member member
+	) {
+		RemainingPhotoCountResponse result = closetClothesQueryUseCase.getRemainingPhotoCount(member.getId());
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+	}
 }
