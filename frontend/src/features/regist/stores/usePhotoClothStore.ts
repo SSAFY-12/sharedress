@@ -6,7 +6,7 @@ export interface PhotoClothItem {
 	name: string;
 	brandId: number | null;
 	categoryId: number | null;
-	// isPublic: boolean;
+	isPublic: boolean;
 }
 
 interface PhotoClothState {

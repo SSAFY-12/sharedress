@@ -17,7 +17,6 @@ const CommentItem = ({ comment, onMoreClick, isMine }: CommentItemProps) => {
 			});
 
 			if (isNaN(date.getTime())) {
-				console.log('뭔가 이상하다');
 				return '';
 			}
 

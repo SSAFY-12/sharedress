@@ -2,23 +2,31 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface ScanState {
-	musinsa: boolean;
-	cm29: boolean;
-	setMusinsa: (musinsa: boolean) => void;
-	getMusinsa: () => boolean;
-	setCm29: (cm29: boolean) => void;
-	getCm29: () => boolean;
+	musinsa: {
+		isScan: boolean;
+		taskId: string;
+	};
+	cm29: {
+		isScan: boolean;
+		taskId: string;
+	};
+	setMusinsa: (musinsa: ScanState['musinsa']) => void;
+	setCm29: (cm29: ScanState['cm29']) => void;
 }
 
 export const useScanStore = create<ScanState>()(
 	persist(
-		(set, get) => ({
-			musinsa: false,
-			cm29: false,
-			setMusinsa: (musinsa) => set({ musinsa }),
-			getMusinsa: () => get().musinsa,
-			setCm29: (cm29: boolean) => set({ cm29 }),
-			getCm29: () => get().cm29,
+		(set) => ({
+			musinsa: {
+				isScan: false,
+				taskId: '',
+			},
+			cm29: {
+				isScan: false,
+				taskId: '',
+			},
+			setMusinsa: (musinsa: ScanState['musinsa']) => set({ musinsa }),
+			setCm29: (cm29: ScanState['cm29']) => set({ cm29 }),
 		}),
 
 		{

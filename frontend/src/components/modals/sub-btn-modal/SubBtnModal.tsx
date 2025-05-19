@@ -49,7 +49,6 @@ export const SubBtnModal = ({
 							<button
 								className='flex flex-row justify-start items-center gap-3.5 py-[4px] px-0'
 								onClick={() => {
-									console.log('옷 등록');
 									onClose();
 									navigate('/regist');
 								}}
@@ -69,7 +68,6 @@ export const SubBtnModal = ({
 								<button
 									className='flex flex-row justify-start items-center gap-3.5 py-[4px] px-0'
 									onClick={() => {
-										console.log('코디 만들기');
 										onClose();
 										navigate('/codi/edit');
 									}}
@@ -81,7 +79,6 @@ export const SubBtnModal = ({
 								<button
 									className='flex flex-row justify-start items-center gap-3.5 py-[4px] px-0'
 									onClick={() => {
-										console.log('옷 등록');
 										onClose();
 										navigate('/social/codi-request');
 									}}

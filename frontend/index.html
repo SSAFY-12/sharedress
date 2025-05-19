@@ -45,7 +45,7 @@
 								scope: '/',
 							},
 						);
-						console.log('PWA Service Worker registered:', pwaRegistration);
+						// console.log('PWA Service Worker registered:', pwaRegistration);
 
 						// FCM 서비스 워커 등록
 						const fcmRegistration = await navigator.serviceWorker.register(
@@ -54,7 +54,7 @@
 								scope: '/',
 							},
 						);
-						console.log('FCM Service Worker registered:', fcmRegistration);
+						// console.log('FCM Service Worker registered:', fcmRegistration);
 					} catch (error) {
 						console.error('Service Worker registration failed:', error);
 					}

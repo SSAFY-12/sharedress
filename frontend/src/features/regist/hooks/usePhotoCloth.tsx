@@ -20,9 +20,24 @@ const usePhotoCloth = () => {
 				throw new Error('사진 업로드 개수가 일치하지 않습니다.');
 			}
 
-			await registerClothDetails(uploaded, items);
-
-			toast.success('옷 스캔 중입니다. 완료 후에 알려드릴게요!');
+			const res = await registerClothDetails(uploaded, items);
+			console.log('res: ', res);
+			toast.success(
+				<div className='flex flex-col justify-center items-start'>
+					<div className='text-smallButton text-left'>사진 변환 중</div>
+					<div className='text-description text-left text-white'>
+						완료가 되면 알림으로 알려드릴게요
+					</div>
+				</div>,
+				{
+					autoClose: 10000,
+					icon: () => (
+						<div className='flex items-center justify-center w-7 h-7'>
+							<img src='/icons/toast_bell.png' alt='icon' />
+						</div>
+					),
+				},
+			);
 			reset();
 			navigate('/mypage');
 		} catch (error) {

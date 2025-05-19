@@ -5,7 +5,7 @@ import SocialHeader from './SocialHeader';
 import { shouldShowNav } from '@/constants/navConfig';
 import getHeaderProps from '@/utils/getHeaderProps';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SubBtnModal } from '@/components/modals/sub-btn-modal/SubBtnModal';
 import { useTokenValidation } from '@/features/auth/hooks/useTokenValidation';
 
@@ -30,6 +30,9 @@ export const MobileLayout = () => {
 		matchPath('/codi/:id/edit', location.pathname) !== null;
 	const isRegistHome = matchPath('/regist', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
+	const isMusinsaScan =
+		location.pathname.replace(/\/$/, '') === '/regist/scan/musinsa';
+	const isRegistScan = location.pathname.replace(/\/$/, '') === '/regist/scan';
 
 	/* 네비게이션 바 표시 여부 결정	*/
 	const showNav = shouldShowNav(location.pathname);
@@ -46,10 +49,6 @@ export const MobileLayout = () => {
 		}
 	};
 
-	useEffect(() => {
-		console.log(isModalOpen);
-	}, [isModalOpen]);
-
 	return (
 		<>
 			<div className='min-h-screen flex flex-col'>
@@ -64,7 +63,10 @@ export const MobileLayout = () => {
 					isCodiPublicEdit ||
 					isRegistCamera ||
 					isRegistCameraPre ||
-					isRegistHome ? null : isSocial ? (
+					isRegistHome ||
+					isRegistHome ||
+					isRegistScan ||
+					isMusinsaScan ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
@@ -82,7 +84,10 @@ export const MobileLayout = () => {
 						isCodiPublicEdit ||
 						isRegistCamera ||
 						isRegistCameraPre ||
-						isRegistHome
+						isRegistHome ||
+						isRegistHome ||
+						isRegistScan ||
+						isMusinsaScan
 							? ''
 							: 'mt-16'
 					} ${

@@ -6,4 +6,5 @@ export const useCoordinationComments = (coordinationId: number) =>
 		queryKey: ['coordinationComments', coordinationId],
 		queryFn: () => fetchCoordinationComments(coordinationId),
 		enabled: !!coordinationId,
+		retry: false,
 	});

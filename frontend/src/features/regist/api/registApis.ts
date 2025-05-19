@@ -40,6 +40,12 @@ interface UploadResponseItem {
 	image: string;
 }
 
+export interface PrivacyAgreementResponse {
+	content: {
+		privacyAgreement: boolean;
+	};
+}
+
 export const LibraryApis = {
 	// --------------------라이브러리 옷 조회------------------------
 	getClothes: async (
@@ -96,6 +102,22 @@ interface PurchaseHistoryRequest {
 
 interface PurchaseHistoryResponse {
 	status: Status;
+	content: {
+		taskId: string;
+		shopId: number;
+	};
+}
+
+export interface RegistStatusRequest {
+	taskId: string;
+	shopId: number;
+}
+
+export interface RegistStatusResponse {
+	status: Status;
+	content: {
+		completed: boolean;
+	};
 }
 
 export const ScanApis = {
@@ -109,6 +131,40 @@ export const ScanApis = {
 		);
 		return response.data;
 	},
+	// --------------------옷 등록 완료여부 조회 ----------------
+	getClothRegistrationStatus: async (
+		data: RegistStatusRequest,
+	): Promise<RegistStatusResponse> => {
+		const response = await client.get(
+			`/api/closet/clothes/purchase-history/task/${data.taskId}`,
+			{
+				params: {
+					shopId: data.shopId,
+				},
+			},
+		);
+		return response.data;
+	},
+};
+
+// 개인정보 동의 여부 조회
+export const getPrivacyAgreement = async (): Promise<boolean> => {
+	const res = await client.get<PrivacyAgreementResponse>(
+		'/api/members/privacy-agreement',
+	);
+	return res.data.content.privacyAgreement;
+};
+
+// 개인정보 동의 여부 설정
+export const setPrivacyAgreement = async (agree: boolean): Promise<boolean> => {
+	const res = await client.patch<PrivacyAgreementResponse>(
+		'/api/members/privacy-agreement',
+		{
+			privacyAgreement: agree,
+		},
+	);
+	console.log(res.data, 'res.data');
+	return res.data.content.privacyAgreement;
 };
 
 export const uploadClothPhotos = async (items: PhotoClothItem[]) => {
@@ -128,10 +184,17 @@ export const uploadClothPhotos = async (items: PhotoClothItem[]) => {
 	return response.data.content;
 };
 
+interface RegisterClothDetailsResponse {
+	status: Status;
+	content: {
+		taskId: string;
+	};
+}
+
 export const registerClothDetails = async (
 	uploaded: UploadResponseItem[],
 	items: PhotoClothItem[],
-) => {
+): Promise<RegisterClothDetailsResponse> => {
 	const body = uploaded.map((upload, index) => {
 		const item = items[index];
 		return {
@@ -140,10 +203,11 @@ export const registerClothDetails = async (
 			brandId: item.brandId ?? 0,
 			categoryId: item.categoryId ?? 0,
 			colorId: 1, // 고정
+			isPublic: item.isPublic,
 		};
 	});
 
-	await client.post('/api/closet/clothes/photos/detail', body);
+	return await client.post('/api/closet/clothes/photos/detail', body);
 };
 
 export const fetchRemainingPhotoCount = async (): Promise<number> => {

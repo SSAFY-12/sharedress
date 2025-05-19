@@ -23,7 +23,11 @@ const useFcmInitialization = () => {
 
 				if (permission === 'default') {
 					// 권한이 아직 요청되지 않은 경우
-					if ('serviceWorker' in navigator && 'Notification' in window) {
+					if (
+						'serviceWorker' in navigator &&
+						'Notification' in window &&
+						Notification.permission === 'granted'
+					) {
 						const registration = await navigator.serviceWorker.ready;
 						await registration.showNotification('알림 안내', {
 							body: '알림을 받으시려면 알림 권한을 허용해주세요.',
@@ -33,7 +37,11 @@ const useFcmInitialization = () => {
 					}
 					const token = await requestNotificationPermission();
 					if (token) {
-						if ('serviceWorker' in navigator && 'Notification' in window) {
+						if (
+							'serviceWorker' in navigator &&
+							'Notification' in window &&
+							Notification.permission === 'granted'
+						) {
 							const registration = await navigator.serviceWorker.ready;
 							await registration.showNotification('알림 안내', {
 								body: '알림 권한이 허용되었습니다!',
@@ -53,13 +61,13 @@ const useFcmInitialization = () => {
 						}
 
 						// 포그라운드 메시지 리스너 설정
-						onMessageListener()
-							.then((payload) => {
-								console.log('포그라운드 메시지 수신:', payload);
-							})
-							.catch((err) => {
-								console.error('메시지 수신 실패:', err);
-							});
+						// onMessageListener()
+						// 	.then((payload) => {
+						// 		// console.log('포그라운드 메시지 수신:', payload);
+						// 	})
+						// 	.catch((err) => {
+						// 		// console.error('메시지 수신 실패:', err);
+						// 	});
 					}
 				} else if (permission === 'granted') {
 					// 이미 권한이 허용된 경우
@@ -85,7 +93,11 @@ const useFcmInitialization = () => {
 					}
 				} else {
 					// 권한이 거부된 경우
-					if ('serviceWorker' in navigator && 'Notification' in window) {
+					if (
+						'serviceWorker' in navigator &&
+						'Notification' in window &&
+						Notification.permission === 'granted'
+					) {
 						const registration = await navigator.serviceWorker.ready;
 						await registration.showNotification('알림 안내', {
 							body: '알림 권한이 거부되었습니다. 브라우저 설정에서 알림을 허용해주세요.',
@@ -96,7 +108,11 @@ const useFcmInitialization = () => {
 				}
 			} catch (error) {
 				console.error('FCM 초기화 실패:', error);
-				if ('serviceWorker' in navigator && 'Notification' in window) {
+				if (
+					'serviceWorker' in navigator &&
+					'Notification' in window &&
+					Notification.permission === 'granted'
+				) {
 					const registration = await navigator.serviceWorker.ready;
 					await registration.showNotification('알림 오류', {
 						body: '알림 설정 중 오류가 발생했습니다.',

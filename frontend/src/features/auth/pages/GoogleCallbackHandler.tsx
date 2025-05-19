@@ -14,7 +14,7 @@ const GoogleCallbackHandler = () => {
 			try {
 				const urlHash = new URLSearchParams(window.location.hash.substring(1));
 				const accessToken = urlHash.get('access_token');
-				console.log('콜백 accessToken:', accessToken); // 디버깅용
+				// console.log('콜백 accessToken:', accessToken); // 디버깅용
 				if (!accessToken) return;
 				await mutation.mutateAsync(accessToken);
 			} catch (error) {

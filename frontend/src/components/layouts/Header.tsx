@@ -12,6 +12,7 @@ export interface HeaderProps {
 	onBadgeClick?: () => void;
 	signUp?: boolean;
 	onSignUpClick?: () => void;
+	className?: string;
 }
 
 const Header = ({
@@ -25,12 +26,15 @@ const Header = ({
 	onBadgeClick,
 	signUp,
 	onSignUpClick,
+	className,
 }: HeaderProps) => {
 	const backIcon = closet
 		? '/icons/arrow_left_white.svg'
 		: '/icons/arrow_left_black.svg';
 	return (
-		<header className='flex items-center justify-between h-16 px-4 bg-transparent'>
+		<header
+			className={`flex items-center justify-between h-16 px-4 bg-transparent ${className}`}
+		>
 			<div className='flex items-center min-w-0'>
 				{showBack && (
 					<div className='flex items-center gap-1 min-w-0'>

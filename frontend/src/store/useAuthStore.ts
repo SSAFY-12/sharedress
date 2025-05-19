@@ -18,20 +18,25 @@ export const useAuthStore = create<AuthState>()(
 			accessToken: null,
 			isGuest: false,
 			isInitialized: false,
-			setAccessToken: (token) => set({ accessToken: token }),
+			setAccessToken: (token) => {
+				set({ accessToken: token, isGuest: token ? false : true });
+			},
 			setIsGuest: (isGuest) => {
-				console.log('게스트 상태 변경:', isGuest);
-				set({ isGuest });
+				if (useAuthStore.getState().accessToken) {
+					set({ isGuest: false });
+				} else {
+					set({ isGuest });
+				}
 			},
 			clearAuth: () => {
-				console.log('인증 정보 초기화');
-				set({ accessToken: null, isGuest: false });
-				// localStorage에서 모든 관련 key 삭제
-				localStorage.removeItem('auth-store');
-				localStorage.removeItem('fcm-store');
-				localStorage.removeItem('profile-storage');
-				localStorage.removeItem('codiItems');
-				localStorage.removeItem('closet-storage');
+				// console.log('인증 정보 초기화');
+				set({ accessToken: null, isGuest: true });
+				// // localStorage에서 모든 관련 key 삭제
+				// localStorage.removeItem('auth-store');
+				// localStorage.removeItem('fcm-store');
+				// localStorage.removeItem('profile-storage');
+				// localStorage.removeItem('codiItems');
+				// localStorage.removeItem('closet-storage');
 			},
 			initializeAuth: async () => {
 				try {
@@ -40,19 +45,19 @@ export const useAuthStore = create<AuthState>()(
 					}
 
 					const hasRefreshToken = document.cookie.includes('refreshToken');
-					console.log('리프레시 토큰 존재 여부:', hasRefreshToken);
+					// console.log('리프레시 토큰 존재 여부:', hasRefreshToken);
 
 					if (hasRefreshToken) {
 						const response = await authApi.refresh();
 						if (response.content.accessToken) {
-							console.log('일반 사용자로 초기화');
+							// console.log('일반 사용자로 초기화');
 							set({
 								accessToken: response.content.accessToken,
 								isGuest: false,
 								isInitialized: true,
 							});
 						} else {
-							console.log('게스트로 초기화 (토큰 없음)');
+							// console.log('게스트로 초기화 (토큰 없음)');
 							set({
 								accessToken: null,
 								isGuest: true,
@@ -60,7 +65,7 @@ export const useAuthStore = create<AuthState>()(
 							});
 						}
 					} else {
-						console.log('게스트로 초기화 (리프레시 토큰 없음)');
+						// console.log('게스트로 초기화 (리프레시 토큰 없음)');
 						set({
 							accessToken: null,
 							isGuest: true,
@@ -68,7 +73,7 @@ export const useAuthStore = create<AuthState>()(
 						});
 					}
 				} catch (error) {
-					console.log('게스트로 초기화 (에러 발생)');
+					// console.log('게스트로 초기화 (에러 발생)');
 					set({
 						accessToken: null,
 						isGuest: true,

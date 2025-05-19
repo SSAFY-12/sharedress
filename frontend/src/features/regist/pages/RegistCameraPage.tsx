@@ -12,6 +12,7 @@ import { useDeferredValue } from 'react';
 import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore';
 import usePhotoCloth from '@/features/regist/hooks/usePhotoCloth';
 import LoadingOverlay from '@/components/etc/LoadingOverlay';
+import { SwitchToggle } from '@/components/buttons/switch-toggle';
 
 const RegistCameraPage = () => {
 	const navigate = useNavigate();
@@ -114,7 +115,7 @@ const RegistCameraPage = () => {
 						</div>
 
 						{/* 공개 여부 */}
-						{/* <div className='flex items-center justify-between pt-2'>
+						<div className='flex items-center justify-between pt-2'>
 							<span className='text-default text-regular'>
 								다른 사람에게 공개
 							</span>
@@ -124,7 +125,7 @@ const RegistCameraPage = () => {
 									updateItem(currentIndex, { isPublic: !item.isPublic })
 								}
 							/>
-						</div> */}
+						</div>
 					</div>
 				</ImageDetailView>
 			</div>

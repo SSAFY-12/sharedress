@@ -23,15 +23,11 @@ const CodiDetailPage = () => {
 	const location = useLocation();
 	const { id } = useParams();
 	const isMe = location.state?.isMe ?? false;
-	console.log('isMe:', isMe);
 	const source = location.state?.source ?? 'my';
-	console.log('source:', source);
 	const ownerId = location.state?.ownerId ?? 0;
 	const isGuest = useAuthStore((state) => state.isGuest);
 
 	const coordinationId = Number(id);
-
-	console.log(coordinationId);
 
 	const {
 		data: coordination,
@@ -206,11 +202,9 @@ const CodiDetailPage = () => {
 	const toRelativeTime = (dateString: string) => {
 		try {
 			if (!dateString) return '';
-			console.log(dateString);
 			const sanitized = sanitizeISOString(dateString);
 			const utcDate = parseISO(sanitized);
 			const kstDate = toZonedTime(utcDate, 'Asia/Seoul');
-			console.log(kstDate);
 
 			if (isNaN(kstDate.getTime())) return '';
 
@@ -231,8 +225,6 @@ const CodiDetailPage = () => {
 	const isMyCodi = coordination.creator.id === coordination.owner.id;
 	const isCodiSourceMy = source === 'my';
 
-	console.log(source);
-
 	const handleBackClick = () => {
 		if (isMe) {
 			if (source === 'my') {
@@ -240,23 +232,34 @@ const CodiDetailPage = () => {
 					state: { initialTab: '코디' },
 				});
 			} else if (source === 'friendspick') {
-				console.log('안녕!!!!!!');
 				navigate(`/mypage`, {
 					state: { initialTab: '코디', initialSubTab: 'friendspick' },
 				});
 			}
 		} else {
-			if (source === 'friends') {
-				navigate(`/friend/${ownerId}`, {
-					state: { initialTab: '코디' },
-				});
-			} else if (source === 'recommended') {
-				navigate(`/friend/${ownerId}`, {
-					state: {
-						initialTab: '코디',
-						initialSubTab: 'recommended',
-					},
-				});
+			if (isGuest) {
+				if (source === 'friends') {
+					navigate(`/link/friend/${ownerId}`, {
+						state: { initialTab: '코디' },
+					});
+				} else if (source === 'recommended') {
+					navigate(`/link/friend/${ownerId}`, {
+						state: { initialTab: '코디', initialSubTab: 'recommended' },
+					});
+				}
+			} else {
+				if (source === 'friends') {
+					navigate(`/friend/${ownerId}`, {
+						state: { initialTab: '코디' },
+					});
+				} else if (source === 'recommended') {
+					navigate(`/friend/${ownerId}`, {
+						state: {
+							initialTab: '코디',
+							initialSubTab: 'recommended',
+						},
+					});
+				}
 			}
 		}
 	};
@@ -275,8 +278,6 @@ const CodiDetailPage = () => {
 				imageUrl: coordination.creator.profileImage,
 		  }
 		: null;
-
-	console.log(item.imageUrl);
 
 	return (
 		<div className='flex flex-col h-screen bg-white w-full overflow-hidden'>

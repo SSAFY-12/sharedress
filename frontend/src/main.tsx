@@ -25,12 +25,12 @@ Sentry.init({
 	environment: import.meta.env.MODE,
 	replaysSessionSampleRate: import.meta.env.PROD ? 0.01 : 1.0,
 	replaysOnErrorSampleRate: 1.0,
-	beforeSend: (event) => {
-		if (!import.meta.env.PROD) {
-			console.log('Sentry 이벤트 전송:', event);
-		}
-		return event;
-	},
+	// beforeSend: (event) => {
+	// 	if (!import.meta.env.PROD) {
+	// 		console.log('Sentry 이벤트 전송:', event);
+	// 	}
+	// 	return event;
+	// },
 });
 
 const queryClient = new QueryClient();

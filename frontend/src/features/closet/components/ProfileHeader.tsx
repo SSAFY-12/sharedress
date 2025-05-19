@@ -1,5 +1,6 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
+import useUnreadNotification from '@/features/alert/hooks/useUnreadNotification';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ interface ProfileHeaderProps {
 	isMe?: boolean;
 	memberId?: number;
 	handleModalOpen?: () => void;
+	onExternalRequestClick?: () => void;
 }
 
 const backgroundImages = [
@@ -38,10 +40,12 @@ const ProfileHeader = ({
 	statusMessage,
 	isMe,
 	memberId,
+	onExternalRequestClick,
 }: // handleModalOpen,
 ProfileHeaderProps) => {
 	const isGuest = useAuthStore((state) => state.isGuest);
 	const navigate = useNavigate();
+	const { hasUnreadNotification } = useUnreadNotification();
 
 	const handleRecommendClick = () => {
 		if (!memberId) return;
@@ -110,7 +114,11 @@ ProfileHeaderProps) => {
 						<img src='/icons/logo_white.svg' alt='쉐어드레스' />
 						<div className='flex gap-4'>
 							<img
-								src='/icons/notification_white.svg'
+								src={
+									hasUnreadNotification
+										? '/icons/notification_unread.svg'
+										: '/icons/notification_white.svg'
+								}
 								alt='알림'
 								onClick={handleNotificationClick}
 								className='cursor-pointer'
@@ -140,9 +148,8 @@ ProfileHeaderProps) => {
 			</div>
 
 			{/* 프로필 카드 컨테이너 */}
-			{/* 얘도 따로 컴포넌트로 빼놔야 하나? */}
-			<div className='relative px-4 pb-4 pt-8'>
-				<div className='absolute left-1/2 transform -translate-x-1/2 -translate-y-1/3 z-20'>
+			<div className='relative px-4 pb-4 pt-8 z-30'>
+				<div className='absolute left-1/2 transform -translate-x-1/2 -translate-y-1/3 z-40'>
 					<div className='w-20 h-20 rounded-full overflow-hidden'>
 						<img
 							src={
@@ -155,7 +162,7 @@ ProfileHeaderProps) => {
 					</div>
 				</div>
 				{/* 프로필 카드 */}
-				<div className='bg-white/70 backdrop-blur-sm rounded-xl pt-16 pb-6 shadow-sm border-white border-2'>
+				<div className='bg-white/70 backdrop-blur-sm rounded-xl pt-16 pb-6 shadow-sm border-white border-2 relative z-30'>
 					<div className='flex flex-col items-center'>
 						<h2 className='mb-1 text-center'>
 							<span className=' text-title text-regular'>{nickname}</span>
@@ -166,12 +173,21 @@ ProfileHeaderProps) => {
 						</p>
 						<div className='w-full px-4'>
 							{isMe ? (
-								<PrimaryBtn
-									size='medium'
-									name='프로필 수정하기'
-									onClick={() => handleProfileEditClick()}
-									color='white'
-								/>
+								<div className='flex gap-2'>
+									<PrimaryBtn
+										size='double'
+										name='프로필 편집'
+										onClick={() => handleProfileEditClick()}
+										color='white'
+									/>
+									<PrimaryBtn
+										size='double'
+										name='내 옷장 공유'
+										onClick={() => onExternalRequestClick?.()}
+										color='semibrown'
+										className='z-50'
+									/>
+								</div>
 							) : (
 								<PrimaryBtn
 									size='medium'

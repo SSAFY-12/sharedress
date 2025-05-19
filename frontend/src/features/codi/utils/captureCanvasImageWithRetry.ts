@@ -7,9 +7,7 @@ export const captureCanvasImageWithRetry = async (
 ): Promise<string> => {
 	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
 		try {
-			console.log(`[캔버스 캡처 시도] ${attempt}번째`);
 			const base64 = await captureCanvasImage(element);
-			console.log('[성공] 캔버스 이미지 캡처 완료');
 			return base64;
 		} catch (error) {
 			console.warn(`[실패] ${attempt}번째 캡처 실패`, error);
