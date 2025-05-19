@@ -5,6 +5,7 @@ public record ClothesPhotoDetailRequest(
 	String name,
 	Long brandId,
 	Long categoryId,
-	Long colorId
+	Long colorId,
+	Boolean isPublic
 ) {
 }

@@ -323,6 +323,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 					.orElseThrow(ExceptionUtil.exceptionSupplier(ColorErrorCode.COLOR_NOT_FOUND))
 			);
 			closetClothes.updateCustomName(req.name());
+			closetClothes.updateIsPublic(req.isPublic());
 
 			itemsToProcess.add(
 				new AiProcessMessagePhotoRequest.ItemInfo(
