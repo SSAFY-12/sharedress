@@ -8,7 +8,6 @@ const RegistSearchPage = () => {
 	const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
 	const handleScrollToTop = () => {
-		console.log('올라가라!');
 		const scrollTarget = getScrollableParent(scrollContainerRef.current);
 		if (scrollTarget instanceof Window) {
 			window.scrollTo({ top: 0, behavior: 'smooth' });

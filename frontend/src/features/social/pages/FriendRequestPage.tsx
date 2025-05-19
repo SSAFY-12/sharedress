@@ -36,7 +36,6 @@ export const FriendRequestsPage = () => {
 	// 	});
 	// 	setActionModalOpen(true);
 	// };
-	console.log('friendRequests', friendRequests);
 	return (
 		<div className='w-full bg-white flex flex-col items-stretch'>
 			{/* 친구 요청 목록 */}

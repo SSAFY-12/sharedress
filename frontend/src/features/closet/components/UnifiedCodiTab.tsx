@@ -52,17 +52,13 @@ const UnifiedCodiTab = ({
 
 	const isGuest = useAuthStore((state) => state.isGuest);
 	const navigate = useNavigate();
-	console.log(activeSubTab);
 	const { scope, label, emptyMessage } = tabInfoMap[activeSubTab];
 
-	console.log(memberId, scope);
 	const {
 		data: coordinationList = [],
 		isLoading,
 		isFetching,
 	} = useCoordinationList(memberId, scope);
-
-	console.log(coordinationList);
 
 	const visibleCoordis = coordinationList.filter((c) => isMe || c.isPublic);
 
