@@ -75,13 +75,23 @@ const UnifiedCodiTab = ({
 	}));
 
 	const handleItemClick = (item: ClothItem) => {
-		navigate(`/codi/${item.id}`, {
-			state: {
-				isMe,
-				source: activeSubTab,
-				...(isMe ? {} : { ownerId: memberId }),
-			},
-		});
+		if (isGuest) {
+			navigate(`/link/codi/${item.id}`, {
+				state: {
+					isMe,
+					source: activeSubTab,
+					...(isMe ? {} : { ownerId: memberId }),
+				},
+			});
+		} else {
+			navigate(`/codi/${item.id}`, {
+				state: {
+					isMe,
+					source: activeSubTab,
+					...(isMe ? {} : { ownerId: memberId }),
+				},
+			});
+		}
 	};
 
 	const [randomText, setRandomText] = useState('');
