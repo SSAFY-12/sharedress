@@ -93,11 +93,11 @@ export const router = createBrowserRouter([
 				),
 			},
 			{
-				path: 'cloth/:id',
+				path: 'cloth/:id/*',
 				element: <ClothPage />,
 			},
 			{
-				path: 'codi/:id',
+				path: 'codi/:id/*',
 				element: <CodiPage />,
 			},
 			{
