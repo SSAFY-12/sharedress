@@ -88,7 +88,7 @@ const PrivacyModal = ({ isOpen, onClose, onAgree }: PrivacyModalProps) => {
 
 	return (
 		<MainModal isOpen={isOpen} onClose={handleClose}>
-			<MainModal.Header showCloseButton={true}>
+			<MainModal.Header showCloseButton={false}>
 				<h2 className='text-topHeader text-regular text-center px-5'>
 					무신사/29CM 계정 정보 활용 동의서
 				</h2>
