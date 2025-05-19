@@ -16,7 +16,6 @@ import LoadingOverlay from '@/components/etc/LoadingOverlay';
 const RegistCameraPage = () => {
 	const navigate = useNavigate();
 	const { items, currentIndex, updateItem, next } = usePhotoClothStore();
-
 	const item = items[currentIndex];
 	if (!item) return null;
 
@@ -30,7 +29,6 @@ const RegistCameraPage = () => {
 		useBrandSearch(deferredQuery);
 	const { data: categoryList = [], isLoading: isCategoryLoading } =
 		useCategoryList();
-
 	const { handleRegister, isLoading } = usePhotoCloth();
 
 	const handleNext = () => {
@@ -39,9 +37,9 @@ const RegistCameraPage = () => {
 
 	const handleBack = () => {
 		if (currentIndex === 0) {
-			navigate('/regist');
+			navigate('/regist/camera/pre');
 		} else {
-			usePhotoClothStore.getState().updateItem(currentIndex, item); // 현재 값 저장 (optional)
+			usePhotoClothStore.getState().updateItem(currentIndex, item);
 			usePhotoClothStore.setState((state) => ({
 				currentIndex: state.currentIndex - 1,
 			}));

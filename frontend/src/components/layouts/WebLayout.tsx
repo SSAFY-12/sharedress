@@ -24,6 +24,9 @@ export const WebLayout = () => {
 	const isCodiDetail = matchPath('/codi/:id', location.pathname) !== null;
 	const isRegistCamera =
 		matchPath('/regist/camera', location.pathname) !== null;
+	const isRegistCameraPre =
+		matchPath('/regist/camera/pre', location.pathname) !== null;
+	const isRegistHome = matchPath('/regist', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 	const navigate = useNavigate();
 
@@ -53,7 +56,9 @@ export const WebLayout = () => {
 				isClothDetail ||
 				isCodiPublicEdit ||
 				isCodiDetail ||
-				isRegistCamera ? null : isSocial ? (
+				isRegistCamera ||
+				isRegistCameraPre ||
+				isRegistHome ? null : isSocial ? (
 					<SocialHeader />
 				) : (
 					<Header {...headerProps} onBackClick={onBackClick} />
@@ -70,7 +75,9 @@ export const WebLayout = () => {
 					isClothDetail ||
 					isCodiPublicEdit ||
 					isCodiDetail ||
-					isRegistCamera
+					isRegistCamera ||
+					isRegistCameraPre ||
+					isRegistHome
 						? ''
 						: 'mt-16'
 				} ${showNav ? '' : 'mb-0'} h-full flex flex-col overflow-y-auto`}

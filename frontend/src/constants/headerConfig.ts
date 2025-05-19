@@ -29,12 +29,6 @@ export const headerConfig: HeaderConfig = {
 		showBack: true,
 		subtitle: '친구 요청 목록',
 	},
-	'/regist': {
-		showBack: true,
-		subtitle: '옷 등록하기',
-		badgeText: '',
-	},
-
 	'/regist/scan': {
 		showBack: true,
 		subtitle: '구매내역 스캔',

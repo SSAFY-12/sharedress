@@ -24,8 +24,11 @@ export const MobileLayout = () => {
 	const isCodiDetail = matchPath('/codi/:id', location.pathname) !== null;
 	const isRegistCamera =
 		matchPath('/regist/camera', location.pathname) !== null;
+	const isRegistCameraPre =
+		matchPath('/regist/camera/pre', location.pathname) !== null;
 	const isCodiPublicEdit =
 		matchPath('/codi/:id/edit', location.pathname) !== null;
+	const isRegistHome = matchPath('/regist', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 
 	/* 네비게이션 바 표시 여부 결정	*/
@@ -59,7 +62,9 @@ export const MobileLayout = () => {
 					isClothDetail ||
 					isCodiDetail ||
 					isCodiPublicEdit ||
-					isRegistCamera ? null : isSocial ? (
+					isRegistCamera ||
+					isRegistCameraPre ||
+					isRegistHome ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
@@ -75,7 +80,9 @@ export const MobileLayout = () => {
 						isClothDetail ||
 						isCodiDetail ||
 						isCodiPublicEdit ||
-						isRegistCamera
+						isRegistCamera ||
+						isRegistCameraPre ||
+						isRegistHome
 							? ''
 							: 'mt-16'
 					} ${

@@ -22,9 +22,9 @@ const usePhotoCloth = () => {
 
 			await registerClothDetails(uploaded, items);
 
-			toast.success('옷 등록 완료!');
+			toast.success('옷 스캔 중입니다. 완료 후에 알려드릴게요!');
 			reset();
-			navigate('/closet');
+			navigate('/mypage');
 		} catch (error) {
 			console.error('등록 실패:', error);
 			toast.error('등록 중 문제가 발생했어요!');

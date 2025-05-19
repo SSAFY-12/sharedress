@@ -145,3 +145,11 @@ export const registerClothDetails = async (
 
 	await client.post('/api/closet/clothes/photos/detail', body);
 };
+
+export const fetchRemainingPhotoCount = async (): Promise<number> => {
+	const res = await client.get<{ content: { remainingCount: number } }>(
+		'/api/closet/clothes/photos/remaining-count',
+	);
+	console.log('데이터: ', res);
+	return res.data.content.remainingCount;
+};
