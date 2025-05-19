@@ -84,9 +84,7 @@ client.interceptors.response.use(
 				// 코디/옷 상세 API는 게스트 사용자도 접근 가능하도록 처리
 				if (
 					originalRequest.url?.includes('/coordinations') ||
-					originalRequest.url?.includes('/closet/clothes') ||
-					originalRequest.url?.includes('/codi') ||
-					originalRequest.url?.includes('/cloth')
+					originalRequest.url?.includes('/closet/clothes')
 				) {
 					console.log(
 						'게스트 사용자 코디/옷 상세 API 호출:',
