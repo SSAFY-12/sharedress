@@ -86,7 +86,7 @@ public class MemberPersistenceAdapter implements MemberRepository {
 			.where(
 				mem.nickname.containsIgnoreCase(keyword),
 				mem.id.ne(myId),
-				mem.id.ne(-1L),
+				mem.id.gt(0L),
 				cursorId != null ? mem.id.lt(cursorId) : null
 			)
 			.orderBy(mem.id.desc()) // 최신순

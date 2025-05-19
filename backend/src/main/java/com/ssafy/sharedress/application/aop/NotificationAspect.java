@@ -51,10 +51,14 @@ public class NotificationAspect {
 				UserContext sender = (UserContext)args[0];
 				Long receiverId = (Long)args[1];
 				if (sender.isGuest()) {
-					return;
+					notificationUseCase.sendCoordinationRecommendNotification(
+						-2L,
+						receiverId,
+						"코디를 추천했어요!"
+					);
+				} else {
+					notificationUseCase.sendCoordinationRecommendNotification(sender.getId(), receiverId, "코디를 추천했어요!");
 				}
-				// TODO: 코디 추천 시 알림 문구 논의 필요
-				notificationUseCase.sendCoordinationRecommendNotification(sender.getId(), receiverId, "코디를 추천했어요!");
 			}
 			case COORDINATION_COPY -> {
 				Long coordinationId = (Long)args[1];
