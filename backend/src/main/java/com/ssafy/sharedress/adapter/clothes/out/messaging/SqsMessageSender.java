@@ -23,8 +23,11 @@ public class SqsMessageSender {
 	private final SqsTemplate sqsTemplate;
 	private final ObjectMapper objectMapper;
 
-	@Value("${cloud.aws.sqs.url}")
-	private String queueUrl;
+	@Value("${cloud.aws.sqs.queues.ai-processing.url}")
+	private String aiProcessingQueueUrl;
+
+	@Value("${cloud.aws.sqs.queues.ai-photo.url}")
+	private String aiPhotoQueueUrl;
 
 	public void send(AiProcessMessagePurchaseRequest message) {
 		try {
@@ -33,7 +36,7 @@ public class SqsMessageSender {
 			String deduplicationId = UUID.randomUUID().toString();
 
 			SendResult<String> sendResult = sqsTemplate.send(to -> to
-				.queue(queueUrl)
+				.queue(aiProcessingQueueUrl)
 				.payload(json)
 				.header("MessageGroupId", "default") // FIFO 큐의 메시지 그룹 ID
 				.header("MessageDeduplicationId", deduplicationId)
@@ -56,7 +59,7 @@ public class SqsMessageSender {
 			String deduplicationId = UUID.randomUUID().toString();
 
 			SendResult<String> sendResult = sqsTemplate.send(to -> to
-				.queue(queueUrl) // TODO[지윤]: photo 처리용 큐로 url 변경
+				.queue(aiPhotoQueueUrl)
 				.payload(json)
 				.header("MessageGroupId", "default") // FIFO 큐의 메시지 그룹 ID
 				.header("MessageDeduplicationId", deduplicationId)
