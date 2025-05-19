@@ -31,14 +31,16 @@ class CategoryClassifier:
         'Jacket': 2, 'Coat': 2, 'Blazer': 2, 'Cardigan': 2, 'Parka': 2,
         'Windbreaker': 2, 'Poncho': 2, 'Suit': 2,
         # bottoms
-        'Jeans': 3, 'Shorts': 3, 'Pants': 3, 'Skirt': 3, 'Leggings': 3,
+        'Jeans': 3, 'Shorts': 3, 'Pants': 3, 'Leggings': 3,
         'Joggers': 3, 'Trousers': 3, 'Sweatpants': 3,
         # shoes
         'Shoes': 4, 'Sneakers': 4, 'Boots': 4, 'Sandals': 4, 'Loafers': 4,
         'Flats': 4, 'Heels': 4, 'Slippers': 4,
         # etc → accessories
         'Bag': 5, 'Backpack': 5, 'Belt': 5, 'Wallet': 5, 'Hat': 5,
-        'Scarf': 5, 'Sunglasses': 5, 'Watch': 5, 'Jewelry': 5
+        'Scarf': 5, 'Sunglasses': 5, 'Watch': 5, 'Jewelry': 5,
+        # 원피스/스커트 카테고리 추가
+        'Dress': 6, 'Skirt': 6, 'One Piece': 6, 'Jumpsuit': 6, 'Romper': 6
     }
 
     _DB_CATEGORIES: Dict[int, str] = {
@@ -46,7 +48,8 @@ class CategoryClassifier:
         2: "아우터",
         3: "하의",
         4: "신발",
-        5: "악세사리"
+        5: "악세사리",
+        6: "원피스/스커트"  # 새 카테고리 추가
     }
 
     # ──────────────────────────────────────────

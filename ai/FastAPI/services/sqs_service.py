@@ -60,9 +60,28 @@ class SQSService:
             message_id = message.get('MessageId', '')
             receipt_handle = message.get('ReceiptHandle', '')
 
-            # Determine message type based on the contents
-            if 'memberId' in body and 'items' in body:
-                # This is a purchase history request
+            # 디버깅: 원본 메시지 내용 로깅
+            logger.info(f"Raw message body: {body}")
+
+            # 메시지 타입 결정 (기존 + 사진 처리 추가)
+            if 'taskId' in body and 'closetClothesId' in str(body):
+                # 이것은 사진 처리 요청입니다
+                # 디버깅: 항목 확인
+                for i, item in enumerate(body.get('items', [])):
+                    logger.info(f"Photo message item {i}: closetClothesId={item.get('closetClothesId')}, categoryId={item.get('categoryId', 'MISSING')}")
+
+                return {
+                    'message_id': message_id,
+                    'receipt_handle': receipt_handle,
+                    'message_type': 'photo',
+                    'data': {
+                        'taskId': body.get('taskId', ''),
+                        'memberId': body.get('memberId', 0),
+                        'items': body.get('items', [])
+                    }
+                }
+            elif 'memberId' in body and 'items' in body:
+                # 이것은 구매 이력 요청입니다
                 return {
                     'message_id': message_id,
                     'receipt_handle': receipt_handle,
@@ -71,12 +90,12 @@ class SQSService:
                         'memberId': body.get('memberId'),
                         'fcmToken': body.get('fcmToken', ''),
                         'items': body.get('items', []),
-                        'taskId': body.get('taskId', ''),  # 새로 추가
-                        'isLast': body.get('isLast', True)  # 새로 추가, 기본값은 True
+                        'taskId': body.get('taskId', ''),
+                        'isLast': body.get('isLast', True)
                     }
                 }
             else:
-                # Standard product URL request
+                # 표준 상품 URL 요청
                 url = body.get('url', '')
                 desired_color = body.get('desired_color', None)
 

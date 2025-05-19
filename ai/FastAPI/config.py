@@ -32,3 +32,4 @@ DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB
 
 API_DOMAIN   = os.getenv("API_DOMAIN", "https://www.sharedress.co.kr")
 AI_COMPLETE  = f"{API_DOMAIN}/api/clothes/ai-complete"
+PHOTO_SQS_QUEUE_URL = os.getenv("PHOTO_SQS_QUEUE_URL", "https://sqs.ap-northeast-2.amazonaws.com/273354621375/ai-photo.fifo")

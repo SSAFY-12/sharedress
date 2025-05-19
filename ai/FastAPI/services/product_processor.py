@@ -70,7 +70,7 @@ class ProductProcessor:
 
             if cat_txt in ["악세사리", "악세서리","액세서리","액세사리"]:
                 cat_txt = "악세사리"
-            valid_categories = ["상의", "하의", "아우터", "신발", "악세사리"]
+            valid_categories = ["상의", "하의", "아우터", "신발", "악세사리", "원피스/스커트"]
 
             if cat_txt not in valid_categories:
                 logger.warning(f"카테고리 '{cat_txt}' 지원하지 않음. 처리 중단: {url}")
@@ -95,7 +95,7 @@ class ProductProcessor:
             logger.info("색상: %s (ID %s, HEX %s)", cname, cid, chex)
 
             # 3) 카테고리 → ID
-            cat_map = {"상의":1,"아우터":2,"하의":3,"신발":4,"악세사리":5}
+            cat_map = {"상의":1,"아우터":2,"하의":3,"신발":4,"악세사리":5,"원피스/스커트":6}
             cat_id  = cat_map.get(cat_txt, 1)
 
             # 4) S3 업로드

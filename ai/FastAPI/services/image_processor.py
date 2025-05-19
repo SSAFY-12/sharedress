@@ -110,11 +110,19 @@ class ImageProcessor:
             # 다른 형식(numpy 등)은 필요에 따라 처리 추가
             return None
 
+        # 파일명에서 슬래시를 언더스코어로 대체
+        safe_filename = filename.replace('/', '_').replace('\\', '_')
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_path = os.path.join(self.log_dir, f"{timestamp}_{filename}")
-        img_pil.save(log_path)
-        logger.info(f"이미지 로그 저장됨: {log_path}")
-        return log_path
+        log_path = os.path.join(self.log_dir, f"{timestamp}_{safe_filename}")
+
+        try:
+            img_pil.save(log_path)
+            logger.info(f"이미지 로그 저장됨: {log_path}")
+            return log_path
+        except Exception as e:
+            logger.warning(f"이미지 로깅 실패: {e}")
+            return None
 
     @staticmethod
     def remove_background(buf: BytesIO) -> BytesIO:

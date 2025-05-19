@@ -6,12 +6,14 @@ from contextlib import asynccontextmanager
 from pyngrok import ngrok
 import os
 
-from config import WORKER_CONCURRENCY
+from config import WORKER_CONCURRENCY, SQS_QUEUE_URL, PHOTO_SQS_QUEUE_URL
 from services.sqs_service import SQSService
 from services.product_processor import ProductProcessor
 from services.purchase_processor import PurchaseProcessor
+from services.photo_processor import PhotoProcessor
 from services.notification_service import NotificationService
 from models.purchase_dto import PurchaseItem
+from models.photo_dto import PhotoItem
 
 # Configure logging
 logging.basicConfig(
@@ -24,11 +26,16 @@ logger = logging.getLogger(__name__)
 sqs_service = SQSService()
 notification_service = NotificationService()
 
+# 사진 전용 SQS 서비스 초기화
+photo_sqs_service = SQSService()
+photo_sqs_service.queue_url = PHOTO_SQS_QUEUE_URL
+
 # Queue for worker tasks
 message_queue = asyncio.Queue()
 
 # Task tracking dict - keeps track of results for each taskId
 task_results = {}
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Initialize database
@@ -77,7 +84,7 @@ async def sqs_poller():
 
     while True:
         try:
-            # Poll for messages
+            # 일반 SQS 폴링
             messages = sqs_service.receive_messages(max_messages=WORKER_CONCURRENCY)
 
             if messages:
@@ -90,8 +97,21 @@ async def sqs_poller():
                         logger.info(f"Parsed message type: {parsed_message['message_type']}")
                         await message_queue.put((parsed_message, message['ReceiptHandle']))
 
+            # 사진 SQS 폴링 (새로 추가)
+            photo_messages = photo_sqs_service.receive_messages(max_messages=WORKER_CONCURRENCY)
+
+            if photo_messages:
+                logger.info(f"Received {len(photo_messages)} photo messages from SQS")
+
+                # 메시지 큐에 추가
+                for message in photo_messages:
+                    parsed_message = photo_sqs_service.parse_message(message)
+                    if parsed_message:
+                        logger.info(f"Parsed photo message: {parsed_message['message_type']}")
+                        await message_queue.put((parsed_message, message['ReceiptHandle']))
+
             # Wait a bit before polling again if no messages
-            if not messages:
+            if not messages and not photo_messages:
                 await asyncio.sleep(5)
 
         except asyncio.CancelledError:
@@ -100,6 +120,7 @@ async def sqs_poller():
         except Exception as e:
             logger.error(f"Error in SQS poller: {e}")
             await asyncio.sleep(5)  # Wait before retrying
+
 async def message_worker(worker_id):
     """Worker to process messages from the queue"""
     logger.info(f"Starting worker {worker_id}")
@@ -111,8 +132,57 @@ async def message_worker(worker_id):
 
             logger.info(f"Worker {worker_id} processing message: {message_data['message_id']}")
 
+            notification_success = False  # 기본값 설정
+
             # Determine message type and process accordingly
-            if message_data['message_type'] == 'purchase':
+            if message_data['message_type'] == 'photo':
+                # 사진 처리 로직
+                photo_data = message_data['data']
+                member_id = photo_data['memberId']
+                task_id = photo_data['taskId']
+
+                # 디버깅: 항목 정보 로깅
+                logger.info(f"Photo data items before conversion: {photo_data['items']}")
+
+                items = []
+                for item_data in photo_data['items']:
+                    # 각 항목을 로깅하고 변환
+                    logger.info(f"Processing item: {item_data}")
+
+                    # categoryId가 있는지 확인하고 기본값 설정
+                    closet_clothes_id = item_data.get('closetClothesId')
+                    s3_url = item_data.get('s3Url')
+                    category_id = item_data.get('categoryId')
+
+                    if category_id is None:
+                        logger.warning(f"Missing categoryId for item {closet_clothes_id}, using default value 1")
+                        category_id = 1  # 없으면 기본값 1(상의)
+
+                    item = PhotoItem(
+                        closetClothesId=closet_clothes_id,
+                        s3Url=s3_url,
+                        categoryId=category_id
+                    )
+                    items.append(item)
+                    logger.info(f"Created PhotoItem: closetClothesId={item.closetClothesId}, categoryId={item.categoryId}")
+
+                # 사진 처리
+                processor = PhotoProcessor()
+                results = await processor.process_photo(
+                    member_id=member_id,
+                    items=items,
+                    message_id=task_id
+                )
+
+                # 알림 전송 로직 추가
+                try:
+                    notification_success = await notification_service.send_completion_notification(results, task_id)
+                    logger.info(f"Sent photo completion notification for task {task_id} ({len(results)} items)")
+                except Exception as e:
+                    logger.error(f"Failed to send photo notification: {e}")
+                    notification_success = False  # 에러 발생 시 실패로 처리
+
+            elif message_data['message_type'] == 'purchase':
                 # Process purchase history
                 purchase_data = message_data['data']
                 member_id = purchase_data['memberId']
@@ -125,12 +195,12 @@ async def message_worker(worker_id):
 
                 logger.info(f"Processing purchase for member {member_id} with {len(items)} items (taskId: {task_id}, isLast: {is_last})")
 
-                # Process purchase items
+                # Process purchase items - task_id를 message_id로 전달
                 processor = PurchaseProcessor()
                 results = await processor.process_purchase(
                     member_id=member_id,
                     items=items,
-                    message_id=message_data['message_id']
+                    message_id=task_id  # 변경: message_id 대신 task_id 전달
                 )
 
                 # taskId가 있는 경우의 처리 로직 추가
@@ -142,7 +212,8 @@ async def message_worker(worker_id):
                     # isLast가 true인 경우에만 알림 전송
                     if is_last:
                         all_results = task_results[task_id]
-                        notification_success = await notification_service.send_completion_notification(all_results)
+                        # task_id 직접 전달
+                        notification_success = await notification_service.send_completion_notification(all_results, task_id)
                         logger.info(f"Sent completion notification for task {task_id} ({len(all_results)} items)")
 
                         # 작업 완료 후 결과 정리
@@ -155,7 +226,7 @@ async def message_worker(worker_id):
                     notification_success = await notification_service.send_completion_notification(results)
 
             else:
-                # Process standard product URL request (일반 상품 URL 처리 - 변경 없음)
+                # Process standard product URL request
                 product_data = message_data['data']
                 processor = ProductProcessor()
                 result = await processor.process_product(
@@ -167,9 +238,13 @@ async def message_worker(worker_id):
                 # Send completion notification
                 notification_success = await notification_service.send_completion_notification(result)
 
-            # 항상 SQS에서 메시지를 삭제하려고 시도
+            # SQS에서 메시지 삭제
             try:
-                sqs_service.delete_message(receipt_handle)
+                if message_data['message_type'] == 'photo':
+                    photo_sqs_service.delete_message(receipt_handle)
+                else:
+                    sqs_service.delete_message(receipt_handle)
+
                 if notification_success:
                     logger.info(f"Worker {worker_id} completed message: {message_data['message_id']}")
                 else:
