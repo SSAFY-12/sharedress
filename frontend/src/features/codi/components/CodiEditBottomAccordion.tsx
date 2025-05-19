@@ -29,9 +29,7 @@ const CodiEditBottomAccordion = ({
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as HTMLElement;
-			console.log(target);
 			const isInside = containerRef.current?.contains(target);
-			console.log(isInside);
 
 			if (!isInside) {
 				setIsExpanded(false);

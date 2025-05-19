@@ -46,8 +46,6 @@ const MyClosetPage = () => {
 		setIsRequestModalOpen(true);
 	};
 
-	console.log('activeSubTab:', activeSubTab);
-
 	useEffect(() => {
 		if (initialTab === '코디') {
 			setActiveSubTab(initialSubTab);

@@ -45,7 +45,6 @@ const FriendClosetPage = () => {
 	// 모달여는 함수
 	const handleModalOpen = () => {
 		setIsModalOpen(true);
-		console.log('모달 열림');
 	};
 
 	useEffect(() => {

@@ -5,7 +5,7 @@ import SocialHeader from './SocialHeader';
 import { shouldShowNav } from '@/constants/navConfig';
 import getHeaderProps from '@/utils/getHeaderProps';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SubBtnModal } from '@/components/modals/sub-btn-modal/SubBtnModal';
 import { useTokenValidation } from '@/features/auth/hooks/useTokenValidation';
 
@@ -42,10 +42,6 @@ export const MobileLayout = () => {
 			navigate('/');
 		}
 	};
-
-	useEffect(() => {
-		console.log(isModalOpen);
-	}, [isModalOpen]);
 
 	return (
 		<>

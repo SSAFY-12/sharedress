@@ -17,11 +17,11 @@ export const useTokenValidation = () => {
 	// 토큰 갱신 함수
 	const handleTokenRefresh = useCallback(async () => {
 		try {
-			const response = await refreshAsync();
-			console.log('✅ 토큰 갱신 성공:', {
-				새토큰: !!response.content.accessToken,
-				시간: new Date().toLocaleString('ko-KR'),
-			});
+			await refreshAsync();
+			// console.log('✅ 토큰 갱신 성공:', {
+			// 	새토큰: !!response.content.accessToken,
+			// 	시간: new Date().toLocaleString('ko-KR'),
+			// });
 			return true;
 		} catch (error) {
 			console.error('❌ 토큰 갱신 실패:', error);
@@ -36,28 +36,28 @@ export const useTokenValidation = () => {
 	const validateToken = useCallback(async () => {
 		// 게스트인 경우 토큰 검증 완전히 건너뛰기
 		if (isGuest) {
-			console.log('게스트 사용자, 토큰 검증 스킵');
+			// console.log('게스트 사용자, 토큰 검증 스킵');
 			return true;
 		}
 
 		const currentToken = useAuthStore.getState().accessToken;
 
 		if (!currentToken) {
-			console.log('⚠️ 액세스 토큰 없음');
+			// console.log('⚠️ 액세스 토큰 없음');
 			navigate('/auth', { replace: true });
 			return false;
 		}
 
 		const expirationTime = getTokenExpiration(currentToken);
-		console.log('⏰ 토큰 만료 시간:', {
-			만료시간: expirationTime
-				? new Date(expirationTime * 1000).toLocaleString('ko-KR')
-				: '없음',
-			현재시간: new Date().toLocaleString('ko-KR'),
-		});
+		// console.log('⏰ 토큰 만료 시간:', {
+		// 	만료시간: expirationTime
+		// 		? new Date(expirationTime * 1000).toLocaleString('ko-KR')
+		// 		: '없음',
+		// 	현재시간: new Date().toLocaleString('ko-KR'),
+		// });
 
 		if (!expirationTime) {
-			console.log('⚠️ 토큰 만료 시간 없음');
+			// console.log('⚠️ 토큰 만료 시간 없음');
 			navigate('/auth', { replace: true });
 			return false;
 		}
@@ -65,10 +65,10 @@ export const useTokenValidation = () => {
 		const currentTime = Date.now() / 1000;
 		const timeUntilExpiration = (expirationTime - currentTime) * 1000;
 
-		console.log('⏳ 토큰 만료까지 남은 시간:', {
-			남은시간: Math.floor(timeUntilExpiration / 1000 / 60) + '분',
-			버퍼시간: Math.floor(TOKEN_EXPIRATION_BUFFER / 1000 / 60) + '분',
-		});
+		// console.log('⏳ 토큰 만료까지 남은 시간:', {
+		// 	남은시간: Math.floor(timeUntilExpiration / 1000 / 60) + '분',
+		// 	버퍼시간: Math.floor(TOKEN_EXPIRATION_BUFFER / 1000 / 60) + '분',
+		// });
 
 		if (timeUntilExpiration <= TOKEN_EXPIRATION_BUFFER) {
 			return await handleTokenRefresh();

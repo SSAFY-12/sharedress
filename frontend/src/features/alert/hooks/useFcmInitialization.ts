@@ -61,13 +61,13 @@ const useFcmInitialization = () => {
 						}
 
 						// 포그라운드 메시지 리스너 설정
-						onMessageListener()
-							.then((payload) => {
-								console.log('포그라운드 메시지 수신:', payload);
-							})
-							.catch((err) => {
-								console.error('메시지 수신 실패:', err);
-							});
+						// onMessageListener()
+						// 	.then((payload) => {
+						// 		// console.log('포그라운드 메시지 수신:', payload);
+						// 	})
+						// 	.catch((err) => {
+						// 		// console.error('메시지 수신 실패:', err);
+						// 	});
 					}
 				} else if (permission === 'granted') {
 					// 이미 권한이 허용된 경우

@@ -24,14 +24,13 @@ export const requestNotificationPermission = async () => {
 			});
 
 			// 토큰을 서버에 저장하는 로직 추가
-			console.log('FCM Token:', token);
+			// console.log('FCM Token:', token);
 			return token;
 		} else {
-			console.log('알림 권한이 거부되었습니다.');
 			return null;
 		}
 	} catch (error) {
-		console.error('FCM 토큰 요청 중 오류 발생:', error);
+		// console.error('FCM 토큰 요청 중 오류 발생:', error);
 		return null;
 	}
 };

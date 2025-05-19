@@ -45,7 +45,7 @@ export const useScanCloth = () => {
 			navigate('/regist/scan');
 		},
 		onError: async (error: any) => {
-			console.log(error, 'error'); // 아이디 비번 다를때 에러코드 분기처리 409 로 나옴
+			// console.log(error, 'error'); // 아이디 비번 다를때 에러코드 분기처리 409 로 나옴
 			if (error.response.data.status.code === '409') {
 				toast.error('아이디 또는 패스워드를 확인하세요');
 			} else {

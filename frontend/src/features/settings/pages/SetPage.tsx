@@ -116,13 +116,13 @@ export const SetPage = () => {
 		// 설치 프롬프트 표시
 		deferredPrompt.prompt();
 		// 사용자 응답 대기
-		const { outcome } = await deferredPrompt.userChoice;
+		await deferredPrompt.userChoice;
 		// 결과 처리
-		if (outcome === 'accepted') {
-			console.log('사용자가 앱 설치를 수락했습니다');
-		} else {
-			console.log('사용자가 앱 설치를 거부했습니다');
-		}
+		// if (outcome === 'accepted') {
+		// 	console.log('사용자가 앱 설치를 수락했습니다');
+		// } else {
+		// 	console.log('사용자가 앱 설치를 거부했습니다');
+		// }
 		// 이벤트 초기화
 		deferredPrompt = null;
 	};

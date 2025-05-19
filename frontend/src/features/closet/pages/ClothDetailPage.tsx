@@ -21,7 +21,6 @@ const ClothDetailPage = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const { data: cloth, isLoading, isError } = useClothDetail(clothId);
-	console.log(cloth);
 	const { mutate: deleteCloth } = useDeleteCloth();
 
 	const handleMenuClick = () => {
