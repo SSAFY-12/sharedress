@@ -24,9 +24,11 @@ export const MobileLayout = () => {
 	const isCodiDetail = matchPath('/codi/:id', location.pathname) !== null;
 	const isCodiPublicEdit =
 		matchPath('/codi/:id/edit', location.pathname) !== null;
+	const isRegistHome = matchPath('/regist', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 	const isMusinsaScan =
 		location.pathname.replace(/\/$/, '') === '/regist/scan/musinsa';
+	const isRegistScan = location.pathname.replace(/\/$/, '') === '/regist/scan';
 
 	/* 네비게이션 바 표시 여부 결정	*/
 	const showNav = shouldShowNav(location.pathname);
@@ -55,6 +57,8 @@ export const MobileLayout = () => {
 					isClothDetail ||
 					isCodiDetail ||
 					isCodiPublicEdit ||
+					isRegistHome ||
+					isRegistScan ||
 					isMusinsaScan ? null : isSocial ? (
 						<SocialHeader />
 					) : (
@@ -71,6 +75,8 @@ export const MobileLayout = () => {
 						isClothDetail ||
 						isCodiDetail ||
 						isCodiPublicEdit ||
+						isRegistHome ||
+						isRegistScan ||
 						isMusinsaScan
 							? ''
 							: 'mt-16'

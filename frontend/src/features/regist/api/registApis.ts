@@ -35,6 +35,12 @@ export interface LibraryRequestParams {
 	size?: number;
 }
 
+export interface PrivacyAgreementResponse {
+	content: {
+		privacyAgreement: boolean;
+	};
+}
+
 export const LibraryApis = {
 	// --------------------라이브러리 옷 조회------------------------
 	getClothes: async (
@@ -133,4 +139,24 @@ export const ScanApis = {
 		);
 		return response.data;
 	},
+};
+
+// 개인정보 동의 여부 조회
+export const getPrivacyAgreement = async (): Promise<boolean> => {
+	const res = await client.get<PrivacyAgreementResponse>(
+		'/api/members/privacy-agreement',
+	);
+	return res.data.content.privacyAgreement;
+};
+
+// 개인정보 동의 여부 설정
+export const setPrivacyAgreement = async (agree: boolean): Promise<boolean> => {
+	const res = await client.patch<PrivacyAgreementResponse>(
+		'/api/members/privacy-agreement',
+		{
+			privacyAgreement: agree,
+		},
+	);
+	console.log(res.data, 'res.data');
+	return res.data.content.privacyAgreement;
 };

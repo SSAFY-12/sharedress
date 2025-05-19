@@ -25,6 +25,8 @@ export const WebLayout = () => {
 	const headerProps = getHeaderProps(location.pathname);
 	const isMusinsaScan =
 		location.pathname.replace(/\/$/, '') === '/regist/scan/musinsa';
+	const isRegistHome = location.pathname.replace(/\/$/, '') === '/regist';
+	const isRegistScan = location.pathname.replace(/\/$/, '') === '/regist/scan';
 	const navigate = useNavigate();
 
 	/* 모달 표시 여부 결정	*/
@@ -53,7 +55,9 @@ export const WebLayout = () => {
 				isClothDetail ||
 				isCodiPublicEdit ||
 				isCodiDetail ||
-				isMusinsaScan ? null : isSocial ? (
+				isMusinsaScan ||
+				isRegistHome ||
+				isRegistScan ? null : isSocial ? (
 					<SocialHeader />
 				) : (
 					<Header {...headerProps} onBackClick={onBackClick} />
@@ -70,7 +74,9 @@ export const WebLayout = () => {
 					isClothDetail ||
 					isCodiPublicEdit ||
 					isCodiDetail ||
-					isMusinsaScan
+					isMusinsaScan ||
+					isRegistHome ||
+					isRegistScan
 						? ''
 						: 'mt-16'
 				} ${showNav ? '' : 'mb-0'} h-full flex flex-col overflow-y-auto`}
