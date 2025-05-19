@@ -17,7 +17,10 @@ import com.ssafy.sharedress.application.coordination.dto.CreateCommentRequest;
 import com.ssafy.sharedress.application.coordination.dto.UpdateCommentRequest;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationCommentQueryUseCase;
 import com.ssafy.sharedress.application.coordination.usecase.CoordinationCommentUseCase;
+import com.ssafy.sharedress.application.guest.annotation.CurrentGuest;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.domain.common.context.UserContext;
+import com.ssafy.sharedress.domain.guest.entity.Guest;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
@@ -66,11 +69,13 @@ public class CoordinationCommentController {
 	@GetMapping("/coordinations/{coordinationId}/comments")
 	public ResponseEntity<ResponseWrapper<List<CoordinationCommentResponse>>> getComments(
 		@PathVariable Long coordinationId,
-		@CurrentMember Member member
+		@CurrentMember(required = false) Member member,
+		@CurrentGuest(required = false) Guest guest
 	) {
+		UserContext userContext = new UserContext(member, guest);
 		List<CoordinationCommentResponse> result = commentQueryUseCase.getCoordinationComments(
 			coordinationId,
-			member.getId()
+			userContext.getId()
 		);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
