@@ -4,7 +4,8 @@ import { useScanStore } from '@/store/useScanStore';
 
 const RegistScanPage = () => {
 	const navigate = useNavigate();
-	const isMusinsaScanning = useScanStore((state) => state.musinsa);
+	const isMusinsaScanning = useScanStore((state) => state.musinsa.isScan);
+	console.log(isMusinsaScanning, 'isMusinsaScanning');
 
 	return (
 		<div className='flex-1 w-full h-full flex flex-col justify-start items-center py-5 px-2 gap-1'>
@@ -31,7 +32,7 @@ const RegistScanPage = () => {
 			</PlatFormBlock>
 			<div className='flex justify-start items-center gap-4 w-full relative py-2 px-2'>
 				<div className='absolute inset-0 bg-black/30 rounded-lg z-10 flex items-center justify-center'>
-					<span className='text-white text-button w-full pr-4'>
+					<span className='text-white text-button w-full pr-2'>
 						업데이트 예정
 					</span>
 				</div>
