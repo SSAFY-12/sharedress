@@ -339,16 +339,15 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			);
 		}
 
-		// TODO[지윤]: 사진용 큐 url 생성되면 새로 생성된 url 로 바꾸고 주석 해제
-		// try {
-		// 	sqsMessageSender.send(
-		// 		new AiProcessMessagePhotoRequest(taskId, memberId, itemsToProcess)
-		// 	);
-		// 	log.debug("SQS 전송 성공: taskId={}", taskId);
-		// } catch (Exception e) {
-		// 	log.error("SQS 전송 중 예외 발생: {}", e.getMessage(), e);
-		// 	throw new RuntimeException("메시지 전송 실패", e);
-		// }
+		try {
+			sqsMessageSender.send(
+				new AiProcessMessagePhotoRequest(taskId, memberId, itemsToProcess)
+			);
+			log.debug("SQS 전송 성공: taskId={}", taskId);
+		} catch (Exception e) {
+			log.error("SQS 전송 중 예외 발생: {}", e.getMessage(), e);
+			throw new RuntimeException("메시지 전송 실패", e);
+		}
 
 		return ClothesPhotoDetailResponse.from(
 			aiTaskRepository.save(aiTask)
