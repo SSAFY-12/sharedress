@@ -3,10 +3,10 @@ import { useLoginInfo } from '@/features/social/hooks/useLoginInfo';
 import CodiDetailPage from './CodiDetailPage';
 
 const CodiDetailLayoutPage = () => {
-	const useLogin = useLoginInfo();
-	console.log('useLogin', useLogin);
-	const data = getMyLoginInfo();
-	console.log('data', data);
+	useLoginInfo();
+	// console.log('useLogin', useLogin);
+	getMyLoginInfo();
+	// console.log('data', data);
 
 	return (
 		<>

@@ -3,8 +3,7 @@ import SelectRegistBlock from '@/features/regist/components/SelectRegistBlock';
 import { useGetCloth } from '@/features/regist/hooks/useGetCloth';
 
 const RegistHomePage = () => {
-	const { data } = useGetCloth();
-	console.log(data, 'data');
+	useGetCloth();
 
 	return (
 		<div className='flex-1 w-full h-full flex flex-col justify-center items-center px-4 pb-36 gap-5'>

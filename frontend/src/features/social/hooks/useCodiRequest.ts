@@ -20,7 +20,6 @@ export const useCodiRequest = (receiverId: number) => {
 			socialApi.requestFriendCodi(receiverId, message),
 		onSuccess: () => {
 			setValue('message', '');
-			console.log('코디 요청 성공');
 		},
 	});
 

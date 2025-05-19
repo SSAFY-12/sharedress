@@ -3,10 +3,10 @@ import { getMyLoginInfo } from '@/features/social/api/socialApi';
 import { useLoginInfo } from '@/features/social/hooks/useLoginInfo';
 
 const FriendClosetLayoutPage = () => {
-	const useLogin = useLoginInfo();
-	console.log('useLogin', useLogin);
-	const data = getMyLoginInfo();
-	console.log('data', data);
+	useLoginInfo();
+	// console.log('useLogin', useLogin);
+	getMyLoginInfo();
+	// console.log('data', data);
 
 	return (
 		<>

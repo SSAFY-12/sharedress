@@ -20,7 +20,6 @@ export const useScanCloth = () => {
 			return response;
 		},
 		onSuccess: async (_, data) => {
-			console.log('스캔완료');
 			if (data.shopId === 1) {
 				setMusinsa(true);
 				// 비동기적으로 5분 후 상태 변경
@@ -55,7 +54,7 @@ export const useScanCloth = () => {
 			navigate('/regist/scan');
 		},
 		onError: async (error: any) => {
-			console.log(error, 'error'); // 아이디 비번 다를때 에러코드 분기처리 409 로 나옴
+			// console.log(error, 'error'); // 아이디 비번 다를때 에러코드 분기처리 409 로 나옴
 			if (error.response.data.status.code === '409') {
 				toast.error('아이디 또는 패스워드를 확인하세요');
 			} else {

@@ -119,7 +119,6 @@ const ProfileEditPage = () => {
 								/>
 							),
 						});
-						console.log('프로필 수정이 완료되었습니다.');
 						setTimeout(() => {
 							navigate('/mypage');
 						}, 10);

@@ -239,7 +239,6 @@ export const postCopyCoordination = async (coordinationId: string) => {
 };
 
 export const deleteCloth = async (closetClothesId: number) => {
-	console.log(closetClothesId);
 	const response = await client.delete(
 		`/api/closet/clothes/${closetClothesId}`,
 	);
@@ -288,7 +287,7 @@ export const fetchRecommendedToFriend = async (memberId: number) => {
 	} catch (error) {
 		console.error('친구 추천 코디 조회 실패:', error);
 		if (axios.isAxiosError(error) && error.response?.status === 401) {
-			console.log('게스트 사용자 권한 없음');
+			// console.log('게스트 사용자 권한 없음');
 			return [];
 		}
 		throw error;
@@ -303,7 +302,6 @@ export const updateCloth = async (
 		`api/closet/clothes/${closetClothesId}`,
 		data,
 	);
-	console.log(response.data.content);
 	return response.data.content;
 };
 
