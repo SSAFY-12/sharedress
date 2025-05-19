@@ -16,7 +16,7 @@ const PlatFormBlock = ({
 	children,
 }: PlatFormBlockProps) => (
 	<div
-		className='relative flex justify-start items-center gap-4 w-full p-2 py-2'
+		className='relative flex justify-start items-center gap-4 w-full p-2 py-2 cursor-pointer'
 		onClick={onClick}
 	>
 		{children}

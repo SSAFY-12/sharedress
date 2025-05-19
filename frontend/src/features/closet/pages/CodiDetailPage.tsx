@@ -246,17 +246,29 @@ const CodiDetailPage = () => {
 				});
 			}
 		} else {
-			if (source === 'friends') {
-				navigate(`/friend/${ownerId}`, {
-					state: { initialTab: '코디' },
-				});
-			} else if (source === 'recommended') {
-				navigate(`/friend/${ownerId}`, {
-					state: {
-						initialTab: '코디',
-						initialSubTab: 'recommended',
-					},
-				});
+			if (isGuest) {
+				if (source === 'friends') {
+					navigate(`/link/friend/${ownerId}`, {
+						state: { initialTab: '코디' },
+					});
+				} else if (source === 'recommended') {
+					navigate(`/link/friend/${ownerId}`, {
+						state: { initialTab: '코디', initialSubTab: 'recommended' },
+					});
+				}
+			} else {
+				if (source === 'friends') {
+					navigate(`/friend/${ownerId}`, {
+						state: { initialTab: '코디' },
+					});
+				} else if (source === 'recommended') {
+					navigate(`/friend/${ownerId}`, {
+						state: {
+							initialTab: '코디',
+							initialSubTab: 'recommended',
+						},
+					});
+				}
 			}
 		}
 	};

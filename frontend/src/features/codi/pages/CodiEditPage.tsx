@@ -6,6 +6,8 @@ import CodiEditBottomSection from '@/features/codi/components/CodiEditBottomSect
 import { useProfileStore } from '@/store/useProfileStore';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { toast } from 'react-toastify';
+import { ClosetResponse } from '@/features/closet/api/closetApi';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // [코디 만들기/수정 페이지]
 // - 사용자가 옷을 조합해서 코디를 만듦
@@ -42,13 +44,19 @@ const CodiEditPage = () => {
 			? targetMemberId
 			: useProfileStore((state) => state.getMyId()) ?? 0;
 
+	const isGuest = useAuthStore((state) => state.isGuest);
+
 	// 카테고리 상태
 	const [activeCategory, setActiveCategory] = useState('all');
 	const categoryId =
 		activeCategory === 'all' ? undefined : Number(activeCategory);
 
 	// 옷장 데이터 조회
-	const { data: products } = useCloset(memberId, categoryId);
+	const {
+		data: products,
+		isFetchingNextPage,
+		fetchNextPage,
+	} = useCloset(memberId, categoryId);
 
 	// 코디에 올려진 아이템들 상태
 	const [canvasItems, setCanvasItems] = useState<any[]>([]);
@@ -107,8 +115,15 @@ const CodiEditPage = () => {
 	}, []);
 
 	const handleBackClick = () => {
-		if (window.history.length > 1) navigate(-1);
-		else navigate('/');
+		if (mode === 'my') {
+			navigate('/mypage');
+		} else {
+			if (isGuest) {
+				navigate(`/link/friend/${targetMemberId}`);
+			} else {
+				navigate(`/friend/${targetMemberId}`);
+			}
+		}
 	};
 
 	const handleNextClick = () => {
@@ -118,9 +133,15 @@ const CodiEditPage = () => {
 		}
 		localStorage.setItem('codiItems', JSON.stringify(canvasItems));
 		if (mode === 'recommended') {
-			navigate('/codi/save', {
-				state: { mode: 'recommended', targetMemberId: targetMemberId },
-			});
+			if (isGuest) {
+				navigate('/link/codi/save', {
+					state: { mode: 'recommended', targetMemberId: targetMemberId },
+				});
+			} else {
+				navigate('/codi/save', {
+					state: { mode: 'recommended', targetMemberId: targetMemberId },
+				});
+			}
 		} else {
 			navigate('/codi/save', { state: { mode: 'my' } });
 		}
@@ -172,7 +193,9 @@ const CodiEditPage = () => {
 							categories={CATEGORIES}
 							activeCategory={activeCategory}
 							filteredProducts={(
-								products?.pages.flatMap((page) => page.content) || []
+								products?.pages.flatMap(
+									(page: ClosetResponse) => page.content,
+								) || []
 							)
 								.filter((item) => {
 									if (mode === 'recommended') return item.isPublic;
@@ -193,6 +216,11 @@ const CodiEditPage = () => {
 								}))}
 							onCategoryChange={(category) => setActiveCategory(category)}
 							onItemClick={addItemToCanvas}
+							hasNextPage={
+								!!products?.pages[products.pages.length - 1]?.pagination.cursor
+							}
+							isFetchingNextPage={isFetchingNextPage}
+							fetchNextPage={fetchNextPage}
 						/>
 					</div>
 				</div>
@@ -217,7 +245,9 @@ const CodiEditPage = () => {
 							categories={CATEGORIES}
 							activeCategory={activeCategory}
 							filteredProducts={(
-								products?.pages.flatMap((page) => page.content) || []
+								products?.pages.flatMap(
+									(page: ClosetResponse) => page.content,
+								) || []
 							)
 								.filter((item) => {
 									if (mode === 'recommended') return item.isPublic;
@@ -238,6 +268,11 @@ const CodiEditPage = () => {
 								}))}
 							onCategoryChange={(category) => setActiveCategory(category)}
 							onItemClick={addItemToCanvas}
+							hasNextPage={
+								!!products?.pages[products.pages.length - 1]?.pagination.cursor
+							}
+							isFetchingNextPage={isFetchingNextPage}
+							fetchNextPage={fetchNextPage}
 						/>
 					</div>
 				</div>

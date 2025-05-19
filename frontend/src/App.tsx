@@ -11,8 +11,11 @@ import { useNavigate } from 'react-router-dom';
 import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
 import PolingProvider from '@/components/poling/PolingProvider';
 import { useScanStore } from '@/store/useScanStore';
+import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 
 export const App = () => {
+	useFcmInitialization();
+
 	const initializeAuth = useAuthStore((state) => state.initializeAuth);
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const [isLoading, setIsLoading] = useState(true);
@@ -35,10 +38,6 @@ export const App = () => {
 	// 		useTokenValidation();
 	// 	}
 	// }, [isPublicRoute]);
-
-	useEffect(() => {
-		console.log('FCM Token:', useFcmStore.getState().token);
-	}, []);
 
 	useEffect(() => {
 		const hideFcmAlert = localStorage.getItem('hideFcmAlert');

@@ -8,6 +8,7 @@ import ItemCategoryBar from '@/components/etc/ItemCategoryBar';
 import { categoryConfig } from '@/constants/categoryConfig';
 import UnifiedCodiTab from '@/features/closet/components/UnifiedCodiTab';
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
+import { ExternalShareModal } from '@/features/social/components/ExternalShareModal';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [
@@ -37,6 +38,14 @@ const MyClosetPage = () => {
 		initialSubTab,
 	);
 
+	// 모달 state 관리
+	const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
+	// 외부 코디 요청 모달
+	const handleExternalRequestClick = () => {
+		setIsRequestModalOpen(true);
+	};
+
 	console.log('activeSubTab:', activeSubTab);
 
 	useEffect(() => {
@@ -62,6 +71,7 @@ const MyClosetPage = () => {
 					code={profile?.code}
 					statusMessage={profile?.oneLiner}
 					isMe={true}
+					onExternalRequestClick={handleExternalRequestClick}
 				/>
 				{/* 자연스러운 그라데이션 효과 */}
 				<div
@@ -128,6 +138,13 @@ const MyClosetPage = () => {
 					<CodiTab memberId={profile?.id ?? 0} />
 				)}
 			</div> */}
+
+			{isRequestModalOpen && (
+				<ExternalShareModal
+					isOpen={isRequestModalOpen}
+					onClose={() => setIsRequestModalOpen(false)}
+				/>
+			)}
 		</div>
 	);
 };

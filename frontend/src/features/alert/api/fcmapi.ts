@@ -25,4 +25,14 @@ const fcmApi = {
 	},
 };
 
+const AlertApi = {
+	getUnreadNotificationStatus: async (): Promise<{
+		hasUnreadNotification: boolean;
+	}> => {
+		const response = await client.get('/api/notifications/unread');
+		return response.data.content;
+	},
+};
+
+export { AlertApi };
 export default fcmApi;

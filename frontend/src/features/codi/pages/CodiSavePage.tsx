@@ -14,6 +14,7 @@ import { captureCanvasImageWithRetry } from '@/features/codi/utils/captureCanvas
 import LoadingOverlay from '@/components/etc/LoadingOverlay';
 import { toast } from 'react-toastify';
 import { createPortal } from 'react-dom';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const EMPTY_FN = () => {};
@@ -23,6 +24,7 @@ const CodiSavePage = () => {
 	const location = useLocation();
 	const mode = location.state?.mode ?? 'my';
 	const targetMemberId = location.state?.targetMemberId ?? 0;
+	const isGuest = useAuthStore((state) => state.isGuest);
 
 	const saveCodi = async (
 		payload: Omit<SaveCodiRequest, 'isPublic'> & { isPublic?: boolean },
@@ -54,9 +56,15 @@ const CodiSavePage = () => {
 	}, [isLoading]);
 
 	const handleBackClick = () => {
-		navigate('/codi/edit', {
-			state: { ...location.state, from: 'save' },
-		});
+		if (isGuest) {
+			navigate('/link/codi/edit', {
+				state: { ...location.state, from: 'save' },
+			});
+		} else {
+			navigate('/codi/edit', {
+				state: { ...location.state, from: 'save' },
+			});
+		}
 	};
 
 	const handleComplete = async () => {
@@ -138,10 +146,24 @@ const CodiSavePage = () => {
 										state: { initialTab: '코디' },
 									});
 								} else {
-									localStorage.removeItem('codiItems');
-									navigate(`/friend/${targetMemberId}`, {
-										state: { initialTab: '코디', initialSubTab: 'recommended' },
-									});
+									if (isGuest) {
+										localStorage.removeItem('codiItems');
+										navigate(`/link/friend/${targetMemberId}`, {
+											state: {
+												initialTab: '코디',
+												initialSubTab: 'recommended',
+												from: 'codi-recommend',
+											},
+										});
+									} else {
+										localStorage.removeItem('codiItems');
+										navigate(`/friend/${targetMemberId}`, {
+											state: {
+												initialTab: '코디',
+												initialSubTab: 'recommended',
+											},
+										});
+									}
 								}
 								resolve(null);
 							} catch (error) {

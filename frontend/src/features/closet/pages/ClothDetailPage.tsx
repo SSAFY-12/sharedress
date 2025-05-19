@@ -7,6 +7,7 @@ import { useDeleteCloth } from '@/features/closet/hooks/useDeleteCloth';
 import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
 import { toast } from 'react-toastify';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
@@ -15,6 +16,7 @@ const ClothDetailPage = () => {
 	const clothId = Number(id);
 	const isMe = location.state?.isMe ?? false;
 	const ownerId = location.state?.ownerId ?? 0;
+	const isGuest = useAuthStore((state) => state.isGuest);
 
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -34,7 +36,11 @@ const ClothDetailPage = () => {
 		if (isMe) {
 			navigate('/mypage');
 		} else if (ownerId) {
-			navigate(`/friend/${ownerId}`);
+			if (isGuest) {
+				navigate(`/link/friend/${ownerId}`);
+			} else {
+				navigate(`/friend/${ownerId}`);
+			}
 		} else {
 			navigate('/mypage');
 		}

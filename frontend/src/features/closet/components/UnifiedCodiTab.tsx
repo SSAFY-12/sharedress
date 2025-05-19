@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCoordinationList } from '@/features/closet/hooks/useCoordinationList';
 import { ClothItem } from '@/components/cards/cloth-card';
 import { ClothListContainer } from '@/containers/ClothListContainer';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface UnifiedCodiTabProps {
 	memberId: number;
@@ -37,12 +39,28 @@ const UnifiedCodiTab = ({
 	activeSubTab,
 	isMe,
 }: UnifiedCodiTabProps) => {
+	const handleRecommendClick = () => {
+		if (!memberId) return;
+
+		navigate('/codi/edit', {
+			state: {
+				mode: 'recommended',
+				targetMemberId: memberId.toString(),
+			},
+		});
+	};
+
+	const isGuest = useAuthStore((state) => state.isGuest);
 	const navigate = useNavigate();
 	console.log(activeSubTab);
 	const { scope, label, emptyMessage } = tabInfoMap[activeSubTab];
 
 	console.log(memberId, scope);
-	const { data: coordinationList = [] } = useCoordinationList(memberId, scope);
+	const {
+		data: coordinationList = [],
+		isLoading,
+		isFetching,
+	} = useCoordinationList(memberId, scope);
 
 	console.log(coordinationList);
 
@@ -57,28 +75,68 @@ const UnifiedCodiTab = ({
 	}));
 
 	const handleItemClick = (item: ClothItem) => {
-		navigate(`/codi/${item.id}`, {
-			state: {
-				isMe,
-				source: activeSubTab,
-				...(isMe ? {} : { ownerId: memberId }),
-			},
-		});
+		if (isGuest) {
+			navigate(`/link/codi/${item.id}`, {
+				state: {
+					isMe,
+					source: activeSubTab,
+					...(isMe ? {} : { ownerId: memberId }),
+				},
+			});
+		} else {
+			navigate(`/codi/${item.id}`, {
+				state: {
+					isMe,
+					source: activeSubTab,
+					...(isMe ? {} : { ownerId: memberId }),
+				},
+			});
+		}
 	};
+
+	const [randomText, setRandomText] = useState('');
+
+	useEffect(() => {
+		const textList = [
+			'친구의 패션테러 진압 작전 개시  💣',
+			'시켜줘, 너의 명예 스타일리스트  😎',
+			'아픈 친구 옷장에 코디 처방전 주기  💊',
+		];
+
+		const randomText = textList[Math.floor(Math.random() * textList.length)];
+		setRandomText(randomText);
+	}, []);
 
 	return (
 		<div className='px-4 flex flex-col flex-1'>
-			{items.length === 0 ? (
-				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor'>
+			{!isMe && !isGuest && (
+				<button
+					className='flex justify-between items-center w-full bg-success/60 rounded-lg p-2 text-white pl-4 py-2 text-description mb-4'
+					onClick={handleRecommendClick}
+				>
+					<span>{randomText}</span>
+					<img
+						src={'/icons/arrow_right_white.svg'}
+						alt='arrow-right'
+						className='w-6 h-6'
+					/>
+				</button>
+			)}
+			{items.length === 0 && !isFetching ? (
+				<div className='flex-1 flex items-center justify-center text-description text-descriptionColor mt-12'>
 					{emptyMessage}
 				</div>
 			) : (
-				<ClothListContainer
-					items={items}
-					onItemClick={handleItemClick}
-					columns={2}
-					type='codi'
-				/>
+				<>
+					<ClothListContainer
+						items={items}
+						onItemClick={handleItemClick}
+						columns={2}
+						type='codi'
+						isLoading={isLoading}
+						isFetching={isFetching}
+					/>
+				</>
 			)}
 		</div>
 	);
