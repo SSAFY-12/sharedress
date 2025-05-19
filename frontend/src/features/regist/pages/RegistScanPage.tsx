@@ -1,11 +1,39 @@
 import PlatFormBlock from '@/features/regist/components/PlatFormBlock';
 import { useNavigate } from 'react-router-dom';
 import { useScanStore } from '@/store/useScanStore';
+import { useEffect, useState } from 'react';
+import { getPrivacyAgreement, setPrivacyAgreement } from '../api/registApis';
+import PrivacyModal from '../components/PrivacyModal';
 
 const RegistScanPage = () => {
 	const navigate = useNavigate();
 	const isMusinsaScanning = useScanStore((state) => state.musinsa.isScan);
 	console.log(isMusinsaScanning, 'isMusinsaScanning');
+
+	const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
+
+	useEffect(() => {
+		const fetchPrivacyAgreement = async () => {
+			try {
+				const agreed = await getPrivacyAgreement();
+				console.log(agreed, 'agreed');
+				if (!agreed) setIsPrivacyModalOpen(true);
+			} catch (error) {
+				console.error('개인정보 동의 조회 실패', error);
+				setIsPrivacyModalOpen(true);
+			}
+		};
+		fetchPrivacyAgreement();
+	}, []);
+
+	const handleAgree = async () => {
+		try {
+			await setPrivacyAgreement(true);
+			setIsPrivacyModalOpen(false);
+		} catch (error) {
+			console.error('개인정보 동의 설정 실패', error);
+		}
+	};
 
 	return (
 		<div className='flex-1 w-full h-full flex flex-col justify-start items-center py-5 px-2 gap-1'>
@@ -46,6 +74,12 @@ const RegistScanPage = () => {
 					<p className='text-description'>https://www.29cm.co.kr</p>
 				</div>
 			</div>
+
+			<PrivacyModal
+				isOpen={isPrivacyModalOpen}
+				onClose={() => setIsPrivacyModalOpen(false)}
+				onAgree={handleAgree}
+			/>
 		</div>
 	);
 };
