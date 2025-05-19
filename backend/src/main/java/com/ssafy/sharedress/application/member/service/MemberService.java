@@ -119,6 +119,7 @@ public class MemberService implements MemberUseCase {
 		return new PrivacyAgreeResponse(member.getIsPrivacyAgreement());
 	}
 
+	@Transactional
 	@Override
 	public PrivacyAgreeResponse updatePrivacyAgreement(Long memberId, PrivacyAgreeRequest request) {
 		Member member = memberRepository.findById(memberId)
