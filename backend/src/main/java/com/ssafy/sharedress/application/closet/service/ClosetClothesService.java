@@ -278,6 +278,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			);
 
 			ClosetClothes closetClothes = closetClothesRepository.save(new ClosetClothes(closet, clothes));
+			closetClothes.updateImgUrl(url); // TODO[지윤]: 현재 테스트로 AI 처리 안돼도 내가 올린 사진 바로 저장, ai 연결되면 삭제
 
 			result.add(ClothesPhotoUploadResponse.from(closetClothes, url));
 		}
@@ -326,10 +327,11 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			itemsToProcess.add(
 				new AiProcessMessagePhotoRequest.ItemInfo(
 					closetClothes.getId(),
-					closetClothes.getClothes().getGoodsLinkUrl()
+					closetClothes.getClothes().getGoodsLinkUrl(),
+					closetClothes.getClothes().getCategory().getId()
 				)
 			);
-		} // 업데이트 완료
+		}
 
 		// TODO[지윤]: 사진용 큐 url 생성되면 새로 생성된 url 로 바꾸고 주석 해제
 		// try {

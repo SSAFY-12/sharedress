@@ -9,7 +9,8 @@ public record AiProcessMessagePhotoRequest(
 ) {
 	public record ItemInfo(
 		Long closetClothesId,
-		String s3Url
+		String s3Url,
+		Long categoryId
 	) {
 	}
 }
