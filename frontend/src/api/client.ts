@@ -18,27 +18,34 @@ const handleGlobalError = async (status: number, serverMessage?: string) => {
 	const errorMessage = serverMessage || getErrorMessage(status);
 	console.error(`API Error (${status}):`, errorMessage);
 
+	// 비회원(게스트)이면 알림 자체를 띄우지 않음
+	if (useAuthStore.getState().isGuest) {
+		return;
+	}
+
 	try {
 		// FCM 메시징 서비스 워커에 메시지 전송
 		if ('serviceWorker' in navigator && 'Notification' in window) {
-			const registration = await navigator.serviceWorker.ready;
-			await registration.showNotification('오류 발생', {
-				body: errorMessage,
-				icon: '/new-android-chrome-192x192.png',
-				badge: '/new-favicon-32x32.png',
-				data: {
-					status: status.toString(),
-					message: serverMessage || '',
-				},
-			});
-
-			// 추가 에러 메시지가 있는 경우 별도 알림
-			if (serverMessage && typeof serverMessage === 'string') {
-				await registration.showNotification('추가 정보', {
-					body: serverMessage,
+			if (Notification.permission === 'granted') {
+				const registration = await navigator.serviceWorker.ready;
+				await registration.showNotification('오류 발생', {
+					body: errorMessage,
 					icon: '/new-android-chrome-192x192.png',
 					badge: '/new-favicon-32x32.png',
+					data: {
+						status: status.toString(),
+						message: serverMessage || '',
+					},
 				});
+
+				// 추가 에러 메시지가 있는 경우 별도 알림
+				if (serverMessage && typeof serverMessage === 'string') {
+					await registration.showNotification('추가 정보', {
+						body: serverMessage,
+						icon: '/new-android-chrome-192x192.png',
+						badge: '/new-favicon-32x32.png',
+					});
+				}
 			}
 		}
 	} catch (error) {
