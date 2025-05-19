@@ -35,10 +35,6 @@ export const App = () => {
 	// }, [isPublicRoute]);
 
 	useEffect(() => {
-		console.log('FCM Token:', useFcmStore.getState().token);
-	}, []);
-
-	useEffect(() => {
 		const hideFcmAlert = localStorage.getItem('hideFcmAlert');
 		if (!hideFcmAlert && !useFcmStore.getState().token) {
 			setShowFcmModal(true);

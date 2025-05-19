@@ -1,5 +1,6 @@
 import { PrimaryBtn } from '@/components/buttons/primary-button';
 import Header from '@/components/layouts/Header';
+import useUnreadNotification from '@/features/alert/hooks/useUnreadNotification';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useNavigate } from 'react-router-dom';
@@ -44,6 +45,7 @@ const ProfileHeader = ({
 ProfileHeaderProps) => {
 	const isGuest = useAuthStore((state) => state.isGuest);
 	const navigate = useNavigate();
+	const { hasUnreadNotification } = useUnreadNotification();
 
 	const handleRecommendClick = () => {
 		if (!memberId) return;
@@ -112,7 +114,11 @@ ProfileHeaderProps) => {
 						<img src='/icons/logo_white.svg' alt='쉐어드레스' />
 						<div className='flex gap-4'>
 							<img
-								src='/icons/notification_white.svg'
+								src={
+									hasUnreadNotification
+										? '/icons/notification_unread.svg'
+										: '/icons/notification_white.svg'
+								}
 								alt='알림'
 								onClick={handleNotificationClick}
 								className='cursor-pointer'
