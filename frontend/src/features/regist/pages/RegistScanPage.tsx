@@ -2,8 +2,11 @@ import PlatFormBlock from '@/features/regist/components/PlatFormBlock';
 import { useNavigate } from 'react-router-dom';
 import { useScanStore } from '@/store/useScanStore';
 import { useEffect, useState } from 'react';
-import { getPrivacyAgreement, setPrivacyAgreement } from '../api/registApis';
-import PrivacyModal from '../components/PrivacyModal';
+import {
+	getPrivacyAgreement,
+	setPrivacyAgreement,
+} from '@/features/regist/api/registApis';
+import PrivacyModal from '@/features/regist/components/PrivacyModal';
 
 const RegistScanPage = () => {
 	const navigate = useNavigate();
