@@ -39,6 +39,7 @@ export default {
 				delete: '#E36969',
 				success: '#2079FF',
 				alarm: '#F2754F',
+				semibrown: '#9D948F',
 			},
 		},
 	},

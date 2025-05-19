@@ -18,20 +18,25 @@ export const useAuthStore = create<AuthState>()(
 			accessToken: null,
 			isGuest: false,
 			isInitialized: false,
-			setAccessToken: (token) => set({ accessToken: token }),
+			setAccessToken: (token) => {
+				set({ accessToken: token, isGuest: token ? false : true });
+			},
 			setIsGuest: (isGuest) => {
-				console.log('게스트 상태 변경:', isGuest);
-				set({ isGuest });
+				if (useAuthStore.getState().accessToken) {
+					set({ isGuest: false });
+				} else {
+					set({ isGuest });
+				}
 			},
 			clearAuth: () => {
 				console.log('인증 정보 초기화');
-				set({ accessToken: null, isGuest: false });
-				// localStorage에서 모든 관련 key 삭제
-				localStorage.removeItem('auth-store');
-				localStorage.removeItem('fcm-store');
-				localStorage.removeItem('profile-storage');
-				localStorage.removeItem('codiItems');
-				localStorage.removeItem('closet-storage');
+				set({ accessToken: null, isGuest: true });
+				// // localStorage에서 모든 관련 key 삭제
+				// localStorage.removeItem('auth-store');
+				// localStorage.removeItem('fcm-store');
+				// localStorage.removeItem('profile-storage');
+				// localStorage.removeItem('codiItems');
+				// localStorage.removeItem('closet-storage');
 			},
 			initializeAuth: async () => {
 				try {
