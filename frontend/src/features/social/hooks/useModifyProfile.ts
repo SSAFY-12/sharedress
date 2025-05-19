@@ -10,7 +10,6 @@ export const useModifyProfile = () => {
 		mutationFn: (profile: Profile) => profileModifyApi.modifyProfile(profile),
 		onMutate: async (newProfile) => {
 			// 이전 상태 저장
-			console.log(newProfile, 'newProfile');
 			const previousProfile = queryClient.getQueryData(['myProfile']);
 			// UI 즉시 반영
 			setIsPublic(newProfile.isPublic ?? true);
