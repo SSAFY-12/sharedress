@@ -16,4 +16,9 @@ public interface NotificationJpaRepository extends JpaRepository<Notification, L
 		+ "ORDER BY n.createdAt DESC"
 	)
 	List<Notification> findAllByReceiverIdOrderByCreatedAtDesc(@Param("receiverId") Long receiverId);
+
+	@Query("SELECT COUNT(n) > 0 FROM Notification n "
+		+ "WHERE n.receiver.id = :receiverId AND n.isRead = false"
+	)
+	Boolean existsUnReadByReceiverId(Long receiverId);
 }

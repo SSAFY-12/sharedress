@@ -30,4 +30,9 @@ public class NotificationPersistenceAdapter implements NotificationRepository {
 	public Optional<Notification> findById(Long id) {
 		return notificationJpaRepository.findById(id);
 	}
+
+	@Override
+	public Boolean existsUnReadByReceiverId(Long receiverId) {
+		return notificationJpaRepository.existsUnReadByReceiverId(receiverId);
+	}
 }
