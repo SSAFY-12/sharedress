@@ -25,6 +25,8 @@ export const MobileLayout = () => {
 	const isCodiPublicEdit =
 		matchPath('/codi/:id/edit', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
+	const isMusinsaScan =
+		location.pathname.replace(/\/$/, '') === '/regist/scan/musinsa';
 
 	/* 네비게이션 바 표시 여부 결정	*/
 	const showNav = shouldShowNav(location.pathname);
@@ -56,7 +58,8 @@ export const MobileLayout = () => {
 					isFriendPage ||
 					isClothDetail ||
 					isCodiDetail ||
-					isCodiPublicEdit ? null : isSocial ? (
+					isCodiPublicEdit ||
+					isMusinsaScan ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
@@ -71,7 +74,8 @@ export const MobileLayout = () => {
 						isFriendPage ||
 						isClothDetail ||
 						isCodiDetail ||
-						isCodiPublicEdit
+						isCodiPublicEdit ||
+						isMusinsaScan
 							? ''
 							: 'mt-16'
 					} ${

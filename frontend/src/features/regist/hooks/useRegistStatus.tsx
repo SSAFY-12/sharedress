@@ -24,7 +24,6 @@ export const useRegistStatus = (
 			console.log('폴링 실행됨:', query.state.data);
 			const response = query.state.data;
 			if (response?.content?.completed) {
-				toast.success('구매내역 등록 완료');
 				if (data.shopId === 1) {
 					setMusinsa({ isScan: false, taskId: '' });
 				} else if (data.shopId === 2) {
@@ -44,7 +43,7 @@ export const useRegistStatus = (
 						autoClose: 10000,
 						icon: () => (
 							<div className='flex items-center justify-center w-7 h-7'>
-								<img src='/icons/toast_closet.png' alt='icon' />
+								<img src='/icons/toast_closet.svg' alt='icon' />
 							</div>
 						),
 					},
@@ -52,7 +51,7 @@ export const useRegistStatus = (
 
 				return false;
 			}
-			return 3000;
+			return 10000;
 		},
 		// 에러 발생 시 3번까지 재시도
 		retry: 3,
