@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useCloset } from '@/features/closet/hooks/useCloset';
 import { useEffect, useRef } from 'react';
 import { ClosetItem } from '@/features/closet/api/closetApi';
-('');
 import { categoryMapping } from '@/constants/categoryConfig';
 import LoadingSpinner from '@/components/etc/LoadingSpinner';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface ClosetTabProps {
 	memberId: number;
@@ -16,6 +16,7 @@ interface ClosetTabProps {
 
 const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	const navigate = useNavigate();
+	const isGuest = useAuthStore((state) => state.isGuest);
 
 	const categoryId =
 		selectedCategory === '전체' ? undefined : categoryMapping[selectedCategory];
@@ -51,9 +52,15 @@ const ClosetTab = ({ memberId, selectedCategory, isMe }: ClosetTabProps) => {
 	);
 
 	const handleItemClick = (item: ClothItem) => {
-		navigate(`/cloth/${item.id}`, {
-			state: { isMe, ownerId: memberId },
-		});
+		if (isGuest) {
+			navigate(`/link/cloth/${item.id}`, {
+				state: { isMe, ownerId: memberId },
+			});
+		} else {
+			navigate(`/cloth/${item.id}`, {
+				state: { isMe, ownerId: memberId },
+			});
+		}
 	};
 
 	if (isLoading) {
