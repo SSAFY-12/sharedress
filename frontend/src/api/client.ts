@@ -81,16 +81,7 @@ client.interceptors.response.use(
 
 			// 게스트인 경우 401 에러를 그대로 반환하고 리다이렉트하지 않음
 			if (isGuest) {
-				// 코디/옷 상세 API는 게스트 사용자도 접근 가능하도록 처리
-				if (
-					originalRequest.url?.includes('/coordinations') ||
-					originalRequest.url?.includes('/closet/clothes')
-				) {
-					console.log(
-						'게스트 사용자 코디/옷 상세 API 호출:',
-						originalRequest.url,
-					);
-					// 인증 헤더는 제거
+				if (originalRequest.url?.includes('/coordinations')) {
 					delete originalRequest.headers.Authorization;
 					return client(originalRequest);
 				}
