@@ -186,6 +186,7 @@ public class NotificationService implements NotificationUseCase {
 			});
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendAiCompleteNotification(Long memberId) {
 		memberRepository.findById(memberId).ifPresent(member -> {
@@ -232,6 +233,12 @@ public class NotificationService implements NotificationUseCase {
 		}
 
 		return NotificationReadResponse.from(notification, isFirstRead);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public Boolean hasUnreadNotification(Long id) {
+		return notificationRepository.existsUnReadByReceiverId(id);
 	}
 
 	private void saveNotification(Member sender, Member receiver, String title, String message, NotificationType type) {
