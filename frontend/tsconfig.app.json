@@ -29,5 +29,6 @@
 		"baseUrl": "src",
 		"paths": { "@/*": ["./*"] }
 	},
-	"include": ["src", ".eslintrc.cjs"]
+	"include": ["src", ".eslintrc.cjs"],
+	"exclude": ["public/firebase-messaging-sw.js"]
 }
