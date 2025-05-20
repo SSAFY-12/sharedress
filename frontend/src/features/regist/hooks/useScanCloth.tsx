@@ -27,7 +27,7 @@ export const useScanCloth = () => {
 			}
 			toast.success(
 				<div className='flex flex-col justify-center items-start'>
-					<div className='text-smallButton text-left'>구매내역 스캔중</div>
+					<div className='text-smallButton text-left'>구매내역 스캔 중</div>
 					<div className='text-description text-left text-white'>
 						완료가 되면 알림으로 알려드릴게요
 					</div>

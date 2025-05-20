@@ -29,12 +29,6 @@ export const headerConfig: HeaderConfig = {
 		showBack: true,
 		subtitle: '친구 요청 목록',
 	},
-	'/regist': {
-		showBack: true,
-		subtitle: '옷 등록하기',
-		badgeText: '',
-	},
-
 	'/regist/scan': {
 		showBack: true,
 		subtitle: '구매내역 스캔',
@@ -45,11 +39,11 @@ export const headerConfig: HeaderConfig = {
 		subtitle: '옷 검색하기',
 		badgeText: '', // 추후에 설정 필요
 	},
-	'/regist/camera': {
-		showBack: true,
-		subtitle: '사진으로 등록',
-		badgeText: '',
-	},
+	// '/regist/camera': {
+	// 	showBack: true,
+	// 	subtitle: '사진으로 등록',
+	// 	badgeText: '',
+	// },
 	'/cloth/:id': {
 		showBack: true,
 	},

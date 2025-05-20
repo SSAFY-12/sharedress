@@ -22,6 +22,10 @@ export const MobileLayout = () => {
 	const isCodiSave = matchPath('/codi/save', location.pathname) !== null;
 	const isClothDetail = matchPath('/cloth/:id', location.pathname) !== null;
 	const isCodiDetail = matchPath('/codi/:id', location.pathname) !== null;
+	const isRegistCamera =
+		matchPath('/regist/camera', location.pathname) !== null;
+	const isRegistCameraPre =
+		matchPath('/regist/camera/pre', location.pathname) !== null;
 	const isCodiPublicEdit =
 		matchPath('/codi/:id/edit', location.pathname) !== null;
 	const isRegistHome = matchPath('/regist', location.pathname) !== null;
@@ -57,6 +61,9 @@ export const MobileLayout = () => {
 					isClothDetail ||
 					isCodiDetail ||
 					isCodiPublicEdit ||
+					isRegistCamera ||
+					isRegistCameraPre ||
+					isRegistHome ||
 					isRegistHome ||
 					isRegistScan ||
 					isMusinsaScan ? null : isSocial ? (
@@ -75,6 +82,9 @@ export const MobileLayout = () => {
 						isClothDetail ||
 						isCodiDetail ||
 						isCodiPublicEdit ||
+						isRegistCamera ||
+						isRegistCameraPre ||
+						isRegistHome ||
 						isRegistHome ||
 						isRegistScan ||
 						isMusinsaScan

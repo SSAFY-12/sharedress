@@ -22,6 +22,10 @@ export const WebLayout = () => {
 	const isCodiPublicEdit =
 		matchPath('/codi/:id/edit', location.pathname) !== null;
 	const isCodiDetail = matchPath('/codi/:id', location.pathname) !== null;
+	const isRegistCamera =
+		matchPath('/regist/camera', location.pathname) !== null;
+	const isRegistCameraPre =
+		matchPath('/regist/camera/pre', location.pathname) !== null;
 	const headerProps = getHeaderProps(location.pathname);
 	const isMusinsaScan =
 		location.pathname.replace(/\/$/, '') === '/regist/scan/musinsa';
@@ -55,6 +59,9 @@ export const WebLayout = () => {
 				isClothDetail ||
 				isCodiPublicEdit ||
 				isCodiDetail ||
+				isRegistCamera ||
+				isRegistCameraPre ||
+				isRegistHome ||
 				isMusinsaScan ||
 				isRegistHome ||
 				isRegistScan ? null : isSocial ? (
@@ -74,6 +81,9 @@ export const WebLayout = () => {
 					isClothDetail ||
 					isCodiPublicEdit ||
 					isCodiDetail ||
+					isRegistCamera ||
+					isRegistCameraPre ||
+					isRegistHome ||
 					isMusinsaScan ||
 					isRegistHome ||
 					isRegistScan

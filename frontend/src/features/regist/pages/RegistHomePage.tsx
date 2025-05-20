@@ -3,10 +3,14 @@ import SelectRegistBlock from '@/features/regist/components/SelectRegistBlock';
 import { useGetCloth } from '@/features/regist/hooks/useGetCloth';
 import Header from '@/components/layouts/Header';
 import { useNavigate } from 'react-router-dom';
+import { useCameraStore } from '@/store/useCameraStore';
+import { toast } from 'react-toastify';
 
 const RegistHomePage = () => {
 	const navigate = useNavigate();
-	useGetCloth();
+	const { data } = useGetCloth();
+	console.log(data, 'data');
+	const cameraStatus = useCameraStore((state) => state.camera.isScan);
 
 	const handleBack = () => {
 		navigate('/mypage');
@@ -32,13 +36,28 @@ const RegistHomePage = () => {
 						image='search.png'
 						onClick={() => router.navigate('/regist/search')}
 					/>
-					<div className='flex items-center justify-between bg-background w-full rounded-lg px-6 relative'>
-						<div className='absolute inset-0 bg-black/30 rounded-lg z-10 flex items-center justify-center'>
-							<span className='text-white text-title w-full pr-4'>
-								{' '}
-								업데이트 예정{' '}
-							</span>
-						</div>
+					<div
+						className='flex items-center justify-between bg-background w-full rounded-lg px-6 cursor-pointer relative'
+						onClick={() =>
+							cameraStatus
+								? toast.info('등록 중에는 신규 등록이 불가능합니다.')
+								: router.navigate('/regist/camera/pre')
+						}
+					>
+						{cameraStatus && (
+							<div className='absolute inset-0 bg-modify/30 rounded-lg z-10 flex items-center justify-center'>
+								<div className='flex items-center justify-center gap-2'>
+									<img
+										src='/icons/loading.svg'
+										className='w-4 h-4'
+										alt='스캔중'
+									/>
+									<span className='text-white text-button w-full pr-4'>
+										등록 중
+									</span>
+								</div>
+							</div>
+						)}
 						<div className='flex flex-col items-start justify-center gap-1.6 py-5'>
 							<div className='flex text-topHeader text-regular'>
 								사진으로 등록
@@ -50,7 +69,7 @@ const RegistHomePage = () => {
 						<img
 							src='/images/regist/camera.png'
 							alt='사진으로 등록'
-							className=' h-full object-cover'
+							className='h-full object-cover'
 						/>
 					</div>
 				</div>

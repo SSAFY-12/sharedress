@@ -9,8 +9,10 @@ import useFcmStore from '@/store/useFcmStore';
 import { GoogleAnalytics } from './components/GoogleAnalytics';
 import { useNavigate } from 'react-router-dom';
 import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
-import PolingProvider from '@/components/poling/PolingProvider';
+import PolingProviderMusinsa from '@/components/poling/PolingProviderMusinsa';
+import PolingProviderCamera from '@/components/poling/PolingProviderCamera';
 import { useScanStore } from '@/store/useScanStore';
+import { useCameraStore } from './store/useCameraStore';
 import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
 
 export const App = () => {
@@ -22,6 +24,8 @@ export const App = () => {
 	const navigate = useNavigate();
 	const [showFcmModal, setShowFcmModal] = useState(false);
 	const isGuest = useAuthStore((state) => state.isGuest);
+	const isCameraScan = useCameraStore((state) => state.camera.isScan);
+	const isMusinsaScan = useScanStore((state) => state.musinsa.isScan);
 
 	// useTokenValidation();
 	// 공개 라우트 목록
@@ -150,10 +154,8 @@ export const App = () => {
 				/>
 			)}
 			{/* PolingProvider를 조건부로 렌더링 */}
-			{useScanStore.getState().musinsa.isScan ||
-			useScanStore.getState().cm29.isScan ? (
-				<PolingProvider />
-			) : null}
+			{isMusinsaScan ? <PolingProviderMusinsa /> : null}
+			{isCameraScan ? <PolingProviderCamera /> : null}
 		</>
 	);
 };
