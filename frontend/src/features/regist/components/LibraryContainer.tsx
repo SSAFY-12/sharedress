@@ -1,5 +1,11 @@
 // frontend/src/features/regist/components/LibraryContainer.tsx
-import React, { useDeferredValue, useEffect, useRef, useState } from 'react';
+import React, {
+	useDeferredValue,
+	useEffect,
+	useRef,
+	useState,
+	useMemo,
+} from 'react';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 import { categoryConfig } from '@/constants/categoryConfig';
@@ -51,15 +57,13 @@ const LibraryContainer = () => {
 				...request,
 				cursor: pageParam as number | undefined,
 			});
-			// console.log(request, 'request');
-			// console.log(categoryMapping[selectedCategory], 'categoryMapping');
-			// console.log(response, 'response');
 
 			return response;
 		},
 		getNextPageParam: (lastPage) => lastPage.pagination.cursor ?? undefined,
 		initialPageParam: undefined,
 		staleTime: 1000 * 5,
+		gcTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
 		placeholderData: () => ({
 			pages: [],
 			pageParams: [],
@@ -94,15 +98,36 @@ const LibraryContainer = () => {
 		return () => io.disconnect();
 	}, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-	const allItems =
-		data?.pages.flatMap((page: LibraryResponse) =>
-			page.content.map((item: LibraryClothes) => ({
-				id: item.id,
-				name: item.name,
-				imageUrl: item.image,
-				brand: item.brandName,
-			})),
-		) || [];
+	const allItems = useMemo(
+		() =>
+			data?.pages.flatMap((page: LibraryResponse) =>
+				page.content.map((item: LibraryClothes) => ({
+					id: item.id,
+					name: item.name,
+					imageUrl: item.image,
+					brand: item.brandName,
+					category: selectedCategory, // 카테고리 정보 추가
+				})),
+			) || [],
+		[data, selectedCategory],
+	);
+
+	// 이미지 프리로딩을 위한 함수
+	const preloadImages = (items: ClothItem[]) => {
+		items.forEach((item) => {
+			if (item.imageUrl) {
+				const img = new Image();
+				img.src = item.imageUrl;
+			}
+		});
+	};
+
+	// 데이터가 변경될 때마다 이미지 프리로딩
+	useEffect(() => {
+		if (allItems.length > 0) {
+			preloadImages(allItems);
+		}
+	}, [allItems]);
 
 	return (
 		<div className='flex flex-col gap-5 w-full items-center'>

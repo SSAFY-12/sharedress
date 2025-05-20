@@ -35,6 +35,11 @@ export interface LibraryRequestParams {
 	size?: number;
 }
 
+interface UploadResponseItem {
+	id: number;
+	image: string;
+}
+
 export interface PrivacyAgreementResponse {
 	content: {
 		privacyAgreement: boolean;
@@ -75,6 +80,7 @@ export const LibraryApis = {
 };
 
 import { MyClosetContent } from '@/store/useClosetStore';
+import { PhotoClothItem } from '@/features/regist/stores/usePhotoClothStore';
 export interface MyClosetResponse {
 	status: Status;
 	content: MyClosetContent[];
@@ -159,4 +165,72 @@ export const setPrivacyAgreement = async (agree: boolean): Promise<boolean> => {
 	);
 	console.log(res.data, 'res.data');
 	return res.data.content.privacyAgreement;
+};
+
+export const uploadClothPhotos = async (items: PhotoClothItem[]) => {
+	const formData = new FormData();
+	items.forEach((item) => {
+		formData.append('photos', item.file);
+	});
+
+	const response = await client.post<{ content: UploadResponseItem[] }>(
+		'/api/closet/clothes/photos/upload',
+		formData,
+		{
+			headers: { 'Content-Type': 'multipart/form-data' },
+		},
+	);
+
+	return response.data.content;
+};
+
+interface CameraStatusResponse {
+	status: Status;
+	content: {
+		completed: boolean;
+	};
+}
+export const getCameraStatus = async (
+	taskId: string,
+): Promise<CameraStatusResponse> => {
+	const response = await client.get<CameraStatusResponse>(
+		`/api/closet/clothes/photos/task/${taskId}`,
+	);
+	return response.data;
+};
+
+interface RegisterClothDetailsResponse {
+	status: Status;
+	content: {
+		taskId: string;
+	};
+}
+
+export const registerClothDetails = async (
+	uploaded: UploadResponseItem[],
+	items: PhotoClothItem[],
+): Promise<RegisterClothDetailsResponse> => {
+	const body = uploaded.map((upload, index) => {
+		const item = items[index];
+		return {
+			id: upload.id,
+			name: item.name,
+			brandId: item.brandId ?? 0,
+			categoryId: item.categoryId ?? 0,
+			colorId: 1, // 고정
+			isPublic: item.isPublic,
+		};
+	});
+
+	const response = await client.post('/api/closet/clothes/photos/detail', body);
+
+	return response.data;
+};
+
+export const fetchRemainingPhotoCount = async (): Promise<number> => {
+	const res = await client.get<{ content: { remainingCount: number } }>(
+		'/api/closet/clothes/photos/remaining-count',
+	);
+	console.log('데이터: ', res);
+	return res.data.content.remainingCount;
 };

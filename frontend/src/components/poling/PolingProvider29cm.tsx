@@ -1,11 +1,11 @@
-import { useRegistStatus } from '@/features/regist/hooks/useRegistStatus';
+import { useRegistScanStatus } from '@/features/regist/hooks/useRegistScanStatus';
 import { useScanStore } from '@/store/useScanStore';
 
 const PolingProvider = () => {
 	const { musinsa, cm29 } = useScanStore();
 
 	// 항상 Hook을 호출하되, enabled 조건으로 제어
-	useRegistStatus(
+	useRegistScanStatus(
 		{
 			taskId: musinsa.taskId,
 			shopId: 1,
@@ -13,7 +13,7 @@ const PolingProvider = () => {
 		musinsa.isScan,
 	);
 
-	useRegistStatus(
+	useRegistScanStatus(
 		{
 			taskId: cm29.taskId,
 			shopId: 2,

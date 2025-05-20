@@ -8,6 +8,7 @@ import {
 } from '@/features/regist/api/registApis';
 import PrivacyModal from '@/features/regist/components/PrivacyModal';
 import Header from '@/components/layouts/Header';
+import { toast } from 'react-toastify';
 
 const RegistScanPage = () => {
 	const navigate = useNavigate();
@@ -58,6 +59,8 @@ const RegistScanPage = () => {
 					onClick={() => {
 						if (!isMusinsaScanning) {
 							navigate('/regist/scan/musinsa');
+						} else {
+							toast.info('스캔 중에는 신규 등록이 불가능합니다.');
 						}
 					}}
 				>
