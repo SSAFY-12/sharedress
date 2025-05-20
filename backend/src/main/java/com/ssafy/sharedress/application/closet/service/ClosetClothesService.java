@@ -281,7 +281,6 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			);
 
 			ClosetClothes closetClothes = closetClothesRepository.save(new ClosetClothes(closet, clothes));
-			closetClothes.updateImgUrl(url); // TODO[지윤]: 현재 테스트로 AI 처리 안돼도 내가 올린 사진 바로 저장, ai 연결되면 삭제
 
 			result.add(ClothesPhotoUploadResponse.from(closetClothes, url));
 		}
