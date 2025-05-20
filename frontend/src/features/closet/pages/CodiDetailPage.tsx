@@ -17,6 +17,7 @@ import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'react-toastify';
+import LoadingOverlay from '@/components/etc/LoadingOverlay';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
@@ -220,7 +221,8 @@ const CodiDetailPage = () => {
 		}
 	};
 
-	if (isLoading) return <div className='p-4'>불러오는 중...</div>;
+	if (isLoading)
+		return <LoadingOverlay message='코디 정보를 불러오는 중이에요...' />;
 	if (isError || !coordination)
 		return <div className='p-4'>코디 정보를 불러오지 못했습니다.</div>;
 
