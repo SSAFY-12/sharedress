@@ -1,6 +1,7 @@
 import { useQuery, UseQueryResult, Query } from '@tanstack/react-query';
 import { getCameraStatus } from '@/features/regist/api/registApis';
 import { toast } from 'react-toastify';
+import { useCameraStore } from '@/store/useCameraStore';
 
 interface CameraStatusResponse {
 	status: {
@@ -15,17 +16,24 @@ interface CameraStatusResponse {
 export const useRegistCameraStatus = (
 	taskId: string,
 	enabled: boolean,
-): UseQueryResult<CameraStatusResponse> =>
-	useQuery<CameraStatusResponse>({
+): UseQueryResult<CameraStatusResponse> => {
+	const { setCamera } = useCameraStore();
+	// console.log('카메라 스캔 훅 실행됨');
+
+	const queryResult = useQuery<CameraStatusResponse>({
 		queryKey: ['cameraStatus', taskId],
 		queryFn: () => getCameraStatus(taskId),
 		refetchInterval: (query: Query<CameraStatusResponse>) => {
+			// console.log('카메라 스캔 폴링 실행됨, data:', query.state.data);
+			// console.log(query.state.data);
 			if (query.state.data?.content?.completed) {
+				// 카메라 스캔 스토어 false
+				setCamera({ isScan: false, taskId: '' });
 				toast.success(
 					<div className='flex flex-col justify-center items-start'>
-						<div className='text-smallButton text-left'>사진 분석 완료</div>
+						<div className='text-smallButton text-left'>사진 변환 완료</div>
 						<div className='text-description text-left text-white'>
-							옷 정보를 분석했어요
+							옷들을 옷장에 넣어 드렸어요
 						</div>
 					</div>,
 					{
@@ -45,3 +53,6 @@ export const useRegistCameraStatus = (
 		enabled: enabled && !!taskId,
 		staleTime: 0,
 	});
+
+	return queryResult;
+};

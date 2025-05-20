@@ -11,17 +11,14 @@ export const useRegistScanStatus = (
 	data: RegistStatusRequest,
 	enabled: boolean,
 ): UseQueryResult<RegistStatusResponse> => {
-	console.log('훅 실행됨:', { data, enabled });
+	// console.log('훅 실행됨:', { data, enabled });
 	const { setMusinsa, setCm29 } = useScanStore();
 
 	return useQuery<RegistStatusResponse>({
 		queryKey: ['registStatus', data.taskId, data.shopId],
-		queryFn: () => {
-			console.log('쿼리 실행됨');
-			return ScanApis.getClothRegistrationStatus(data);
-		},
+		queryFn: () => ScanApis.getClothRegistrationStatus(data),
 		refetchInterval: (query: Query<RegistStatusResponse>) => {
-			console.log('폴링 실행됨:', query.state.data);
+			// console.log('폴링 실행됨:', query.state.data);
 			const response = query.state.data;
 			if (response?.content?.completed) {
 				if (data.shopId === 1) {
@@ -32,9 +29,7 @@ export const useRegistScanStatus = (
 
 				toast.success(
 					<div className='flex flex-col justify-center items-start'>
-						<div className='text-smallButton text-left'>
-							구매내역 스캔 완료료
-						</div>
+						<div className='text-smallButton text-left'>구매내역 스캔 완료</div>
 						<div className='text-description text-left text-white'>
 							옷들을 옷장에 넣어 드렸어요요
 						</div>

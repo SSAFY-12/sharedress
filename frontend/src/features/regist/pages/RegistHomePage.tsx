@@ -40,7 +40,7 @@ const RegistHomePage = () => {
 						className='flex items-center justify-between bg-background w-full rounded-lg px-6 cursor-pointer relative'
 						onClick={() =>
 							cameraStatus
-								? toast.error('등록 중에는 신규 등록이 불가능합니다.')
+								? toast.info('등록 중에는 신규 등록이 불가능합니다.')
 								: router.navigate('/regist/camera/pre')
 						}
 					>

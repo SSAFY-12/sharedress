@@ -60,7 +60,7 @@ const RegistScanPage = () => {
 						if (!isMusinsaScanning) {
 							navigate('/regist/scan/musinsa');
 						} else {
-							toast.error('스캔 중에는 신규 등록이 불가능합니다.');
+							toast.info('스캔 중에는 신규 등록이 불가능합니다.');
 						}
 					}}
 				>

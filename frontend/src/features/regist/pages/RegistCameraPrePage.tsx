@@ -88,7 +88,7 @@ const RegistCameraPrePage = () => {
 				</div>
 				<div className='mt-4 text-right'>
 					<p>
-						<span className='test-alarm text-description'>
+						<span className='text-alarm text-categoryButton px-2'>
 							오늘 등록 가능 사진 개수 {remainingPhotoCount} / 5
 						</span>
 					</p>
