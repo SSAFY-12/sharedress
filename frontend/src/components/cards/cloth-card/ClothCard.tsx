@@ -57,15 +57,17 @@ export const ClothCard = ({
 					</div>
 				)}
 			</div>
-			{type === 'cloth' ? (
-				<p className='mt-2.5 text-categoryButton text-description'>
-					{item.brand}
-				</p>
-			) : (
-				<p className='mt-2.5 text-categoryButton text-description'>
-					{item.name}
-				</p>
-			)}
+			<div className='w-full'>
+				{type === 'cloth' ? (
+					<p className='mt-2.5 text-categoryButton text-description truncate text-left'>
+						{item.brand}
+					</p>
+				) : (
+					<p className='mt-2.5 text-categoryButton text-description truncate text-left'>
+						{item.name}
+					</p>
+				)}
+			</div>
 		</div>
 	);
 };

@@ -115,6 +115,7 @@ const RegistCameraPage = () => {
 								onChange={(e) =>
 									updateItem(currentIndex, { name: e.target.value })
 								}
+								placeholder='상품명을 입력해주세요.'
 							/>
 						</div>
 
@@ -127,6 +128,7 @@ const RegistCameraPage = () => {
 									categoryList.find((c) => c.id === item.categoryId)?.name ?? ''
 								}
 								onClick={() => setIsCategorySheetOpen(true)}
+								placeholder='카테고리를 선택해주세요.'
 							/>
 						</div>
 
@@ -140,6 +142,7 @@ const RegistCameraPage = () => {
 										?.brandNameKor ?? ''
 								}
 								onClick={() => setIsBrandSheetOpen(true)}
+								placeholder='브랜드를 선택해주세요.'
 							/>
 						</div>
 
@@ -203,6 +206,9 @@ const RegistCameraPage = () => {
 						placeholder='브랜드 검색'
 						value={inputQuery}
 						onChange={(e) => setInputQuery(e.target.value)}
+						onSubmit={(e) => {
+							e.preventDefault();
+						}}
 					/>
 					<div className='mt-4 flex flex-wrap justify-center items-center gap-2'>
 						{isBrandLoading ? (

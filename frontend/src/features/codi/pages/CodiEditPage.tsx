@@ -60,34 +60,27 @@ const CodiEditPage = () => {
 
 	// 코디에 올려진 아이템들 상태
 	const [canvasItems, setCanvasItems] = useState<any[]>([]);
-	const [maxZIndex, setMaxZIndex] = useState(0);
 
 	const addItemToCanvas = (item: any) => {
-		const currentMaxZIndex =
-			canvasItems.length > 0
-				? Math.max(...canvasItems.map((item) => item.zIndex))
-				: 0;
-		const newZIndex = currentMaxZIndex + 1;
 		const newItem = {
 			...item,
 			canvasId: `canvas-${item.id}-${Date.now()}`,
 			position: { x: 0, y: 0 },
 			rotation: 0,
 			scale: 1,
-			zIndex: newZIndex,
+			zIndex: 0,
 			imageUrl: item.imageUrl,
 		};
-		setMaxZIndex(newZIndex);
 		setCanvasItems([...canvasItems, newItem]);
 	};
 
 	const updateCanvasItem = (updatedItem: any) => {
-		if (updatedItem.zIndex > maxZIndex) setMaxZIndex(updatedItem.zIndex);
-		setCanvasItems(
-			canvasItems.map((item) =>
-				item.canvasId === updatedItem.canvasId ? updatedItem : item,
-			),
-		);
+		setCanvasItems((prevItems) => {
+			const rest = prevItems.filter(
+				(item) => item.canvasId !== updatedItem.canvasId,
+			);
+			return [...rest, updatedItem];
+		});
 	};
 
 	const removeFromCanvas = (canvasId: string) => {
@@ -183,8 +176,6 @@ const CodiEditPage = () => {
 								isEditable={true}
 								updateItem={updateCanvasItem}
 								removeItem={removeFromCanvas}
-								maxZIndex={maxZIndex}
-								setMaxZIndex={setMaxZIndex}
 								width={window.innerWidth}
 								height={window.innerWidth * 1.1}
 							/>
@@ -237,8 +228,6 @@ const CodiEditPage = () => {
 								isEditable={true}
 								updateItem={updateCanvasItem}
 								removeItem={removeFromCanvas}
-								maxZIndex={maxZIndex}
-								setMaxZIndex={setMaxZIndex}
 							/>
 						</div>
 						<CodiEditBottomSection

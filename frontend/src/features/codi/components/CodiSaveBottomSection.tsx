@@ -7,7 +7,7 @@ interface CodiSaveBottomSectionProps {
 	isPublic: boolean;
 	isLoading: boolean;
 	onDescriptionChange: (
-		e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
 	) => void;
 	onPublicToggle: () => void;
 	mode: 'my' | 'recommended';

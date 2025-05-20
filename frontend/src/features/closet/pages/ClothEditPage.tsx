@@ -219,6 +219,9 @@ const ClothEditPage = () => {
 						placeholder='검색'
 						value={inputQuery}
 						onChange={(e) => setInputQuery(e.target.value)}
+						onSubmit={(e) => {
+							e.preventDefault();
+						}}
 					/>
 					<div className='mt-4 flex flex-wrap justify-start gap-2'>
 						{isBrandLoading ? (

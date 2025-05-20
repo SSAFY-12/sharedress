@@ -14,7 +14,6 @@ interface CanvasItem {
 	};
 	rotation: number;
 	scale: number;
-	zIndex: number;
 	aspectRatio?: number;
 	initialWidth?: number;
 	initialHeight?: number;
@@ -26,8 +25,6 @@ interface CodiCanvasProps {
 	isEditable?: boolean;
 	updateItem: (item: CanvasItem) => void;
 	removeItem: (id: string) => void;
-	maxZIndex: number;
-	setMaxZIndex: (value: number) => void;
 	id?: string;
 	width?: number;
 	height?: number;
@@ -45,8 +42,6 @@ const CodiCanvas = ({
 	isEditable = true,
 	updateItem,
 	removeItem,
-	maxZIndex = 0,
-	setMaxZIndex,
 	id,
 	width,
 	height,
@@ -105,16 +100,11 @@ const CodiCanvas = ({
 
 			const item = items.find((item) => item.canvasId === canvasId);
 			if (item) {
-				const newZIndex = maxZIndex + 1;
-				setMaxZIndex(newZIndex);
-				updateItem({
-					...item,
-					zIndex: newZIndex,
-				});
+				updateItem(item);
 				setActiveItem(canvasId);
 			}
 		},
-		[activeItem, items, maxZIndex, updateItem, setMaxZIndex, isEditable],
+		[activeItem, items, updateItem, isEditable],
 	);
 
 	const handleCanvasClick = useCallback(() => {
@@ -133,13 +123,7 @@ const CodiCanvas = ({
 
 			setInteractionMode('move');
 			setActiveItem(item.canvasId);
-
-			const newZIndex = maxZIndex + 1;
-			setMaxZIndex(newZIndex);
-			updateItem({
-				...item,
-				zIndex: newZIndex,
-			});
+			updateItem(item);
 
 			setStartPoint({ x: clientX, y: clientY });
 			setStartValues({
@@ -148,7 +132,7 @@ const CodiCanvas = ({
 				scale: item.scale,
 			});
 		},
-		[isEditable, maxZIndex, updateItem, setMaxZIndex],
+		[isEditable, updateItem],
 	);
 
 	const handleTransformStart = useCallback(
@@ -161,13 +145,7 @@ const CodiCanvas = ({
 
 			setInteractionMode('transform');
 			setActiveItem(item.canvasId);
-
-			const newZIndex = maxZIndex + 1;
-			setMaxZIndex(newZIndex);
-			updateItem({
-				...item,
-				zIndex: newZIndex,
-			});
+			updateItem(item);
 
 			const itemElement = document.getElementById(item.canvasId);
 			if (itemElement) {
@@ -188,7 +166,7 @@ const CodiCanvas = ({
 				});
 			}
 		},
-		[isEditable, maxZIndex, updateItem, setMaxZIndex],
+		[isEditable, updateItem],
 	);
 
 	const handleMove = useCallback(
@@ -320,7 +298,7 @@ const CodiCanvas = ({
 				</div>
 			)}
 
-			{items.map((item) => (
+			{items.map((item, index) => (
 				<div
 					id={item.canvasId}
 					key={item.canvasId}
@@ -339,7 +317,7 @@ const CodiCanvas = ({
 							scale(${item.scale})
 						`,
 						transformOrigin: 'center',
-						zIndex: item.zIndex,
+						zIndex: index + 1,
 						opacity: isEditable ? (item.isLoaded ? 1 : 0) : 1,
 						transition: isEditable ? 'opacity 0.2s ease-in-out' : 'none',
 					}}

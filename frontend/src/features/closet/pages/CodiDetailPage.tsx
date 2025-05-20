@@ -17,6 +17,7 @@ import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
 import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from 'react-toastify';
+import LoadingOverlay from '@/components/etc/LoadingOverlay';
 
 const CodiDetailPage = () => {
 	const navigate = useNavigate();
@@ -101,7 +102,9 @@ const CodiDetailPage = () => {
 	};
 
 	const handleCommentChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>,
 	) => {
 		setCommentText(e.target.value);
 	};
@@ -218,7 +221,8 @@ const CodiDetailPage = () => {
 		}
 	};
 
-	if (isLoading) return <div className='p-4'>불러오는 중...</div>;
+	if (isLoading)
+		return <LoadingOverlay message='코디 정보를 불러오는 중이에요...' />;
 	if (isError || !coordination)
 		return <div className='p-4'>코디 정보를 불러오지 못했습니다.</div>;
 
@@ -295,8 +299,8 @@ const CodiDetailPage = () => {
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
 				<ImageDetailView item={item} recommender={recommender}>
 					<div className='px-4'>
-						<div className='flex flex-col items-start gap-3'>
-							<p className='text-regular text-default'>
+						<div className='w-full flex flex-col items-start gap-3'>
+							<p className='text-regular text-default break-words text-left'>
 								{coordination.description}
 							</p>
 							<p className='text-description text-descriptionColor mb-6'>

@@ -195,7 +195,9 @@ const CodiSavePage = () => {
 	};
 
 	const handleDescriptionChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>,
 	) => {
 		setDescription(e.target.value);
 	};
@@ -248,8 +250,6 @@ const CodiSavePage = () => {
 							isEditable={false}
 							updateItem={EMPTY_FN}
 							removeItem={EMPTY_FN}
-							maxZIndex={0}
-							setMaxZIndex={EMPTY_FN}
 							id='codi-canvas-capture'
 							width={400}
 							height={440}
@@ -281,8 +281,6 @@ const CodiSavePage = () => {
 										isEditable={false}
 										updateItem={EMPTY_FN}
 										removeItem={EMPTY_FN}
-										maxZIndex={0}
-										setMaxZIndex={EMPTY_FN}
 										id='codi-canvas'
 										width={window.innerWidth}
 										height={window.innerWidth * 1.1}
@@ -324,8 +322,6 @@ const CodiSavePage = () => {
 										isEditable={false}
 										updateItem={EMPTY_FN}
 										removeItem={EMPTY_FN}
-										maxZIndex={0}
-										setMaxZIndex={EMPTY_FN}
 										id='codi-canvas'
 										width={400}
 										height={440}
