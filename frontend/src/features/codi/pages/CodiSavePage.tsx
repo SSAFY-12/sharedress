@@ -195,7 +195,9 @@ const CodiSavePage = () => {
 	};
 
 	const handleDescriptionChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>,
 	) => {
 		setDescription(e.target.value);
 	};

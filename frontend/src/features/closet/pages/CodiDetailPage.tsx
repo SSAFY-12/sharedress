@@ -101,7 +101,9 @@ const CodiDetailPage = () => {
 	};
 
 	const handleCommentChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>,
 	) => {
 		setCommentText(e.target.value);
 	};

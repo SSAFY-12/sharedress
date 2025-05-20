@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { InputFieldProps } from './InputField.types';
 
 export const InputField = ({
@@ -17,17 +18,27 @@ export const InputField = ({
 	const textClass =
 		'text-default text-regular placeholder:text-descriptionColor text-left';
 
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+	useEffect(() => {
+		if (type === 'text' && textareaRef.current) {
+			textareaRef.current.style.height = 'auto';
+			textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+		}
+	}, [value, type]);
+
 	if (type === 'text') {
 		return (
-			<input
-				type='text'
+			<textarea
+				ref={textareaRef}
 				value={value}
 				onChange={onChange}
 				placeholder={placeholder}
 				disabled={disabled}
-				className={`${baseClass} ${textClass} ${className} `}
+				className={`${baseClass} ${textClass} ${className} resize-none overflow-hidden h-auto min-h-[48px]`}
 				onFocus={onFocus}
 				onBlur={onBlur}
+				rows={1}
 			/>
 		);
 	}
