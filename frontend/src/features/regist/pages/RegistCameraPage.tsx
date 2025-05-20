@@ -13,6 +13,7 @@ import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore'
 import usePhotoCloth from '@/features/regist/hooks/usePhotoCloth';
 import LoadingOverlay from '@/components/etc/LoadingOverlay';
 import { SwitchToggle } from '@/components/buttons/switch-toggle';
+import { toast } from 'react-toastify';
 
 const RegistCameraPage = () => {
 	const navigate = useNavigate();
@@ -33,7 +34,35 @@ const RegistCameraPage = () => {
 	const { handleRegister, isLoading } = usePhotoCloth();
 
 	const handleNext = () => {
+		if (items[currentIndex].name === '') {
+			toast.info('상품명을 입력해주세요.');
+			return;
+		}
+		if (items[currentIndex].categoryId === null) {
+			toast.info('카테고리를 선택해주세요.');
+			return;
+		}
+		if (items[currentIndex].brandId === null) {
+			toast.info('브랜드를 선택해주세요.');
+			return;
+		}
 		next();
+	};
+
+	const registClick = () => {
+		if (items[currentIndex].name === '') {
+			toast.info('상품명을 입력해주세요.');
+			return;
+		}
+		if (items[currentIndex].categoryId === null) {
+			toast.info('카테고리를 선택해주세요.');
+			return;
+		}
+		if (items[currentIndex].brandId === null) {
+			toast.info('브랜드를 선택해주세요.');
+			return;
+		}
+		handleRegister();
 	};
 
 	const handleBack = () => {
@@ -64,7 +93,7 @@ const RegistCameraPage = () => {
 				badgeText={currentIndex === items.length - 1 ? '완료' : '다음'}
 				onBackClick={handleBack}
 				onBadgeClick={
-					currentIndex === items.length - 1 ? handleRegister : handleNext
+					currentIndex === items.length - 1 ? registClick : handleNext
 				}
 			/>
 
@@ -135,6 +164,7 @@ const RegistCameraPage = () => {
 				isOpen={isCategorySheetOpen}
 				onClose={() => setIsCategorySheetOpen(false)}
 				snapPoints={[1]}
+				className='pb-4'
 			>
 				<div className='p-4 pt-0'>
 					<p className='text-center text-button text-regular mb-4'>
@@ -143,7 +173,7 @@ const RegistCameraPage = () => {
 					{isCategoryLoading ? (
 						<p className='text-description text-center'>불러오는 중...</p>
 					) : (
-						<div className='flex flex-wrap gap-3 justify-center'>
+						<div className='flex flex-wrap gap-3 justify-center px-10'>
 							{categoryList.map((cat) => (
 								<button
 									key={cat.id}
@@ -166,6 +196,7 @@ const RegistCameraPage = () => {
 				isOpen={isBrandSheetOpen}
 				onClose={() => setIsBrandSheetOpen(false)}
 				snapPoints={[1]}
+				className='pb-4'
 			>
 				<div className='p-4 pt-2.5'>
 					<SearchBar
@@ -173,7 +204,7 @@ const RegistCameraPage = () => {
 						value={inputQuery}
 						onChange={(e) => setInputQuery(e.target.value)}
 					/>
-					<div className='mt-4 flex flex-wrap justify-start gap-2'>
+					<div className='mt-4 flex flex-wrap justify-center items-center gap-2'>
 						{isBrandLoading ? (
 							<p className='text-description text-center w-full mt-6 mb-6'>
 								검색 중...
