@@ -72,7 +72,13 @@ export const InputField = ({
 			onClick={onClick}
 			disabled={disabled}
 		>
-			<span className={`${textClass}`}>{value}</span>
+			<span
+				className={`text-default text-left ${
+					!value ? 'text-descriptionColor' : 'text-regular'
+				}`}
+			>
+				{value || placeholder}
+			</span>
 			<img src='/icons/arrow_down.svg' alt='arrow-down' />
 		</button>
 	);
