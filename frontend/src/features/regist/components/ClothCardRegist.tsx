@@ -1,6 +1,8 @@
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { RegisteredBedge } from './RegisteredBedge';
 import { useState } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface ClothCardRegistProps {
 	item: ClothItem;
@@ -12,7 +14,6 @@ export const ClothCardRegist = ({
 	item,
 	className = '',
 }: ClothCardRegistProps) => {
-	const [isLoading, setIsLoading] = useState(true);
 	const [imageError, setImageError] = useState(false);
 
 	return (
@@ -20,25 +21,18 @@ export const ClothCardRegist = ({
 			<div
 				className={`w-full aspect-[10/11] border border-light overflow-hidden rounded-md relative`}
 			>
-				{isLoading && (
-					<div className='absolute inset-0 bg-gray-200 animate-pulse' />
-				)}
-				<img
+				<LazyLoadImage
 					src={
 						imageError
 							? '/placeholder.svg?height=200&width=200'
 							: item.imageUrl || '/placeholder.svg?height=200&width=200'
 					}
 					alt={item.name}
-					className={`object-cover w-full transition-opacity duration-300 ${
-						isLoading ? 'opacity-0' : 'opacity-100'
-					}`}
-					loading='lazy'
-					onLoad={() => setIsLoading(false)}
-					onError={() => {
-						setImageError(true);
-						setIsLoading(false);
-					}}
+					effect='blur'
+					wrapperClassName='w-full h-full'
+					className='object-cover w-full h-full'
+					onError={() => setImageError(true)}
+					placeholderSrc='/placeholder.svg?height=200&width=200'
 				/>
 				<RegisteredBedge libraryId={item.id} />
 			</div>
