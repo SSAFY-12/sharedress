@@ -295,8 +295,8 @@ const CodiDetailPage = () => {
 			<div className='flex-1 overflow-y-auto pb-24 relative scrollbar-hide'>
 				<ImageDetailView item={item} recommender={recommender}>
 					<div className='px-4'>
-						<div className='flex flex-col items-start gap-3'>
-							<p className='text-regular text-default'>
+						<div className='w-full flex flex-col items-start gap-3'>
+							<p className='text-regular text-default break-words text-left'>
 								{coordination.description}
 							</p>
 							<p className='text-description text-descriptionColor mb-6'>
