@@ -26,54 +26,23 @@ const RegistCameraPrePage = () => {
 		fetchCount();
 	}, []);
 
-	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { files } = e.target;
 		if (!files || remainingPhotoCount === null) return;
 
 		const fileList = Array.from(files);
 		const sliced = fileList.slice(0, remainingPhotoCount);
 
-		// heic -> jpeg
-		const convertedFiles = await Promise.all(
-			sliced.map(async (file) => {
-				if (
-					file.type === 'image/heic' ||
-					file.name.toLowerCase().endsWith('.heic')
-				) {
-					try {
-						const { default: heic2any } = await import('heic2any');
-						const jpegBlob = await heic2any({
-							blob: file,
-							toType: 'image/jpeg',
-							quality: 0.9,
-						});
-						return new File(
-							[jpegBlob as BlobPart],
-							file.name.replace(/\.heic$/i, '.jpg'),
-							{ type: 'image/jpeg' },
-						);
-					} catch (err) {
-						console.error('HEIC 변환 실패:', err);
-						toast.error('HEIC 파일을 변환할 수 없습니다.');
-						return null;
-					}
-				}
-				return file;
-			}),
-		);
-
-		const validFiles = convertedFiles.filter((f): f is File => f !== null);
-
 		if (fileList.length > remainingPhotoCount) {
 			toast.info(`현재 최대 ${remainingPhotoCount}장까지 등록 가능합니다.`);
 		}
 
-		if (validFiles.length === 0) {
+		if (sliced.length === 0) {
 			toast.error('선택한 파일이 없습니다.');
 			return;
 		}
 
-		usePhotoClothStore.getState().setItems(validFiles);
+		usePhotoClothStore.getState().setItems(sliced);
 		navigate('/regist/camera');
 	};
 
