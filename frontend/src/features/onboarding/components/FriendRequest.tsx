@@ -3,26 +3,31 @@ import { ChevronLeft, Search } from 'lucide-react';
 const FriendRequest = () => {
 	const friends = [
 		{
+			id: 'dev',
 			name: '쉐어드레스 개발자',
 			desc: '개발자 코디룩',
 			img: 'https://images.unsplash.com/photo-1558788353-f76d92427f16?auto=format&fit=facearea&w=400&h=400&q=80',
 		},
 		{
+			id: 'beginner',
 			name: '쉐어드레스 입문자',
 			desc: '어플 쓰는법 알려줘',
 			img: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=facearea&w=400&h=400&q=80',
 		},
 		{
+			id: 'ai',
 			name: '쉐어드레스 ai',
 			desc: 'ai 열심히 했어요',
 			img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=facearea&w=400&h=400&q=80',
 		},
 		{
+			id: 'frontend',
 			name: '쉐어드레스 프론트',
 			desc: '프론트도 열심히 했어요',
 			img: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80',
 		},
 		{
+			id: 'backend',
 			name: '쉐어드레스 백엔드',
 			desc: '백엔드도 열심히했어요',
 			img: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80',
@@ -55,9 +60,9 @@ const FriendRequest = () => {
 				</div>
 
 				<div className='h-[calc(100%-140px)] overflow-y-auto p-2'>
-					{friends.map((friend, idx) => (
+					{friends.map((friend) => (
 						<div
-							key={idx}
+							key={friend.id}
 							className='mb-2 flex items-center justify-between rounded-lg p-2'
 						>
 							<div className='flex items-center'>

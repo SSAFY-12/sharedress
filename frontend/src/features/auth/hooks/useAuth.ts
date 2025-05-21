@@ -34,8 +34,17 @@ const useAuth = () => {
 				}
 			}
 
-			// 로그인 성공 시 /mypage로 리다이렉트
-			navigate('/mypage', { replace: true });
+			// 온보딩 완료 여부 확인
+			const hasCompletedOnboarding = localStorage.getItem(
+				'hasCompletedOnboarding',
+			);
+
+			// 온보딩을 완료하지 않은 경우 온보딩 페이지로, 완료한 경우 마이페이지로 이동
+			if (hasCompletedOnboarding === 'true') {
+				navigate('/mypage', { replace: true });
+			} else {
+				navigate('/onboarding', { replace: true });
+			}
 		},
 		onError: (error) => {
 			// 특정 기능에 대한 구체적인 에러 처리

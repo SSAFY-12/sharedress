@@ -65,43 +65,55 @@ const OutfitStyling = () => (
 				</div>
 
 				<div className='grid grid-cols-3 gap-2'>
-					{[
-						tshirts,
-						pants,
-						hoodi,
-						outer,
-						shortPants,
-						hair,
-						tshirts,
-						pants,
-						hoodi,
-					].map((img, idx) => {
-						const altArr = [
-							'면티',
-							'바지',
-							'후드티',
-							'아우터',
-							'반바지',
-							'비니',
-							'면티',
-							'바지',
-							'후드티',
-						];
-						return (
-							<div key={idx} className='flex flex-col'>
-								<div className='aspect-square overflow-hidden rounded-lg bg-gray-100'>
-									<img
-										src={img}
-										alt={altArr[idx]}
-										className='h-full w-full object-cover'
-									/>
-								</div>
-								<div className='mt-1'>
-									<p className='text-xs text-gray-500'>{altArr[idx]}</p>
-								</div>
-							</div>
-						);
-					})}
+					{[1, 2, 3, 4, 5, 6].map((item) => (
+						<div
+							key={item}
+							className='aspect-square overflow-hidden rounded-lg bg-gray-100'
+						>
+							{item === 1 && (
+								<img
+									src={pants}
+									alt='바지'
+									className='h-full w-full object-cover'
+								/>
+							)}
+							{item === 2 && (
+								<img
+									src={hoodi}
+									alt='후드티'
+									className='h-full w-full object-cover'
+								/>
+							)}
+							{item === 3 && (
+								<img
+									src={tshirts}
+									alt='면티'
+									className='h-full w-full object-cover'
+								/>
+							)}
+							{item === 4 && (
+								<img
+									src={hair}
+									alt='비니'
+									className='h-full w-full object-cover'
+								/>
+							)}
+							{item === 5 && (
+								<img
+									src={shortPants}
+									alt='반바지'
+									className='h-full w-full object-cover'
+								/>
+							)}
+							{item === 6 && (
+								<img
+									src={outer}
+									alt='아우터'
+									className='h-full w-full object-cover'
+								/>
+							)}
+						</div>
+					))}
 				</div>
 			</div>
 		</div>
