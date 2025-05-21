@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import ClothesRegister from '@/features/onboarding/components/ClothRegister';
-import MyCloset from '@/features/onboarding/components/Mycloset';
-import ActionMenu from '@/features/onboarding/components/ActionMenu';
-import ShareOutfit from '@/features/onboarding/components/ShareOutfit';
-import FriendRequest from '@/features/onboarding/components/FriendRequest';
+import ClothesRegister from '../features/onboarding/components/ClothRegister';
+import MyCloset from '../features/onboarding/components/Mycloset';
+import ActionMenu from '../features/onboarding/components/ActionMenu';
+import ShareOutfit from '../features/onboarding/components/ShareOutfit';
+import FriendRequest from '../features/onboarding/components/FriendRequest';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -51,69 +51,71 @@ const OnboardingPage = () => {
 	};
 
 	return (
-		<main className='flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4'>
-			<div className='mb-4 flex space-x-2'>
-				{screens.map((_, index) => (
-					<button
-						key={index}
-						className={`h-2 w-2 rounded-full ${
-							currentScreen === index ? 'bg-gray-800' : 'bg-gray-300'
-						}`}
-						onClick={() => goToScreen(index)}
-					/>
-				))}
-			</div>
-
-			<div className='mb-6'>
-				<h2 className='text-center text-2xl font-bold'>
-					{screens[currentScreen].title}
-				</h2>
-				<p className='text-center text-gray-600'>
-					{screens[currentScreen].subtitle}
-				</p>
-			</div>
-
-			<div className='mb-8'>{screens[currentScreen].component}</div>
-
-			<div className='flex w-full max-w-md items-center justify-between'>
-				{currentScreen > 0 ? (
-					<button
-						className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white'
-						onClick={prevScreen}
-					>
-						<ChevronLeft className='h-4 w-4' />
-					</button>
-				) : (
-					<div className='w-10'></div>
-				)}
-
-				<div className='flex space-x-2'>
-					<button className='rounded-full border border-gray-800 bg-white px-4 py-1 text-sm text-gray-800'>
-						건너뛰기
-					</button>
-
-					{currentScreen < screens.length - 1 && (
+		<div className='flex h-screen w-full flex-col items-center justify-center bg-gray-100 p-4'>
+			<div className='flex w-full max-w-md flex-col items-center'>
+				<div className='mb-4 flex space-x-2'>
+					{screens.map((_, index) => (
 						<button
-							className='rounded-full bg-gray-800 px-4 py-1 text-sm text-white'
-							onClick={nextScreen}
-						>
-							다음
-						</button>
-					)}
+							key={index}
+							className={`h-2 w-2 rounded-full ${
+								currentScreen === index ? 'bg-gray-800' : 'bg-gray-300'
+							}`}
+							onClick={() => goToScreen(index)}
+						/>
+					))}
 				</div>
 
-				{currentScreen < screens.length - 1 ? (
-					<button
-						className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white'
-						onClick={nextScreen}
-					>
-						<ChevronRight className='h-4 w-4' />
-					</button>
-				) : (
-					<div className='w-10'></div>
-				)}
+				<div className='mb-4'>
+					<h2 className='text-center text-2xl font-bold'>
+						{screens[currentScreen].title}
+					</h2>
+					<p className='text-center text-gray-600'>
+						{screens[currentScreen].subtitle}
+					</p>
+				</div>
+
+				<div className='mb-4'>{screens[currentScreen].component}</div>
+
+				<div className='flex w-full max-w-md items-center justify-between'>
+					{currentScreen > 0 ? (
+						<button
+							className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white'
+							onClick={prevScreen}
+						>
+							<ChevronLeft className='h-4 w-4' />
+						</button>
+					) : (
+						<div className='w-10'></div>
+					)}
+
+					<div className='flex space-x-2'>
+						<button className='rounded-full border border-gray-800 bg-white px-4 py-1 text-sm text-gray-800'>
+							건너뛰기
+						</button>
+
+						{currentScreen < screens.length - 1 && (
+							<button
+								className='rounded-full bg-gray-800 px-4 py-1 text-sm text-white'
+								onClick={nextScreen}
+							>
+								다음
+							</button>
+						)}
+					</div>
+
+					{currentScreen < screens.length - 1 ? (
+						<button
+							className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white'
+							onClick={nextScreen}
+						>
+							<ChevronRight className='h-4 w-4' />
+						</button>
+					) : (
+						<div className='w-10'></div>
+					)}
+				</div>
 			</div>
-		</main>
+		</div>
 	);
 };
 

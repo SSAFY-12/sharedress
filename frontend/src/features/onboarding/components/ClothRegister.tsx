@@ -2,7 +2,7 @@ import { ChevronLeft } from 'lucide-react';
 
 const ClothesRegister = () => (
 	<div className='w-full max-w-md'>
-		<div className='h-[580px] w-[320px] overflow-hidden rounded-xl bg-white shadow-md'>
+		<div className='h-[500px] w-[320px] overflow-hidden rounded-xl bg-white shadow-md'>
 			<div className='flex items-center p-4'>
 				<ChevronLeft className='h-5 w-5 text-gray-500' />
 				<span className='ml-2 font-medium'>옷 등록하기</span>

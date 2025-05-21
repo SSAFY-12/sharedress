@@ -20,6 +20,7 @@ import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import ClothDetailLayoutPage from '@/features/closet/pages/ClothDetailLayoutPage';
 import CodiDetailLayoutPage from '@/features/closet/pages/CodiDetailLayoutPage';
+import OnboardingPage from '@/pages/OnboardingPage';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -39,6 +40,7 @@ const InitialRoute = () => {
 export const router = createBrowserRouter([
 	// 공개 라우트
 	{ path: '/auth', element: <AuthPage /> },
+	{ path: '/onboarding', element: <OnboardingPage /> },
 	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
 	{ path: '/link/:code', element: <ExternalUserPage /> },
 	{ path: '/link/friend/:id', element: <FriendClosetLayoutPage /> }, // <-- App 없이 바로!
