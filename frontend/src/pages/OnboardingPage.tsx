@@ -7,8 +7,6 @@ import ShareOutfit from '@/features/onboarding/components/ShareOutfit';
 import FriendRequest from '@/features/onboarding/components/FriendRequest';
 import OutfitStyling from '@/features/onboarding/components/OutfitStyling';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-
 const OnboardingPage = () => {
 	const [currentScreen, setCurrentScreen] = useState(0);
 	const navigate = useNavigate();
@@ -84,35 +82,33 @@ const OnboardingPage = () => {
 
 				<div className='mb-4'>{screens[currentScreen].component}</div>
 
-				<div className='flex w-full max-w-md items-center justify-between'>
-					{currentScreen > 0 ? (
-						<button
-							className='flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-black'
-							onClick={prevScreen}
-						>
-							<ChevronLeft className='h-5 w-5' style={{ color: '#000' }} />
-						</button>
-					) : (
-						<div className='w-10'></div>
-					)}
-
+				<div className='flex w-full max-w-md items-center justify-center'>
 					<div className='flex space-x-2'>
-						{currentScreen < screens.length - 1 ? (
-							<>
-								<button
-									className='h-10 px-6 rounded-full border border-gray-800 bg-white text-sm text-gray-800 flex items-center justify-center font-medium'
-									onClick={() => navigate('/mypage')}
-								>
-									건너뛰기
-								</button>
-								<button
-									className='h-10 px-6 rounded-full bg-gray-800 text-sm text-white flex items-center justify-center font-medium'
-									onClick={nextScreen}
-								>
-									다음
-								</button>
-							</>
-						) : (
+						{currentScreen > 0 && (
+							<button
+								className='h-10 px-6 rounded-full border border-gray-800 bg-white text-sm text-gray-800 flex items-center justify-center font-medium'
+								onClick={prevScreen}
+							>
+								이전
+							</button>
+						)}
+						{currentScreen < screens.length - 1 && (
+							<button
+								className='h-10 px-6 rounded-full border border-gray-800 bg-white text-sm text-gray-800 flex items-center justify-center font-medium'
+								onClick={() => navigate('/mypage')}
+							>
+								건너뛰기
+							</button>
+						)}
+						{currentScreen < screens.length - 1 && (
+							<button
+								className='h-10 px-6 rounded-full bg-gray-800 text-sm text-white flex items-center justify-center font-medium'
+								onClick={nextScreen}
+							>
+								다음
+							</button>
+						)}
+						{currentScreen === screens.length - 1 && (
 							<button
 								className='h-10 px-6 rounded-full bg-gray-800 text-sm text-white flex items-center justify-center font-medium'
 								onClick={() => navigate('/mypage')}
@@ -121,17 +117,6 @@ const OnboardingPage = () => {
 							</button>
 						)}
 					</div>
-
-					{currentScreen < screens.length - 1 ? (
-						<button
-							className='flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-black'
-							onClick={nextScreen}
-						>
-							<ChevronRight className='h-5 w-5' style={{ color: '#000' }} />
-						</button>
-					) : (
-						<div className='w-10'></div>
-					)}
 				</div>
 			</div>
 		</div>
