@@ -20,12 +20,12 @@ const OnboardingPage = () => {
 		{
 			component: <ClothesRegister key='clothes-register' />,
 			title: '옷 등록하기',
-			subtitle: '다양한 방법으로 간편하게 등록',
+			subtitle: '다양한 방법으로 간편하게 등록해보세요',
 		},
 		{
 			component: <MyCloset key='my-closet' />,
 			title: '마이 옷장',
-			subtitle: '나만의 옷장과 코디를 한눈에',
+			subtitle: '나만의 옷장과 코디를 한눈에 볼 수 잇어요',
 		},
 		{
 			component: <OutfitStyling key='outfit-styling' />,
@@ -40,7 +40,7 @@ const OnboardingPage = () => {
 		{
 			component: <ShareOutfit key='share-outfit' />,
 			title: '코디 공유하기',
-			subtitle: '링크로 코디 추천을 요청해보세요',
+			subtitle: '링크로 비회원 친구에게도 코디 추천을 요청해보세요',
 		},
 	];
 

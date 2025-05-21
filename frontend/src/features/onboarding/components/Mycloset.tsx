@@ -1,10 +1,10 @@
 import { Plus } from 'lucide-react';
-import tshirts from '../../../assets/onboarding/gptTshirts.png';
-import hair from '../../../assets/onboarding/gpthair.png';
-import hoodi from '../../../assets/onboarding/gpthoodi.png';
-import outer from '../../../assets/onboarding/gptouter.png';
-import pants from '../../../assets/onboarding/gptpants.png';
-import shortPants from '../../../assets/onboarding/gptshortpants.png';
+import tshirts from '@/assets/onboarding/gptTshirts.png';
+import hair from '@/assets/onboarding/gpthair.png';
+import hoodi from '@/assets/onboarding/gpthoodi.png';
+import outer from '@/assets/onboarding/gptouter.png';
+import pants from '@/assets/onboarding/gptpants.png';
+import shortPants from '@/assets/onboarding/gptshortpants.png';
 
 const MyCloset = () => (
 	<div className='w-full max-w-md'>
