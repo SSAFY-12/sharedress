@@ -4,7 +4,6 @@ import { fetchRemainingPhotoCount } from '@/features/regist/api/registApis';
 import { toast } from 'react-toastify';
 import { usePhotoClothStore } from '@/features/regist/stores/usePhotoClothStore';
 import Header from '@/components/layouts/Header';
-import heic2any from 'heic2any';
 
 const RegistCameraPrePage = () => {
 	const navigate = useNavigate();
@@ -42,6 +41,7 @@ const RegistCameraPrePage = () => {
 					file.name.toLowerCase().endsWith('.heic')
 				) {
 					try {
+						const { default: heic2any } = await import('heic2any');
 						const jpegBlob = await heic2any({
 							blob: file,
 							toType: 'image/jpeg',

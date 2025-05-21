@@ -203,6 +203,11 @@ export default defineConfig(({ mode }) => {
 						'public/firebase-messaging-sw.js',
 					),
 				},
+				output: {
+					manualChunks: {
+						heic2any: ['heic2any'],
+					},
+				},
 			},
 			outDir: 'dist',
 			assetsDir: 'assets',
