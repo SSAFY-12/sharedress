@@ -58,6 +58,7 @@ public class ClothesService implements ClothesUseCase {
 		}
 	}
 
+	@SendNotification(NotificationType.AI_COMPLETE)
 	@Transactional
 	@Override
 	public void markPhotoClothesAsAiCompleted(Long memberId, List<Long> successClosetClothes,
