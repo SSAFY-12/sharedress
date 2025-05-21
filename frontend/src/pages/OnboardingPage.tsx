@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import ClothesRegister from '../features/onboarding/components/ClothRegister';
-import MyCloset from '../features/onboarding/components/Mycloset';
-import ActionMenu from '../features/onboarding/components/ActionMenu';
-import ShareOutfit from '../features/onboarding/components/ShareOutfit';
-import FriendRequest from '../features/onboarding/components/FriendRequest';
+import ClothesRegister from '@/features/onboarding/components/ClothRegister';
+import MyCloset from '@/features/onboarding/components/Mycloset';
+import ActionMenu from '@/features/onboarding/components/ActionMenu';
+import ShareOutfit from '@/features/onboarding/components/ShareOutfit';
+import FriendRequest from '@/features/onboarding/components/FriendRequest';
+import OutfitStyling from '@/features/onboarding/components/OutfitStyling';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -25,6 +26,11 @@ const OnboardingPage = () => {
 			component: <ActionMenu key='action-menu' />,
 			title: '옷장 & 코디',
 			subtitle: '원하는 기능을 선택하세요',
+		},
+		{
+			component: <OutfitStyling key='outfit-styling' />,
+			title: '코디 꾸미기',
+			subtitle: '나만의 스타일을 완성해보세요',
 		},
 		{
 			component: <ShareOutfit key='share-outfit' />,
