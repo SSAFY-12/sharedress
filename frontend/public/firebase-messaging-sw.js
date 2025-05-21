@@ -29,3 +29,23 @@ messaging.onBackgroundMessage((payload) => {
 
 	self.registration.showNotification(notificationTitle, notificationOptions);
 });
+
+self.addEventListener('notificationclick', (event) => {
+	event.notification.close();
+
+	// 알림 클릭 시 웹사이트로 이동
+	event.waitUntil(
+		clients.matchAll({ type: 'window' }).then((clientList) => {
+			// 이미 열려있는 창이 있다면 그 창으로 이동
+			for (const client of clientList) {
+				if (client.url.includes('/') && 'focus' in client) {
+					return client.focus();
+				}
+			}
+			// 열려있는 창이 없다면 새 창 열기
+			if (clients.openWindow) {
+				return clients.openWindow('/');
+			}
+		}),
+	);
+});
