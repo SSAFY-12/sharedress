@@ -8,8 +8,10 @@ const ActionMenu = () => (
 					<div className='flex items-center'>
 						<div className='mr-3 h-12 w-12 rounded-full bg-purple-200'></div>
 						<div>
-							<p className='font-bold'>좀인#8314</p>
-							<p className='text-xs text-gray-500'>A705 맴버 🔥</p>
+							<p className='font-bold'>쉐어드레스#0522</p>
+							<p className='text-xs text-gray-500'>
+								옷장 공유와 조언을 한 번에🔥
+							</p>
 						</div>
 					</div>
 					<div className='mt-2 flex space-x-2'>

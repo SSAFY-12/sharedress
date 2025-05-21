@@ -1,4 +1,4 @@
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Shirt, Scissors } from 'lucide-react';
 
 const ShareOutfit = () => (
 	<div className='w-full max-w-md'>
@@ -8,8 +8,10 @@ const ShareOutfit = () => (
 					<div className='flex items-center'>
 						<div className='mr-3 h-12 w-12 rounded-full bg-purple-200'></div>
 						<div>
-							<p className='font-bold'>좀인#8314</p>
-							<p className='text-xs text-gray-500'>A705 맴버 🔥</p>
+							<p className='font-bold'>쉐어드레스#0522</p>
+							<p className='text-xs text-gray-500'>
+								옷장 공유와 조언을 한 번에🔥
+							</p>
 						</div>
 					</div>
 					<div className='mt-2 flex space-x-2'>
@@ -126,16 +128,8 @@ const ShareOutfit = () => (
 
 					<div className='mb-3 flex justify-center'>
 						<div className='flex items-center'>
-							<img
-								src='https://via.placeholder.com/40'
-								alt='셔츠'
-								className='h-10 w-8 object-contain'
-							/>
-							<img
-								src='https://via.placeholder.com/40'
-								alt='바지'
-								className='h-10 w-8 object-contain'
-							/>
+							<Shirt className='h-10 w-8 text-blue-400' />
+							<Scissors className='h-10 w-8 text-pink-400' />
 						</div>
 					</div>
 
@@ -155,7 +149,7 @@ const ShareOutfit = () => (
 					<div className='flex items-center rounded-md border border-gray-200 bg-gray-50 p-2'>
 						<input
 							type='text'
-							value='sharedress.co.kr/Mgn2NExPOy'
+							value='sharedress.co.kr/share-dress'
 							readOnly
 							className='flex-1 bg-transparent text-xs outline-none'
 						/>

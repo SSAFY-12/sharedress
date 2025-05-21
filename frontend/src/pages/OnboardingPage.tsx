@@ -13,9 +13,9 @@ const OnboardingPage = () => {
 
 	const screens = [
 		{
-			component: <MyCloset key='my-closet' />,
-			title: '마이 옷장',
-			subtitle: '나만의 옷장과 코디를 한눈에',
+			component: <ActionMenu key='action-menu' />,
+			title: '옷장 & 코디',
+			subtitle: '플러스 버튼을 눌러 원하는 기능을 선택하세요',
 		},
 		{
 			component: <ClothesRegister key='clothes-register' />,
@@ -23,9 +23,9 @@ const OnboardingPage = () => {
 			subtitle: '다양한 방법으로 간편하게 등록',
 		},
 		{
-			component: <ActionMenu key='action-menu' />,
-			title: '옷장 & 코디',
-			subtitle: '원하는 기능을 선택하세요',
+			component: <MyCloset key='my-closet' />,
+			title: '마이 옷장',
+			subtitle: '나만의 옷장과 코디를 한눈에',
 		},
 		{
 			component: <OutfitStyling key='outfit-styling' />,
@@ -33,14 +33,14 @@ const OnboardingPage = () => {
 			subtitle: '나만의 스타일을 완성해보세요',
 		},
 		{
-			component: <ShareOutfit key='share-outfit' />,
-			title: '코디 공유하기',
-			subtitle: '링크로 코디 추천을 요청해보세요',
-		},
-		{
 			component: <FriendRequest key='friend-request' />,
 			title: '친구에게 코디 요청',
 			subtitle: '함께 스타일링하고 소통하세요',
+		},
+		{
+			component: <ShareOutfit key='share-outfit' />,
+			title: '코디 공유하기',
+			subtitle: '링크로 코디 추천을 요청해보세요',
 		},
 	];
 

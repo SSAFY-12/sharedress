@@ -1,4 +1,10 @@
 import { Plus } from 'lucide-react';
+import tshirts from '../../../assets/onboarding/gptTshirts.png';
+import hair from '../../../assets/onboarding/gpthair.png';
+import hoodi from '../../../assets/onboarding/gpthoodi.png';
+import outer from '../../../assets/onboarding/gptouter.png';
+import pants from '../../../assets/onboarding/gptpants.png';
+import shortPants from '../../../assets/onboarding/gptshortpants.png';
 
 const MyCloset = () => (
 	<div className='w-full max-w-md'>
@@ -8,8 +14,10 @@ const MyCloset = () => (
 					<div className='flex items-center'>
 						<div className='mr-3 h-12 w-12 rounded-full bg-purple-200'></div>
 						<div>
-							<p className='font-bold'>좀인#8314</p>
-							<p className='text-xs text-gray-500'>A705 맴버 🔥</p>
+							<p className='font-bold'>쉐어드레스#0522</p>
+							<p className='text-xs text-gray-500'>
+								옷장 공유와 조언을 한 번에🔥
+							</p>
 						</div>
 					</div>
 					<div className='mt-2 flex space-x-2'>
@@ -55,43 +63,43 @@ const MyCloset = () => (
 						>
 							{item === 1 && (
 								<img
-									src='https://via.placeholder.com/120'
+									src={pants}
 									alt='바지'
 									className='h-full w-full object-cover'
 								/>
 							)}
 							{item === 2 && (
 								<img
-									src='https://via.placeholder.com/120'
-									alt='바지'
+									src={hoodi}
+									alt='후드티'
 									className='h-full w-full object-cover'
 								/>
 							)}
 							{item === 3 && (
 								<img
-									src='https://via.placeholder.com/120'
-									alt='후드티'
+									src={tshirts}
+									alt='면티'
 									className='h-full w-full object-cover'
 								/>
 							)}
 							{item === 4 && (
 								<img
-									src='https://via.placeholder.com/120'
-									alt='티셔츠'
+									src={hair}
+									alt='비니'
 									className='h-full w-full object-cover'
 								/>
 							)}
 							{item === 5 && (
 								<img
-									src='https://via.placeholder.com/120'
-									alt='모자'
+									src={shortPants}
+									alt='반바지'
 									className='h-full w-full object-cover'
 								/>
 							)}
 							{item === 6 && (
 								<img
-									src='https://via.placeholder.com/120'
-									alt='티셔츠'
+									src={outer}
+									alt='아우터'
 									className='h-full w-full object-cover'
 								/>
 							)}
