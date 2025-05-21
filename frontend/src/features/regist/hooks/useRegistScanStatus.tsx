@@ -31,7 +31,7 @@ export const useRegistScanStatus = (
 					<div className='flex flex-col justify-center items-start'>
 						<div className='text-smallButton text-left'>구매내역 스캔 완료</div>
 						<div className='text-description text-left text-white'>
-							옷들을 옷장에 넣어 드렸어요요
+							옷들을 옷장에 넣어 드렸어요
 						</div>
 					</div>,
 					{
