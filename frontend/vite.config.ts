@@ -153,6 +153,20 @@ export default defineConfig(({ mode }) => {
 					clientsClaim: true,
 					skipWaiting: true,
 					globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'],
+					maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB로 증가
+					runtimeCaching: [
+						{
+							urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
+							handler: 'CacheFirst',
+							options: {
+								cacheName: 'images',
+								expiration: {
+									maxEntries: 60,
+									maxAgeSeconds: 30 * 24 * 60 * 60,
+								},
+							},
+						},
+					],
 				},
 			}),
 			checker({
@@ -163,7 +177,7 @@ export default defineConfig(({ mode }) => {
 				},
 			}),
 			sentryVitePlugin({
-				org: 'ssafy-d6',
+				org: 'sharedress',
 				project: 'javascript-react',
 			}),
 			viteImagemin({
@@ -175,10 +189,10 @@ export default defineConfig(({ mode }) => {
 					optimizationLevel: 7,
 				},
 				mozjpeg: {
-					quality: 80,
+					quality: 40, // 품질을 40%로 더 낮춤
 				},
 				pngquant: {
-					quality: [0.8, 0.9],
+					quality: [0.4, 0.6], // 품질 범위를 더 낮춤
 					speed: 4,
 				},
 				svgo: {
@@ -232,15 +246,43 @@ export default defineConfig(({ mode }) => {
 					),
 				},
 				output: {
-					manualChunks: {
-						vendor: ['react', 'react-dom', 'react-router-dom'],
+					manualChunks: (id) => {
+						if (id.includes('node_modules')) {
+							if (
+								id.includes('react') ||
+								id.includes('react-dom') ||
+								id.includes('react-router-dom')
+							) {
+								return 'vendor-react';
+							}
+							if (
+								id.includes('framer-motion') ||
+								id.includes('react-toastify') ||
+								id.includes('lucide-react')
+							) {
+								return 'vendor-ui';
+							}
+							if (id.includes('date-fns') || id.includes('jwt-decode')) {
+								return 'vendor-utils';
+							}
+							return 'vendor';
+						}
+					},
+					assetFileNames: (assetInfo) => {
+						const info = assetInfo.name;
+						if (!info) return 'assets/[name]-[hash][extname]';
+						if (info.endsWith('.png') || info.endsWith('.jpg')) {
+							return 'assets/images/[name]-[hash][extname]';
+						}
+						return 'assets/[name]-[hash][extname]';
 					},
 				},
 			},
 			outDir: 'dist',
 			assetsDir: 'assets',
 			base: '/',
-			chunkSizeWarningLimit: 1000,
+			chunkSizeWarningLimit: 2000,
+			assetsInlineLimit: 4096,
 		},
 		define: {
 			'process.env': process.env,
