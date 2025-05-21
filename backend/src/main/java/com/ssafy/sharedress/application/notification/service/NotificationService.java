@@ -71,8 +71,8 @@ public class NotificationService implements NotificationUseCase {
 				);
 
 				saveNotification(
-					friendRequest.getRequester(),
 					friendRequest.getReceiver(),
+					friendRequest.getRequester(),
 					"친구 요청 수락",
 					"친구 요청을 수락했어요!",
 					NotificationType.FRIEND_ACCEPT
