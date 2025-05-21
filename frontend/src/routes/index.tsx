@@ -20,6 +20,8 @@ import CodiEditPage from '@/features/codi/pages/CodiEditPage';
 import CodiSavePage from '@/features/codi/pages/CodiSavePage';
 import ClothDetailLayoutPage from '@/features/closet/pages/ClothDetailLayoutPage';
 import CodiDetailLayoutPage from '@/features/closet/pages/CodiDetailLayoutPage';
+import OnboardingPage from '@/pages/OnboardingPage';
+import OnboardingLayout from '@/layouts/OnboardingLayout';
 
 // 인증된 사용자만 접근 가능한 라우트
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -41,13 +43,29 @@ export const router = createBrowserRouter([
 	{ path: '/auth', element: <AuthPage /> },
 	{ path: '/oauth/google/callback', element: <GoogleCallbackHandler /> },
 	{ path: '/link/:code', element: <ExternalUserPage /> },
-	{ path: '/link/friend/:id', element: <FriendClosetLayoutPage /> }, // <-- App 없이 바로!
+	{ path: '/link/friend/:id', element: <FriendClosetLayoutPage /> },
 	{ path: '/link/codi/edit', element: <CodiEditPage /> },
 	{ path: '/link/codi/save', element: <CodiSavePage /> },
 	{ path: '/link/cloth/:id', element: <ClothDetailLayoutPage /> },
 	{ path: '/link/codi/:id', element: <CodiDetailLayoutPage /> },
 
-	// 인증 필요 라우트
+	// 온보딩 레이아웃
+	{
+		path: '/',
+		element: <OnboardingLayout />,
+		children: [
+			{
+				path: 'onboarding',
+				element: (
+					<ProtectedRoute>
+						<OnboardingPage />
+					</ProtectedRoute>
+				),
+			},
+		],
+	},
+
+	// 메인 앱 라우트
 	{
 		path: '/',
 		element: <App />,

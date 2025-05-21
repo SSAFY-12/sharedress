@@ -8,6 +8,7 @@ import {
 } from '@/features/regist/api/registApis';
 import PrivacyModal from '@/features/regist/components/PrivacyModal';
 import Header from '@/components/layouts/Header';
+import { toast } from 'react-toastify';
 
 const RegistScanPage = () => {
 	const navigate = useNavigate();
@@ -58,6 +59,8 @@ const RegistScanPage = () => {
 					onClick={() => {
 						if (!isMusinsaScanning) {
 							navigate('/regist/scan/musinsa');
+						} else {
+							toast.info('스캔 중에는 신규 등록이 불가능합니다.');
 						}
 					}}
 				>
@@ -90,6 +93,22 @@ const RegistScanPage = () => {
 					<div className='flex flex-col items-start gap-1 py-2'>
 						<h1 className='text-smallButton text-regular'>29cm</h1>
 						<p className='text-description'>https://www.29cm.co.kr</p>
+					</div>
+				</div>
+				<div className='flex justify-start items-center gap-4 w-full relative py-2 px-2'>
+					<div className='absolute inset-0 bg-black/30 rounded-lg z-10 flex items-center justify-center'>
+						<span className='text-white text-button w-full pr-2'>
+							업데이트 예정
+						</span>
+					</div>
+					<img
+						src='/images/regist/ably.png'
+						alt='ably'
+						className='h-14 object-cover border border-light rounded-lg'
+					/>
+					<div className='flex flex-col items-start gap-1 py-2'>
+						<h1 className='text-smallButton text-regular'>ABLY</h1>
+						<p className='text-description'>https://m.a-bly.com/</p>
 					</div>
 				</div>
 

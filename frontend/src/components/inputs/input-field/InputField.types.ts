@@ -6,7 +6,9 @@ export interface InputFieldProps {
 	hexCode?: string; // 색상 코드
 	value: string; // 현재 값
 	onChange?: (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>,
 	) => void; // 값 변경 핸들러
 	onFocus?: () => void; // 포커스 핸들러
 	onBlur?: () => void; // 블러 핸들러

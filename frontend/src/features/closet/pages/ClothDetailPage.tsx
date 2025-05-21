@@ -8,6 +8,7 @@ import { ImageDetailView } from '@/containers/ImageDetailView';
 import Header from '@/components/layouts/Header';
 import { toast } from 'react-toastify';
 import { useAuthStore } from '@/store/useAuthStore';
+import LoadingOverlay from '@/components/etc/LodaingOverlay';
 
 const ClothDetailPage = () => {
 	const navigate = useNavigate();
@@ -71,7 +72,8 @@ const ClothDetailPage = () => {
 		});
 	};
 
-	if (isLoading) return <div className='p-4'>불러오는 중...</div>;
+	if (isLoading)
+		return <LoadingOverlay message='옷 정보를 불러오는 중이에요...' />;
 	if (isError || !cloth)
 		return <div className='p-4'>옷 정보를 불러오지 못했습니다.</div>;
 

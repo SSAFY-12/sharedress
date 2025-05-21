@@ -94,7 +94,7 @@ export const FriendCodiRequestPage = () => {
 				placeholder='친구 검색'
 				value={searchValue}
 				onChange={handleSearchChange}
-				className='sticky top-0 z-10 bg-white'
+				className=' bg-white'
 			/>
 
 			{/* <button

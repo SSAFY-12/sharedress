@@ -4,10 +4,12 @@ import { useState, useEffect } from 'react';
 import { FriendRequestActionModal } from '@/features/social/components/FriendRequestActionModal';
 import useRequest from '@/features/social/hooks/useRequest';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
+import { useSocialStore } from '@/store/useSocialStore';
 
 // 메인 컴포넌트
 export const FriendRequestsPage = () => {
 	const { friendRequests } = useRequest();
+	const setHasRequest = useSocialStore((state) => state.setHasRequest);
 
 	// 모달 관련 상태
 	const [actionModalOpen, setActionModalOpen] = useState(false);
@@ -25,6 +27,12 @@ export const FriendRequestsPage = () => {
 		window.addEventListener('resize', handleResize);
 		return () => window.removeEventListener('resize', handleResize);
 	}, []);
+
+	useEffect(() => {
+		if (friendRequests !== undefined) {
+			setHasRequest(friendRequests.length > 0);
+		}
+	}, [friendRequests, setHasRequest]);
 
 	// const handleActionClick = (type: 'accept' | 'reject', request: any) => {
 	// 	setActionType(type);
