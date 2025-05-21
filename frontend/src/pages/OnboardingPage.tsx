@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ClothesRegister from '@/features/onboarding/components/ClothRegister';
 import MyCloset from '@/features/onboarding/components/Mycloset';
 import ActionMenu from '@/features/onboarding/components/ActionMenu';
@@ -10,6 +11,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const OnboardingPage = () => {
 	const [currentScreen, setCurrentScreen] = useState(0);
+	const navigate = useNavigate();
 
 	const screens = [
 		{
@@ -85,36 +87,47 @@ const OnboardingPage = () => {
 				<div className='flex w-full max-w-md items-center justify-between'>
 					{currentScreen > 0 ? (
 						<button
-							className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white'
+							className='flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-black'
 							onClick={prevScreen}
 						>
-							<ChevronLeft className='h-4 w-4' />
+							<ChevronLeft className='h-5 w-5' style={{ color: '#000' }} />
 						</button>
 					) : (
 						<div className='w-10'></div>
 					)}
 
 					<div className='flex space-x-2'>
-						<button className='rounded-full border border-gray-800 bg-white px-4 py-1 text-sm text-gray-800'>
-							건너뛰기
-						</button>
-
-						{currentScreen < screens.length - 1 && (
+						{currentScreen < screens.length - 1 ? (
+							<>
+								<button
+									className='h-10 px-6 rounded-full border border-gray-800 bg-white text-sm text-gray-800 flex items-center justify-center font-medium'
+									onClick={() => navigate('/mypage')}
+								>
+									건너뛰기
+								</button>
+								<button
+									className='h-10 px-6 rounded-full bg-gray-800 text-sm text-white flex items-center justify-center font-medium'
+									onClick={nextScreen}
+								>
+									다음
+								</button>
+							</>
+						) : (
 							<button
-								className='rounded-full bg-gray-800 px-4 py-1 text-sm text-white'
-								onClick={nextScreen}
+								className='h-10 px-6 rounded-full bg-gray-800 text-sm text-white flex items-center justify-center font-medium'
+								onClick={() => navigate('/mypage')}
 							>
-								다음
+								시작하기
 							</button>
 						)}
 					</div>
 
 					{currentScreen < screens.length - 1 ? (
 						<button
-							className='flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-white'
+							className='flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 bg-white text-black'
 							onClick={nextScreen}
 						>
-							<ChevronRight className='h-4 w-4' />
+							<ChevronRight className='h-5 w-5' style={{ color: '#000' }} />
 						</button>
 					) : (
 						<div className='w-10'></div>
