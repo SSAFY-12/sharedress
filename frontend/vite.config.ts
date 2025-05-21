@@ -8,6 +8,7 @@ import path from 'path';
 import mkcert from 'vite-plugin-mkcert';
 import { VitePWA } from 'vite-plugin-pwa';
 import fs from 'fs';
+import viteImagemin from 'vite-plugin-imagemin';
 
 const cspHeader = [
 	// 기본 설정
@@ -145,6 +146,33 @@ export default defineConfig(({ mode }) => {
 				org: 'ssafy-d6',
 				project: 'javascript-react',
 			}),
+			viteImagemin({
+				gifsicle: {
+					optimizationLevel: 7,
+					interlaced: false,
+				},
+				optipng: {
+					optimizationLevel: 7,
+				},
+				mozjpeg: {
+					quality: 80,
+				},
+				pngquant: {
+					quality: [0.8, 0.9],
+					speed: 4,
+				},
+				svgo: {
+					plugins: [
+						{
+							name: 'removeViewBox',
+						},
+						{
+							name: 'removeEmptyAttrs',
+							active: false,
+						},
+					],
+				},
+			}),
 		],
 		css: {
 			postcss: {
@@ -183,10 +211,16 @@ export default defineConfig(({ mode }) => {
 						'public/firebase-messaging-sw.js',
 					),
 				},
+				output: {
+					manualChunks: {
+						vendor: ['react', 'react-dom', 'react-router-dom'],
+					},
+				},
 			},
 			outDir: 'dist',
 			assetsDir: 'assets',
 			base: '/',
+			chunkSizeWarningLimit: 1000,
 		},
 		define: {
 			'process.env': process.env,
