@@ -1,0 +1,91 @@
+# 프로젝트 기술 스택 및 제약사항
+- 이 프로젝트는 React(v18+), TypeScript, Tailwind CSS, TanStack Query, Zustand, PWA, Vite을 사용한다.
+- Next.js는 사용하지 않으며, React Router를 사용한 CSR(Client-Side Rendering) 방식으로 구현한다.
+- 라우팅은 React Router v6를 사용한다.
+
+## 0. 파일/폴더 구조
+src/
+├── api/                # API 통신 관련
+├── assets/            # 정적 리소스
+├── components/        # 컴포넌트
+├── hooks/            # 커스텀 훅
+├── routes/           # 라우트 컴포넌트 (페이지)
+├── stores/           # 상태 관리 (Zustand)
+├── types/            # TypeScript 타입
+└── utils/            # 유틸리티
+
+
+## 1. 파일/폴더 네이밍 규칙
+- 컴포넌트 파일: PascalCase (예: MyComponent.tsx)
+- API 관련 파일: camelCase (예: fetchUserApi.ts)
+- 상수 파일: SCREAMING_SNAKE_CASE (예: USER_ROLE_CONST.ts)
+- 폴더명: kebab-case (예: user-profile/)
+- 변수/함수/타입 네이밍은 ESLint 규칙을 따름
+
+## 2. 변수/함수 네이밍
+- 변수: camelCase, UPPER_CASE, PascalCase 허용
+- 함수: camelCase, PascalCase 허용, 단 React Hook은 use로 시작
+- 타입/인터페이스/클래스/Enum: PascalCase
+- 상수: UPPER_CASE
+
+### 2. 변수/함수 네이밍 (예외 사항)
+- 라우터 관련 변수는 소문자 허용 (예: router)
+- 설정 관련 변수는 camelCase 허용 (예: headerConfig)
+- API 클라이언트는 camelCase 허용 (예: client)
+
+
+## 3. 코드 스타일
+- 화살표 함수 사용 권장
+- 객체 구조분해 할당 권장
+- 상대경로 import 대신 @ 별칭 사용
+
+
+## 4. 금지 패턴
+- inline style 사용 금지
+- 직접적인 SQL 쿼리 사용 금지 (ORM만 사용)
+- React 17+에서는 import React from 'react' 생략
+
+
+## 5. 트러블슈팅/시행착오
+- Tailwind purge 설정 누락 주의
+
+
+## 6. 업데이트 이력 (예시)
+- **2025-04-23 (안주민)**  
+  - 초안 작성: 파일/폴더 네이밍 규칙, 코드 스타일 추가  
+  - 금지 패턴: inline style 사용 금지 항목 추가
+
+- **2025-04-25 (김현래)**  
+  - 트러블슈팅: Tailwind purge 설정 누락 사례 추가  
+  - 함수 네이밍 규칙: React Hook 예외 사항 명시
+
+- **2025-04-27 (박예승)**  
+  - 폴더 구조 규칙: `src/features/` 디렉토리 추가  
+  - API 호출 규칙: TanStack Query 사용 의무화 명시
+
+
+## AI 활용 가이드
+### **Cursor에게 이렇게 요청해보세요!**
+1. **코드 생성**  
+   - "React 함수형 컴포넌트 템플릿 생성해줘. TypeScript, Tailwind CSS 사용해야 함"  
+   - "Zustand로 사용자 인증 상태 관리 store 만들어줘"
+
+2. **리팩토링**  
+   - "TanStack Query의 useQuery를 사용하도록 이 코드 리팩토링 해줘"
+
+3. **문서화**  
+   - "현재 컴포넌트의 props를 마크다운 테이블로 문서화해줘"  
+   - "이 함수의 JSDoc 주석을 자동 생성해줘"
+
+4. **트러블슈팅**  
+   - "Tailwind 클래스가 프로덕션에서 적용되지 않는 문제 해결법은?"
+
+### **프롬프트 작성 팁**
+- 기술 스택 명시: "React 18, TypeScript 5, 기준으로..."
+- 컨텍스트 제공: "현재 사용자 인증은 Zustand로 관리 중인데..."  
+- 출력 형식 지정: "마크다운 테이블로 보여줘", "주석이 포함된 코드로 생성해줘"
+
+
+이 규칙을 반드시 지키며, 코드 리뷰 시 위반 사항은 지적한다.
+팀 상황에 따라 주기적으로 업데이트를 실시한다.
+cursor 에디터에서 ai에게 코드를 제안, 리팩토링, 문서화 요청시 해당 규칙을 참고한다.

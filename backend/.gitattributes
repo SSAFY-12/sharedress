@@ -1,0 +1,13 @@
+# 모든 텍스트 파일은 LF로 저장 (줄 끝 통일)
+* text eol=lf
+
+# 윈도우 실행용 배치 파일은 CRLF 유지
+*.bat text eol=crlf
+
+# 실행 파일, 바이너리 파일은 줄 끝 처리하지 않음
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary

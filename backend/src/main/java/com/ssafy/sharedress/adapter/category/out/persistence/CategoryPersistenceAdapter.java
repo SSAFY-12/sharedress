@@ -1,0 +1,33 @@
+package com.ssafy.sharedress.adapter.category.out.persistence;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
+
+import com.ssafy.sharedress.domain.category.entity.Category;
+import com.ssafy.sharedress.domain.category.repository.CategoryRepository;
+
+import lombok.RequiredArgsConstructor;
+
+@Repository
+@RequiredArgsConstructor
+public class CategoryPersistenceAdapter implements CategoryRepository {
+
+	private final CategoryJpaRepository categoryJpaRepository;
+
+	@Override
+	public List<Category> findAllByOrderByIdAsc() {
+		return categoryJpaRepository.findAllByOrderByIdAsc();
+	}
+
+	@Override
+	public Optional<Category> findById(Long id) {
+		return categoryJpaRepository.findById(id);
+	}
+
+	@Override
+	public Category getReferenceById(Long id) {
+		return categoryJpaRepository.getReferenceById(id);
+	}
+}
