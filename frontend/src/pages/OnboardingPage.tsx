@@ -6,6 +6,7 @@ import ActionMenu from '@/features/onboarding/components/ActionMenu';
 import ShareOutfit from '@/features/onboarding/components/ShareOutfit';
 import FriendRequest from '@/features/onboarding/components/FriendRequest';
 import OutfitStyling from '@/features/onboarding/components/OutfitStyling';
+import { PrimaryBtn } from '@/components/buttons/primary-button/PrimaryBtn';
 
 const OnboardingPage = () => {
 	const [currentScreen, setCurrentScreen] = useState(0);
@@ -110,36 +111,40 @@ const OnboardingPage = () => {
 				<div className='flex w-full max-w-md items-center justify-center'>
 					<div className='flex space-x-2'>
 						{currentScreen > 0 && (
-							<button
-								className='h-10 px-6 rounded-full border border-gray-800 bg-white text-sm text-gray-800 flex items-center justify-center font-medium'
+							<PrimaryBtn
+								size='compact'
+								name='이전'
+								color='white'
+								activate={true}
 								onClick={prevScreen}
-							>
-								이전
-							</button>
+							/>
 						)}
 						{currentScreen < screens.length - 1 && (
-							<button
-								className='h-10 px-6 rounded-full border border-gray-800 bg-white text-sm text-gray-800 flex items-center justify-center font-medium'
+							<PrimaryBtn
+								size='compact'
+								name='건너뛰기'
+								color='white'
+								activate={true}
 								onClick={handleCompleteOnboarding}
-							>
-								건너뛰기
-							</button>
+							/>
 						)}
 						{currentScreen < screens.length - 1 && (
-							<button
-								className='h-10 px-6 rounded-full bg-gray-800 text-sm text-white flex items-center justify-center font-medium'
+							<PrimaryBtn
+								size='compact'
+								name='다음'
+								color='black'
+								activate={true}
 								onClick={nextScreen}
-							>
-								다음
-							</button>
+							/>
 						)}
 						{currentScreen === screens.length - 1 && (
-							<button
-								className='h-10 px-6 rounded-full bg-gray-800 text-sm text-white flex items-center justify-center font-medium'
+							<PrimaryBtn
+								size='compact'
+								name='시작하기'
+								color='black'
+								activate={true}
 								onClick={handleCompleteOnboarding}
-							>
-								시작하기
-							</button>
+							/>
 						)}
 					</div>
 				</div>

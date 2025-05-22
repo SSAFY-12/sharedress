@@ -1,4 +1,4 @@
-import { X, Plus, Shirt, Scissors } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 
 const ShareOutfit = () => (
 	<div className='w-full max-w-md'>
@@ -102,20 +102,32 @@ const ShareOutfit = () => (
 				</div>
 			</div>
 
-			<div className='absolute bottom-0 flex w-full justify-around border-t border-gray-200 bg-white py-3'>
-				<button className='flex flex-col items-center'>
-					<div className='mb-1 h-5 w-5 text-gray-400'>👥</div>
-					<span className='text-xs'>FRIENDS</span>
-				</button>
-				<button className='relative -mt-5 flex flex-col items-center'>
-					<div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-800'>
+			<div className='absolute bottom-0 flex w-full justify-between px-1.5 pb-2 h-[70px] bg-background z-99'>
+				<div className='flex-1 flex justify-center items-center'>
+					<button className='flex flex-col items-center justify-center gap-1.5 py-1'>
+						<img
+							src='/icons/nav_friend_default.svg'
+							alt='friends'
+							className='w-7 h-7 mb-1'
+						/>
+						<span className='text-navUnselected text-low'>FRIENDS</span>
+					</button>
+				</div>
+				<div className='flex justify-center items-center'>
+					<button className='flex items-center justify-center p-4 bg-regular rounded-full border-8 border-background'>
 						<Plus className='h-5 w-5 text-white' />
-					</div>
-				</button>
-				<button className='flex flex-col items-center'>
-					<div className='mb-1 h-5 w-5 text-gray-800'>👕</div>
-					<span className='text-xs'>CLOSET</span>
-				</button>
+					</button>
+				</div>
+				<div className='flex-1 flex justify-center items-center'>
+					<button className='flex flex-col items-center justify-center gap-1.5 py-1'>
+						<img
+							src='/icons/nav_closet_default.svg'
+							alt='closet'
+							className='w-7 h-7 mb-1'
+						/>
+						<span className='text-navUnselected text-regular'>CLOSET</span>
+					</button>
+				</div>
 			</div>
 
 			<div className='absolute left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50'>
@@ -127,10 +139,11 @@ const ShareOutfit = () => (
 					</div>
 
 					<div className='mb-3 flex justify-center'>
-						<div className='flex items-center'>
-							<Shirt className='h-10 w-8 text-blue-400' />
-							<Scissors className='h-10 w-8 text-pink-400' />
-						</div>
+						<img
+							src='/images/social/share-profile.png'
+							alt='공유 프로필'
+							className='h-20 object-contain'
+						/>
 					</div>
 
 					<div className='mb-2 text-center'>

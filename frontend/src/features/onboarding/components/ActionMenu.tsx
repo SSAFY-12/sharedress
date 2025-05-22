@@ -102,41 +102,69 @@ const ActionMenu = () => (
 				</div>
 			</div>
 
-			<div className='absolute bottom-0 flex w-full justify-around border-t border-gray-200 bg-white py-3'>
-				<button className='flex flex-col items-center'>
-					<div className='mb-1 h-5 w-5 text-gray-400'>👥</div>
-					<span className='text-xs'>FRIENDS</span>
-				</button>
-				<button className='relative -mt-5 flex flex-col items-center'>
-					<div className='flex h-10 w-10 items-center justify-center rounded-full bg-gray-800'>
+			<div className='absolute bottom-0 flex w-full justify-between px-1.5 pb-2 h-[70px] bg-background z-99'>
+				<div className='flex-1 flex justify-center items-center'>
+					<button className='flex flex-col items-center justify-center gap-1.5 py-1'>
+						<div className='mb-1 text-3xl text-navUnselected text-low'>👥</div>
+						<span className='text-navUnselected text-low'>FRIENDS</span>
+					</button>
+				</div>
+				<div className='flex justify-center items-center'>
+					<button className='flex items-center justify-center p-4 bg-regular rounded-full border-8 border-background'>
 						<Plus className='h-5 w-5 text-white' />
-					</div>
-				</button>
-				<button className='flex flex-col items-center'>
-					<div className='mb-1 h-5 w-5 text-gray-800'>👕</div>
-					<span className='text-xs'>CLOSET</span>
-				</button>
+					</button>
+				</div>
+				<div className='flex-1 flex justify-center items-center'>
+					<button className='flex flex-col items-center justify-center gap-1.5 py-1'>
+						<div className='mb-1 text-3xl text-navUnselected text-regular'>
+							👕
+						</div>
+						<span className='text-navUnselected text-regular'>CLOSET</span>
+					</button>
+				</div>
 			</div>
 
-			<div className='absolute left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50'>
-				<div className='w-72 rounded-xl bg-white shadow-lg'>
-					<div className='border-b border-gray-100 p-4'>
-						<p className='font-medium'>옷장</p>
-						<button className='mt-2 flex items-center text-sm'>
-							<span className='mr-2 text-green-500'>👕</span>
-							옷등록
-						</button>
-					</div>
-					<div className='p-4'>
-						<p className='font-medium'>코디</p>
-						<button className='mt-2 flex items-center text-sm'>
-							<span className='mr-2 text-pink-500'>👗</span>
-							코디 만들기
-						</button>
-						<button className='mt-2 flex items-center text-sm'>
-							<span className='mr-2 text-blue-500'>💬</span>
-							친구에게 코디 요청하기
-						</button>
+			<div className='absolute inset-0 bg-black bg-opacity-50 z-40 pointer-events-none' />
+			<div className='absolute bottom-0 left-0 right-0 z-50 flex justify-center items-end pointer-events-none'>
+				<div className='flex flex-col justify-end items-center w-full px-4 pb-4'>
+					<div className='flex flex-col gap-2 w-full max-w-[300px]'>
+						{/* 옷장 섹션 */}
+						<div className='flex flex-col rounded-xl bg-white p-5 pb-6.5 gap-2.5'>
+							<span className='w-full text-start text-smallButton text-low'>
+								옷장
+							</span>
+							<button
+								className='flex flex-row justify-start items-center gap-3.5 py-[4px] px-0 cursor-default'
+								disabled
+							>
+								<span className='text-2xl mr-2 text-green-500'>👕</span>
+								<span className='text-default text-regular'>옷등록</span>
+							</button>
+						</div>
+						{/* 코디 섹션 */}
+						<div className='flex flex-col rounded-xl bg-white p-5 pb-6.5 gap-2.5'>
+							<span className='w-full text-start text-smallButton text-low'>
+								코디
+							</span>
+							<div className='flex flex-col gap-1'>
+								<button
+									className='flex flex-row justify-start items-center gap-3.5 py-[4px] px-0 cursor-default'
+									disabled
+								>
+									<span className='text-2xl mr-2 text-pink-500'>👗</span>
+									<span className='text-default text-regular'>코디 만들기</span>
+								</button>
+								<button
+									className='flex flex-row justify-start items-center gap-3.5 py-[4px] px-0 cursor-default'
+									disabled
+								>
+									<span className='text-2xl mr-2 text-blue-500'>💬</span>
+									<span className='text-default text-regular'>
+										친구에게 코디 요청하기
+									</span>
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
