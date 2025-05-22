@@ -1,0 +1,291 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import checker from 'vite-plugin-checker';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
+import path from 'path';
+import mkcert from 'vite-plugin-mkcert';
+import { VitePWA } from 'vite-plugin-pwa';
+import fs from 'fs';
+import viteImagemin from 'vite-plugin-imagemin';
+
+const cspHeader = [
+	// 기본 설정
+	"default-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data:", // FCM 푸시 알림 기본 설정
+
+	// 스크립트 설정
+	"script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:", // FCM 푸시 알림 스크립트 설정
+
+	// 스타일 설정
+	"style-src 'self' 'unsafe-inline' https: http:", // FCM 푸시 알림 스타일 설정
+
+	// 이미지 설정
+	"img-src 'self' data: blob: https: http:", // FCM 푸시 알림 이미지 설정
+
+	// 폰트 설정
+	"font-src 'self' data: https: http:", // FCM 푸시 알림 폰트 설정
+
+	// 프레임 설정
+	"frame-src 'self' https: http:", // FCM 푸시 알림 프레임 설정
+
+	// 웹소켓 등 연결 설정 (Vite HMR을 위해 필요)
+	"connect-src 'self' ws: wss: https: http:", // FCM 푸시 알림 웹소켓 설정
+
+	// 워커 설정 (PWA를 위해 필요)
+	"worker-src 'self' blob:", // FCM 푸시 알림 워커 설정
+
+	// 매니페스트 설정
+	"manifest-src 'self'", // FCM 푸시 알림 매니페스트 설정
+].join('; ');
+
+// Vite 설정 파일
+export default defineConfig(({ mode }) => {
+	const env = loadEnv(mode, process.cwd(), '');
+	const isDevelopment = mode === 'development';
+
+	// Service Worker 파일 생성
+	const swContent = `
+		importScripts(
+			'https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js',
+		);
+		importScripts(
+			'https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js',
+		);
+
+		firebase.initializeApp({
+			apiKey: '${env.VITE_FIREBASE_API_KEY}',
+			authDomain: '${env.VITE_FIREBASE_AUTH_DOMAIN}',
+			projectId: '${env.VITE_FIREBASE_PROJECT_ID}',
+			storageBucket: '${env.VITE_FIREBASE_STORAGE_BUCKET}',
+			messagingSenderId: '${env.VITE_FIREBASE_MESSAGING_SENDER_ID}',
+			appId: '${env.VITE_FIREBASE_APP_ID}',
+		});
+
+		const messaging = firebase.messaging();
+
+		messaging.onBackgroundMessage((payload) => {
+			// console.log('백그라운드 메시지 수신:', payload);
+
+			const notificationTitle = payload.notification.title;
+			const notificationOptions = {
+				body: payload.notification.body,
+				icon: '/new-android-chrome-192x192.png',
+				badge: '/new-favicon-32x32.png',
+				data: payload.data,
+			};
+
+			self.registration.showNotification(notificationTitle, notificationOptions);
+		});
+
+		self.addEventListener('notificationclick', (event) => {
+			event.notification.close();
+
+			// 알림 클릭 시 웹사이트로 이동
+			event.waitUntil(
+				clients.matchAll({ type: 'window' }).then((clientList) => {
+					// 이미 열려있는 창이 있다면 그 창으로 이동
+					for (const client of clientList) {
+						if (client.url.includes('/') && 'focus' in client) {
+							return client.focus();
+						}
+					}
+					// 열려있는 창이 없다면 새 창 열기
+					if (clients.openWindow) {
+						return clients.openWindow('/');
+					}
+				}),
+			);
+		});
+	`;
+
+	// 빌드 시점에 Service Worker 파일 생성
+	if (mode === 'production') {
+		fs.writeFileSync(
+			path.resolve(__dirname, 'public/firebase-messaging-sw.js'),
+			swContent,
+		);
+	}
+
+	return {
+		plugins: [
+			react(),
+			mkcert(),
+			VitePWA({
+				registerType: 'autoUpdate',
+				injectRegister: false,
+				devOptions: { enabled: true, type: 'module' },
+				includeAssets: [
+					'new-favicon.ico',
+					'new-apple-touch-icon.png',
+					'new-favicon-16x16.png',
+					'new-favicon-32x32.png',
+					'new-android-chrome-192x192.png',
+					'new-android-chrome-512x512.png',
+				],
+				manifest: {
+					name: '쉐어드레스',
+					short_name: '쉐어드레스',
+					description: 'share + dress, share + address',
+					theme_color: '#242424',
+					background_color: '#ffffff',
+					display: 'standalone',
+					orientation: 'portrait-primary',
+					start_url: '/',
+					scope: '/',
+					icons: [
+						{
+							src: '/new-android-chrome-192x192.png',
+							sizes: '192x192',
+							type: 'image/png',
+							purpose: 'any maskable',
+						},
+						{
+							src: '/new-android-chrome-512x512.png',
+							sizes: '512x512',
+							type: 'image/png',
+							purpose: 'any maskable',
+						},
+					],
+				},
+				workbox: {
+					disableDevLogs: true,
+					clientsClaim: true,
+					skipWaiting: true,
+					globPatterns: ['**/*.{js,css,html,woff2,png,jpg,svg,mp4}'],
+					maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB로 증가
+					runtimeCaching: [
+						{
+							urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
+							handler: 'CacheFirst',
+							options: {
+								cacheName: 'images',
+								expiration: {
+									maxEntries: 60,
+									maxAgeSeconds: 30 * 24 * 60 * 60,
+								},
+							},
+						},
+					],
+				},
+			}),
+			checker({
+				typescript: true,
+				eslint: {
+					lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+					dev: { logLevel: ['error', 'warning'] },
+				},
+			}),
+			sentryVitePlugin({
+				org: 'sharedress',
+				project: 'javascript-react',
+			}),
+			viteImagemin({
+				gifsicle: {
+					optimizationLevel: 7,
+					interlaced: false,
+				},
+				optipng: {
+					optimizationLevel: 7,
+				},
+				mozjpeg: {
+					quality: 40, // 품질을 40%로 더 낮춤
+				},
+				pngquant: {
+					quality: [0.4, 0.6], // 품질 범위를 더 낮춤
+					speed: 4,
+				},
+				svgo: {
+					plugins: [
+						{
+							name: 'removeViewBox',
+						},
+						{
+							name: 'removeEmptyAttrs',
+							active: false,
+						},
+					],
+				},
+			}),
+		],
+		css: {
+			postcss: {
+				plugins: [tailwindcss, autoprefixer],
+			},
+		},
+		resolve: {
+			alias: { '@': path.resolve(__dirname, './src') },
+		},
+		server: {
+			https: true,
+			port: 5173,
+			headers: {
+				'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+				'Cross-Origin-Embedder-Policy': 'credentialless',
+				'Referrer-Policy': 'strict-origin-when-cross-origin',
+				'Access-Control-Allow-Origin': '*',
+				'Cross-Origin-Resource-Policy': 'cross-origin',
+				'Content-Security-Policy': cspHeader,
+			},
+			proxy: {
+				'/api': {
+					target: 'http://www.sharedress.co.kr',
+					changeOrigin: true,
+					secure: false,
+				},
+			},
+		},
+		build: {
+			sourcemap: true,
+			rollupOptions: {
+				input: {
+					main: path.resolve(__dirname, 'index.html'),
+					'service-worker': path.resolve(
+						__dirname,
+						'public/firebase-messaging-sw.js',
+					),
+				},
+				output: {
+					manualChunks: (id) => {
+						if (id.includes('node_modules')) {
+							if (
+								id.includes('react') ||
+								id.includes('react-dom') ||
+								id.includes('react-router-dom')
+							) {
+								return 'vendor-react';
+							}
+							if (
+								id.includes('framer-motion') ||
+								id.includes('react-toastify') ||
+								id.includes('lucide-react')
+							) {
+								return 'vendor-ui';
+							}
+							if (id.includes('date-fns') || id.includes('jwt-decode')) {
+								return 'vendor-utils';
+							}
+							return 'vendor';
+						}
+					},
+					assetFileNames: (assetInfo) => {
+						const info = assetInfo.name;
+						if (!info) return 'assets/[name]-[hash][extname]';
+						if (info.endsWith('.png') || info.endsWith('.jpg')) {
+							return 'assets/images/[name]-[hash][extname]';
+						}
+						return 'assets/[name]-[hash][extname]';
+					},
+				},
+			},
+			outDir: 'dist',
+			assetsDir: 'assets',
+			base: '/',
+			chunkSizeWarningLimit: 2000,
+			assetsInlineLimit: 4096,
+		},
+		define: {
+			'process.env': process.env,
+		},
+	};
+});

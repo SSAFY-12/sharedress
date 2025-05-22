@@ -7,5 +7,9 @@
     "prepare": "husky install",
     "pre-commit": "sh .husky/pre-commit",
     "commit-msg": "sh .husky/commit-msg"
+  },
+  "dependencies": {
+    "firebase": "^11.6.1",
+    "react-router-dom": "^7.5.3"
   }
 }

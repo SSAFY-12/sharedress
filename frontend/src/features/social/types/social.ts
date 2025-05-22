@@ -1,0 +1,81 @@
+export interface FriendList {
+	//친구 리스트
+	items: {
+		id: number; //친구 고유 아이디
+		nickname: string; //닉네임
+		code: string; // 중복 방지 코드
+		profileImage: string; //프로필 이미지
+		oneLiner: string; //한줄 소개
+	}[]; //배열 리스트 === 친구 목록
+	hasRequest: boolean; //친구 요청 여부
+}
+
+export interface FriendRequestList {
+	// 친구 요청 목록 리스트
+	content: {
+		id: number; //친구 요청 고유 아이디
+		message: string; //메시지
+		requester: {
+			id: number; //요청자 고유 아이디
+			nickname: string; //요청자 닉네임
+			profileImage: string; //요청자 프로필 이미지
+			code: string; // 중복 방지 코드
+		}; //요청자 정보(사람)
+	}[]; //배열 리스트 === 친구 요청 목록
+}
+
+export interface SearchUser {
+	// 유저 검색 -> 전체 유저 검색
+	content: {
+		// id: number; //유저 고유 아이디
+		profileImage: string; //프로필 이미지
+		nickname: string; //유저 닉네임
+		code: string; // 중복 방지 코드
+		relationStatus: RelationStatus; //친구 관계
+		memberId: number; // 유저 고유 아이디
+	}[]; //배열 리스트 === 유저 검색 결과
+}
+
+export type RelationStatus = 0 | 1 | 2 | 3; //친구 관계 (0-친구, 1-친구 요청 보냄, 2- 친구 요청 받음, 3-아무 사이 아님)
+
+export interface SearchFriend {
+	// 친구 검색
+	content: {
+		id: number; //친구 고유 아이디
+		nickname: string; //닉네임
+		code: string; // 닉네임 중복방지
+		profileImage: string; //프로필 이미지
+		oneLiner: string; //한줄 소개
+		// isFriend: boolean; //친구 관계 여부
+		// isRequestPending: boolean; //친구 요청 여부
+	}[]; //여러명의 친구 검색 결과
+}
+
+// 특정 친구 요청 조회
+export interface FriendRequest {
+	content: {
+		id: number; //친구 요청 고유 아이디 -> requestId로 전달될 것 : 친구 수락 / 거절 / 취소에 사용될 내용
+		message: string; //메시지
+	};
+}
+
+export interface FriendRequest {
+	// 친구 요청
+	receiverId: number; //받는 사람 고유 아이디
+	message: string; //메시지
+}
+
+export interface AcceptFriendRequest {
+	// 친구 요청 수락
+	requestId: number; //친구 요청 고유 아이디
+}
+
+export interface RejectFriendRequest {
+	// 친구 요청 거절
+	requestId: number; //친구 요청 고유 아이디
+}
+
+export interface CancelFriendRequest {
+	// 친구 요청 취소
+	requestId: number; //친구 요청 고유 아이디
+}
