@@ -1,0 +1,145 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'checkstyle'
+}
+
+group = 'com.ssafy'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+checkstyle {
+	toolVersion = '10.12.1'
+	configFile = file("${rootDir}/checkstyle/naver-checkstyle-rules.xml")
+	configProperties = [
+		'suppressionFile': "${rootDir}/checkstyle/naver-checkstyle-suppressions.xml"
+	]
+	sourceSets = [sourceSets.main]
+	maxWarnings = 0
+}
+
+tasks.named('checkstyleMain') {
+	dependsOn tasks.named('compileTestJava')
+	mustRunAfter tasks.named('compileTestJava')
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVer', "2024.0.0")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVer}"
+	}
+}
+
+dependencies {
+	// Spring Boot Starter
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// lombok
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//Actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// DB
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// Spring Data JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// dot env
+	implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+	// queryDSL 설정
+	implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+	implementation "com.querydsl:querydsl-core"
+	implementation "com.querydsl:querydsl-collections"
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+
+	// querydsl JPAAnnotationProcessor 사용 지정
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+
+	// java.lang.NoClassDefFoundError (javax.annotation.Generated) 대응 코드
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	// java.lang.NoClassDefFoundError (javax.annotation.Entity) 대응 코드
+
+	// openfeign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	// Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// AWS SQS
+	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+
+	// HashIds
+	implementation 'org.hashids:hashids:1.0.3'
+
+	// S3
+	implementation "software.amazon.awssdk:s3"
+
+	// AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// Firebase
+	implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+	// json
+	implementation 'org.json:json:20250107'
+
+	// validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// Querydsl 설정부
+def generated = 'src/main/generated'
+
+// querydsl QClass 파일 생성 위치를 지정
+tasks.withType(JavaCompile).configureEach {
+	options.getGeneratedSourceOutputDirectory().set(file(generated))
+}
+
+// java source set 에 querydsl QClass 위치 추가
+sourceSets {
+	main.java.srcDirs += [generated]
+}
+
+// gradle clean 시에 QClass 디렉토리 삭제
+clean {
+	delete file(generated)
+}
