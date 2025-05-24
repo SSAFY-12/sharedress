@@ -172,9 +172,8 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		List<AiProcessMessagePurchaseRequest.ItemInfo> itemsToProcess = new ArrayList<>();
 
 		// TODO[지윤]: 시연시나리오용 memberId==146 에 대한 분기처리
-		// TODO[지윤]: 현재 45번으로 먼저 테스트 후 146으로 변경할 예정
 		// 구매내역을 가지고 요청한 146 은 aiTask 생성, admin 생성 후 return
-		if (memberId == 45) {
+		if (memberId == 146L) {
 			request.items().stream()
 				.sorted((a, b) -> -1) // 내림차순 유지
 				.forEach(item -> {
