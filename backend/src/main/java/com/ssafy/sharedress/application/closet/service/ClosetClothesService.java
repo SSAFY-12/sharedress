@@ -21,6 +21,8 @@ import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailRequest;
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailResponse;
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoUploadResponse;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
+import com.ssafy.sharedress.domain.admin.entity.Admin;
+import com.ssafy.sharedress.domain.admin.repository.AdminRepository;
 import com.ssafy.sharedress.domain.ai.entity.AiTask;
 import com.ssafy.sharedress.domain.ai.entity.TaskType;
 import com.ssafy.sharedress.domain.ai.repository.AiTaskRepository;
@@ -76,6 +78,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final ShoppingMallRepository shoppingMallRepository;
 	private final AiTaskRepository aiTaskRepository;
 	private final PhotoUploadLogRepository photoUploadLogRepository;
+	private final AdminRepository adminRepository;
 
 	private final SqsMessageSender sqsMessageSender;
 	private final ImageStoragePort imageStoragePort;
@@ -167,6 +170,45 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		AiTask aiTask = new AiTask(taskId, false, member, shoppingMall, TaskType.PURCHASE_HISTORY);
 
 		List<AiProcessMessagePurchaseRequest.ItemInfo> itemsToProcess = new ArrayList<>();
+
+		// TODO[지윤]: 시연시나리오용 memberId==146 에 대한 분기처리
+		// TODO[지윤]: 현재 45번으로 먼저 테스트 후 146으로 변경할 예정
+		// 구매내역을 가지고 요청한 146 은 aiTask 생성, admin 생성 후 return
+		if (memberId == 45) {
+			request.items().stream()
+				.sorted((a, b) -> -1) // 내림차순 유지
+				.forEach(item -> {
+					// 상품명 필수 체크
+					if (item.name() == null || item.name().isBlank()) {
+						log.warn("상품명이 비어있어 Admin 등록에서 제외됨: item={}", item);
+						return;
+					}
+
+					Optional<Brand> optionalBrand = brandRepository.findByExactNameEnOrKr(item.brandNameEng(),
+						item.brandNameKor());
+					if (optionalBrand.isEmpty()) {
+						log.warn("해당 브랜드를 찾을 수 없음: {}", item);
+						return;
+					}
+
+					Brand brand = optionalBrand.get();
+					String normalizedName = RegexUtils.normalizeProductName(item.name());
+
+					Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(normalizedName, brand.getId());
+					if (existing.isEmpty()) {
+						log.warn("Clothes 테이블에 해당 옷이 없음 {}", item);
+						return;
+					}
+
+					Clothes clothes = existing.get();
+
+					Admin admin = new Admin(member, taskId, clothes);
+					adminRepository.save(admin);
+
+					log.info("시연용 Admin 데이터 등록 완료: clothesId={}, memberId={}", clothes.getId(), memberId);
+				});
+			return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());
+		}
 
 		request.items()
 			.stream()
