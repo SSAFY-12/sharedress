@@ -17,4 +17,11 @@ public interface PurchaseUseCase {
 	);
 
 	Login29cmClient.LoginResponse login29CM(ShoppingMallLoginRequest request);
+
+	AiTaskResponse get29CmPurchaseHistory(
+		Long memberId,
+		Long shopId,
+		String cookie,
+		String rootOrderNo
+	);
 }

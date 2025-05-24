@@ -25,7 +25,7 @@ public interface Login29cmClient {
 	}
 
 	record LoginResponse(
-		String token
+		String cookie
 	) {
 	}
 }

@@ -17,6 +17,8 @@ import com.ssafy.sharedress.application.shoppingmall.dto.ShoppingMallResponse;
 import com.ssafy.sharedress.application.shoppingmall.usecase.PurchaseUseCase;
 import com.ssafy.sharedress.application.shoppingmall.usecase.ShoppingMallUseCase;
 import com.ssafy.sharedress.domain.member.entity.Member;
+import com.ssafy.sharedress.domain.shoppingmall.error.ShoppingMallErrorCode;
+import com.ssafy.sharedress.global.exception.ExceptionUtil;
 import com.ssafy.sharedress.global.response.ResponseWrapper;
 import com.ssafy.sharedress.global.response.ResponseWrapperFactory;
 
@@ -54,8 +56,31 @@ public class ShoppingMallController {
 		}
 
 		if (request.shopId() == 3) {
-			String token = purchaseUseCase.login29CM(request).token();
-			log.info("29CM token: {}", token);
+			String cookie = purchaseUseCase.login29CM(request).cookie();
+			if (cookie == null || cookie.isEmpty()) {
+				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_ID_PW_NOT_MATCH);
+			}
+			// 1. 양쪽 대괄호 제거
+			String noBrackets = cookie.replaceAll("^\\[|\\]$", "");
+
+			// 2. 쿠키 항목별로 split
+			String[] cookieEntries = noBrackets.split(", ");
+
+			// 3. 각 항목에서 첫 번째 세미콜론 앞까지만 남김
+			StringBuilder cookieHeader = new StringBuilder();
+			for (String entry : cookieEntries) {
+				int endIndex = entry.indexOf(';');
+				if (endIndex != -1) {
+					cookieHeader.append(entry, 0, endIndex).append("; ");
+				}
+			}
+			AiTaskResponse result = purchaseUseCase.get29CmPurchaseHistory(
+				member.getId(),
+				request.shopId(),
+				cookieHeader.toString().trim(),
+				null
+			);
+			return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, result);
 		}
 		return null;
 	}

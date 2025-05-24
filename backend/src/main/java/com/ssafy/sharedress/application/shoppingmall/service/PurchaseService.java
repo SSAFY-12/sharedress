@@ -2,12 +2,12 @@ package com.ssafy.sharedress.application.shoppingmall.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.ssafy.sharedress.adapter.shoppingmall.out.cm29.CM29PurchaseClient;
 import com.ssafy.sharedress.adapter.shoppingmall.out.cm29.Login29cmClient;
 import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.LoginMusinsaClient;
 import com.ssafy.sharedress.adapter.shoppingmall.out.musinsa.MusinsaPurchaseClient;
@@ -15,6 +15,7 @@ import com.ssafy.sharedress.application.ai.dto.AiTaskResponse;
 import com.ssafy.sharedress.application.closet.service.ClosetClothesService;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryItem;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
+import com.ssafy.sharedress.application.shoppingmall.dto.CM29OrderResponse;
 import com.ssafy.sharedress.application.shoppingmall.dto.MusinsaOrderResponse;
 import com.ssafy.sharedress.application.shoppingmall.dto.ShoppingMallLoginRequest;
 import com.ssafy.sharedress.application.shoppingmall.usecase.PurchaseUseCase;
@@ -32,6 +33,7 @@ public class PurchaseService implements PurchaseUseCase {
 	private final LoginMusinsaClient loginMusinsaClient;
 	private final MusinsaPurchaseClient musinsaPurchaseClient;
 	private final Login29cmClient login29cmClient;
+	private final CM29PurchaseClient cm29PurchaseClient;
 	private final ClosetClothesService closetClothesService;
 
 	@Override
@@ -118,19 +120,15 @@ public class PurchaseService implements PurchaseUseCase {
 			new Login29cmClient.LoginRequest(request.id(), request.password())
 		)) {
 			// 🔸 Set-Cookie 헤더에서 `_ftwuid` 추출
-			Optional<String> ftwuidCookie = response.headers()
+			String cookie = response.headers()
 				.getOrDefault("Set-Cookie", List.of())
-				.stream()
-				.filter(cookie -> cookie.startsWith("_ftwuid"))
-				.findFirst();
+				.toString();
 
-			return ftwuidCookie
-				.map(cookie -> {
-					String[] parts = cookie.split(";");
-					String token = parts[0].split("=")[1].substring(1);
-					return new Login29cmClient.LoginResponse(token);
-				})
-				.orElseThrow(ExceptionUtil.exceptionSupplier(ShoppingMallErrorCode.SHOPPING_MALL_TOKEN_NOT_FOUND));
+			if (cookie.length() < 10) {
+				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_ID_PW_NOT_MATCH);
+			}
+
+			return new Login29cmClient.LoginResponse(cookie);
 		} catch (ResponseStatusException e) {
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 				ExceptionUtil.throwException(ShoppingMallErrorCode.SHOPPING_MALL_ID_PW_NOT_MATCH);
@@ -139,10 +137,52 @@ public class PurchaseService implements PurchaseUseCase {
 			} else {
 				throw new RuntimeException("29CM 로그인 서버 오류 발생");
 			}
-		} catch (Exception e) {
-			log.error("29CM Openfeign error: {}", e.getMessage());
-			throw new RuntimeException("29CM 로그인 서버 오류 발생");
 		}
 		return null;
+	}
+
+	@Override
+	public AiTaskResponse get29CmPurchaseHistory(Long memberId, Long shopId, String cookie, String rootOrderNo) {
+		List<CM29OrderResponse.OrderItem> allOrders = new ArrayList<>();
+		String offset = null;
+		while (true) {
+			CM29OrderResponse orderResponse = cm29PurchaseClient.getOrderHistory(cookie, offset);
+
+			if (orderResponse == null || orderResponse.results() == null) {
+				break;
+			}
+
+			// "구매 확정"인 주문 필터링
+			for (CM29OrderResponse.Result order : orderResponse.results()) {
+				for (CM29OrderResponse.Manage manage : order.manages()) {
+					if ("배송완료".equals(manage.order_item_delivery_status_description())) {
+						allOrders.add(manage.order_item_no());
+					}
+				}
+			}
+
+			// 메타 데이터에서 onlineOffset 가져오기
+			offset = orderResponse.next();
+
+			// 다음 요청이 필요한지 판단
+			boolean hasMore = offset != null;
+
+			if (!hasMore) {
+				break;
+			}
+		}
+
+		PurchaseHistoryRequest request = new PurchaseHistoryRequest(
+			shopId,
+			allOrders.stream()
+				.map(order -> new PurchaseHistoryItem(
+					order.item_name(),
+					order.front_brand_name(),
+					order.brand_name(),
+					"https://product.29cm.co.kr/catalog/" + order.item_no()
+				))
+				.toList()
+		);
+		return closetClothesService.registerClothesFromPurchase(request, memberId);
 	}
 }
