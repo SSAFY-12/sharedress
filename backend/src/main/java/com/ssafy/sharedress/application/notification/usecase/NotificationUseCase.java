@@ -23,4 +23,6 @@ public interface NotificationUseCase {
 	List<NotificationResponse> getNotifications(Long memberId);
 
 	NotificationReadResponse readNotification(Long notificationId, Long memberId);
+
+	Boolean hasUnreadNotification(Long id);
 }

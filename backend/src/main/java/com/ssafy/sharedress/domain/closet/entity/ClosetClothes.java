@@ -67,6 +67,7 @@ public class ClosetClothes extends BaseTimeEntity {
 	public ClosetClothes(Closet closet, Clothes clothes) {
 		this.closet = closet;
 		this.clothes = clothes;
+		this.isPublic = true;
 	}
 
 	public void updateIsPublic(Boolean isPublic) {

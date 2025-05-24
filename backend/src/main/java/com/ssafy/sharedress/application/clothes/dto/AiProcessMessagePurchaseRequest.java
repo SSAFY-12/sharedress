@@ -2,7 +2,7 @@ package com.ssafy.sharedress.application.clothes.dto;
 
 import java.util.List;
 
-public record AiProcessMessageRequest(
+public record AiProcessMessagePurchaseRequest(
 	String taskId,
 	Boolean isLast,
 	Long memberId,

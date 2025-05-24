@@ -23,6 +23,8 @@ import com.ssafy.sharedress.application.member.dto.FcmTokenRequest;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MemberSearchResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
+import com.ssafy.sharedress.application.member.dto.PrivacyAgreeRequest;
+import com.ssafy.sharedress.application.member.dto.PrivacyAgreeResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileImageResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
@@ -162,4 +164,20 @@ public class MemberController {
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
+	@GetMapping("/members/privacy-agreement")
+	public ResponseEntity<ResponseWrapper<PrivacyAgreeResponse>> getPrivacyAgreement(
+		@CurrentMember Member member
+	) {
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
+			memberUseCase.getPrivacyAgreement(member.getId()));
+	}
+
+	@PatchMapping("/members/privacy-agreement")
+	public ResponseEntity<ResponseWrapper<PrivacyAgreeResponse>> updatePrivacyAgreement(
+		@CurrentMember Member member,
+		@RequestBody PrivacyAgreeRequest request
+	) {
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK,
+			memberUseCase.updatePrivacyAgreement(member.getId(), request));
+	}
 }

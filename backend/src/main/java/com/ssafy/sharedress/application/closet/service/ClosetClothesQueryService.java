@@ -10,9 +10,11 @@ import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesIdResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesResponse;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
+import com.ssafy.sharedress.application.clothes.dto.RemainingPhotoCountResponse;
 import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
 import com.ssafy.sharedress.domain.closet.error.ClosetClothesErrorCode;
 import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
+import com.ssafy.sharedress.domain.clothes.repository.PhotoUploadLogRepository;
 import com.ssafy.sharedress.domain.common.context.UserContext;
 import com.ssafy.sharedress.global.dto.CursorPageResult;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
@@ -25,7 +27,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 
+	private static final int MAX_DAILY_UPLOAD_COUNT = 5;
+
 	private final ClosetClothesRepository closetClothesRepository;
+	private final PhotoUploadLogRepository photoUploadLogRepository;
 
 	@Override
 	public CursorPageResult<ClosetClothesResponse> getMemberClosetClothes(
@@ -50,7 +55,7 @@ public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 	@Override
 	public ClosetClothesDetailResponse getClosetClothesDetail(Long memberId, Long closetClothesId) {
 		// TODO[준]: 검증 로직 필요
-		return closetClothesRepository.findById(closetClothesId)
+		return closetClothesRepository.findByIdAndImgNotNull(closetClothesId)
 			.map(ClosetClothesDetailResponse::from)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetClothesErrorCode.CLOSET_CLOTHES_NOT_FOUND));
 	}
@@ -61,6 +66,13 @@ public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 			.stream()
 			.map(ClosetClothesIdResponse::fromEntity)
 			.toList();
+	}
+
+	@Override
+	public RemainingPhotoCountResponse getRemainingPhotoCount(Long memberId) {
+		int uploadedCount = photoUploadLogRepository.countByMemberIdAndCreatedAt(memberId);
+		int remainingCount = Math.max(MAX_DAILY_UPLOAD_COUNT - uploadedCount, 0);
+		return new RemainingPhotoCountResponse(remainingCount);
 	}
 
 	// -- 게스트 -- //

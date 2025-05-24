@@ -2,6 +2,7 @@ package com.ssafy.sharedress.domain.member.entity;
 
 import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -41,6 +42,9 @@ public class Member extends BaseTimeEntity {
 
 	private Boolean notificationStatus;
 
+	@Column(nullable = false)
+	private Boolean isPrivacyAgreement = false;
+
 	public Member(String email, String profileUrl, String nickname, String code) {
 		this.email = email;
 		this.profileUrl = profileUrl;
@@ -76,5 +80,9 @@ public class Member extends BaseTimeEntity {
 
 	public void clearFcmToken() {
 		this.fcmToken = null;
+	}
+
+	public void updatePrivacyAgreement(boolean isPrivacyAgreement) {
+		this.isPrivacyAgreement = isPrivacyAgreement;
 	}
 }

@@ -19,6 +19,8 @@ public interface ClosetClothesRepository {
 
 	ClosetClothes getReferenceById(Long id);
 
+	Optional<ClosetClothes> findByIdAndImgNotNull(Long id);
+
 	Optional<ClosetClothes> findById(Long id);
 
 	boolean existsByClosetIdAndClothesId(Long closetId, Long clothesId);
@@ -30,4 +32,6 @@ public interface ClosetClothesRepository {
 	List<ClosetClothes> findAllByClothesIds(List<Long> clothesIds);
 
 	List<ClosetClothes> findAllByMemberId(Long myId);
+
+	List<ClosetClothes> findAllByIds(List<Long> closetClothesIds);
 }

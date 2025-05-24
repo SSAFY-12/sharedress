@@ -11,4 +11,6 @@ public interface NotificationRepository {
 	List<Notification> findByReceiverId(Long receiverId);
 
 	Optional<Notification> findById(Long id);
+
+	Boolean existsUnReadByReceiverId(Long receiverId);
 }

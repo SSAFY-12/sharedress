@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ssafy.sharedress.application.member.dto.FcmTokenRequest;
 import com.ssafy.sharedress.application.member.dto.MemberProfileResponse;
 import com.ssafy.sharedress.application.member.dto.MyProfileResponse;
+import com.ssafy.sharedress.application.member.dto.PrivacyAgreeRequest;
+import com.ssafy.sharedress.application.member.dto.PrivacyAgreeResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateNotificationStatusRequest;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileImageResponse;
 import com.ssafy.sharedress.application.member.dto.UpdateProfileRequest;
@@ -108,5 +110,22 @@ public class MemberService implements MemberUseCase {
 		if (request.fcmToken() != null) {
 			member.updateFcmToken(request.fcmToken());
 		}
+	}
+
+	@Override
+	public PrivacyAgreeResponse getPrivacyAgreement(Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+		return new PrivacyAgreeResponse(member.getIsPrivacyAgreement());
+	}
+
+	@Transactional
+	@Override
+	public PrivacyAgreeResponse updatePrivacyAgreement(Long memberId, PrivacyAgreeRequest request) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(MemberErrorCode.MEMBER_NOT_FOUND));
+
+		member.updatePrivacyAgreement(request.privacyAgreement());
+		return new PrivacyAgreeResponse(member.getIsPrivacyAgreement());
 	}
 }

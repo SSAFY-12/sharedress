@@ -60,13 +60,20 @@ cloud:
             access-key: ${AWS_ACCESS_KEY}
             secret-key: ${AWS_SECRET_KEY}
         sqs:
-            url: https://sqs.ap-northeast-2.amazonaws.com/273354621375/ai-processing.fifo
-            queue-name: ai-processing.fifo
+            queues:
+                ai-processing:
+                    url: https://sqs.ap-northeast-2.amazonaws.com/273354621375/ai-processing.fifo
+                    queue-name: ai-processing.fifo
+                ai-photo:
+                    url: https://sqs.ap-northeast-2.amazonaws.com/273354621375/ai-photo.fifo
+                    queue-name: ai-photo.fifo
+
         s3:
             bucket: ai-processing-output
             path:
                 profile: profile
                 coordination: coordination
+                photo: photo
         stack:
             auto: false
 

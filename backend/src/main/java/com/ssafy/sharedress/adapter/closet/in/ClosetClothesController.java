@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesDetailResponse;
 import com.ssafy.sharedress.application.closet.dto.ClosetClothesIdResponse;
@@ -20,6 +21,10 @@ import com.ssafy.sharedress.application.closet.dto.ClosetClothesUpdateRequest;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesQueryUseCase;
 import com.ssafy.sharedress.application.closet.usecase.ClosetClothesUseCase;
 import com.ssafy.sharedress.application.clothes.dto.AddLibraryClothesToClosetRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailRequest;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailResponse;
+import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoUploadResponse;
+import com.ssafy.sharedress.application.clothes.dto.RemainingPhotoCountResponse;
 import com.ssafy.sharedress.application.guest.annotation.CurrentGuest;
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
 import com.ssafy.sharedress.domain.common.context.UserContext;
@@ -112,5 +117,34 @@ public class ClosetClothesController {
 			HttpStatus.OK,
 			closetClothesQueryUseCase.getMyClosetClothesIds(member.getId())
 		);
+	}
+
+	@PostMapping("/closet/clothes/photos/upload")
+	public ResponseEntity<ResponseWrapper<List<ClothesPhotoUploadResponse>>> uploadClosetClothesPhotos(
+		@CurrentMember Member member,
+		@RequestParam("photos") List<MultipartFile> photos
+	) {
+		List<ClothesPhotoUploadResponse> result = closetClothesUseCase.uploadClosetClothesPhotos(
+			member.getId(),
+			photos
+		);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.CREATED, result);
+	}
+
+	@PostMapping("/closet/clothes/photos/detail")
+	public ResponseEntity<ResponseWrapper<ClothesPhotoDetailResponse>> getClosetClothesDetailByPhoto(
+		@CurrentMember Member member,
+		@RequestBody List<ClothesPhotoDetailRequest> request
+	) {
+		ClothesPhotoDetailResponse result = closetClothesUseCase.registerClothesFromPhotos(member.getId(), request);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.ACCEPTED, result);
+	}
+
+	@GetMapping("/closet/clothes/photos/remaining-count")
+	public ResponseEntity<ResponseWrapper<RemainingPhotoCountResponse>> getRemainingPhotoCount(
+		@CurrentMember Member member
+	) {
+		RemainingPhotoCountResponse result = closetClothesQueryUseCase.getRemainingPhotoCount(member.getId());
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
 	}
 }

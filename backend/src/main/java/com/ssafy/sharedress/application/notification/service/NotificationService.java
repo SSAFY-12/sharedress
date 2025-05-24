@@ -47,14 +47,14 @@ public class NotificationService implements NotificationUseCase {
 				.map(Member::getFcmToken)
 				.orElse(null),
 			"친구 요청",
-			message
+			message.isEmpty() ? "친구 요청을 보냈어요!" : message
 		);
 
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
 			memberRepository.getReferenceById(receiverId),
 			"친구 요청",
-			message,
+			message.isEmpty() ? "친구 요청을 보냈어요!" : message,
 			NotificationType.FRIEND_REQUEST
 		);
 	}
@@ -67,14 +67,14 @@ public class NotificationService implements NotificationUseCase {
 				sendFcmNotification(
 					friendRequest.getRequester().getFcmToken(),
 					"친구 요청 수락",
-					friendRequest.getMessage()
+					"친구 요청을 수락했어요!"
 				);
 
 				saveNotification(
-					friendRequest.getRequester(),
 					friendRequest.getReceiver(),
+					friendRequest.getRequester(),
 					"친구 요청 수락",
-					friendRequest.getMessage(),
+					"친구 요청을 수락했어요!",
 					NotificationType.FRIEND_ACCEPT
 				);
 			});
@@ -88,14 +88,14 @@ public class NotificationService implements NotificationUseCase {
 				.map(Member::getFcmToken)
 				.orElse(null),
 			"코디 요청",
-			message
+			message.isEmpty() ? "코디 요청을 보냈어요!" : message
 		);
 
 		saveNotification(
 			memberRepository.getReferenceById(senderId),
 			memberRepository.getReferenceById(receiverId),
 			"코디 요청",
-			message,
+			message.isEmpty() ? "코디 요청을 보냈어요!" : message,
 			NotificationType.COORDINATION_REQUEST
 		);
 	}
@@ -186,6 +186,7 @@ public class NotificationService implements NotificationUseCase {
 			});
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public void sendAiCompleteNotification(Long memberId) {
 		memberRepository.findById(memberId).ifPresent(member -> {
@@ -232,6 +233,12 @@ public class NotificationService implements NotificationUseCase {
 		}
 
 		return NotificationReadResponse.from(notification, isFirstRead);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public Boolean hasUnreadNotification(Long id) {
+		return notificationRepository.existsUnReadByReceiverId(id);
 	}
 
 	private void saveNotification(Member sender, Member receiver, String title, String message, NotificationType type) {

@@ -1,5 +1,6 @@
 package com.ssafy.sharedress.domain.ai.entity;
 
+import com.ssafy.sharedress.domain.common.entity.BaseTimeEntity;
 import com.ssafy.sharedress.domain.member.entity.Member;
 import com.ssafy.sharedress.domain.shoppingmall.entity.ShoppingMall;
 
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "ai_task")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AiTask {
+public class AiTask extends BaseTimeEntity {
 
 	@Id
 	private String id;
@@ -43,6 +44,7 @@ public class AiTask {
 		this.isCompleted = isCompleted;
 		this.member = member;
 		this.type = type;
+		this.shoppingMall = shoppingMall;
 	}
 
 	public void updateCompleted() {

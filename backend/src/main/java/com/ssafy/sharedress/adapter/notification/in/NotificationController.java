@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ssafy.sharedress.application.member.annotation.CurrentMember;
+import com.ssafy.sharedress.application.notification.dto.NotificationExistsResponse;
 import com.ssafy.sharedress.application.notification.dto.NotificationReadResponse;
 import com.ssafy.sharedress.application.notification.dto.NotificationResponse;
 import com.ssafy.sharedress.application.notification.usecase.NotificationUseCase;
@@ -42,5 +43,17 @@ public class NotificationController {
 	) {
 		NotificationReadResponse result = notificationUseCase.readNotification(notificationId, member.getId());
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, result);
+	}
+
+	@GetMapping("/notifications/unread")
+	public ResponseEntity<ResponseWrapper<NotificationExistsResponse>> getUnreadNotificationCount(
+		@CurrentMember Member member
+	) {
+		return ResponseWrapperFactory.toResponseEntity(
+			HttpStatus.OK,
+			new NotificationExistsResponse(
+				notificationUseCase.hasUnreadNotification(member.getId())
+			)
+		);
 	}
 }
