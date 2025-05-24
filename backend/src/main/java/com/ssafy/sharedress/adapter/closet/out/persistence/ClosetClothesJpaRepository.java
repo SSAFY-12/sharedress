@@ -35,4 +35,6 @@ public interface ClosetClothesJpaRepository extends JpaRepository<ClosetClothes,
 			WHERE cc.closet.member.id = :memberId
 		""")
 	List<ClosetClothes> findAllByMemberId(@Param("memberId") Long memberId);
+
+	void deleteAllByCloset_Id(Long closetId);
 }

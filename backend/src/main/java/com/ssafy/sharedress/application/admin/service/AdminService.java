@@ -41,7 +41,6 @@ public class AdminService implements AdminUseCase {
 	public void runDemoPurchaseScanFlow(Long memberId) {
 
 		List<Admin> admins = adminRepository.findAllByMemberId(memberId);
-
 		if (admins.isEmpty()) {
 			log.warn("Admin 데이터가 존재하지 않음: memberId={}", memberId);
 			return;
@@ -52,13 +51,12 @@ public class AdminService implements AdminUseCase {
 		Closet closet = closetRepository.findByMemberId(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
-		// clothes 리스트를 해당 member 의 closetClothes에 저장
 		for (Admin admin : admins) {
 			Clothes clothes = admin.getClothes();
 			boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
 				clothes.getId());
 			if (alreadyExists) {
-				log.info("이미 등록된 옷 (중복 스킵): clothesId={}, closetId={}", clothes.getId(), closet.getId());
+				log.info("이미 등록된 옷 스킵: clothesId={}, closetId={}", clothes.getId(), closet.getId());
 				continue;
 			}
 
@@ -70,15 +68,21 @@ public class AdminService implements AdminUseCase {
 
 		AiTask aiTask = aiTaskRepository.findById(taskId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));
-
 		aiTask.updateCompleted(); // true 로 업데이트
 
-		log.info("AiTask 완료 처리: taskId={}", taskId);
-
-		// Admin 테이블 데이터 삭제
 		adminRepository.deleteAllByTaskId(taskId);
 		log.info("Admin 테이블 정리 완료: 삭제 taskId={}", taskId);
 
+	}
+
+	@Override
+	@Transactional
+	public void deleteAllClosetClothes(Long memberId) {
+		Closet closet = closetRepository.findByMemberId(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
+
+		closetClothesRepository.deleteAllByCloset_Id(closet.getId());
+		log.info("ClosetClothes 모두 삭제: memberId={}, closetId={}", memberId, closet.getId());
 	}
 
 }

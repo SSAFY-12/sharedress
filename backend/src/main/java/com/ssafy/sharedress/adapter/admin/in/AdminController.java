@@ -2,6 +2,7 @@ package com.ssafy.sharedress.adapter.admin.in;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,9 +22,16 @@ public class AdminController {
 	public ResponseEntity<ResponseWrapper<Void>> runDemoPurchaseScanFlow(
 	) {
 		// TODO[지윤]: 146 멤버만
-		// Long memberId = 146L;
-		Long memberId = 45L;
+		Long memberId = 146L;
 		adminUseCase.runDemoPurchaseScanFlow(memberId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
+	}
+
+	@DeleteMapping("/admin/closet-clothes")
+	public ResponseEntity<ResponseWrapper<Void>> deleteAllClosetClothesForDemo() {
+		// TODO[지윤]: 146 멤버만
+		Long memberId = 146L;
+		adminUseCase.deleteAllClosetClothes(memberId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 }
