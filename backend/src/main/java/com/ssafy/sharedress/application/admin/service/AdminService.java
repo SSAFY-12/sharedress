@@ -1,0 +1,84 @@
+package com.ssafy.sharedress.application.admin.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.ssafy.sharedress.application.admin.usecase.AdminUseCase;
+import com.ssafy.sharedress.application.aop.SendNotification;
+import com.ssafy.sharedress.domain.admin.entity.Admin;
+import com.ssafy.sharedress.domain.admin.repository.AdminRepository;
+import com.ssafy.sharedress.domain.ai.entity.AiTask;
+import com.ssafy.sharedress.domain.ai.error.TaskErrorCode;
+import com.ssafy.sharedress.domain.ai.repository.AiTaskRepository;
+import com.ssafy.sharedress.domain.closet.entity.Closet;
+import com.ssafy.sharedress.domain.closet.entity.ClosetClothes;
+import com.ssafy.sharedress.domain.closet.error.ClosetErrorCode;
+import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
+import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
+import com.ssafy.sharedress.domain.clothes.entity.Clothes;
+import com.ssafy.sharedress.domain.notification.entity.NotificationType;
+import com.ssafy.sharedress.global.exception.ExceptionUtil;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class AdminService implements AdminUseCase {
+
+	private final AdminRepository adminRepository;
+	private final ClosetRepository closetRepository;
+	private final ClosetClothesRepository closetClothesRepository;
+	private final AiTaskRepository aiTaskRepository;
+
+	@SendNotification(NotificationType.AI_COMPLETE)
+	@Override
+	@Transactional
+	public void runDemoPurchaseScanFlow(Long memberId) {
+
+		List<Admin> admins = adminRepository.findAllByMemberId(memberId);
+
+		if (admins.isEmpty()) {
+			log.warn("Admin 데이터가 존재하지 않음: memberId={}", memberId);
+			return;
+		}
+
+		String taskId = admins.get(0).getTaskId();
+
+		Closet closet = closetRepository.findByMemberId(memberId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
+
+		// clothes 리스트를 해당 member 의 closetClothes에 저장
+		for (Admin admin : admins) {
+			Clothes clothes = admin.getClothes();
+			boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
+				clothes.getId());
+			if (alreadyExists) {
+				log.info("이미 등록된 옷 (중복 스킵): clothesId={}, closetId={}", clothes.getId(), closet.getId());
+				continue;
+			}
+
+			ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
+			closetClothes.updateImgUrl(clothes.getImageUrl());
+			closetClothesRepository.save(closetClothes);
+			log.info("시연용 옷 등록 완료: clothesId={}, closetId={}", clothes.getId(), closet.getId());
+		}
+
+		AiTask aiTask = aiTaskRepository.findById(taskId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));
+
+		aiTask.updateCompleted(); // true 로 업데이트
+
+		log.info("AiTask 완료 처리: taskId={}", taskId);
+
+		// Admin 테이블 데이터 삭제
+		adminRepository.deleteAllByTaskId(taskId);
+		log.info("Admin 테이블 정리 완료: 삭제 taskId={}", taskId);
+
+	}
+
+}
