@@ -8,7 +8,7 @@ const PolingProvider = () => {
 	useRegistScanStatus(
 		{
 			taskId: cm29.taskId, // 29cm 구매내역 스캔 태스크 아이디
-			shopId: 2, // 29cm 구매내역 스캔 상점 아이디
+			shopId: 3, // 29cm 구매내역 스캔 상점 아이디
 		},
 		cm29.isScan, // 29cm 구매내역 스캔 상태
 	);

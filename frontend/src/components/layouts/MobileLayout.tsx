@@ -32,6 +32,8 @@ export const MobileLayout = () => {
 	const headerProps = getHeaderProps(location.pathname);
 	const isMusinsaScan =
 		location.pathname.replace(/\/$/, '') === '/regist/scan/musinsa';
+	const is29cmScan =
+		location.pathname.replace(/\/$/, '') === '/regist/scan/29cm';
 	const isRegistScan = location.pathname.replace(/\/$/, '') === '/regist/scan';
 
 	/* 네비게이션 바 표시 여부 결정	*/
@@ -66,7 +68,8 @@ export const MobileLayout = () => {
 					isRegistHome ||
 					isRegistHome ||
 					isRegistScan ||
-					isMusinsaScan ? null : isSocial ? (
+					isMusinsaScan ||
+					is29cmScan ? null : isSocial ? (
 						<SocialHeader />
 					) : (
 						<Header {...headerProps} onBackClick={onBackClick} />
@@ -87,7 +90,8 @@ export const MobileLayout = () => {
 						isRegistHome ||
 						isRegistHome ||
 						isRegistScan ||
-						isMusinsaScan
+						isMusinsaScan ||
+						is29cmScan
 							? ''
 							: 'mt-16'
 					} ${
