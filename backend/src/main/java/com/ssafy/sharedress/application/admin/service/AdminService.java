@@ -107,7 +107,7 @@ public class AdminService implements AdminUseCase {
 		adminPhotos.forEach(adminPhoto -> adminPhoto
 			.getClosetClothes()
 			.updateImgUrl(
-				"https://ai-processing-output.s3.ap-northeast-2.amazonaws.com/1_2_db56d197-dd1e-4b3f-b4e3-9a99ccb1d67c.png"));
+				"https://ai-processing-output.s3.ap-northeast-2.amazonaws.com/1_1_029fd132-b730-4c7d-bc18-1774fddbde08.png"));
 
 		AiTask aiTask = aiTaskRepository.findById(taskId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));

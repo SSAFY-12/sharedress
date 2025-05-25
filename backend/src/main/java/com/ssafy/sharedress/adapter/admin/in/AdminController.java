@@ -44,9 +44,10 @@ public class AdminController {
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 
+	// 146 옷장 사진 등록 AI 처리 완료를 위한 임시 API
 	@PostMapping("/admin/photo")
 	public ResponseEntity<ResponseWrapper<Void>> runDemoPhotoFlow() {
-		Long memberId = 148L;
+		Long memberId = 146L;
 		adminUseCase.runDemoPhotoFlow(memberId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}

@@ -327,7 +327,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			ClosetClothes closetClothes = closetClothesRepository.save(new ClosetClothes(closet, clothes));
 
 			// For test
-			if (memberId == 148L) {
+			if (memberId == 146L) {
 				adminPhotoRepository.save(
 					new AdminPhoto(
 						memberRepository.getReferenceById(memberId),
@@ -361,7 +361,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		);
 
 		// for test
-		if (memberId == 148L) {
+		if (memberId == 146L) {
 			List<AdminPhoto> adminPhotos = adminPhotoRepository.findAllByMemberId(memberId);
 			adminPhotos.forEach(adminPhoto -> adminPhoto.updateTaskId(taskId));
 
@@ -386,11 +386,10 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				closetClothes.updateIsPublic(req.isPublic());
 
 				// TODO: log 필요하면 추가할 것
-
-				return ClothesPhotoDetailResponse.from(
-					aiTaskRepository.save(aiTask)
-				);
 			}
+			return ClothesPhotoDetailResponse.from(
+				aiTaskRepository.save(aiTask)
+			);
 		}
 
 		List<AiProcessMessagePhotoRequest.ItemInfo> itemsToProcess = new ArrayList<>();
