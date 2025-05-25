@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ssafy.sharedress.application.admin.usecase.AdminUseCase;
 import com.ssafy.sharedress.application.aop.SendNotification;
 import com.ssafy.sharedress.domain.admin.entity.Admin;
+import com.ssafy.sharedress.domain.admin.entity.AdminPhoto;
+import com.ssafy.sharedress.domain.admin.repository.AdminPhotoRepository;
 import com.ssafy.sharedress.domain.admin.repository.AdminRepository;
 import com.ssafy.sharedress.domain.ai.entity.AiTask;
 import com.ssafy.sharedress.domain.ai.error.TaskErrorCode;
@@ -36,6 +38,7 @@ public class AdminService implements AdminUseCase {
 	private final ClosetClothesRepository closetClothesRepository;
 	private final AiTaskRepository aiTaskRepository;
 	private final FriendRepository friendRepository;
+	private final AdminPhotoRepository adminPhotoRepository;
 
 	@SendNotification(NotificationType.AI_COMPLETE)
 	@Override
@@ -91,6 +94,27 @@ public class AdminService implements AdminUseCase {
 	@Transactional
 	public void deleteAllFriends(Long memberId) {
 		friendRepository.deleteAllByMemberId(memberId);
+	}
+
+	@Override
+	@Transactional
+	public void runDemoPhotoFlow(Long memberId) {
+		List<AdminPhoto> adminPhotos = adminPhotoRepository.findAllByMemberId(memberId);
+
+		String taskId = adminPhotos.get(0).getTaskId();
+
+		// TODO: 시연 때 사진 업로드 이미지 완료된 애로 변경해주기
+		adminPhotos.forEach(adminPhoto -> adminPhoto
+			.getClosetClothes()
+			.updateImgUrl(
+				"https://ai-processing-output.s3.ap-northeast-2.amazonaws.com/1_2_db56d197-dd1e-4b3f-b4e3-9a99ccb1d67c.png"));
+
+		AiTask aiTask = aiTaskRepository.findById(taskId)
+			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));
+		aiTask.updateCompleted(); // true 로 업데이트
+
+		adminPhotoRepository.deleteAll(adminPhotos);
+		log.info("AdminPhoto 테이블 정리 완료: 삭제 taskId={}", taskId);
 	}
 
 }

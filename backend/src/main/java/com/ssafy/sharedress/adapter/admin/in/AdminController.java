@@ -20,8 +20,7 @@ public class AdminController {
 
 	// 구매내역 스캔 AI 처리 완료를 위한 임시 API
 	@PostMapping("/admin")
-	public ResponseEntity<ResponseWrapper<Void>> runDemoPurchaseScanFlow(
-	) {
+	public ResponseEntity<ResponseWrapper<Void>> runDemoPurchaseScanFlow() {
 		// TODO[지윤]: 146 멤버만
 		Long memberId = 146L;
 		adminUseCase.runDemoPurchaseScanFlow(memberId);
@@ -42,6 +41,13 @@ public class AdminController {
 	public ResponseEntity<ResponseWrapper<Void>> deleteAllFriendsForDemo() {
 		Long memberId = 146L;
 		adminUseCase.deleteAllFriends(memberId);
+		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
+	}
+
+	@PostMapping("/admin/photo")
+	public ResponseEntity<ResponseWrapper<Void>> runDemoPhotoFlow() {
+		Long memberId = 148L;
+		adminUseCase.runDemoPhotoFlow(memberId);
 		return ResponseWrapperFactory.toResponseEntity(HttpStatus.OK, null);
 	}
 }

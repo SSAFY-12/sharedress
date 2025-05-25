@@ -6,4 +6,6 @@ public interface AdminUseCase {
 	void deleteAllClosetClothes(Long memberId);
 
 	void deleteAllFriends(Long memberId);
+
+	void runDemoPhotoFlow(Long memberId);
 }
