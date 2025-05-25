@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ProfileHeader from '@/features/closet/components/ProfileHeader';
 import ClosetTab from '@/features/closet/components/ClosetTab';
 import { useLocation, useParams } from 'react-router-dom';
@@ -9,7 +9,8 @@ import { categoryConfig } from '@/constants/categoryConfig';
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
 import UnifiedCodiTab from '@/features/closet/components/UnifiedCodiTab';
-import { GuestModal } from '@/features/closet/components/GuestModal';
+import { GuestModal1 } from '../components/GuestModal1';
+import { GuestModal2 } from '../components/GuestModal2';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [
@@ -42,6 +43,13 @@ const FriendClosetPage = () => {
 
 	// 모달 state 관리
 	const [isModalOpen, setIsModalOpen] = useState(false);
+
+	// 랜덤 모달 선택
+	const selectedModalType = useMemo(
+		() => (Math.random() < 0.5 ? '1' : '2'),
+		[],
+	);
+
 	// 모달여는 함수
 	const handleModalOpen = () => {
 		setIsModalOpen(true);
@@ -125,8 +133,14 @@ const FriendClosetPage = () => {
 					/>
 				)}
 			</div>
-			{isModalOpen && (
-				<GuestModal
+			{isModalOpen && selectedModalType === '1' && (
+				<GuestModal1
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			)}
+			{isModalOpen && selectedModalType === '2' && (
+				<GuestModal2
 					isOpen={isModalOpen}
 					onClose={() => setIsModalOpen(false)}
 				/>

@@ -8,6 +8,7 @@ import { useCloset } from '@/features/closet/hooks/useCloset';
 import { toast } from 'react-toastify';
 import { ClosetResponse } from '@/features/closet/api/closetApi';
 import { useAuthStore } from '@/store/useAuthStore';
+import { CodiTutorialModal } from '../components/CodiTutorialModal';
 
 // [코디 만들기/수정 페이지]
 // - 사용자가 옷을 조합해서 코디를 만듦
@@ -61,6 +62,9 @@ const CodiEditPage = () => {
 	// 코디에 올려진 아이템들 상태
 	const [canvasItems, setCanvasItems] = useState<any[]>([]);
 
+	// 튜토리얼 모달 상태
+	const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+
 	const addItemToCanvas = (item: any) => {
 		const newItem = {
 			...item,
@@ -106,6 +110,12 @@ const CodiEditPage = () => {
 			document.removeEventListener('touchstart', preventDoubleTapZoom);
 		};
 	}, []);
+
+	useEffect(() => {
+		if (isGuest && mode === 'recommended') {
+			setIsTutorialOpen(true);
+		}
+	}, [isGuest, mode]);
 
 	const handleBackClick = () => {
 		if (mode === 'my') {
@@ -266,6 +276,12 @@ const CodiEditPage = () => {
 					</div>
 				</div>
 			</div>
+			{isTutorialOpen && (
+				<CodiTutorialModal
+					isOpen={isTutorialOpen}
+					onClose={() => setIsTutorialOpen(false)}
+				/>
+			)}
 		</>
 	);
 };

@@ -4,6 +4,7 @@ import useUnreadNotification from '@/features/alert/hooks/useUnreadNotification'
 import { useAuthStore } from '@/store/useAuthStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useNavigate } from 'react-router-dom';
+import GuestTooltip from './GuestTooltip';
 
 interface ProfileHeaderProps {
 	profileImage?: string;
@@ -189,18 +190,21 @@ ProfileHeaderProps) => {
 									/>
 								</div>
 							) : (
-								<PrimaryBtn
-									size='medium'
-									name='코디 추천하기'
-									onClick={() => {
-										if (!isGuest) {
-											handleRecommendClick();
-										} else {
-											handleGuestRecommendClick();
-										}
-									}}
-									color='white'
-								/>
+								<div>
+									<PrimaryBtn
+										size='medium'
+										name='코디 추천하기'
+										onClick={() => {
+											if (!isGuest) {
+												handleRecommendClick();
+											} else {
+												handleGuestRecommendClick();
+											}
+										}}
+										color='white'
+									/>
+									{isGuest && <GuestTooltip />}
+								</div>
 							)}
 						</div>
 					</div>
