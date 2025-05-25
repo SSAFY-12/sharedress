@@ -12,4 +12,6 @@ public interface FriendRepository {
 	List<Friend> findAllByMemberId(Long memberId);
 
 	List<Friend> findByKeyword(Long memberId, String keyword);
+
+	void deleteAllByMemberId(Long memberId);
 }

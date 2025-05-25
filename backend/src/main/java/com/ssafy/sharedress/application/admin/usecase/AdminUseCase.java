@@ -4,4 +4,6 @@ public interface AdminUseCase {
 	void runDemoPurchaseScanFlow(Long memberId);
 
 	void deleteAllClosetClothes(Long memberId);
+
+	void deleteAllFriends(Long memberId);
 }

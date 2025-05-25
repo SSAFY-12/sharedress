@@ -18,6 +18,7 @@ import com.ssafy.sharedress.domain.closet.error.ClosetErrorCode;
 import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
 import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
+import com.ssafy.sharedress.domain.friend.repository.FriendRepository;
 import com.ssafy.sharedress.domain.notification.entity.NotificationType;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
@@ -34,6 +35,7 @@ public class AdminService implements AdminUseCase {
 	private final ClosetRepository closetRepository;
 	private final ClosetClothesRepository closetClothesRepository;
 	private final AiTaskRepository aiTaskRepository;
+	private final FriendRepository friendRepository;
 
 	@SendNotification(NotificationType.AI_COMPLETE)
 	@Override
@@ -83,6 +85,12 @@ public class AdminService implements AdminUseCase {
 
 		closetClothesRepository.deleteAllByCloset_Id(closet.getId());
 		log.info("ClosetClothes 모두 삭제: memberId={}, closetId={}", memberId, closet.getId());
+	}
+
+	@Override
+	@Transactional
+	public void deleteAllFriends(Long memberId) {
+		friendRepository.deleteAllByMemberId(memberId);
 	}
 
 }
