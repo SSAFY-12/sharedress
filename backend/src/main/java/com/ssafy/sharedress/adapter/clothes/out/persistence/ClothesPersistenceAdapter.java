@@ -1,6 +1,5 @@
 package com.ssafy.sharedress.adapter.clothes.out.persistence;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.sharedress.application.clothes.dto.ClothesSearchResponse;
 import com.ssafy.sharedress.domain.brand.entity.QBrand;
@@ -72,45 +73,7 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 			condition.and(clothes.id.lt(cursorId));
 		}
 
-		if (keyword != null && !keyword.isBlank()) {
-			String[] tokens = keyword.trim().split("\\s+");
-			BooleanBuilder keywordCondition = new BooleanBuilder();
-
-			// 브랜드-상품 조합 조건
-			for (int i = 0; i < tokens.length; i++) {
-				String brandToken = tokens[i];
-				List<String> productTokens = new ArrayList<>();
-
-				for (int j = 0; j < tokens.length; j++) {
-					if (j != i) {
-						productTokens.add(tokens[j]);
-					}
-				}
-
-				BooleanBuilder candidate = new BooleanBuilder();
-
-				// 브랜드 조건
-				candidate.andAnyOf(
-					brand.nameKr.containsIgnoreCase(brandToken),
-					brand.nameEn.containsIgnoreCase(brandToken)
-				);
-
-				// 상품명 조건
-				for (String productToken : productTokens) {
-					candidate.and(clothes.name.containsIgnoreCase(productToken));
-				}
-
-				keywordCondition.or(candidate);
-			}
-
-			BooleanBuilder nameOnly = new BooleanBuilder();
-			for (String token : tokens) {
-				nameOnly.and(clothes.name.containsIgnoreCase(token));
-			}
-			keywordCondition.or(nameOnly);
-
-			condition.and(keywordCondition);
-		}
+		condition.and(searchByKeyword(keyword, brand, clothes));
 
 		List<ClothesSearchResponse> fetched = queryFactory
 			.select(Projections.constructor(ClothesSearchResponse.class,
@@ -135,6 +98,40 @@ public class ClothesPersistenceAdapter implements ClothesRepository {
 		Long nextCursor = hasNext ? content.get(content.size() - 1).id() : null;
 
 		return new CursorPageResult<>(content, hasNext, nextCursor);
+	}
+
+	public BooleanExpression searchByKeyword(String keyword, QBrand brand, QClothes product) {
+		if (keyword == null || keyword.trim().isEmpty()) {
+			return null;
+		}
+
+		String[] tokens = keyword.trim().split("\\s+"); // 공백 기준 분리
+		String keywordNoSpace = keyword.replaceAll("\\s+", ""); // 전체 공백 제거
+
+		// 1. 각 토큰이 브랜드명 또는 상품명에 포함되는지 검사 (AND 조건)
+		BooleanExpression tokenMatch = null;
+		for (String token : tokens) {
+			BooleanExpression singleTokenMatch =
+				Expressions.stringTemplate("replace({0}, ' ', '')", brand.nameKr).containsIgnoreCase(token)
+					.or(Expressions.stringTemplate("replace({0}, ' ', '')", brand.nameEn).containsIgnoreCase(token))
+					.or(Expressions.stringTemplate("replace({0}, ' ', '')", product.name).containsIgnoreCase(token));
+
+			tokenMatch = (tokenMatch == null) ? singleTokenMatch : tokenMatch.and(singleTokenMatch);
+		}
+
+		// 2. 공백 제거된 전체 문자열로 브랜드+상품을 concat한 문자열에서 검색 (OR 조건)
+		BooleanExpression concatMatchKr = Expressions.stringTemplate(
+			"replace(concat({0}, {1}), ' ', '')",
+			brand.nameKr, product.name
+		).containsIgnoreCase(keywordNoSpace);
+
+		BooleanExpression concatMatchEn = Expressions.stringTemplate(
+			"replace(concat({0}, {1}), ' ', '')",
+			brand.nameEn, product.name
+		).containsIgnoreCase(keywordNoSpace);
+
+		// 최종 조건: 둘 중 하나라도 만족하면 됨
+		return tokenMatch.or(concatMatchKr).or(concatMatchEn);
 	}
 
 	@Override
