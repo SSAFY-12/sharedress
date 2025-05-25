@@ -11,22 +11,24 @@ export const useRegistScanStatus = (
 	data: RegistStatusRequest,
 	enabled: boolean,
 ): UseQueryResult<RegistStatusResponse> => {
-	// console.log('훅 실행됨:', { data, enabled });
-	const { setMusinsa, setCm29 } = useScanStore();
+	const { setMusinsa, setCm29 } = useScanStore(); // 무신사, 29cm 구매내역 스캔 상태 설정
 
 	return useQuery<RegistStatusResponse>({
-		queryKey: ['registStatus', data.taskId, data.shopId],
-		queryFn: () => ScanApis.getClothRegistrationStatus(data),
+		queryKey: ['registStatus', data.taskId, data.shopId], // 구매내역 스캔 상태 조회 키
+		queryFn: () => ScanApis.getClothRegistrationStatus(data), // 구매내역 스캔 상태 조회 API 호출
 		refetchInterval: (query: Query<RegistStatusResponse>) => {
-			// console.log('폴링 실행됨:', query.state.data);
-			const response = query.state.data;
+			// 구매내역 스캔 상태 조회 폴링 실행
+
+			const response = query.state.data; // 구매내역 스캔 상태 조회 API 응답
 			if (response?.content?.completed) {
+				// 구매내역 스캔 완료 시
 				if (data.shopId === 1) {
-					setMusinsa({ isScan: false, taskId: '' });
+					setMusinsa({ isScan: false, taskId: '' }); // 무신사 구매내역 스캔 상태 초기화
 				} else if (data.shopId === 2) {
-					setCm29({ isScan: false, taskId: '' });
+					setCm29({ isScan: false, taskId: '' }); // 29cm 구매내역 스캔 상태 초기화
 				}
 
+				// 구매내역 스캔 완료 토스트 메시지
 				toast.success(
 					<div className='flex flex-col justify-center items-start'>
 						<div className='text-smallButton text-left'>구매내역 스캔 완료</div>

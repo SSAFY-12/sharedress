@@ -13,7 +13,9 @@ import { toast } from 'react-toastify';
 const RegistScanPage = () => {
 	const navigate = useNavigate();
 	const isMusinsaScanning = useScanStore((state) => state.musinsa.isScan);
+	const is29cmScanning = useScanStore((state) => state.cm29.isScan);
 	console.log(isMusinsaScanning, 'isMusinsaScanning');
+	console.log(is29cmScanning, 'is29cmScanning');
 
 	const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
 
@@ -79,22 +81,33 @@ const RegistScanPage = () => {
 						</div>
 					)}
 				</PlatFormBlock>
-				<div className='flex justify-start items-center gap-4 w-full relative py-2 px-2'>
-					<div className='absolute inset-0 bg-black/30 rounded-lg z-10 flex items-center justify-center'>
-						<span className='text-white text-button w-full pr-2'>
-							업데이트 예정
-						</span>
-					</div>
-					<img
-						src='/images/regist/29cm.png'
-						alt='29cm'
-						className='h-14 object-cover border border-light rounded-lg'
-					/>
-					<div className='flex flex-col items-start gap-1 py-2'>
-						<h1 className='text-smallButton text-regular'>29cm</h1>
-						<p className='text-description'>https://www.29cm.co.kr</p>
-					</div>
-				</div>
+				<PlatFormBlock
+					title='29cm'
+					description='https://www.29cm.co.kr'
+					image='29cm.png'
+					onClick={() => {
+						if (!is29cmScanning) {
+							navigate('/regist/scan/29cm');
+						} else {
+							toast.info('스캔 중에는 신규 등록이 불가능합니다.');
+						}
+					}}
+				>
+					{is29cmScanning && (
+						<div className='absolute inset-0 bg-modify/30 rounded-lg z-10 flex items-center justify-center'>
+							<div className='flex items-center justify-center gap-2'>
+								<img
+									src='/icons/loading.svg'
+									className='w-4 h-4'
+									alt='스캔중'
+								/>
+								<span className='text-white text-button w-full pr-4'>
+									스캔 중
+								</span>
+							</div>
+						</div>
+					)}
+				</PlatFormBlock>
 				<div className='flex justify-start items-center gap-4 w-full relative py-2 px-2'>
 					<div className='absolute inset-0 bg-black/30 rounded-lg z-10 flex items-center justify-center'>
 						<span className='text-white text-button w-full pr-2'>

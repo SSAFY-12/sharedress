@@ -133,8 +133,9 @@ export const ScanApis = {
 	},
 	// --------------------옷 등록 완료여부 조회 ----------------
 	getClothRegistrationStatus: async (
-		data: RegistStatusRequest,
+		data: RegistStatusRequest, // 구매내역 스캔 상태 조회 요청 데이터
 	): Promise<RegistStatusResponse> => {
+		// 구매내역 스캔 상태 조회 API 호출
 		const response = await client.get(
 			`/api/closet/clothes/purchase-history/task/${data.taskId}`,
 			{

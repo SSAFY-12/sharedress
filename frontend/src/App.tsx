@@ -14,6 +14,7 @@ import PolingProviderCamera from '@/components/poling/PolingProviderCamera';
 import { useScanStore } from '@/store/useScanStore';
 import { useCameraStore } from './store/useCameraStore';
 import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
+import PolingProvider29cm from './components/poling/PolingProvider29cm';
 
 export const App = () => {
 	useFcmInitialization();
@@ -26,22 +27,7 @@ export const App = () => {
 	const isGuest = useAuthStore((state) => state.isGuest);
 	const isCameraScan = useCameraStore((state) => state.camera.isScan);
 	const isMusinsaScan = useScanStore((state) => state.musinsa.isScan);
-
-	// useTokenValidation();
-	// 공개 라우트 목록
-	// const isPublicRoute =
-	// 	location.pathname === '/auth' ||
-	// 	location.pathname === '/auth/google/callback' ||
-	// 	location.pathname === '/oauth/google/callback' ||
-	// 	location.pathname.startsWith('/link/') ||
-	// 	location.pathname.startsWith('/friend/');
-
-	// // 공개 라우트가 아니면 토큰 검사
-	// useEffect(() => {
-	// 	if (!isPublicRoute) {
-	// 		useTokenValidation();
-	// 	}
-	// }, [isPublicRoute]);
+	const isCm29Scan = useScanStore((state) => state.cm29.isScan);
 
 	useEffect(() => {
 		const hideFcmAlert = localStorage.getItem('hideFcmAlert');
@@ -67,20 +53,6 @@ export const App = () => {
 	return (
 		<>
 			<GoogleAnalytics />
-
-			{/* 개발 환경에서만 보이는 Sentry 테스트 버튼 */}
-			{/* {import.meta.env.DEV && (
-				<div className='fixed bottom-4 right-4 z-50'>
-					<button
-						onClick={() => {
-							throw new Error('This is your first error!');
-						}}
-						className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg'
-					>
-						Break the world
-					</button>
-				</div>
-			)} */}
 
 			{/* 모바일 레이아웃 */}
 			<div className='block sm:hidden min-h-screen bg-white'>
@@ -156,6 +128,8 @@ export const App = () => {
 			{/* PolingProvider를 조건부로 렌더링 */}
 			{isMusinsaScan ? <PolingProviderMusinsa /> : null}
 			{isCameraScan ? <PolingProviderCamera /> : null}
+			{/* 29cm 구매내역 스캔 프로바이더 */}
+			{isCm29Scan ? <PolingProvider29cm /> : null}
 		</>
 	);
 };

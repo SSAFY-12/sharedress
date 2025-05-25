@@ -29,6 +29,8 @@ export const WebLayout = () => {
 	const headerProps = getHeaderProps(location.pathname);
 	const isMusinsaScan =
 		location.pathname.replace(/\/$/, '') === '/regist/scan/musinsa';
+	const is29cmScan =
+		location.pathname.replace(/\/$/, '') === '/regist/scan/29cm';
 	const isRegistHome = location.pathname.replace(/\/$/, '') === '/regist';
 	const isRegistScan = location.pathname.replace(/\/$/, '') === '/regist/scan';
 	const navigate = useNavigate();
@@ -63,6 +65,7 @@ export const WebLayout = () => {
 				isRegistCameraPre ||
 				isRegistHome ||
 				isMusinsaScan ||
+				is29cmScan ||
 				isRegistHome ||
 				isRegistScan ? null : isSocial ? (
 					<SocialHeader />
@@ -85,6 +88,7 @@ export const WebLayout = () => {
 					isRegistCameraPre ||
 					isRegistHome ||
 					isMusinsaScan ||
+					is29cmScan ||
 					isRegistHome ||
 					isRegistScan
 						? ''
