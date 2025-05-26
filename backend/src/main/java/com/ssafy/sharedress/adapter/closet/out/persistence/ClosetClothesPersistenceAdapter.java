@@ -176,4 +176,9 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	public void deleteAllByCloset_Id(Long closetId) {
 		closetClothesJpaRepository.deleteAllByCloset_Id(closetId);
 	}
+
+	@Override
+	public void delete(ClosetClothes closetClothes) {
+		closetClothesJpaRepository.delete(closetClothes);
+	}
 }
