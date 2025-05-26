@@ -90,6 +90,9 @@ public class AdminService implements AdminUseCase {
 		Closet closet = closetRepository.findByMemberId(memberId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(ClosetErrorCode.CLOSET_NOT_FOUND));
 
+		coordinationRepository.findMyCoordinations(memberId)
+			.forEach(coordinationRepository::delete);
+
 		closetClothesRepository.findAllByMemberId(memberId)
 			.forEach(closetClothesRepository::delete);
 	}
