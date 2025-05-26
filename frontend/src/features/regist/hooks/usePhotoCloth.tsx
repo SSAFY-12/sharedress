@@ -43,7 +43,7 @@ const usePhotoCloth = () => {
 			);
 
 			reset();
-			navigate('/mypage');
+			navigate('/regist');
 		} catch (error) {
 			console.error('등록 실패:', error);
 			toast.error('등록 중 문제가 발생했어요!');
