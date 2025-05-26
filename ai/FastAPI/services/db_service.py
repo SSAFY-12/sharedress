@@ -33,7 +33,7 @@ class DBService:
             return None
 
     # -----------------------------------------------------------
-    # Look-ups
+    # Look-ups (재연결 로직 추가)
     # -----------------------------------------------------------
     def get_category_id_by_name(self, name: str) -> int | None:
         try:
@@ -41,7 +41,15 @@ class DBService:
             return c.id if c else None
         except Exception as e:
             logger.error(f"Category lookup error: {e}")
-            return None
+            # DB 연결 오류 시 재연결 시도
+            try:
+                self.db.close()
+                self.db = next(get_db())
+                c = self.db.query(Category).filter(Category.category_name == name).first()
+                return c.id if c else None
+            except Exception as e2:
+                logger.error(f"Category lookup retry failed: {e2}")
+                return None
 
     def get_category_name(self, category_id: int) -> str | None:
         try:
@@ -49,7 +57,15 @@ class DBService:
             return c.category_name if c else None
         except Exception as e:
             logger.error(f"Category name lookup error: {e}")
-            return None
+            # DB 연결 오류 시 재연결 시도
+            try:
+                self.db.close()
+                self.db = next(get_db())
+                c = self.db.query(Category).filter(Category.id == category_id).first()
+                return c.category_name if c else None
+            except Exception as e2:
+                logger.error(f"Category name retry failed: {e2}")
+                return None
 
     def get_color_name(self, color_id: int) -> str | None:
         try:
@@ -57,7 +73,15 @@ class DBService:
             return c.color_name if c else None
         except Exception as e:
             logger.error(f"Color name lookup error: {e}")
-            return None
+            # DB 연결 오류 시 재연결 시도
+            try:
+                self.db.close()
+                self.db = next(get_db())
+                c = self.db.query(Color).filter(Color.id == color_id).first()
+                return c.color_name if c else None
+            except Exception as e2:
+                logger.error(f"Color name retry failed: {e2}")
+                return None
 
     # -----------------------------------------------------------
     # Color HEX 업데이트
@@ -78,6 +102,7 @@ class DBService:
             self.db.rollback()
             logger.error("Clothes update failed: %s", e)
             return False
+
     def update_color_hex(self, color_id: int, hex_code: str) -> bool:
         try:
             color = self.db.query(Color).filter(Color.id == color_id).first()

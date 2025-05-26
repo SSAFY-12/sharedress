@@ -1,4 +1,5 @@
 import logging
+import time
 from io import BytesIO
 from typing import List, Optional
 from PIL import Image
@@ -127,41 +128,98 @@ class PhotoProcessor:
         try:
             from services.product_processor import ProductProcessor
             processor = ProductProcessor()
-            return await processor._download(url)
+            buffer = await processor._download(url)
+
+            if buffer:
+                # 파일 헤더로 포맷 검사
+                buffer.seek(0)
+                header = buffer.read(12)
+                buffer.seek(0)
+
+                # HEIC 파일 헤더 확인
+                is_heic = any(header.find(sig) != -1 for sig in [b'ftypheic', b'ftypmif1', b'ftyphevc', b'ftypheix'])
+
+                if is_heic:
+                    logger.info(f"HEIC 이미지 감지됨, PNG로 변환 중...")
+                    try:
+                        # pillow-heif 라이브러리 사용
+                        from pillow_heif import register_heif_opener, HeifImagePlugin
+                        register_heif_opener()
+
+                        # HEIC 파일 열기
+                        heic_image = Image.open(buffer)
+
+                        # 주의: mode 속성 직접 수정 대신 convert 메서드만 사용
+                        rgb_image = heic_image.convert("RGB")
+
+                        # PNG로 변환
+                        output_buffer = BytesIO()
+                        rgb_image.save(output_buffer, format="PNG")
+                        output_buffer.seek(0)
+
+                        logger.info("HEIC → PNG 변환 성공")
+                        return output_buffer
+                    except Exception as e:
+                        logger.error(f"HEIC 변환 실패: {e}")
+                        # 원본 반환 (처리가 실패하더라도 시도는 함)
+                        buffer.seek(0)
+                        return buffer
+
+            return buffer
         except Exception as e:
             logger.error(f"다운로드 오류 {url}: {e}")
             return None
 
     def _update_closet_clothes(self, closet_clothes_id: int, image_url: str) -> bool:
         """closet_clothes 테이블 업데이트"""
-        try:
-            # DB 연결
-            import pymysql
-            from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
+        max_retries = 3
+        retry_count = 0
 
-            conn = pymysql.connect(
-                host=DB_HOST,
-                user=DB_USER,
-                password=DB_PASSWORD,
-                db=DB_NAME,
-                port=DB_PORT,
-                charset='utf8mb4'
-            )
+        while retry_count < max_retries:
+            try:
+                # DB 연결
+                import pymysql
+                from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
 
-            cursor = conn.cursor()
+                conn = pymysql.connect(
+                    host=DB_HOST,
+                    user=DB_USER,
+                    password=DB_PASSWORD,
+                    db=DB_NAME,
+                    port=DB_PORT,
+                    charset='utf8mb4',
+                    connect_timeout=10,  # 연결 타임아웃 설정
+                    read_timeout=30,     # 읽기 타임아웃 설정
+                    write_timeout=30     # 쓰기 타임아웃 설정
+                )
 
-            # closet_clothes 테이블 업데이트
-            sql = "UPDATE closet_clothes SET image_url = %s WHERE id = %s"
-            affected_rows = cursor.execute(sql, (image_url, closet_clothes_id))
-            conn.commit()
+                cursor = conn.cursor()
 
-            cursor.close()
-            conn.close()
+                # closet_clothes 테이블 업데이트
+                sql = "UPDATE closet_clothes SET image_url = %s WHERE id = %s"
+                affected_rows = cursor.execute(sql, (image_url, closet_clothes_id))
+                conn.commit()
 
-            return affected_rows > 0
-        except Exception as e:
-            logger.error(f"DB 업데이트 오류: {e}")
-            return False
+                cursor.close()
+                conn.close()
+
+                return affected_rows > 0
+
+            except pymysql.err.OperationalError as e:
+                # MySQL 서버 연결 끊김 오류 처리
+                if e.args[0] == 2006:  # "MySQL server has gone away"
+                    retry_count += 1
+                    logger.warning(f"MySQL 연결 끊김, 재시도 중 ({retry_count}/{max_retries})")
+                    if retry_count < max_retries:
+                        time.sleep(1)  # 잠시 대기 후 재시도
+                        continue
+
+                logger.error(f"DB 업데이트 오류: {e}")
+                return False
+
+            except Exception as e:
+                logger.error(f"DB 업데이트 오류: {e}")
+                return False
 
     def _create_error_result(self, member_id: int, closet_clothes_id: int, category_id: int, message_id: Optional[str]) -> PhotoProcessingResult:
         """에러 결과 생성"""

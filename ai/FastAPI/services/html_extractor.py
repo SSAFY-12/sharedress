@@ -12,7 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-
+from services.cm29_extractor import get_extractor as get_29cm_extractor
 logger = logging.getLogger(__name__)
 
 class HTMLExtractor:
@@ -49,6 +49,11 @@ class HTMLExtractor:
     def extract_from_url(self, url: str, desired_color: Optional[str] = None) -> Dict[str, Any]:
         """URL에서 상품 정보 추출"""
         try:
+            # ───────────────────────── 29CM 전용 처리 ─────────────────────────
+            if "29cm.co.kr" in url:
+                logger.info("29CM URL 감지 – 전용 파서 사용")
+                return get_29cm_extractor().extract(url)
+            # ───────────────────────── Musinsa (기존) ─────────────────────────
             # 상품 ID 추출
             product_id = url.split('/')[-1]
             logger.info(f"상품 ID: {product_id}")

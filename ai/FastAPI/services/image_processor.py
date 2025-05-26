@@ -78,6 +78,29 @@ class ImageProcessor:
         r = requests.get(url, timeout=10)
         r.raise_for_status()
         buf = BytesIO(r.content)
+
+        # HEIC 파일 헤더 검사
+        buf.seek(0)
+        header = buf.read(12)
+        buf.seek(0)
+
+        is_heic = any(header.find(sig) != -1 for sig in [b'ftypheic', b'ftypmif1', b'ftyphevc', b'ftypheix'])
+
+        if is_heic:
+            try:
+                from pillow_heif import register_heif_opener
+                register_heif_opener()
+                img = Image.open(buf)
+                # 원본 버퍼 유지를 위해 새 버퍼 생성
+                new_buf = BytesIO()
+                img.convert("RGB").save(new_buf, format="PNG")
+                new_buf.seek(0)
+                return new_buf, Image.open(new_buf).convert("RGB")
+            except Exception as e:
+                logger.warning(f"HEIC 변환 실패: {e}, 일반 방식으로 시도합니다.")
+                # 실패하면 기존 방식 시도
+                buf.seek(0)
+
         return buf, Image.open(buf).convert("RGB")
 
     def _has_person(self, img: Image.Image) -> bool:
@@ -127,6 +150,34 @@ class ImageProcessor:
     @staticmethod
     def remove_background(buf: BytesIO) -> BytesIO:
         try:
+            # HEIC 파일인지 확인
+            buf.seek(0)
+            header = buf.read(12)
+            buf.seek(0)
+            is_heic = any(header.find(sig) != -1 for sig in [b'ftypheic', b'ftypmif1', b'ftyphevc', b'ftypheix'])
+
+            if is_heic:
+                # HEIC 파일이면 먼저 PNG로 변환
+                try:
+                    from pillow_heif import register_heif_opener
+                    register_heif_opener()
+
+                    img = Image.open(buf)
+                    # 새 버퍼에 PNG로 저장
+                    png_buf = BytesIO()
+                    img.convert("RGB").save(png_buf, format="PNG")
+                    png_buf.seek(0)
+
+                    # 변환된 PNG에서 배경 제거
+                    result = BytesIO(remove(png_buf.getvalue()))
+                    return result
+                except Exception as e:
+                    logger.error(f"HEIC 변환 후 배경 제거 실패: {e}")
+                    # 실패하면 원본 반환
+                    buf.seek(0)
+                    return buf
+
+            # 일반 이미지 배경 제거
             return BytesIO(remove(buf.getvalue()))
         except Exception as e:
             logger.error("rembg error: %s", e)
@@ -145,8 +196,9 @@ class ImageProcessor:
                 ref_path = self._save_image_to_log(reference_img, f"reference_{category}.png")
                 logger.info(f"참조 이미지 저장됨: {ref_path}")
 
-                # 이미지를 임시 파일로 저장
-                temp_file = os.path.join(self.log_dir, f"temp_{category}.png")
+                # 이미지를 임시 파일로 저장 - 이 부분 수정
+                safe_category = category.replace('/', '_').replace('\\', '_')  # 슬래시를 언더스코어로 변환
+                temp_file = os.path.join(self.log_dir, f"temp_{safe_category}.png")
                 reference_img.save(temp_file)
 
                 # images.edit API 사용
