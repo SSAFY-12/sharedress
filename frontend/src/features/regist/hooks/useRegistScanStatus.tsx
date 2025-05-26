@@ -24,7 +24,7 @@ export const useRegistScanStatus = (
 				// 구매내역 스캔 완료 시
 				if (data.shopId === 1) {
 					setMusinsa({ isScan: false, taskId: '' }); // 무신사 구매내역 스캔 상태 초기화
-				} else if (data.shopId === 2) {
+				} else if (data.shopId === 3) {
 					setCm29({ isScan: false, taskId: '' }); // 29cm 구매내역 스캔 상태 초기화
 				}
 

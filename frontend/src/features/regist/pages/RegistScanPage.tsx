@@ -86,11 +86,11 @@ const RegistScanPage = () => {
 					description='https://www.29cm.co.kr'
 					image='29cm.png'
 					onClick={() => {
-						if (!is29cmScanning) {
-							navigate('/regist/scan/29cm');
-						} else {
+						if (is29cmScanning) {
 							toast.info('스캔 중에는 신규 등록이 불가능합니다.');
+							return;
 						}
+						navigate('/regist/scan/29cm');
 					}}
 				>
 					{is29cmScanning && (
@@ -108,22 +108,6 @@ const RegistScanPage = () => {
 						</div>
 					)}
 				</PlatFormBlock>
-				<div className='flex justify-start items-center gap-4 w-full relative py-2 px-2'>
-					<div className='absolute inset-0 bg-black/30 rounded-lg z-10 flex items-center justify-center'>
-						<span className='text-white text-button w-full pr-2'>
-							업데이트 예정
-						</span>
-					</div>
-					<img
-						src='/images/regist/ably.png'
-						alt='ably'
-						className='h-14 object-cover border border-light rounded-lg'
-					/>
-					<div className='flex flex-col items-start gap-1 py-2'>
-						<h1 className='text-smallButton text-regular'>ABLY</h1>
-						<p className='text-description'>https://m.a-bly.com/</p>
-					</div>
-				</div>
 
 				<PrivacyModal
 					isOpen={isPrivacyModalOpen}
