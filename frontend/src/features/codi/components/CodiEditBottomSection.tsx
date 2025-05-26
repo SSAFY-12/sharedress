@@ -1,5 +1,5 @@
 import { ClothListContainer } from '@/containers/ClothListContainer';
-import CodiCategoryTabs from './CodiCategoryTabs';
+import CodiCategoryTabs from '@/features/codi/components/CodiCategoryTabs';
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { useEffect, useRef } from 'react';
 

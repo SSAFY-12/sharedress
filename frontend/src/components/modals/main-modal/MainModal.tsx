@@ -7,7 +7,7 @@ import {
 	ModalHeaderProps,
 	ModalBodyProps,
 	ModalFooterProps,
-} from './MainModal.types';
+} from '@/components/modals/main-modal/MainModal.types';
 import { CN } from '@/lib/utils';
 
 // 이 Context는 모달의 상태(isOpen)와 닫기 함수(onClose)를 자식 컴포넌트들에게 전달

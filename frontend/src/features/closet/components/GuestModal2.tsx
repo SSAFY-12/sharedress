@@ -31,7 +31,7 @@ export const GuestModal2 = ({ isOpen, onClose }: GuestModal2Props) => (
 						</div>
 					</div>
 					<div className='flex flex-col justify-center items-center w-full gap-2'>
-						<GoogleAuthPage />
+						<GoogleAuthPage id='signupB' />
 					</div>
 				</div>
 			</MainModal.Body>

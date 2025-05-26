@@ -1,6 +1,6 @@
 import { MainModal } from '@/components/modals/main-modal/MainModal';
 import useRequest from '@/features/social/hooks/useRequest';
-import { FriendRequestActionModalProps } from './FriendRequestActionModal';
+import { FriendRequestActionModalProps } from '@/features/social/components/FriendRequestActionModal';
 import { UserMiniAvatar } from '@/components/cards/user-mini-avatar';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { PrimaryBtn } from '@/components/buttons/primary-button';

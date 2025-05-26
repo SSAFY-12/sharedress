@@ -1,4 +1,4 @@
-import { BadgeProps } from './Badge.types';
+import { BadgeProps } from '@/components/etc/badge/Badge.types';
 import {
 	Bell,
 	Settings,

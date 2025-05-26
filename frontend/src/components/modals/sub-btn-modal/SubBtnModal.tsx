@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { SubBtnModalProps } from './SubBtnModal.types';
+import { SubBtnModalProps } from '@/components/modals/sub-btn-modal/SubBtnModal.types';
 import { useNavigate } from 'react-router-dom';
 
 export const SubBtnModal = ({

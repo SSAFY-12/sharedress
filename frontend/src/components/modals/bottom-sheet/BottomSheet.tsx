@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { BottomSheetProps } from './BottomSheet.types';
+import { BottomSheetProps } from '@/components/modals/bottom-sheet/BottomSheet.types';
 import { CN } from '@/lib/utils';
 
 // 메인 바텀 시트 컴포넌트
