@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClosetClothesQueryService implements ClosetClothesQueryUseCase {
 
-	private static final int MAX_DAILY_UPLOAD_COUNT = 5;
+	private static final int MAX_DAILY_UPLOAD_COUNT = 1;
 
 	private final ClosetClothesRepository closetClothesRepository;
 	private final PhotoUploadLogRepository photoUploadLogRepository;

@@ -124,6 +124,11 @@ public class ClosetClothesController {
 		@CurrentMember Member member,
 		@RequestParam("photos") List<MultipartFile> photos
 	) {
+		// TODO: 사진 제한 개수 발표용 카페에 뿌리기 위해 1개로 제한
+		if (photos.size() > 1) {
+			return ResponseWrapperFactory.toResponseEntity(HttpStatus.BAD_REQUEST, null);
+		}
+
 		List<ClothesPhotoUploadResponse> result = closetClothesUseCase.uploadClosetClothesPhotos(
 			member.getId(),
 			photos
