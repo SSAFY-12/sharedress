@@ -8,4 +8,6 @@ public interface AdminUseCase {
 	void deleteAllFriends(Long memberId);
 
 	void runDemoPhotoFlow(Long memberId);
+
+	void updateFalsePrivacy(Long memberId);
 }

@@ -176,39 +176,19 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 		// TODO[지윤]: 시연시나리오용 memberId==146 에 대한 분기처리
 		// 구매내역을 가지고 요청한 146 은 aiTask 생성, admin 생성 후 return
-		if (memberId == 146L) {
-			request.items().stream()
-				.sorted((a, b) -> -1) // 내림차순 유지
-				.forEach(item -> {
-					// 상품명 필수 체크
-					if (item.name() == null || item.name().isBlank()) {
-						log.warn("상품명이 비어있어 Admin 등록에서 제외됨: item={}", item);
-						return;
-					}
+		if (memberId == 140L) {
+			List<Long> clothesIds = List.of(
+				// 시연용 옷 ID 목록
+				1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L
+			);
 
-					Optional<Brand> optionalBrand = brandRepository.findByExactNameEnOrKr(item.brandNameEng(),
-						item.brandNameKor());
-					if (optionalBrand.isEmpty()) {
-						log.warn("해당 브랜드를 찾을 수 없음: {}", item);
-						return;
-					}
-
-					Brand brand = optionalBrand.get();
-					String normalizedName = RegexUtils.normalizeProductName(item.name());
-
-					Optional<Clothes> existing = clothesRepository.findByNameAndBrandId(normalizedName, brand.getId());
-					if (existing.isEmpty()) {
-						log.warn("Clothes 테이블에 해당 옷이 없음 {}", item);
-						return;
-					}
-
-					Clothes clothes = existing.get();
-
-					Admin admin = new Admin(member, taskId, clothes);
-					adminRepository.save(admin);
-
-					log.info("시연용 Admin 데이터 등록 완료: clothesId={}, memberId={}", clothes.getId(), memberId);
-				});
+			clothesIds.forEach(id -> {
+				clothesRepository.findById(id)
+					.ifPresent(clothes -> {
+						Admin admin = new Admin(member, taskId, clothes);
+						adminRepository.save(admin);
+					});
+			});
 			return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());
 		}
 
@@ -327,7 +307,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			ClosetClothes closetClothes = closetClothesRepository.save(new ClosetClothes(closet, clothes));
 
 			// For test
-			if (memberId == 146L) {
+			if (memberId == 140L) {
 				adminPhotoRepository.save(
 					new AdminPhoto(
 						memberRepository.getReferenceById(memberId),
@@ -361,7 +341,7 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		);
 
 		// for test
-		if (memberId == 146L) {
+		if (memberId == 140L) {
 			List<AdminPhoto> adminPhotos = adminPhotoRepository.findAllByMemberId(memberId);
 			adminPhotos.forEach(adminPhoto -> adminPhoto.updateTaskId(taskId));
 

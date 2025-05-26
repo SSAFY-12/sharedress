@@ -21,6 +21,7 @@ import com.ssafy.sharedress.domain.closet.repository.ClosetClothesRepository;
 import com.ssafy.sharedress.domain.closet.repository.ClosetRepository;
 import com.ssafy.sharedress.domain.clothes.entity.Clothes;
 import com.ssafy.sharedress.domain.friend.repository.FriendRepository;
+import com.ssafy.sharedress.domain.member.repository.MemberRepository;
 import com.ssafy.sharedress.domain.notification.entity.NotificationType;
 import com.ssafy.sharedress.global.exception.ExceptionUtil;
 
@@ -39,6 +40,7 @@ public class AdminService implements AdminUseCase {
 	private final AiTaskRepository aiTaskRepository;
 	private final FriendRepository friendRepository;
 	private final AdminPhotoRepository adminPhotoRepository;
+	private final MemberRepository memberRepository;
 
 	@SendNotification(NotificationType.AI_COMPLETE)
 	@Override
@@ -115,6 +117,14 @@ public class AdminService implements AdminUseCase {
 
 		adminPhotoRepository.deleteAll(adminPhotos);
 		log.info("AdminPhoto 테이블 정리 완료: 삭제 taskId={}", taskId);
+	}
+
+	@Override
+	public void updateFalsePrivacy(Long memberId) {
+		memberRepository.findById(memberId)
+			.ifPresent(member -> {
+				member.updatePrivacyAgreement(false);
+			});
 	}
 
 }
