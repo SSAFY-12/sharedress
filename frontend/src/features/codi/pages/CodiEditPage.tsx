@@ -52,6 +52,8 @@ const CodiEditPage = () => {
 	const categoryId =
 		activeCategory === 'all' ? undefined : Number(activeCategory);
 
+	const [activeCanvasId, setActiveCanvasId] = useState<string | null>(null);
+
 	// 옷장 데이터 조회
 	const {
 		data: products,
@@ -76,6 +78,7 @@ const CodiEditPage = () => {
 			imageUrl: item.imageUrl,
 		};
 		setCanvasItems([...canvasItems, newItem]);
+		setActiveCanvasId(newItem.canvasId);
 	};
 
 	const updateCanvasItem = (updatedItem: any) => {
@@ -186,6 +189,8 @@ const CodiEditPage = () => {
 								isEditable={true}
 								updateItem={updateCanvasItem}
 								removeItem={removeFromCanvas}
+								activeItem={activeCanvasId}
+								setActiveItem={setActiveCanvasId}
 								width={window.innerWidth}
 								height={window.innerWidth * 1.1}
 							/>
@@ -238,6 +243,8 @@ const CodiEditPage = () => {
 								isEditable={true}
 								updateItem={updateCanvasItem}
 								removeItem={removeFromCanvas}
+								activeItem={activeCanvasId}
+								setActiveItem={setActiveCanvasId}
 							/>
 						</div>
 						<CodiEditBottomSection

@@ -28,6 +28,8 @@ interface CodiCanvasProps {
 	id?: string;
 	width?: number;
 	height?: number;
+	activeItem: string | null;
+	setActiveItem: (item: string | null) => void;
 }
 
 // 카테고리별 기본 크기 설정
@@ -45,8 +47,10 @@ const CodiCanvas = ({
 	id,
 	width,
 	height,
+	activeItem,
+	setActiveItem,
 }: CodiCanvasProps) => {
-	const [activeItem, setActiveItem] = useState<string | null>(null);
+	// const [activeItem, setActiveItem] = useState<string | null>(null);
 	const [interactionMode, setInteractionMode] = useState<
 		'move' | 'transform' | null
 	>(null);
@@ -104,14 +108,14 @@ const CodiCanvas = ({
 				setActiveItem(canvasId);
 			}
 		},
-		[activeItem, items, updateItem, isEditable],
+		[activeItem, items, updateItem, isEditable, setActiveItem],
 	);
 
 	const handleCanvasClick = useCallback(() => {
 		if (!isEditable) return;
 		setActiveItem(null);
 		setInteractionMode(null);
-	}, [isEditable]);
+	}, [isEditable, setActiveItem]);
 
 	const handleMoveStart = useCallback(
 		(e: React.MouseEvent | React.TouchEvent, item: CanvasItem) => {
@@ -132,7 +136,7 @@ const CodiCanvas = ({
 				scale: item.scale,
 			});
 		},
-		[isEditable, updateItem],
+		[isEditable, updateItem, setActiveItem],
 	);
 
 	const handleTransformStart = useCallback(
@@ -166,7 +170,7 @@ const CodiCanvas = ({
 				});
 			}
 		},
-		[isEditable, updateItem],
+		[isEditable, updateItem, setActiveItem],
 	);
 
 	const handleMove = useCallback(
@@ -232,7 +236,7 @@ const CodiCanvas = ({
 			setActiveItem(null);
 			setInteractionMode(null);
 		},
-		[removeItem, isEditable],
+		[removeItem, isEditable, setActiveItem],
 	);
 
 	useEffect(() => {
