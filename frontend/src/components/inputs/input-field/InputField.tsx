@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { InputFieldProps } from './InputField.types';
+import { InputFieldProps } from '@/components/inputs/input-field/InputField.types';
 
 export const InputField = ({
 	type,

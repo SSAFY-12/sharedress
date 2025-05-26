@@ -1,7 +1,7 @@
 import { matchPath, Outlet, useLocation } from 'react-router-dom';
-import Header from './Header';
-import NavBar from './NavBar';
-import SocialHeader from './SocialHeader';
+import Header from '@/components/layouts/Header';
+import NavBar from '@/components/layouts/NavBar';
+import SocialHeader from '@/components/layouts/SocialHeader';
 import { shouldShowNav } from '@/constants/navConfig';
 import getHeaderProps from '@/utils/getHeaderProps';
 import { useNavigate } from 'react-router-dom';

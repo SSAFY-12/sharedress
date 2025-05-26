@@ -1,4 +1,4 @@
-import { UserMiniAvatarProps } from './UserMiniAvatar.types';
+import { UserMiniAvatarProps } from '@/components/cards/user-mini-avatar/UserMiniAvatar.types';
 
 export const UserMiniAvatar = ({
 	src,

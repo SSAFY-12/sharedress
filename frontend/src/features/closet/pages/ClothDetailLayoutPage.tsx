@@ -1,6 +1,6 @@
 import { getMyLoginInfo } from '@/features/social/api/socialApi';
 import { useLoginInfo } from '@/features/social/hooks/useLoginInfo';
-import ClothDetailPage from './ClothDetailPage';
+import ClothDetailPage from '@/features/closet/pages/ClothDetailPage';
 
 const ClothDetailLayoutPage = () => {
 	useLoginInfo();

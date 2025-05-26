@@ -4,17 +4,17 @@ import { WebLayout } from '@/components/layouts/WebLayout';
 import { MobileLayout } from '@/components/layouts/MobileLayout';
 import { Slide, ToastContainer } from 'react-toastify';
 import { useEffect, useState } from 'react';
-import { useAuthStore } from './store/useAuthStore';
+import { useAuthStore } from '@/store/useAuthStore';
 import useFcmStore from '@/store/useFcmStore';
-import { GoogleAnalytics } from './components/GoogleAnalytics';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { useNavigate } from 'react-router-dom';
 import { AlertModal } from '@/components/modals/fcm-modal/AlertModal';
 import PolingProviderMusinsa from '@/components/poling/PolingProviderMusinsa';
 import PolingProviderCamera from '@/components/poling/PolingProviderCamera';
 import { useScanStore } from '@/store/useScanStore';
-import { useCameraStore } from './store/useCameraStore';
+import { useCameraStore } from '@/store/useCameraStore';
 import useFcmInitialization from '@/features/alert/hooks/useFcmInitialization';
-import PolingProvider29cm from './components/poling/PolingProvider29cm';
+import PolingProvider29cm from '@/components/poling/PolingProvider29cm';
 
 export const App = () => {
 	useFcmInitialization();

@@ -1,5 +1,5 @@
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
-import { RegisteredBedge } from './RegisteredBedge';
+import { RegisteredBedge } from '@/features/regist/components/RegisteredBedge';
 import { useState } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';

@@ -3,7 +3,10 @@
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
-const GoogleAuthPage = () => {
+interface GoogleAuthPageProps {
+	id?: string;
+}
+const GoogleAuthPage = ({ id }: GoogleAuthPageProps) => {
 	const location = useLocation();
 	// const navigate = useNavigate();
 
@@ -59,6 +62,7 @@ const GoogleAuthPage = () => {
 		<button
 			onClick={() => handleLogin()}
 			className='flex items-center gap-2.5 px-10 py-2.5 bg-white border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors duration-200 text-base font-bold shadow-sm'
+			id={id}
 		>
 			<img
 				src='https://developers.google.com/identity/images/g-logo.png'

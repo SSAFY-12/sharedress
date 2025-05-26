@@ -1,4 +1,4 @@
-import GoogleAuthPage from './GoogleAuthPage';
+import GoogleAuthPage from '@/features/auth/pages/GoogleAuthPage';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 export const LoginPage = () => {

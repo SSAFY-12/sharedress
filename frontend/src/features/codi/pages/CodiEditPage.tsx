@@ -8,7 +8,7 @@ import { useCloset } from '@/features/closet/hooks/useCloset';
 import { toast } from 'react-toastify';
 import { ClosetResponse } from '@/features/closet/api/closetApi';
 import { useAuthStore } from '@/store/useAuthStore';
-import { CodiTutorialModal } from '../components/CodiTutorialModal';
+import { CodiTutorialModal } from '@/features/codi/components/CodiTutorialModal';
 
 // [코디 만들기/수정 페이지]
 // - 사용자가 옷을 조합해서 코디를 만듦

@@ -1,4 +1,4 @@
-import { imageUrlToBase64 } from './imageUrlToBase64';
+import { imageUrlToBase64 } from '@/features/codi/utils/imageUrlToBase64';
 
 export const replaceImageWithBase64 = async (container: HTMLElement) => {
 	const imgElements = container.querySelectorAll('img');

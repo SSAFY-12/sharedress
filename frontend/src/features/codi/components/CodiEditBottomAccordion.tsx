@@ -1,6 +1,6 @@
 import { ClothItem } from '@/components/cards/cloth-card/ClothCard.types';
 import { useEffect, useRef, useState } from 'react';
-import CodiCategoryTabs from './CodiCategoryTabs';
+import CodiCategoryTabs from '@/features/codi/components/CodiCategoryTabs';
 import { ClothListContainer } from '@/containers/ClothListContainer';
 
 interface Category {

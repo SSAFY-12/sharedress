@@ -9,8 +9,8 @@ import { categoryConfig } from '@/constants/categoryConfig';
 import SubTabNavigation from '@/features/closet/components/SubTabNavigation';
 import { useFriendProfile } from '@/features/closet/hooks/useFriendProfile';
 import UnifiedCodiTab from '@/features/closet/components/UnifiedCodiTab';
-import { GuestModal1 } from '../components/GuestModal1';
-import { GuestModal2 } from '../components/GuestModal2';
+import { GuestModal1 } from '@/features/closet/components/GuestModal1';
+import { GuestModal2 } from '@/features/closet/components/GuestModal2';
 
 const closetTab = ['옷장', '코디'];
 const CodiTabs = [

@@ -22,7 +22,7 @@ export const useScanCloth = () => {
 			console.log(response, 'ScanAPI 쏜 res');
 			if (variables.shopId === 1) {
 				setMusinsa({ isScan: true, taskId: content.taskId });
-			} else if (variables.shopId === 2) {
+			} else if (variables.shopId === 3) {
 				setCm29({ isScan: true, taskId: content.taskId });
 			}
 			toast.success(

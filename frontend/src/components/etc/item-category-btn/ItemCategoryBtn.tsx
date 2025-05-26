@@ -1,4 +1,4 @@
-import { ItemCategoryBtnProps } from './ItemCategoryBtn.types';
+import { ItemCategoryBtnProps } from '@/components/etc/item-category-btn/ItemCategoryBtn.types';
 
 export const ItemCategoryBtn = ({
 	text,

@@ -1,4 +1,4 @@
-import { PrimaryBtnProps } from './PrimaryBtn.types';
+import { PrimaryBtnProps } from '@/components/buttons/primary-button/PrimaryBtn.types';
 
 export const PrimaryBtn = ({
 	size,

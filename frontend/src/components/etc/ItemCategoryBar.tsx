@@ -1,4 +1,4 @@
-import { ItemCategoryBtn } from './item-category-btn';
+import { ItemCategoryBtn } from '@/components/etc/item-category-btn';
 
 interface ItemCategoryBarProps {
 	categories: string[];

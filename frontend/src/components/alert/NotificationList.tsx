@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import NotificationItem from './NotificationItem';
+import NotificationItem from '@/components/alert/NotificationItem';
 import {
 	UserPlus, // 친구 요청
 	UserCheck, // 친구 수락

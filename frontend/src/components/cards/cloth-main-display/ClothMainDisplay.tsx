@@ -1,5 +1,5 @@
 import { Camera } from 'lucide-react';
-import { ClothMainDisplayProps } from './ClothMainDisplay.types';
+import { ClothMainDisplayProps } from '@/components/cards/cloth-main-display/ClothMainDisplay.types';
 
 // 메인 옷 이미지, 수정 모드 시 오버레이 표시
 export const ClothMainDisplay = ({

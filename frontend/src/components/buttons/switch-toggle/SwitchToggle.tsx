@@ -1,4 +1,4 @@
-import { SwitchToggleProps } from './SwitchToggle.types';
+import { SwitchToggleProps } from '@/components/buttons/switch-toggle/SwitchToggle.types';
 
 export const SwitchToggle = ({
 	checked,

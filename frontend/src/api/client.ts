@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getErrorMessage } from './errorHandler';
+import { getErrorMessage } from '@/api/errorHandler';
 import { useAuthStore } from '@/store/useAuthStore';
 import { authApi } from '@/features/auth/api/authApi';
 

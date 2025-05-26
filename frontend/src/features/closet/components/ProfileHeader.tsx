@@ -4,7 +4,7 @@ import useUnreadNotification from '@/features/alert/hooks/useUnreadNotification'
 import { useAuthStore } from '@/store/useAuthStore';
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
 import { useNavigate } from 'react-router-dom';
-import GuestTooltip from './GuestTooltip';
+import GuestTooltip from '@/features/closet/components/GuestTooltip';
 
 interface ProfileHeaderProps {
 	profileImage?: string;

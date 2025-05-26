@@ -2,7 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { getTokenExpiration } from '@/features/auth/utils/tokenUtils';
 import { useNavigate, useLocation } from 'react-router-dom';
-import useRefresh from './useRefresh';
+import useRefresh from '@/features/auth/hooks/useRefresh';
 
 const TOKEN_EXPIRATION_BUFFER = 3 * 60 * 1000; // 3분 버퍼
 const INITIAL_CHECK_DELAY = 3000; // 초기 체크 지연 시간 (3초)

@@ -1,5 +1,5 @@
 import { useProfileStore } from '@/store/useProfileStore';
-import CommentItem from './CommentItem';
+import CommentItem from '@/features/closet/components/CommentItem';
 
 interface Comment {
 	id: number;

@@ -1,5 +1,5 @@
 import { getOptimizedImageUrl } from '@/utils/imageUtils';
-import { CommentItemProps } from './CommentItem.types';
+import { CommentItemProps } from '@/features/closet/components/CommentItem.types';
 import { formatDistanceToNow, parse } from 'date-fns';
 import { ko } from 'date-fns/locale';
 

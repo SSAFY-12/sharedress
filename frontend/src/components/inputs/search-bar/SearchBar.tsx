@@ -1,4 +1,4 @@
-import { SearchBarProps } from './SearchBar.types';
+import { SearchBarProps } from '@/components/inputs/search-bar/SearchBar.types';
 
 export const SearchBar = ({
 	placeholder,
