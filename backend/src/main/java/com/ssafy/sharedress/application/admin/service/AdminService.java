@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.application.admin.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,10 +63,12 @@ public class AdminService implements AdminUseCase {
 
 		for (Admin admin : admins) {
 			Clothes clothes = admin.getClothes();
-			boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
-				clothes.getId());
-			if (alreadyExists) {
-				log.info("이미 등록된 옷 스킵: clothesId={}, closetId={}", clothes.getId(), closet.getId());
+
+			Optional<ClosetClothes> existing = closetClothesRepository.findByClosetIdAndClothesId(
+				closet.getId(), clothes.getId());
+
+			if (existing.isPresent()) {
+				existing.get().updateImgUrl(clothes.getImageUrl());
 				continue;
 			}
 
@@ -77,11 +80,10 @@ public class AdminService implements AdminUseCase {
 
 		AiTask aiTask = aiTaskRepository.findById(taskId)
 			.orElseThrow(ExceptionUtil.exceptionSupplier(TaskErrorCode.TASK_NOT_FOUND));
-		aiTask.updateCompleted(); // true 로 업데이트
+		aiTask.updateCompleted();
 
 		adminRepository.deleteAllByTaskId(taskId);
 		log.info("Admin 테이블 정리 완료: 삭제 taskId={}", taskId);
-
 	}
 
 	@Override
@@ -103,6 +105,7 @@ public class AdminService implements AdminUseCase {
 		friendRepository.deleteAllByMemberId(memberId);
 	}
 
+	@SendNotification(NotificationType.AI_COMPLETE)
 	@Override
 	@Transactional
 	public void runDemoPhotoFlow(Long memberId) {
@@ -125,6 +128,7 @@ public class AdminService implements AdminUseCase {
 	}
 
 	@Override
+	@Transactional
 	public void updateFalsePrivacy(Long memberId) {
 		memberRepository.findById(memberId)
 			.ifPresent(member -> {

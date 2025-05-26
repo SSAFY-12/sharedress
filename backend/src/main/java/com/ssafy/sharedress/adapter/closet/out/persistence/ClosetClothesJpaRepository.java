@@ -1,6 +1,7 @@
 package com.ssafy.sharedress.adapter.closet.out.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,4 +38,14 @@ public interface ClosetClothesJpaRepository extends JpaRepository<ClosetClothes,
 	List<ClosetClothes> findAllByMemberId(@Param("memberId") Long memberId);
 
 	void deleteAllByCloset_Id(Long closetId);
+
+	@Query("""
+			SELECT cc
+			FROM ClosetClothes cc
+			WHERE cc.closet.id = :closetId AND cc.clothes.id = :clothesId
+		""")
+	Optional<ClosetClothes> findByClosetIdAndClothesId(
+		@Param("closetId") Long closetId,
+		@Param("clothesId") Long clothesId
+	);
 }

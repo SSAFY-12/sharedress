@@ -200,7 +200,6 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 				7956L,
 				8554L,
 				9716L,
-				10006L,
 				10130L,
 				10235L,
 				10338L,
@@ -277,8 +276,20 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			clothesIds.forEach(id -> {
 				clothesRepository.findById(id)
 					.ifPresent(clothes -> {
-						Admin admin = new Admin(member, taskId, clothes);
-						adminRepository.save(admin);
+						boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
+							id);
+						if (alreadyExists) {
+							log.info("시연용 중복 옷 스킵: clothesId={}, closetId={}", id, closet.getId());
+							return;
+						}
+
+						// 옷장에 등록
+						ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
+						closetClothesRepository.save(closetClothes);
+						log.info("시연용 옷장 등록 완료: clothesId={}, closetId={}", id, closet.getId());
+
+						// Admin 테이블에도 기록
+						adminRepository.save(new Admin(member, taskId, clothes));
 					});
 			});
 			return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());

@@ -181,4 +181,9 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 	public void delete(ClosetClothes closetClothes) {
 		closetClothesJpaRepository.delete(closetClothes);
 	}
+
+	@Override
+	public Optional<ClosetClothes> findByClosetIdAndClothesId(Long closetId, Long clothesId) {
+		return closetClothesJpaRepository.findByClosetIdAndClothesId(closetId, clothesId);
+	}
 }

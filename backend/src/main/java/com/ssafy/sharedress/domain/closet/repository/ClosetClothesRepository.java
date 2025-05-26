@@ -38,4 +38,6 @@ public interface ClosetClothesRepository {
 	void deleteAllByCloset_Id(Long closetId);
 
 	void delete(ClosetClothes closetClothes);
+
+	Optional<ClosetClothes> findByClosetIdAndClothesId(Long closetId, Long clothesId);
 }
