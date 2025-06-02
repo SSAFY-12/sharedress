@@ -3,7 +3,9 @@ package com.ssafy.sharedress.adapter.friend.out.persistence;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.ssafy.sharedress.domain.friend.entity.Friend;
 
@@ -27,4 +29,9 @@ public interface FriendJpaRepository extends JpaRepository<Friend, Long> {
 		+ "OR (f.memberB.id = :memberId AND a.nickname LIKE %:keyword%) "
 		+ "ORDER BY f.id DESC")
 	List<Friend> findByKeyword(Long memberId, String keyword);
+
+	@Modifying
+	@Query("DELETE FROM Friend f "
+		+ "WHERE f.memberA.id = :memberId or f.memberB.id = :memberId")
+	void deleteAllByMemberId(@Param("memberId") Long memberId);
 }

@@ -34,4 +34,10 @@ public interface ClosetClothesRepository {
 	List<ClosetClothes> findAllByMemberId(Long myId);
 
 	List<ClosetClothes> findAllByIds(List<Long> closetClothesIds);
+
+	void deleteAllByCloset_Id(Long closetId);
+
+	void delete(ClosetClothes closetClothes);
+
+	Optional<ClosetClothes> findByClosetIdAndClothesId(Long closetId, Long clothesId);
 }

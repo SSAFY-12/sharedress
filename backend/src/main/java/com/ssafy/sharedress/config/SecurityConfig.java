@@ -45,6 +45,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/clothes/ai-complete").permitAll()
 				.requestMatchers("/api/photo/ai-complete").permitAll()
 				.requestMatchers("/api/html2canvas/proxy").permitAll()
+				.requestMatchers("/api/admin/**").permitAll()
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

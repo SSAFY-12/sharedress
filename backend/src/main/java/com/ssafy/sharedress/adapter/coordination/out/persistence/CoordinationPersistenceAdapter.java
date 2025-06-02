@@ -178,4 +178,9 @@ public class CoordinationPersistenceAdapter implements CoordinationRepository {
 			.distinct()
 			.fetch();
 	}
+
+	@Override
+	public void delete(Coordination coordination) {
+		coordinationJpaRepository.delete(coordination);
+	}
 }

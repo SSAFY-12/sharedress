@@ -21,6 +21,10 @@ import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailRequest;
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoDetailResponse;
 import com.ssafy.sharedress.application.clothes.dto.ClothesPhotoUploadResponse;
 import com.ssafy.sharedress.application.clothes.dto.PurchaseHistoryRequest;
+import com.ssafy.sharedress.domain.admin.entity.Admin;
+import com.ssafy.sharedress.domain.admin.entity.AdminPhoto;
+import com.ssafy.sharedress.domain.admin.repository.AdminPhotoRepository;
+import com.ssafy.sharedress.domain.admin.repository.AdminRepository;
 import com.ssafy.sharedress.domain.ai.entity.AiTask;
 import com.ssafy.sharedress.domain.ai.entity.TaskType;
 import com.ssafy.sharedress.domain.ai.repository.AiTaskRepository;
@@ -76,6 +80,8 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 	private final ShoppingMallRepository shoppingMallRepository;
 	private final AiTaskRepository aiTaskRepository;
 	private final PhotoUploadLogRepository photoUploadLogRepository;
+	private final AdminRepository adminRepository;
+	private final AdminPhotoRepository adminPhotoRepository;
 
 	private final SqsMessageSender sqsMessageSender;
 	private final ImageStoragePort imageStoragePort;
@@ -167,6 +173,127 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 		AiTask aiTask = new AiTask(taskId, false, member, shoppingMall, TaskType.PURCHASE_HISTORY);
 
 		List<AiProcessMessagePurchaseRequest.ItemInfo> itemsToProcess = new ArrayList<>();
+
+		// TODO[지윤]: 시연시나리오용 memberId==146 에 대한 분기처리
+		// 구매내역을 가지고 요청한 146 은 aiTask 생성, admin 생성 후 return
+		if (memberId == 140L) {
+			List<Long> clothesIds = List.of(
+				// 시연용 옷 ID 목록
+				1732L,
+				2520L,
+				2920L,
+				3077L,
+				3458L,
+				3643L,
+				4095L,
+				4635L,
+				5665L,
+				5954L,
+				6034L,
+				7098L,
+				7153L,
+				7335L,
+				7504L,
+				7794L,
+				7814L,
+				7927L,
+				7956L,
+				8554L,
+				9716L,
+				10130L,
+				10235L,
+				10338L,
+				10519L,
+				10752L,
+				10767L,
+				10863L,
+				10888L,
+				10937L,
+				11513L,
+				12222L,
+				12280L,
+				13237L,
+				13364L,
+				13441L,
+				13724L,
+				50021L,
+				50026L,
+				50039L,
+				50095L,
+				50100L,
+				50117L,
+				50145L,
+				50163L,
+				50172L,
+				50377L,
+				50380L,
+				50575L,
+				50852L,
+				51018L,
+				51831L,
+				51965L,
+				52300L,
+				54740L,
+				54814L,
+				54938L,
+				55116L,
+				55969L,
+				55979L,
+				55996L,
+				56068L,
+				56070L,
+				56495L,
+				56534L,
+				56749L,
+				56758L,
+				57039L,
+				57846L,
+				57980L,
+				58145L,
+				58203L,
+				58590L,
+				58623L,
+				58643L,
+				58672L,
+				58804L,
+				58832L,
+				58874L,
+				58879L,
+				59287L,
+				59300L,
+				59323L,
+				59326L,
+				59344L,
+				59361L,
+				59366L,
+				59380L,
+				59389L,
+				59392L,
+				59396L,
+				59404L
+			);
+
+			clothesIds.forEach(id -> {
+				clothesRepository.findById(id)
+					.ifPresent(clothes -> {
+						boolean alreadyExists = closetClothesRepository.existsByClosetIdAndClothesId(closet.getId(),
+							id);
+						if (alreadyExists) {
+							log.info("시연용 중복 옷 스킵: clothesId={}, closetId={}", id, closet.getId());
+							return;
+						}
+
+						// 옷장에 등록
+						ClosetClothes closetClothes = new ClosetClothes(closet, clothes);
+						closetClothesRepository.save(closetClothes);
+						log.info("시연용 옷장 등록 완료: clothesId={}, closetId={}", id, closet.getId());
+
+						// Admin 테이블에도 기록
+						adminRepository.save(new Admin(member, taskId, clothes));
+					});
+			});
+			return AiTaskResponse.from(aiTaskRepository.save(aiTask), request.shopId());
+		}
 
 		request.items()
 			.stream()
@@ -282,6 +409,16 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 
 			ClosetClothes closetClothes = closetClothesRepository.save(new ClosetClothes(closet, clothes));
 
+			// For test
+			if (memberId == 140L) {
+				adminPhotoRepository.save(
+					new AdminPhoto(
+						memberRepository.getReferenceById(memberId),
+						null,
+						closetClothes
+					));
+			}
+
 			result.add(ClothesPhotoUploadResponse.from(closetClothes, url));
 		}
 		return result;
@@ -305,6 +442,38 @@ public class ClosetClothesService implements ClosetClothesUseCase {
 			shoppingMallRepository.getReferenceById(-1L),
 			TaskType.PHOTO
 		);
+
+		// for test
+		if (memberId == 140L) {
+			List<AdminPhoto> adminPhotos = adminPhotoRepository.findAllByMemberId(memberId);
+			adminPhotos.forEach(adminPhoto -> adminPhoto.updateTaskId(taskId));
+
+			for (int i = 0; i < request.size(); i++) {
+				AdminPhoto adminPhoto = adminPhotos.get(i);
+				ClosetClothes closetClothes = adminPhoto.getClosetClothes();
+				ClothesPhotoDetailRequest req = request.get(i);
+
+				closetClothes.updateCustomBrand(
+					brandRepository.findById(req.brandId())
+						.orElseThrow(ExceptionUtil.exceptionSupplier(BrandErrorCode.BRAND_NOT_FOUND))
+				);
+				closetClothes.updateCustomCategory(
+					categoryRepository.findById(req.categoryId())
+						.orElseThrow(ExceptionUtil.exceptionSupplier(CategoryErrorCode.CATEGORY_NOT_FOUND))
+				);
+				closetClothes.updateCustomColor(
+					colorRepository.findById(req.colorId())
+						.orElseThrow(ExceptionUtil.exceptionSupplier(ColorErrorCode.COLOR_NOT_FOUND))
+				);
+				closetClothes.updateCustomName(req.name());
+				closetClothes.updateIsPublic(req.isPublic());
+
+				// TODO: log 필요하면 추가할 것
+			}
+			return ClothesPhotoDetailResponse.from(
+				aiTaskRepository.save(aiTask)
+			);
+		}
 
 		List<AiProcessMessagePhotoRequest.ItemInfo> itemsToProcess = new ArrayList<>();
 

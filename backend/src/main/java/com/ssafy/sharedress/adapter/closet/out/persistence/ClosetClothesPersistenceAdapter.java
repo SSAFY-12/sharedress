@@ -171,4 +171,19 @@ public class ClosetClothesPersistenceAdapter implements ClosetClothesRepository 
 			.where(condition)
 			.fetch();
 	}
+
+	@Override
+	public void deleteAllByCloset_Id(Long closetId) {
+		closetClothesJpaRepository.deleteAllByCloset_Id(closetId);
+	}
+
+	@Override
+	public void delete(ClosetClothes closetClothes) {
+		closetClothesJpaRepository.delete(closetClothes);
+	}
+
+	@Override
+	public Optional<ClosetClothes> findByClosetIdAndClothesId(Long closetId, Long clothesId) {
+		return closetClothesJpaRepository.findByClosetIdAndClothesId(closetId, clothesId);
+	}
 }

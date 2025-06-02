@@ -33,4 +33,9 @@ public class FriendPersistenceAdapter implements FriendRepository {
 	public List<Friend> findByKeyword(Long memberId, String keyword) {
 		return friendJpaRepository.findByKeyword(memberId, keyword);
 	}
+
+	@Override
+	public void deleteAllByMemberId(Long memberId) {
+		friendJpaRepository.deleteAllByMemberId(memberId);
+	}
 }
