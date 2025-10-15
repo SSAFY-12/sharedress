@@ -1,6 +1,7 @@
 # 🧥 [SHAREDRESS](https://sharedress.co.kr/)
-![스크린샷_2025-05-22_140158](/uploads/068ff19e3dac8e3266ede9861a3dad18/스크린샷_2025-05-22_140158.png)
-> **나의 옷을 쉽게 등록하고, 친구와 함께 패션을 공유하는 서비스**
+<img width="181" height="344" alt="Image" src="https://github.com/user-attachments/assets/bf722161-7234-46cb-942f-8eaae251d07d" /> <img width="181" height="344" alt="Image" src="https://github.com/user-attachments/assets/6fab5c48-14d1-4494-add2-6060fa3f166b" /> <img width="181" height="344" alt="Image" src="https://github.com/user-attachments/assets/ea3a4d77-9fd0-4991-9d3e-845739836a99" />
+
+
 ---
 
 ## 📌 서비스 소개
@@ -17,9 +18,6 @@ SHAREDRESS는 사용자가 직접 보유한 옷을 디지털 옷장에 등록하
   친구에게 코디를 추천하거나, 외부 링크로 비회원에게도 코디를 요청할 수 있습니다.
 
 ---
-## 🎥 시연
-
-전체 시연 영상 준비 중
 
 ## 🛠 기술 스택
 
@@ -45,32 +43,96 @@ SHAREDRESS는 사용자가 직접 보유한 옷을 디지털 옷장에 등록하
 
 ## 🚀 프로젝트 구조
 
-### Frontend
-...
-
 ### Backend
-...
+```bash
+src/
+└─ main/
+   ├─ java/
+   │  └─ com/ssafy/sharedress/
+   │     ├─ adapter/                 # 프레젠테이션/어댑터 레이어 (웹 API 진입점)
+   │     │  ├─ ai/in/
+   │     │  ├─ auth/in/
+   │     │  ├─ brand/in/
+   │     │  ├─ category/in/
+   │     │  ├─ closet/in/
+   │     │  ├─ clothes/in/
+   │     │  ├─ color/in/
+   │     │  ├─ coordination/in/
+   │     │  ├─ friend/in/
+   │     │  ├─ handler/              # 글로벌 예외 핸들러
+   │     │  ├─ member/in/
+   │     │  ├─ notification/in/
+   │     │  ├─ s3/                   # S3 어댑터
+   │     │  └─ shoppingmall/in/
+   │     │
+   │     ├─ application/             # 애플리케이션 레이어 (유스케이스, 서비스, DTO, AOP)
+   │     │  ├─ ai/{dto,service,usecase}
+   │     │  ├─ aop/                  # 알림 전송 등 횡단 관심사
+   │     │  ├─ auth/{dto,handler,service,usecase}
+   │     │  ├─ brand/{dto,service,usecase}
+   │     │  ├─ category/{dto,service,usecase}
+   │     │  ├─ closet/{dto,service,usecase}
+   │     │  ├─ clothes/{dto,service,usecase}
+   │     │  ├─ color/{dto,service,usecase}
+   │     │  ├─ coordination/{dto,service,usecase}
+   │     │  ├─ friend/{dto,service,usecase}
+   │     │  ├─ guest/{annotation,dto,filter,resolver,service,usecase}
+   │     │  ├─ jwt/                   # JWT 필터/토큰/리프레시토큰 등
+   │     │  ├─ member/{annotation,dto,resolver,service,usecase}
+   │     │  ├─ notification/{dto,service,usecase}
+   │     │  └─ shoppingmall/{dto,service,usecase}
+   │     │
+   │     ├─ config/                  # 스프링/인프라 설정
+   │     │  # Async, Firebase, JPA, AOP Log, OpenFeign, QueryDSL, S3, Security, SQS, WebMvc 등
+   │     │
+   │     ├─ domain/                  # 도메인 레이어 (엔티티/리포지토리/에러/포트)
+   │     │  ├─ ai/{entity,error,repository}
+   │     │  ├─ brand/{entity,error,repository}
+   │     │  ├─ category/{entity,error,repository}
+   │     │  ├─ closet/{entity,error,repository}
+   │     │  ├─ clothes/{entity,error,repository}
+   │     │  ├─ clothesuploadhistory/{entity}
+   │     │  ├─ color/{entity,error,repository}
+   │     │  ├─ common/
+   │     │  │  ├─ context/           # 유저 컨텍스트 등
+   │     │  │  ├─ entity/            # 공통 베이스 엔티티
+   │     │  │  └─ port/              # 외부 시스템 포트 (예: ImageStoragePort)
+   │     │  ├─ coordination/{entity,error,repository}
+   │     │  ├─ friend/{entity,error,repository}
+   │     │  ├─ guest/{entity,error,repository}
+   │     │  ├─ member/{entity,error,repository}
+   │     │  ├─ notification/{entity,error,port,repository}
+   │     │  └─ shoppingmall/{entity,error,repository}
+   │     │
+   │     └─ global/                  # 전역 공통 유틸/예외/응답 DTO
+   │        ├─ dto/
+   │        ├─ exception/
+   │        ├─ response/
+   │        └─ util/
+   │
+   └─ resources/
+      └─ application.yaml            # 환경 설정 (프로파일별 분리 가능)
+```
 
-### AI
-...
+
 
 ---
 
 ## 시스템 아키텍처
-...
+<img width="1170" height="511" alt="Image" src="https://github.com/user-attachments/assets/3ef949ec-d227-4209-bd74-c0584ed8adb6" />
 
 ---
 
 ## 팀원
 | 김현래 | 박예승 | 안주민 |
 |--------|--------|--------|
-| <img src="https://avatars.githubusercontent.com/u/00000001" width="120"/> | <img src="https://avatars.githubusercontent.com/u/00000002" width="120"/> | <img src="https://avatars.githubusercontent.com/u/00000003" width="120"/> |
-| [@gusto917](https://lab.ssafy.com/gusto917) | [@yspark8538](https://lab.ssafy.com/yspark8538) | [@jumin9774](https://lab.ssafy.com/jumin9774) |
+| <img src="https://avatars.githubusercontent.com/u/189121986?v=4" width="120"/> | <img src="https://avatars.githubusercontent.com/u/175369181?v=4" width="120"/> | <img src="https://avatars.githubusercontent.com/u/140716804?v=4" width="120"/> |
+| [@hyeon-ztl](https://github.com/hyeon-ztl) | [@Yeseung-Park](https://github.com/Yeseung-Park) | [@JUMINAHN](https://github.com/JUMINAHN) |
 | FE | FE | FE |
 
 | 이준호 | 김지윤 | 이시우 |
 |--------|--------|--------|
-| <img src="https://avatars.githubusercontent.com/u/00000001" width="120"/> | <img src="https://avatars.githubusercontent.com/u/00000002" width="120"/> | <img src="https://avatars.githubusercontent.com/u/00000003" width="120"/> |
-| [@777joonho](https://lab.ssafy.com/777joonho) | [@jiyun0218](https://lab.ssafy.com/jiyun0218) | [@siwoo4442](https://lab.ssafy.com/siwoo4442) |
+| <img src="https://avatars.githubusercontent.com/u/39540595?v=4" width="120"/> | <img src="https://avatars.githubusercontent.com/u/80970422?v=4" width="120"/> | <img src="[https://avatars.githubusercontent.com/u/00000003](https://avatars.githubusercontent.com/u/194054627?v=4)" width="120"/> |
+| [@leejh7](https://github/leejh7) | [@ziy00n](https://github.com/ziy00n) | [@LEE-SIU](https://github.com/LEE-SIU) |
 | BE | BE | AI |
 
